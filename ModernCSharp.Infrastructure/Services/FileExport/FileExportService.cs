@@ -1,25 +1,22 @@
 using Microsoft.Extensions.Logging;
+
+using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Models.Errors;
 using ModernCSharp.ApplicationCore.Models.FileExport;
 using ModernCSharp.ApplicationCore.Utils;
 
-namespace ModernCSharp.ApplicationCore.Services.FileExport;
+namespace ModernCSharp.Infrastructure.Services.FileExport;
 
-public interface IFileExportService
+public class FileExportService<T>(
+    IFileExportStrategyFactory<T> strategyFactory,
+    ILogger<FileExportService<T>> logger) : IFileExportService<T>
 {
-    Task<IResult> ExportAsync(IFileExportContext context);
-}
-
-public class FileExportService(
-    IFileExportStrategyFactory strategyFactory,
-    ILogger<FileExportService> logger) : IFileExportService
-{
-    public async Task<IResult> ExportAsync(IFileExportContext context)
+    public async Task<IResult> ExportAsync(IFileExportContext<T> context, CancellationToken cancellationToken = default)
     {
         try
         {
-            if (!FileIoUtils.ValidateExportContext<IFileExportContext>(context))
+            if (!FileIoUtils.ValidateExportContext<IFileExportContext<T>, T>(context))
             {
                 logger.LogWarning("Invalid import context provided.");
                 return Result.Failure(FileExportErrors.InvalidContext);

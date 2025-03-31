@@ -4,20 +4,19 @@ using CsvHelper;
 
 using Microsoft.Extensions.Logging;
 
-using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.ApplicationCore.Services.FileExport.Commands;
+using ModernCSharp.Infrastructure.Services.FileExport.Commands;
 
-namespace ModernCSharp.ApplicationCore.Services.FileExport.Handlers;
+namespace ModernCSharp.Infrastructure.Services.FileExport.Handlers;
 
-public class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger, OrderService orderService) : IFileExportStrategy
+public class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : IFileExportStrategy<Order>
 {
-    private OrderCsvExportContext _context;
+    private OrderCsvExportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderCsv];
 
-    public void InitializeContext(IFileExportContext context)
+    public void InitializeContext(IFileExportContext<Order> context)
     {
         if (context is OrderCsvExportContext exportContext)
         {
@@ -34,35 +33,33 @@ public class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger, Orde
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await PerformExportAsync(_context, cancellationToken);
+            await PerformExportAsync(cancellationToken);
             return Result.Success();
         }
         catch (OperationCanceledException)
         {
-            logger.LogError("Export {FileType} operation  was cancelled.", _context.FileType);
+            logger.LogError("Export {FileType} operation  was cancelled.", _context!.FileType);
             return Result.Failure(new("", $"Export {_context.FileType} operation  was cancelled."));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while exporting orders to {@OutputPath}.", _context.OutputPath);
+            logger.LogError(ex, "An error occurred while exporting orders to {@OutputPath}.", _context!.OutputPath);
             return Result.Failure(new("", $"An error occurred while exporting orders to {_context.OutputPath}."));
         }
     }
 
-    private async Task PerformExportAsync(OrderCsvExportContext context, CancellationToken cancellationToken = default)
+    private async Task PerformExportAsync(CancellationToken cancellationToken = default)
     {
-        var orders = await orderService.GetOrdersAsync(cancellationToken);
-
-        if (orders.Count == 0)
+        if (_context!.DataToExport.Count == 0)
         {
             logger.LogInformation("No order to export.");
             return;
         }
 
-        await using var stream = new FileStream(context.OutputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+        await using var stream = new FileStream(_context.OutputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
         await using var writer = new StreamWriter(stream);
         await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-        await csv.WriteRecordsAsync(orders, cancellationToken);
+        await csv.WriteRecordsAsync(_context.DataToExport, cancellationToken);
     }
 }

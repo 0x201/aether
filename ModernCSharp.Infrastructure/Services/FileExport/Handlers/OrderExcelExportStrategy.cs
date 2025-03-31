@@ -2,20 +2,19 @@
 
 using Microsoft.Extensions.Logging;
 
-using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.ApplicationCore.Services.FileExport.Commands;
+using ModernCSharp.Infrastructure.Services.FileExport.Commands;
 
-namespace ModernCSharp.ApplicationCore.Services.FileExport.Handlers;
+namespace ModernCSharp.Infrastructure.Services.FileExport.Handlers;
 
-public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger, OrderService orderService) : IFileExportStrategy
+public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) : IFileExportStrategy<Order>
 {
-    private OrderExcelExportContext _context;
+    private OrderExcelExportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderExcel];
 
-    public void InitializeContext(IFileExportContext context)
+    public void InitializeContext(IFileExportContext<Order> context)
     {
         if (context is OrderExcelExportContext exportContext)
         {
@@ -32,28 +31,27 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger, 
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await PerformExportAsync(_context, cancellationToken);
+            await PerformExportAsync(cancellationToken);
             return Result.Success();
         }
         catch (OperationCanceledException)
         {
-            logger.LogError("Export {FileType} operation  was cancelled.", _context.FileType);
+            logger.LogError("Export {FileType} operation  was cancelled.", _context!.FileType);
             return Result.Failure(new("", $"Export {_context.FileType} operation  was cancelled."));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while exporting orders to {@OutputPath}.", _context.OutputPath);
+            logger.LogError(ex, "An error occurred while exporting orders to {@OutputPath}.", _context!.OutputPath);
             return Result.Failure(new("", $"An error occurred while exporting orders to {_context.OutputPath}."));
         }
     }
-    private async Task PerformExportAsync(OrderExcelExportContext context, CancellationToken cancellationToken = default)
+    private Task PerformExportAsync(CancellationToken cancellationToken = default)
     {
-        var orders = await orderService.GetOrdersAsync(cancellationToken);
-
-        if (orders.Count == 0)
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_context!.DataToExport.Count == 0)
         {
             logger.LogInformation("No order to export.");
-            return;
+            return Task.CompletedTask;
         }
 
         using var wb = new XLWorkbook();
@@ -70,7 +68,7 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger, 
         }
 
         var contentRowIndex = 2;
-        foreach (var order in orders)
+        foreach (var order in _context.DataToExport)
         {
             var currentRow = ws.Row(contentRowIndex);
             currentRow.Cell("A").SetValue(order.Id);
@@ -82,5 +80,7 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger, 
         }
 
         wb.SaveAs(_context.OutputPath);
+
+        return Task.CompletedTask;
     }
 }

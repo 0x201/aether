@@ -8,15 +8,16 @@ public static class FileIoUtils
 {
     public static bool ValidatePath(string path) => !path.Contains("..") && Path.IsPathRooted(path) && File.Exists(path);
 
-    public static bool ValidateExportContext<TContext>(IFileExportContext exportContext)
-        where TContext : IFileExportContext
+    public static bool ValidateExportContext<TContext, T>(IFileExportContext<T> exportContext)
+        where TContext : class, IFileExportContext<T>
     {
-        if (exportContext is TContext context)
+        if (exportContext is not TContext context)
         {
-            return !string.IsNullOrEmpty(context.OutputPath);
+            return false;
         }
-        return false;
+        return !string.IsNullOrEmpty(context.OutputPath) && context.DataToExport.Count != 0;
     }
+
     public static bool ValidateImportContext<TContext>(IFileImportContext importContext) 
         where TContext : IFileImportContext
     {

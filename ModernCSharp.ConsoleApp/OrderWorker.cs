@@ -1,20 +1,20 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.ApplicationCore.Services.FileExport;
-using ModernCSharp.ApplicationCore.Services.FileExtraction;
+using ModernCSharp.Infrastructure.Services;
 
 namespace ModernCSharp.ConsoleApp;
 
 public class OrderWorker(ILogger<OrderWorker> logger
-    , IFileExportService fileExportService
-    , OrderService orderService
-    , IFileImportService<Order> fileImportService) : BackgroundService
+    , IFileExportService<Order> fileExportService
+    , IFileImportService<Order> fileImportService
+    , ExportContextFactory<Order> exportContextFactory
+    , ImportContextFactory importContextFactory
+    , OrderService orderService) : BackgroundService
 {
     private int _exitCode = 0;
 
@@ -48,18 +48,20 @@ public class OrderWorker(ILogger<OrderWorker> logger
 
     private async Task<bool> ExportAsync(CancellationToken cancellationToken = default)
     {
-        List<(FileType Type, string Path)> exportTasks = [
-            (FileType.OrderCsv, "D:\\orders.csv"),
-            (FileType.OrderJson, "D:\\orders.json"),
-            (FileType.OrderExcel, "D:\\orders.xlsx")
+        var ordersToExport = await orderService.GetOrdersAsync(cancellationToken);
+
+        List<(FileType Type, string Path, List<Order> OrdersToExport)> exportTasks = [
+            (FileType.OrderCsv, "D:\\orders.csv", ordersToExport),
+            (FileType.OrderJson, "D:\\orders.json", ordersToExport),
+            (FileType.OrderExcel, "D:\\orders.xlsx", ordersToExport)
         ];
         IResult result = null;
         cancellationToken.ThrowIfCancellationRequested();
-        foreach (var (fileType, filePath) in exportTasks)
+        foreach (var (fileType, filePath, orders) in exportTasks)
         {
-            var exportContext = FileExportContext.Create(fileType, filePath);
+            var exportContext = exportContextFactory.CreateContext(fileType, filePath, orders);
 
-            result = await fileExportService.ExportAsync(exportContext);
+            result = await fileExportService.ExportAsync(exportContext, cancellationToken);
 
             if (result.IsFailure)
             {
@@ -92,13 +94,13 @@ public class OrderWorker(ILogger<OrderWorker> logger
 
         foreach (var (fileType, filePath) in importTasks)
         {
-            var importContext = FileImportContext.Create(fileType, filePath);
+            var importContext = importContextFactory.CreateContext(fileType, filePath);
 
-            result = await fileImportService.ImportAsync(importContext);
+            result = await fileImportService.ImportAsync(importContext, cancellationToken);
 
             if (result.IsFailure)
             {
-                logger.LogError("Failed to import {FileType} file at {FilePath}: {@Error}",
+                logger.LogError("Failed to import {FileType} file from {FilePath}: {@Error}",
                     fileType, filePath, result.Error);
                 break;
             }

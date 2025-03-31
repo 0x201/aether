@@ -7,9 +7,7 @@
   </Configurations>
   <Project Path="ModernCSharp.ApplicationCore/ModernCSharp.ApplicationCore.csproj" />
   <Project Path="ModernCSharp.ConsoleApp/ModernCSharp.ConsoleApp.csproj" />
-  <Project Path="ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj" />
-  <Project Path="ModernCSharp.WPFApp.Core/ModernCSharp.WPFApp.Core.csproj" />
-  <Project Path="ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj" />
+  <Project Path="ModernCSharp.Infrastructure/ModernCSharp.Infrastructure.csproj" Id="a571ea02-90ee-485c-a8b6-0db80c4dc45c" />
   <Project Path="ModernCSharp.WinFormsApp/ModernCSharp.WinFormsApp.csproj" />
   <Project Path="ModernCSharp.WinUIApp.Core/ModernCSharp.WinUIApp.Core.csproj">
     <Platform Solution="*|arm64" Project="arm64" />
@@ -29,4 +27,7 @@
     <Platform Solution="*|x86" Project="x86" />
     <Deploy />
   </Project>
+  <Project Path="ModernCSharp.WPFApp.Core/ModernCSharp.WPFApp.Core.csproj" />
+  <Project Path="ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj" />
+  <Project Path="ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj" />
 </Solution>

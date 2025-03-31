@@ -2,7 +2,7 @@
 
 namespace ModernCSharp.ApplicationCore.Models.FileExport;
 
-public interface IFileExportContext
+public interface IFileExportContext<T>
 {
     string OutputPath
     {
@@ -13,4 +13,6 @@ public interface IFileExportContext
     {
         get; set;
     }
+
+    List<T> DataToExport { get; }
 }

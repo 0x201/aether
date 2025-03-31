@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ModernCSharp.ApplicationCore;
+using ModernCSharp.Infrastructure;
 using ModernCSharp.ApplicationCore.Services;
 using ModernCSharp.ConsoleApp;
 
@@ -9,6 +9,7 @@ using ModernCSharp.ConsoleApp;
 var hostBuilder = Host.CreateApplicationBuilder();
 
 hostBuilder.Services.AddSingleton<OrderService>();
+hostBuilder.Services.AddFileContexts();
 hostBuilder.Services.AddFileImporters();
 hostBuilder.Services.AddFileExporters();
 
