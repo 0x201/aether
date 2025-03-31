@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.WinUIApp.ViewModels;
 
 using Windows.Storage.Pickers;
@@ -32,15 +33,19 @@ public sealed partial class BlankPage : Page
         var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
         WinRT.Interop.InitializeWithWindow.Initialize(orderFilePicker, hWnd);
 
-        orderFilePicker.FileTypeFilter.Add(".csv");
-        orderFilePicker.FileTypeFilter.Add(".json");
-        orderFilePicker.FileTypeFilter.Add(".xlsx");
+        var fileExtension = MapFileType(ViewModel.SelectedFileType);
+        orderFilePicker.FileTypeFilter.Add(fileExtension);
+
+        //orderFilePicker.FileTypeFilter.Add(".csv");
+        //orderFilePicker.FileTypeFilter.Add(".json");
+        //orderFilePicker.FileTypeFilter.Add(".xlsx");
 
         var selectedOrderFile = await orderFilePicker.PickSingleFileAsync();
 
-        if (selectedOrderFile != null)
+        if (selectedOrderFile is not null)
         {
             OrderFilePathTextBlock.Text = $"Order file path: {selectedOrderFile.Name}";
+            ViewModel.FilePath = selectedOrderFile.Path;
         }
         else
         {
@@ -48,12 +53,14 @@ public sealed partial class BlankPage : Page
         }
     }
 
-    private async void StartButton_Click(object sender, RoutedEventArgs e)
+    private string MapFileType(FileType fileType)
     {
-        await foreach (var progress in ViewModel.ReportProgress())
+        return fileType switch
         {
-            FetchDataProgressBar.Value = progress;
-            FetchDataProgressRing.Value = progress;
-        }
+            FileType.OrderJson => ".json",
+            FileType.OrderCsv => ".csv",
+            FileType.OrderExcel => ".xlsx",
+            _ => throw new NotSupportedException("Unsupported file type")
+        };
     }
 }

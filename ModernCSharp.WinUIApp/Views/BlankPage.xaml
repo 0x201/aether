@@ -13,31 +13,60 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="OpenOrderFileButton"
-                Grid.Row="0"
-                Click="OpenOrderFileButton_Click">
-            Open
-        </Button>
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal">
-            <TextBlock x:Name="OrderFilePathTextBlock"
-                       TextWrapping="Wrap" 
-                       Padding="20,5,0,0"></TextBlock>
+        <StackPanel
+            Grid.Row="0">
+            <TextBlock Text="Select file type:" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <RadioButtons
+                Header="Order File Options">
+                <RadioButton
+                    Content="Json Order"
+                    GroupName="FileTypeGroup"
+                    IsChecked="{x:Bind ViewModel.SelectedFileType, Mode=TwoWay, Converter={StaticResource FileTypeConverter}, ConverterParameter=OrderJSON}"/>
+                <RadioButton Content="Csv Order"
+                    GroupName="FileTypeGroup"
+                    IsChecked="{x:Bind ViewModel.SelectedFileType, Mode=TwoWay, Converter={StaticResource FileTypeConverter}, ConverterParameter=OrderCSV}"/>
+                <RadioButton
+                    Content="Excel Order"
+                    GroupName="FileTypeGroup"
+                    IsChecked="{x:Bind ViewModel.SelectedFileType, Mode=TwoWay, Converter={StaticResource FileTypeConverter}, ConverterParameter=OrderEXCEL}"/>
+            </RadioButtons>
         </StackPanel>
 
-        <StackPanel Grid.Row="2">
-            <ProgressBar x:Name="FetchDataProgressBar" 
-                     Width="100" 
-                     Height="100" 
-                     Minimum="0" 
-                     Maximum="100"/>
-            <ProgressRing x:Name="FetchDataProgressRing" 
-                      Width="100"
-                      Height="100" 
-                      Minimum="0" 
-                      Maximum="100"
-                      IsIndeterminate="False"/>
-            <Button x:Name="StartButton" Click="StartButton_Click">Start</Button>
+        <Button 
+            x:Name="OpenOrderFileButton"
+            Grid.Row="1"
+            Click="OpenOrderFileButton_Click">
+            Open
+        </Button>
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal">
+            <TextBlock
+                x:Name="OrderFilePathTextBlock"
+                TextWrapping="Wrap" 
+                Padding="20,5,0,0"/>
+            <ProgressBar
+                Width="100"
+                Height="100"
+                Minimum="0"
+                Maximum="100"
+                Value="{x:Bind ViewModel.CurrentProgress, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.ProgressBarVisibility, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+            <ProgressRing
+                Width="100"
+                Height="100"
+                Minimum="0"
+                Maximum="100"
+                IsIndeterminate="False"
+                Value="{x:Bind ViewModel.CurrentProgress, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.ProgressBarVisibility, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+            <Button
+                Content="Start import"
+                Command="{x:Bind ViewModel.ImportCommand}"/>
+            <TextBlock
+                x:Name="ImportResultTextBlock" 
+                Height="50"
+                Text="{x:Bind ViewModel.ImportResult, Mode=OneWay}"/>
         </StackPanel>
 
 
