@@ -9,8 +9,10 @@ namespace ModernCSharp.WinFormsApp.Views;
 public partial class OrderListView : Form, IView<OrdersListPresenter>
 {
     private readonly ImportOrdersView _importOrdersView;
-    public BindingList<Order> DataSource { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public BindingList<Order> DataSource { get; set; }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public OrdersListPresenter Presenter { get; set; }
 
     public OrderListView()

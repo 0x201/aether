@@ -1,6 +1,8 @@
 ﻿using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Presenters;
 
+using System.ComponentModel;
+
 namespace ModernCSharp.WinFormsApp.Views;
 
 public partial class ImportOrdersView : Form, IView<ImportOrderPresenter>
@@ -8,6 +10,8 @@ public partial class ImportOrdersView : Form, IView<ImportOrderPresenter>
     public event Action ImportCompleted;
 
     private readonly OrdersListPresenter _ordersListPresenter;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ImportOrderPresenter Presenter { get; set; }
 
     public ImportOrdersView()

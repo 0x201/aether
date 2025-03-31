@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ModernCSharp.ApplicationCore;
+using ModernCSharp.Infrastructure;
 using ModernCSharp.ApplicationCore.Services;
 using ModernCSharp.WinFormsApp.Views;
 
@@ -28,7 +28,7 @@ internal static class Program
             .ConfigureServices((context, services) =>
             {
                 services.AddScoped<OrderService>();
-
+                services.AddFileContexts();
                 services.AddFileExporters();
                 services.AddFileImporters();
 
