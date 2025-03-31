@@ -76,8 +76,6 @@ public partial class App : Microsoft.UI.Xaml.Application
             // Views and ViewModels
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<SettingsPage>();
-            services.AddTransient<ListDetailsViewModel>();
-            services.AddTransient<ListDetailsPage>();
             services.AddTransient<DataGridViewModel>();
             services.AddTransient<DataGridPage>();
             services.AddTransient<BlankViewModel>();

@@ -5,8 +5,6 @@ using ModernCSharp.WinUIApp.Core.Contracts.Services;
 using ModernCSharp.WinUIApp.Core.Helpers;
 using ModernCSharp.WinUIApp.Helpers;
 using ModernCSharp.WinUIApp.Models;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace ModernCSharp.WinUIApp.Services;
