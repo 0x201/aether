@@ -1,4 +1,4 @@
-﻿using ModernCSharp.Application.Models;
+﻿using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Presenters;
 

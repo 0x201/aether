@@ -1,5 +1,5 @@
-﻿using ModernCSharp.Application.Models;
-using ModernCSharp.Application.Services;
+﻿using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.ApplicationCore.Services;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Views;
 

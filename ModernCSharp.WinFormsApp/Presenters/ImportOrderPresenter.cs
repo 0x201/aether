@@ -1,6 +1,6 @@
-﻿using ModernCSharp.Application.Models;
-using ModernCSharp.Application.Services.FileImportServices;
-using ModernCSharp.Application.Utils;
+﻿using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.ApplicationCore.Services.FileImportServices;
+using ModernCSharp.ApplicationCore.Utils;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Views;
 

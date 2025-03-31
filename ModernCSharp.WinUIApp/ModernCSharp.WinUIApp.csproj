@@ -35,7 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ModernCSharp.Application\ModernCSharp.Application.csproj" />
+		<ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
 		<ProjectReference Include="..\ModernCSharp.WinUIApp.Core\ModernCSharp.WinUIApp.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>

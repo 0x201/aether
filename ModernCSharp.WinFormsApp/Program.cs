@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ModernCSharp.Application;
-using ModernCSharp.Application.Services;
+using ModernCSharp.ApplicationCore;
+using ModernCSharp.ApplicationCore.Services;
 using ModernCSharp.WinFormsApp.Views;
 
 namespace ModernCSharp.WinFormsApp;

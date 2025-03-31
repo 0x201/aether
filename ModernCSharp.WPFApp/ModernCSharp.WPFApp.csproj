@@ -17,7 +17,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\ModernCSharp.Application\ModernCSharp.Application.csproj" />
+    <ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
     <ProjectReference Include="..\ModernCSharp.WPFApp.Core\ModernCSharp.WPFApp.Core.csproj" />
   </ItemGroup>
 

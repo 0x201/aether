@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 
+using ModernCSharp.ApplicationCore;
 using ModernCSharp.WinUIApp.Activation;
 using ModernCSharp.WinUIApp.Contracts.Services;
 using ModernCSharp.WinUIApp.Controls;
 using ModernCSharp.WinUIApp.Core.Contracts.Services;
 using ModernCSharp.WinUIApp.Core.Services;
-using ModernCSharp.WinUIApp.Helpers;
 using ModernCSharp.WinUIApp.Models;
 using ModernCSharp.WinUIApp.Services;
 using ModernCSharp.WinUIApp.ViewModels;
@@ -69,6 +69,8 @@ public partial class App : Microsoft.UI.Xaml.Application
             // Core Services
             services.AddSingleton<ISampleDataService, SampleDataService>();
             services.AddSingleton<IFileService, FileService>();
+            services.AddFileImporters();
+            services.AddFileExporters();
 
             // UserControls
             services.AddTransient<AddOrderDialog>();
