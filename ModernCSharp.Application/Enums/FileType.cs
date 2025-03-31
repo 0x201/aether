@@ -2,7 +2,7 @@
 
 public enum FileType
 {
-    JSON = 1,
-    CSV = 2,
-    EXCEL = 3
+    OrderJson = 1,
+    OrderCsv = 2,
+    OrderExcel = 3
 }
