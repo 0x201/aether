@@ -5,18 +5,16 @@ using Microsoft.Extensions.Logging;
 using ModernCSharp.Application.Abstractions;
 using ModernCSharp.Application.Enums;
 using ModernCSharp.Application.Models;
-using ModernCSharp.Application.Models.Errors;
 using ModernCSharp.Application.Models.FileExtraction;
 using ModernCSharp.Application.Services.FileExtraction.Commands;
-using ModernCSharp.Application.Utils;
 
 namespace ModernCSharp.Application.Services.FileExtraction.Handlers;
 
-public class OrderExcelImporter(ILogger<OrderExcelImporter> logger, OrderService orderService) : IFileImporter
+public class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger) : IFileImportStrategy<Order>
 {
     private OrderExcelImportContext _context;
 
-    public List<FileType> FileTypes => [FileType.EXCEL];
+    public List<FileType> FileTypes => [FileType.OrderExcel];
 
     public void InitializeContext(IFileImportContext context)
     {
@@ -30,36 +28,27 @@ public class OrderExcelImporter(ILogger<OrderExcelImporter> logger, OrderService
         }
     }
 
-    public async Task<IResult> ImportAsync(CancellationToken cancellationToken = default)
+    public async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
     {
-        if (!FileIOUtils.ValidateImportContext<OrderExcelImportContext>(_context))
-        {
-            logger.LogWarning("Invalid import context provided.");
-            return Result.Failure(FileImportErrors.InvalidContext);
-        }
-
         try
         {
-            if (!FileIOUtils.ValidatePath(_context.InputPath))
-            {
-                return Result.Failure(FileImportErrors.InvalidInputPath);
-            }
             cancellationToken.ThrowIfCancellationRequested();
-            await PerformImportAsync(_context, cancellationToken);
-            return Result.Success();
+            var orders = await PerformImportAsync(_context);
+            return ImportResult<Order>.Success(orders);
         }
         catch (OperationCanceledException)
         {
             logger.LogError("Import {FileType} operation  was cancelled.", _context.FileType);
-            return Result.Failure(new("", $"Import {_context.FileType} operation  was cancelled."));
+            return ImportResult<Order>.Failure(new("", $"Import {_context.FileType} operation  was cancelled."));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while importing orders from {@OutputPath}.", _context.InputPath);
-            return Result.Failure(new("", $"An error occurred while importing orders from {_context.InputPath}."));
+            logger.LogError(ex, "An error occurred while importing orders from {@InputPath}.", _context.InputPath);
+            return ImportResult<Order>.Failure(new("", $"An error occurred while importing orders from {_context.InputPath}."));
         }
     }
-    private async Task PerformImportAsync(OrderExcelImportContext context, CancellationToken cancellationToken = default)
+    
+    private Task<List<Order>> PerformImportAsync(OrderExcelImportContext context)
     {
         using var stream = new FileStream(context.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var wb = new XLWorkbook(stream);
@@ -92,11 +81,6 @@ public class OrderExcelImporter(ILogger<OrderExcelImporter> logger, OrderService
             orders.Add(newOrder);
         }
 
-        if (orders.Count == 0)
-        {
-            logger.LogInformation("No order to import.");
-            return;
-        }
-        await orderService.InsertManyAsync(orders);
+        return Task.FromResult(orders);
     }
 }

@@ -1,10 +1,10 @@
 ﻿using ModernCSharp.Application.Enums;
+using ModernCSharp.Application.Services.FileExtraction.Commands;
 
 namespace ModernCSharp.Application.Models.FileExtraction;
 
 public class FileImportContext : IFileImportContext
 {
-
     public string InputPath
     {
         get;
@@ -15,9 +15,20 @@ public class FileImportContext : IFileImportContext
         get;
         set;
     }
-    public FileImportContext(FileType fileType, string inputPath)
+
+    protected FileImportContext(FileType fileType, string inputPath)
     {
         FileType = fileType;
         InputPath = inputPath;
+    }
+    public static IFileImportContext Create(FileType fileType, string inputPath)
+    {
+        return fileType switch
+        {
+            FileType.OrderCsv => new OrderCsvImportContext(fileType, inputPath),
+            FileType.OrderJson => new OrderJsonImportContext(fileType, inputPath),
+            FileType.OrderExcel => new OrderExcelImportContext(fileType, inputPath),
+            _ => throw new NotSupportedException($"Unsupported file type: {fileType}")
+        };
     }
 }

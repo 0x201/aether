@@ -27,16 +27,12 @@ public static class DependencyInjection
 
     public static IServiceCollection AddFileImporters(this IServiceCollection services)
     {
-        services.AddSingleton<IFileImporter, OrderJsonImporter>();
-        services.AddSingleton<IFileImporter, OrderCsvImporter>();
-        services.AddSingleton<IFileImporter, OrderExcelImporter>();
+        services.AddTransient<IFileImportStrategy<Order>, OrderJsonImportStrategy>();
+        services.AddTransient<IFileImportStrategy<Order>, OrderCsvImportStrategy>();
+        services.AddTransient<IFileImportStrategy<Order>, OrderExcelImportStrategy>();
+        services.AddSingleton<IFileImportStrategyFactory<Order>, FileImportStrategyFactory<Order>>();
+        services.AddTransient<IFileImportService<Order>, FileImportService<Order>>();
 
-
-        services.AddSingleton(serviceProvider =>
-        {
-            var importers = serviceProvider.GetServices<IFileImporter>();
-            return new FileImporterFactory(importers);
-        });
         return services;
     }
 }
