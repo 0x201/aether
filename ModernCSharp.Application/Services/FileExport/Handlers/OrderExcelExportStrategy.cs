@@ -1,27 +1,23 @@
-﻿using System.Globalization;
-
-using CsvHelper;
+﻿using ClosedXML.Excel;
 
 using Microsoft.Extensions.Logging;
 
 using ModernCSharp.Application.Abstractions;
 using ModernCSharp.Application.Enums;
 using ModernCSharp.Application.Models;
-using ModernCSharp.Application.Models.Errors;
 using ModernCSharp.Application.Models.FileExport;
 using ModernCSharp.Application.Services.FileExport.Commands;
-using ModernCSharp.Application.Utils;
 
 namespace ModernCSharp.Application.Services.FileExport.Handlers;
 
-public class OrderCsvExporter(ILogger<OrderCsvExporter> logger, OrderService orderService) : IFileExporter
+public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger, OrderService orderService) : IFileExportStrategy
 {
-    private OrderCsvExportContext _context;
-    public List<FileType> FileTypes => [FileType.CSV];
+    private OrderExcelExportContext _context;
+    public List<FileType> FileTypes => [FileType.OrderExcel];
 
     public void InitializeContext(IFileExportContext context)
     {
-        if (context is OrderCsvExportContext exportContext)
+        if (context is OrderExcelExportContext exportContext)
         {
             _context = exportContext;
         }
@@ -33,18 +29,8 @@ public class OrderCsvExporter(ILogger<OrderCsvExporter> logger, OrderService ord
 
     public async Task<IResult> ExportAsync(CancellationToken cancellationToken = default)
     {
-        if (!FileIOUtils.ValidateExportContext<OrderCsvExportContext>(_context))
-        {
-            logger.LogWarning("Invalid export context provided.");
-            return Result.Failure(FileExportErrors.InvalidContext);
-        }
-
         try
         {
-            if (!FileIOUtils.ValidatePath(_context.OutputPath))
-            {
-                return Result.Failure(FileExportErrors.InvalidOutputPath);
-            }
             cancellationToken.ThrowIfCancellationRequested();
             await PerformExportAsync(_context, cancellationToken);
             return Result.Success();
@@ -60,8 +46,7 @@ public class OrderCsvExporter(ILogger<OrderCsvExporter> logger, OrderService ord
             return Result.Failure(new("", $"An error occurred while exporting orders to {_context.OutputPath}."));
         }
     }
-
-    private async Task PerformExportAsync(OrderCsvExportContext context, CancellationToken cancellationToken = default)
+    private async Task PerformExportAsync(OrderExcelExportContext context, CancellationToken cancellationToken = default)
     {
         var orders = await orderService.GetOrdersAsync(cancellationToken);
 
@@ -71,10 +56,31 @@ public class OrderCsvExporter(ILogger<OrderCsvExporter> logger, OrderService ord
             return;
         }
 
-        using var stream = new FileStream(context.OutputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-        using var writer = new StreamWriter(stream);
-        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        using var wb = new XLWorkbook();
+        var ws = wb.AddWorksheet("Worksheet 1");
 
-        await csv.WriteRecordsAsync(orders, cancellationToken);
+        var headerRow = ws.Row(1);
+        var properties = typeof(Order).GetProperties();
+
+        var headerCellIndex = 1;
+        foreach (var property in properties)
+        {
+            headerRow.Cell(headerCellIndex).SetValue(property.Name);
+            headerCellIndex++;
+        }
+
+        var contentRowIndex = 2;
+        foreach (var order in orders)
+        {
+            var currentRow = ws.Row(contentRowIndex);
+            currentRow.Cell("A").SetValue(order.Id);
+            currentRow.Cell("B").SetValue(order.OrderStatus.ToString());
+            currentRow.Cell("C").SetValue(order.Quantity);
+            currentRow.Cell("D").SetValue(order.Total);
+
+            contentRowIndex++;
+        }
+
+        wb.SaveAs(_context.OutputPath);
     }
 }

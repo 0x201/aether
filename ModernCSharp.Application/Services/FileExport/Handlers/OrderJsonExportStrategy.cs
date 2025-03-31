@@ -4,19 +4,16 @@ using ModernCSharp.Application.Abstractions;
 using ModernCSharp.Application.Constants;
 using ModernCSharp.Application.Enums;
 using ModernCSharp.Application.Models;
-using ModernCSharp.Application.Models.Errors;
 using ModernCSharp.Application.Models.FileExport;
 using ModernCSharp.Application.Services.FileExport.Commands;
-using ModernCSharp.Application.Utils;
-
 using System.Text.Json;
 
 namespace ModernCSharp.Application.Services.FileExport.Handlers;
 
-public class OrderJsonExporter(ILogger<OrderJsonExporter> logger, OrderService orderService) : IFileExporter
+public class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger, OrderService orderService) : IFileExportStrategy
 {
     private OrderJsonExportContext _context;
-    public List<FileType> FileTypes => [FileType.JSON];
+    public List<FileType> FileTypes => [FileType.OrderJson];
 
     public void InitializeContext(IFileExportContext context)
     {
@@ -31,17 +28,8 @@ public class OrderJsonExporter(ILogger<OrderJsonExporter> logger, OrderService o
     }
     public async Task<IResult> ExportAsync(CancellationToken cancellationToken = default)
     {
-        if (!FileIOUtils.ValidateExportContext<OrderJsonExportContext>(_context))
-        {
-            logger.LogWarning("Invalid context provided.");
-            return Result.Failure(FileExportErrors.InvalidContext);
-        }
         try
         {
-            if (!FileIOUtils.ValidatePath(_context.OutputPath))
-            {
-                return Result.Failure(FileExportErrors.InvalidOutputPath);
-            }
             cancellationToken.ThrowIfCancellationRequested();
             await PerformExportAsync(_context, cancellationToken);
             return Result.Success();

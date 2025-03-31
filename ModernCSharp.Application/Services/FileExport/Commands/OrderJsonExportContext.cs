@@ -3,10 +3,4 @@ using ModernCSharp.Application.Models.FileExport;
 
 namespace ModernCSharp.Application.Services.FileExport.Commands;
 
-public class OrderJsonExportContext : FileExportContext
-{
-    public OrderJsonExportContext(FileType fileType, string outputPath)
-        : base(fileType, outputPath)
-    {
-    }
-}
+public class OrderJsonExportContext(FileType fileType, string outputPath) : FileExportContext(fileType, outputPath);
