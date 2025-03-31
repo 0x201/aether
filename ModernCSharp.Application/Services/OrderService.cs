@@ -5,19 +5,17 @@ namespace ModernCSharp.Application.Services;
 
 public class OrderService
 {
-    public List<Order> Orders { get; set; } = [];
-
-    public OrderService()
+    private List<Order> Orders
     {
-        Orders = 
-        [
-             new() { Id = 1, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100 },
-             new() { Id = 2, OrderStatus = OrderStatus.Processing, Quantity = 10, Total = 100 },
-             new() { Id = 3, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100 },
-             new() { Id = 4, OrderStatus = OrderStatus.Shipped, Quantity = 10, Total = 100 },
-             new() { Id = 5, OrderStatus = OrderStatus.Delivered, Quantity = 10, Total = 100 },
-        ];
-    }
+        get;
+    } =
+    [
+        new() { Id = 1, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100 },
+        new() { Id = 2, OrderStatus = OrderStatus.Processing, Quantity = 10, Total = 100 },
+        new() { Id = 3, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100 },
+        new() { Id = 4, OrderStatus = OrderStatus.Shipped, Quantity = 10, Total = 100 },
+        new() { Id = 5, OrderStatus = OrderStatus.Delivered, Quantity = 10, Total = 100 },
+    ];
 
     public async Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken = default)
     {
