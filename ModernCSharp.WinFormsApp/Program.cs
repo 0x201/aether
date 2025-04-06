@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ModernCSharp.Infrastructure;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.WinFormsApp.Views;
+using ModernCSharp.Infrastructure;
+using ModernCSharp.WinFormsApp.Presenters;
 
 namespace ModernCSharp.WinFormsApp;
 
@@ -13,13 +13,22 @@ internal static class Program
     ///  The main entry point for the application.
     /// </summary>
     [STAThread]
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
 
         var host = CreateHostBuilder(args).Build();
-        var mainForm = host.Services.GetRequiredService<MainForm>();
-        System.Windows.Forms.Application.Run(mainForm);
+        try
+        {
+            var mainPresenter = host.Services.GetRequiredService<MainPresenter>();
+            mainPresenter.InitializeAsync().GetAwaiter().GetResult();
+            Application.Run((Form)mainPresenter.View);
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
 
     static IHostBuilder CreateHostBuilder(string[] args)

@@ -1,18 +1,12 @@
 ﻿namespace ModernCSharp.WinFormsApp.Common;
 
-public abstract class AbstractPresenter<TView, TPresenter>
-    : IPresenter<TView, TPresenter>
-     where TView : IView<TPresenter>
-    where TPresenter : class, IPresenter<TView, TPresenter>
+public abstract class AbstractPresenter<TView>(TView view) : IPresenter<TView>
+     where TView : class, IView
 {
-    protected TView _view;
-    public TView View
+    public TView View { get; private set; } = view ?? throw new ArgumentNullException(nameof(view));
+
+    public virtual Task InitializeAsync()
     {
-        get => _view;
-        set
-        {
-            _view = value;
-            _view.Presenter = this as TPresenter;
-        }
+        return Task.CompletedTask;
     }
 }

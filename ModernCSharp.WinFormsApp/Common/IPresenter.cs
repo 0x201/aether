@@ -1,8 +1,8 @@
 ﻿namespace ModernCSharp.WinFormsApp.Common;
 
-public interface IPresenter<TView, TPresenter>
-    where TView : IView<TPresenter>
-    where TPresenter : IPresenter<TView, TPresenter>
+public interface IPresenter<TView>
+    where TView : IView
 {
-    TView View { get; set; }
+    TView View { get; }
+    Task InitializeAsync();
 }

@@ -1,64 +1,55 @@
-﻿using ModernCSharp.WinFormsApp.Common;
-using ModernCSharp.WinFormsApp.Presenters;
-
-using System.ComponentModel;
+﻿using ModernCSharp.WinFormsApp.Enums;
+using ModernCSharp.WinFormsApp.Models;
 
 namespace ModernCSharp.WinFormsApp.Views;
 
-public partial class ImportOrdersView : Form, IView<ImportOrderPresenter>
+public partial class ImportOrdersView : BaseView, IImportView
 {
-    public event Action ImportCompleted;
+    public event AsyncEventHandler<OperationMode> ImportRequested;
+    public OperationMode Mode
+    {
+        get;
+        set;
+    }
 
-    private readonly OrdersListPresenter _ordersListPresenter;
-
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ImportOrderPresenter Presenter { get; set; }
+    public string FilePath
+    {
+        get;
+        set;
+    }
 
     public ImportOrdersView()
     {
         InitializeComponent();
     }
 
-    public ImportOrdersView(
-        ImportOrderPresenter importOrderPresenter,
-        OrdersListPresenter ordersListPresenter) : this()
-    {
-        Presenter = importOrderPresenter;
-        _ordersListPresenter = ordersListPresenter;
-    }
-
-    public virtual void OnImportCompleted()
-    {
-        ImportCompleted?.Invoke();
-    }
-
-
-    private void ImportOrdersForm_Load(object sender, EventArgs e)
-    {
-
-    }
-
     private void OpenOrderFilesButton_Click(object sender, EventArgs e)
     {
-        var result = openOrderFilesDialog.ShowDialog();
-
-        if (result == DialogResult.OK)
+        var openFileDialog = new OpenFileDialog()
         {
-            var filePath = openOrderFilesDialog.FileName;
-
-            OrderFilePathTextBox.Text = filePath;
+            Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+            Title = "Select a CSV File"
+        };
+        if (openFileDialog.ShowDialog() == DialogResult.OK)
+        {
+            OrderFilePathTextBox.Text = openFileDialog.FileName;
+            FilePath = openFileDialog.FileName;
         }
     }
 
     private async void ImportOrderButton_Click(object sender, EventArgs e)
     {
-        var filePath = OrderFilePathTextBox.Text;
-        var result = await Presenter.Import(filePath);
+        await ImportRequested?.Invoke(this, Mode);
+    }
 
-        if (result.IsSuccess)
-        {
-            MessageBox.Show("Successfully imported orders");
-            OnImportCompleted();
-        }
+    public override void CloseView()
+    {
+        DialogResult = DialogResult.OK;
+        base.CloseView();
+    }
+
+    private void CloseButton_Click(object sender, EventArgs e)
+    {
+        CloseView();
     }
 }

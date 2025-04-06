@@ -1,30 +1,18 @@
-using Microsoft.Extensions.DependencyInjection;
+using ModernCSharp.WinFormsApp.Models;
 
 namespace ModernCSharp.WinFormsApp.Views;
 
-public partial class MainForm : Form
+public partial class MainForm : BaseView, IMainView
 {
-    private readonly IServiceProvider _serviceProvider;
+    public event AsyncEventHandler ShowOrdersForm;
 
     public MainForm()
     {
         InitializeComponent();
     }
 
-    public MainForm(IServiceProvider serviceProvider) : this()
+    private void OrderListToolStripMenuItem1_Click(object sender, EventArgs e)
     {
-        _serviceProvider = serviceProvider;
-    }
-
-    private void MainForm_Load(object sender, EventArgs e)
-    {
-
-    }
-
-    private void orderListToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-        var orderListView = _serviceProvider.GetRequiredService<OrderListView>();
-
-        orderListView.Show();
+        ShowOrdersForm?.Invoke(this, EventArgs.Empty);
     }
 }

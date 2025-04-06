@@ -28,45 +28,58 @@
         /// </summary>
         private void InitializeComponent()
         {
+            EditToolStripMenuItem = new ToolStripMenuItem();
+            OrdersToolStripMenuItem = new ToolStripMenuItem();
+            OrderListToolStripMenuItem1 = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
-            importOrdersToolStripMenuItem = new ToolStripMenuItem();
-            orderListToolStripMenuItem = new ToolStripMenuItem();
+            FileToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
+            // EditToolStripMenuItem
+            // 
+            EditToolStripMenuItem.Name = "EditToolStripMenuItem";
+            EditToolStripMenuItem.Size = new Size(42, 21);
+            EditToolStripMenuItem.Text = "Edit";
+            // 
+            // OrdersToolStripMenuItem
+            // 
+            OrdersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { OrderListToolStripMenuItem1 });
+            OrdersToolStripMenuItem.Name = "OrdersToolStripMenuItem";
+            OrdersToolStripMenuItem.Size = new Size(61, 21);
+            OrdersToolStripMenuItem.Text = "Orders";
+            // 
+            // OrderListToolStripMenuItem1
+            // 
+            OrderListToolStripMenuItem1.Name = "OrderListToolStripMenuItem1";
+            OrderListToolStripMenuItem1.Size = new Size(134, 22);
+            OrderListToolStripMenuItem1.Text = "Order List";
+            OrderListToolStripMenuItem1.Click += OrderListToolStripMenuItem1_Click;
+            // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { importOrdersToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { FileToolStripMenuItem, EditToolStripMenuItem, OrdersToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(800, 24);
+            menuStrip1.Size = new Size(800, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
-            // importOrdersToolStripMenuItem
+            // FileToolStripMenuItem
             // 
-            importOrdersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { orderListToolStripMenuItem });
-            importOrdersToolStripMenuItem.Name = "importOrdersToolStripMenuItem";
-            importOrdersToolStripMenuItem.Size = new Size(54, 20);
-            importOrdersToolStripMenuItem.Text = "Orders";
-            // 
-            // orderListToolStripMenuItem
-            // 
-            orderListToolStripMenuItem.Name = "orderListToolStripMenuItem";
-            orderListToolStripMenuItem.Size = new Size(180, 22);
-            orderListToolStripMenuItem.Text = "Order List";
-            orderListToolStripMenuItem.Click += orderListToolStripMenuItem_Click;
+            FileToolStripMenuItem.Name = "FileToolStripMenuItem";
+            FileToolStripMenuItem.Size = new Size(39, 21);
+            FileToolStripMenuItem.Text = "File";
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 510);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Name = "MainForm";
             Text = "MainForm";
-            Load += MainForm_Load;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -74,9 +87,10 @@
         }
 
         #endregion
-
+        private ToolStripMenuItem EditToolStripMenuItem;
+        private ToolStripMenuItem OrdersToolStripMenuItem;
+        private ToolStripMenuItem OrderListToolStripMenuItem1;
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem importOrdersToolStripMenuItem;
-        private ToolStripMenuItem orderListToolStripMenuItem;
+        private ToolStripMenuItem FileToolStripMenuItem;
     }
 }

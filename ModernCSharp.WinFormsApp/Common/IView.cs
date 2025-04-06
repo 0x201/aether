@@ -1,6 +1,9 @@
 ﻿namespace ModernCSharp.WinFormsApp.Common;
 
-public interface IView<TPresenter>
+public interface IView
 {
-    TPresenter Presenter { get; set; }
+    void ShowMessage(string message, string title);
+    void ShowError(string message);
+    void ShowView();
+    void CloseView();
 }

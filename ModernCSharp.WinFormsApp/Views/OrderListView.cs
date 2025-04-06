@@ -1,51 +1,122 @@
-﻿using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.WinFormsApp.Common;
-using ModernCSharp.WinFormsApp.Presenters;
+﻿using System.ComponentModel;
 
-using System.ComponentModel;
+using ModernCSharp.ApplicationCore.Enums;
+using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.WinFormsApp.Enums;
+using ModernCSharp.WinFormsApp.Models;
 
 namespace ModernCSharp.WinFormsApp.Views;
 
-public partial class OrderListView : Form, IView<OrdersListPresenter>
+public partial class OrderListView : BaseView, IOrderListView
 {
-    private readonly ImportOrdersView _importOrdersView;
+    public string ExportFilePath
+    {
+        get;
+        set;
+    }
 
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public BindingList<Order> DataSource { get; set; }
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public OrdersListPresenter Presenter { get; set; }
+    public event AsyncEventHandler<OperationMode> ShowImportOrdersView;
+    public event AsyncEventHandler<ExportOrdersEventArgs> ExportOrders;
+    public event EventHandler ShowClearOrdersConfirmation;
 
     public OrderListView()
     {
         InitializeComponent();
     }
 
-    public OrderListView(
-        OrdersListPresenter ordersPresenter,
-        ImportOrdersView importOrdersView) : this()
+    private async void ImportOrdersButton_Click(object sender, EventArgs e)
     {
-        Presenter = ordersPresenter;
-        _importOrdersView = importOrdersView;
+        ImportButton.Enabled = false;
+
+        try
+        {
+            await ShowImportOrdersView?.Invoke(this, OperationMode.Import);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"An error occurred while importing orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            ImportButton.Enabled = true;
+        }
     }
 
-    private async void OrderListView_Load(object sender, EventArgs e)
+    public void DisplayData(IEnumerable<Order> orders)
     {
-        _importOrdersView.ImportCompleted += async () => await UpdateData();
-
-        DataSource = new BindingList<Order>(await Presenter.GetOrders());
-        OrderDataGridView.DataSource = DataSource;
+        OrderDataGridView.DataSource = new BindingList<Order>([.. orders]);
     }
 
-    private void ImportOrdersButton_Click(object sender, EventArgs e)
+    private async void AppendButton_Click(object sender, EventArgs e)
     {
-        _importOrdersView.Show();
+        AppendButton.Enabled = false;
+
+        try
+        {
+            await ShowImportOrdersView?.Invoke(this, OperationMode.Append);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"An error occurred while appending orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            AppendButton.Enabled = true;
+        }
     }
 
-
-    public async Task UpdateData()
+    private void ClearButton_Click(object sender, EventArgs e)
     {
-        DataSource = new BindingList<Order>(await Presenter.GetOrders());
-        OrderDataGridView.Refresh();
+        ShowClearOrdersConfirmation?.Invoke(this, EventArgs.Empty);
     }
 
+    private async void ExportButton_Click(object sender, EventArgs e)
+    {
+        ExportButton.Enabled = false;
+
+        try
+        {
+            List<Order> ordersToExport = [];
+
+            if (OrderDataGridView is not null)
+            {
+                foreach (DataGridViewRow row in OrderDataGridView.SelectedRows)
+                {
+                    var order = new Order
+                    {
+                        Id = (int)row.Cells["Id"].Value,
+                        Quantity = (int)row.Cells["Quantity"].Value,
+                        OrderStatus = (OrderStatus)row.Cells["OrderStatus"].Value,
+                        Total = (decimal)row.Cells["Total"].Value,
+                    };
+
+                    ordersToExport.Add(order);
+                }
+            }
+
+            var folderBrowserDialog = new FolderBrowserDialog
+            {
+                RootFolder = Environment.SpecialFolder.MyComputer,
+            };
+
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportFilePath = folderBrowserDialog.SelectedPath;
+                var exportArgs = new ExportOrdersEventArgs
+                {
+                    ExportFilePath = ExportFilePath,
+                    OrderToExport = ordersToExport
+                };
+                await ExportOrders?.Invoke(this, exportArgs);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"An error occurred while exporting orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            ExportButton.Enabled = true;
+        }
+    }
 }
