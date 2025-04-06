@@ -7,19 +7,19 @@ using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
 
 namespace ModernCSharp.Infrastructure.Services;
 
-public class OrderCsvExportContextStrategy : IFileExportContextStrategy<Order>
+internal class OrderCsvExportContextStrategy : IFileExportContextStrategy<Order>
 {
     public bool CanHandle(FileType fileType) => fileType == FileType.OrderCsv;
     public IFileExportContext<Order> CreateContext(string outputPath, List<Order> data) => new OrderCsvExportContext(FileType.OrderCsv, outputPath, data);
 }
 
-public class OrderExcelExportContextStrategy : IFileExportContextStrategy<Order>
+internal class OrderExcelExportContextStrategy : IFileExportContextStrategy<Order>
 {
     public bool CanHandle(FileType fileType) => fileType == FileType.OrderExcel;
     public IFileExportContext<Order> CreateContext(string outputPath, List<Order> data) => new OrderExcelExportContext(FileType.OrderExcel, outputPath, data);
 }
 
-public class OrderJsonExportContextStrategy : IFileExportContextStrategy<Order>
+internal class OrderJsonExportContextStrategy : IFileExportContextStrategy<Order>
 {
     public bool CanHandle(FileType fileType) => fileType == FileType.OrderJson;
     public IFileExportContext<Order> CreateContext(string outputPath, List<Order> data) => new OrderJsonExportContext(FileType.OrderJson, outputPath, data);
@@ -39,21 +39,21 @@ public class ExportContextFactory<T>(IEnumerable<IFileExportContextStrategy<T>> 
         return strategy?.CreateContext(outputPath, dataToExport) ??
             throw new NotSupportedException($"Unsupported file type: {fileType}");
     }
-} 
+}
 
-public class OrderCsvImportContextStrategy : IFileImportContextStrategy
+internal class OrderCsvImportContextStrategy : IFileImportContextStrategy
 {
     public bool CanHandle(FileType fileType) => fileType == FileType.OrderCsv;
     public IFileImportContext CreateContext(string outputPath) => new OrderCsvImportContext(FileType.OrderCsv, outputPath);
 }
 
-public class OrderExcelImportContextStrategy : IFileImportContextStrategy
+internal class OrderExcelImportContextStrategy : IFileImportContextStrategy
 {
     public bool CanHandle(FileType fileType) => fileType == FileType.OrderExcel;
     public IFileImportContext CreateContext(string outputPath) => new OrderExcelImportContext(FileType.OrderExcel, outputPath);
 }
 
-public class OrderJsonImportContextStrategy : IFileImportContextStrategy
+internal class OrderJsonImportContextStrategy : IFileImportContextStrategy
 {
     public bool CanHandle(FileType fileType) => fileType == FileType.OrderJson;
     public IFileImportContext CreateContext(string outputPath) => new OrderJsonImportContext(FileType.OrderJson, outputPath);

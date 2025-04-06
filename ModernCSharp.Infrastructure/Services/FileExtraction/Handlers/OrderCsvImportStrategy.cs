@@ -11,7 +11,7 @@ using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
 
 namespace ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
 
-public class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : IFileImportStrategy<Order>
+internal class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : IFileImportStrategy<Order>
 {
     private OrderCsvImportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderCsv];

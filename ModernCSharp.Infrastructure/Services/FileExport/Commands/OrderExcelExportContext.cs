@@ -4,4 +4,4 @@ using ModernCSharp.ApplicationCore.Models.FileExport;
 
 namespace ModernCSharp.Infrastructure.Services.FileExport.Commands;
 
-public class OrderExcelExportContext(FileType fileType, string outputPath, List<Order> ordersToExport) : FileExportContext<Order>(fileType, outputPath, ordersToExport);
+internal class OrderExcelExportContext(FileType fileType, string outputPath, List<Order> ordersToExport) : FileExportContext<Order>(fileType, outputPath, ordersToExport);

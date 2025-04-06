@@ -9,7 +9,7 @@ using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
 
 namespace ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
 
-public class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger) : IFileImportStrategy<Order>
+internal class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger) : IFileImportStrategy<Order>
 {
     private OrderExcelImportContext? _context;
 

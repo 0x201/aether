@@ -10,7 +10,7 @@ using ModernCSharp.Infrastructure.Services.FileExport.Commands;
 
 namespace ModernCSharp.Infrastructure.Services.FileExport.Handlers;
 
-public class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) : IFileExportStrategy<Order>
+internal class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) : IFileExportStrategy<Order>
 {
     private OrderJsonExportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderJson];

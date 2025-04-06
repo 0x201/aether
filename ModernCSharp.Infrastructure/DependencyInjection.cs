@@ -14,18 +14,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddFileContexts(this IServiceCollection services)
     {
+        services.AddTransient<IFileExportContextStrategy<Order>, OrderCsvExportContextStrategy>();
+        services.AddTransient<IFileExportContextStrategy<Order>, OrderJsonExportContextStrategy>();
+        services.AddTransient<IFileExportContextStrategy<Order>, OrderExcelExportContextStrategy>();
 
-        services.Scan(scan => scan
-            .FromAssemblyOf<OrderCsvExportContextStrategy>()
-            .AddClasses(c => c.AssignableTo(typeof(IFileExportContextStrategy<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
-
-        services.Scan(scan => scan
-            .FromAssemblyOf<OrderCsvImportContextStrategy>()
-            .AddClasses(c => c.AssignableTo<IFileImportContextStrategy>())
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
+        services.AddTransient<IFileImportContextStrategy, OrderCsvImportContextStrategy>();
+        services.AddTransient<IFileImportContextStrategy, OrderJsonImportContextStrategy>();
+        services.AddTransient<IFileImportContextStrategy, OrderExcelImportContextStrategy>();
 
         services.AddTransient<ImportContextFactory>();
         services.AddTransient<ExportContextFactory<Order>>();
@@ -35,19 +30,10 @@ public static class DependencyInjection
 
     public static IServiceCollection AddFileExporters(this IServiceCollection services)
     {
-        services.Scan(scan => scan
-            .FromAssemblyOf<OrderJsonExportStrategy>()
-            .AddClasses(c => c.AssignableTo(typeof(IFileExportStrategy<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
-
-
-        services.Scan(scan => scan
-            .FromAssemblyOf<FileExportStrategyFactory<Order>>()
-            .AddClasses(c => c.AssignableTo(typeof(IFileExportStrategyFactory<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
-
+        services.AddTransient<IFileExportStrategy<Order>, OrderCsvExportStrategy>();
+        services.AddTransient<IFileExportStrategy<Order>, OrderJsonExportStrategy>();
+        services.AddTransient<IFileExportStrategy<Order>, OrderExcelExportStrategy>();
+        services.AddTransient<IFileExportStrategyFactory<Order>, FileExportStrategyFactory<Order>>();
         services.AddTransient<IFileExportService<Order>, FileExportService<Order>>();
 
         return services;
@@ -55,19 +41,11 @@ public static class DependencyInjection
 
     public static IServiceCollection AddFileImporters(this IServiceCollection services)
     {
-        services.Scan(scan => scan
-            .FromAssemblyOf<OrderJsonImportStrategy>()
-            .AddClasses(c => c.AssignableTo(typeof(IFileImportStrategy<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
+        services.AddTransient<IFileImportStrategy<Order>, OrderCsvImportStrategy>();
+        services.AddTransient<IFileImportStrategy<Order>, OrderJsonImportStrategy>();
+        services.AddTransient<IFileImportStrategy<Order>, OrderExcelImportStrategy>();
 
-        services.Scan(scan => scan
-            .FromAssemblyOf<FileImportStrategyFactory<Order>>()
-            .AddClasses(c => c.AssignableTo(typeof(IFileImportStrategyFactory<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
-
-
+        services.AddTransient<IFileImportStrategyFactory<Order>, FileImportStrategyFactory<Order>>();
         services.AddTransient<IFileImportService<Order>, FileImportService<Order>>();
 
         return services;

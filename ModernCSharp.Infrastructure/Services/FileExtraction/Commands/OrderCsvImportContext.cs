@@ -3,4 +3,4 @@ using ModernCSharp.ApplicationCore.Models.FileExtraction;
 
 namespace ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
 
-public class OrderCsvImportContext(FileType fileType, string inputPath) : FileImportContext(fileType, inputPath);
+internal class OrderCsvImportContext(FileType fileType, string inputPath) : FileImportContext(fileType, inputPath);

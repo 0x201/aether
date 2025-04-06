@@ -23,7 +23,7 @@ public class FileExportService<T>(
             }
 
             var strategy = strategyFactory.GetStrategy(context);
-            return await strategy.ExportAsync();
+            return await strategy.ExportAsync(cancellationToken);
         }
         catch (NotSupportedException ex)
         {
