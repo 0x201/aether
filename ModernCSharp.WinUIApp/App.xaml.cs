@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 
-using ModernCSharp.ApplicationCore;
+using ModernCSharp.Infrastructure;
 using ModernCSharp.WinUIApp.Activation;
 using ModernCSharp.WinUIApp.Contracts.Services;
 using ModernCSharp.WinUIApp.Controls;
