@@ -16,12 +16,11 @@ internal class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : 
     private OrderCsvImportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderCsv];
 
-    public void InitializeContext(IFileImportContext context)
+    public void Initialize(IFileImportContext context)
     {
         if (context is not OrderCsvImportContext importContext)
         {
-            logger.LogError("Invalid file import context type.");
-            throw new ArgumentException("Invalid file import context");
+            throw new ArgumentException($"Invalid file import context. Expected {typeof(OrderCsvImportContext)}, but got {context.GetType()}.");
         }
         _context = importContext;
     }

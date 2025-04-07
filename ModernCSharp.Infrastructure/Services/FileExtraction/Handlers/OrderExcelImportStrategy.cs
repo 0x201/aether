@@ -15,16 +15,13 @@ internal class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger
 
     public List<FileType> FileTypes => [FileType.OrderExcel];
 
-    public void InitializeContext(IFileImportContext context)
+    public void Initialize(IFileImportContext context)
     {
-        if (context is OrderExcelImportContext importContext)
+        if (context is not OrderExcelImportContext importContext)
         {
-            _context = importContext;
+            throw new ArgumentException($"Invalid file import context. Expected {typeof(OrderExcelImportContext)}, but got {context.GetType()}.");
         }
-        else
-        {
-            throw new ArgumentException("Invalid file import context");
-        }
+        _context = importContext;
     }
 
     public async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
@@ -32,7 +29,7 @@ internal class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var orders = await PerformImportAsync();
+            var orders = await PerformImportAsync(cancellationToken);
             return ImportResult<Order>.Success(orders);
         }
         catch (OperationCanceledException)

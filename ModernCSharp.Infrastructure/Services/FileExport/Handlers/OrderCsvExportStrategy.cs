@@ -16,16 +16,13 @@ internal class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : 
     private OrderCsvExportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderCsv];
 
-    public void InitializeContext(IFileExportContext<Order> context)
+    public void Initialize(IFileExportContext<Order> context)
     {
-        if (context is OrderCsvExportContext exportContext)
+        if (context is not OrderCsvExportContext exportContext)
         {
-            _context = exportContext;
+            throw new ArgumentException($"Invalid file export context. Expected {typeof(OrderCsvExportContext)}, but got {context.GetType()}.");
         }
-        else
-        {
-            throw new ArgumentException("Invalid file export context");
-        }
+        _context = exportContext;
     }
 
     public async Task<IResult> ExportAsync(CancellationToken cancellationToken = default)

@@ -15,16 +15,13 @@ internal class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) 
     private OrderJsonImportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderJson];
 
-    public void InitializeContext(IFileImportContext context)
+    public void Initialize(IFileImportContext context)
     {
-        if (context is OrderJsonImportContext importContext)
+        if (context is not OrderJsonImportContext importContext)
         {
-            _context = importContext;
+            throw new ArgumentException($"Invalid file import context. Expected {typeof(OrderJsonImportContext)}, but got {context.GetType()}.");
         }
-        else
-        {
-            throw new ArgumentException("Invalid file import context");
-        }
+        _context = importContext;
     }
 
     public async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)

@@ -14,16 +14,13 @@ internal class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger
     private OrderExcelExportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderExcel];
 
-    public void InitializeContext(IFileExportContext<Order> context)
+    public void Initialize(IFileExportContext<Order> context)
     {
-        if (context is OrderExcelExportContext exportContext)
+        if (context is not OrderExcelExportContext exportContext)
         {
-            _context = exportContext;
+            throw new ArgumentException($"Invalid file export context. Expected {typeof(OrderExcelExportContext)}, but got {context.GetType()}.");
         }
-        else
-        {
-            throw new ArgumentException("Invalid file export context");
-        }
+        _context = exportContext;
     }
 
     public async Task<IResult> ExportAsync(CancellationToken cancellationToken = default)

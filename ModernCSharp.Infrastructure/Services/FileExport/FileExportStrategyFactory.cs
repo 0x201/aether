@@ -10,7 +10,7 @@ public interface IFileExportStrategy<T>
     {
         get;
     }
-    void InitializeContext(IFileExportContext<T> context);
+    void Initialize(IFileExportContext<T> context);
     Task<IResult> ExportAsync(CancellationToken cancellationToken = default);
     bool CanExport(FileType fileType) => FileTypes.Contains(fileType);
 }
@@ -27,7 +27,7 @@ public class FileExportStrategyFactory<T>(IEnumerable<IFileExportStrategy<T>> st
         var strategy = strategies.FirstOrDefault(x => x.CanExport(context.FileType)) ??
          throw new NotImplementedException($"Cannot find the implementation of {nameof(IFileExportStrategyFactory<T>)} for {context.FileType}");
 
-        strategy.InitializeContext(context);
+        strategy.Initialize(context);
         return strategy;
     }
 }

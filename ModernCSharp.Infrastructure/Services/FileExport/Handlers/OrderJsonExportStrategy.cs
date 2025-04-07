@@ -15,16 +15,13 @@ internal class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) 
     private OrderJsonExportContext? _context;
     public List<FileType> FileTypes => [FileType.OrderJson];
 
-    public void InitializeContext(IFileExportContext<Order> context)
+    public void Initialize(IFileExportContext<Order> context)
     {
-        if (context is OrderJsonExportContext exportContext)
+        if (context is not OrderJsonExportContext exportContext)
         {
-            _context = exportContext;
+            throw new ArgumentException($"Invalid file export context. Expected {typeof(OrderJsonExportContext)}, but got {context.GetType()}.");
         }
-        else
-        {
-            throw new ArgumentException("Invalid file export context");
-        }
+        _context = exportContext;
     }
 
     public async Task<IResult> ExportAsync(CancellationToken cancellationToken = default)
