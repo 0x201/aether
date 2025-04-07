@@ -4,7 +4,7 @@ using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Infrastructure.Services;
+using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Models;
@@ -26,7 +26,7 @@ public class OrdersListPresenter(
         View.ShowImportOrdersView += OnShowImportOrdersView;
         View.ShowClearOrdersConfirmation += OnShowClearOrdersConfirmation;
         View.ExportOrders += OnExportOrders;
-        _orders = [.. await GetOrders()];
+        _orders = await GetOrders();
         View.DisplayData(_orders);
 
         await base.InitializeAsync();

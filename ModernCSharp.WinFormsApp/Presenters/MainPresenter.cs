@@ -2,16 +2,10 @@
 using ModernCSharp.WinFormsApp.Views;
 
 namespace ModernCSharp.WinFormsApp.Presenters;
-public class MainPresenter : AbstractPresenter<IMainView>
+public class MainPresenter(
+    IMainView view,
+    IPresenter<IOrderListView> orderPresenter) : AbstractPresenter<IMainView>(view)
 {
-    private readonly IPresenter<IOrderListView> orderPresenter;
-
-    public MainPresenter(IMainView view,
-        IPresenter<IOrderListView> orderPresenter) : base(view)
-    {
-        this.orderPresenter = orderPresenter;
-    }
-
     public async override Task InitializeAsync()
     {
         View.ShowOrdersForm += OnShowOrdersForm;

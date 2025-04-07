@@ -18,4 +18,8 @@
     <ProjectReference Include="..\ModernCSharp.Infrastructure\ModernCSharp.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
+  </ItemGroup>
+
 </Project>

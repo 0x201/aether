@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
@@ -7,6 +9,11 @@ namespace ModernCSharp.WinFormsApp.Views;
 
 public interface IOrderListView : IView
 {
+    BindingList<Order> Orders
+    {
+        get;
+        set;
+    }
     string ExportFilePath
     {
         get;

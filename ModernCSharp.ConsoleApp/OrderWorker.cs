@@ -5,16 +5,17 @@ using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Infrastructure.Services;
+using ModernCSharp.Infrastructure.Services.FileContext;
 
 namespace ModernCSharp.ConsoleApp;
 
-public class OrderWorker(ILogger<OrderWorker> logger
-    , IFileExportService<Order> fileExportService
-    , IFileImportService<Order> fileImportService
-    , ExportContextFactory<Order> exportContextFactory
-    , ImportContextFactory importContextFactory
-    , OrderService orderService) : BackgroundService
+public class OrderWorker(
+    ILogger<OrderWorker> logger,
+    IFileExportService<Order> fileExportService,
+    IFileImportService<Order> fileImportService,
+    ExportContextFactory<Order> exportContextFactory,
+    ImportContextFactory importContextFactory,
+    OrderService orderService) : BackgroundService
 {
     private int _exitCode = 0;
 
@@ -37,7 +38,7 @@ public class OrderWorker(ILogger<OrderWorker> logger
         catch (Exception ex)
         {
             _exitCode = 500;
-            logger.LogError(ex, "An error occurred: {@Message}", ex.Message);
+            logger.LogError(ex, "An error occurred: {Message}", ex.Message);
             throw;
         }
         finally

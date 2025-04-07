@@ -1,14 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-using ModernCSharp.ApplicationCore.Services.FileExtraction;
+using ModernCSharp.Infrastructure.Services.FileContext;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
 
-public partial class BlankViewModel(IFileImportService<Order> fileImportService) : ObservableRecipient
+public partial class BlankViewModel(
+    IFileImportService<Order> fileImportService,
+    ImportContextFactory importContextFactory) : ObservableRecipient
 {
     [ObservableProperty]
     public double currentProgress = 0;
@@ -49,7 +51,7 @@ public partial class BlankViewModel(IFileImportService<Order> fileImportService)
         for (var i = 1; i <= totalItems; i++)
         {
             ProgressBarVisibility = true;
-            var fileImportContext = FileImportContext.Create(SelectedFileType, FilePath);
+            var fileImportContext = importContextFactory.CreateContext(SelectedFileType, FilePath);
             var result = await fileImportService.ImportAsync(fileImportContext);
             if (result.IsSuccess)
             {
