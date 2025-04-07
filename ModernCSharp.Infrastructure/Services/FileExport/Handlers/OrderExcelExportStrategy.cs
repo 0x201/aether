@@ -72,6 +72,8 @@ internal class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger
             currentRow.Cell("B").SetValue(order.OrderStatus.ToString());
             currentRow.Cell("C").SetValue(order.Quantity);
             currentRow.Cell("D").SetValue(order.Total);
+            currentRow.Cell("E").SetValue(order.OrderDate);
+            currentRow.Cell("F").SetValue(order.CustomerName);
 
             contentRowIndex++;
         }

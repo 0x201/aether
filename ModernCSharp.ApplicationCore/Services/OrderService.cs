@@ -10,11 +10,11 @@ public class OrderService
         get;
     } =
     [
-        new() { Id = 1, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100 },
-        new() { Id = 2, OrderStatus = OrderStatus.Processing, Quantity = 10, Total = 100 },
-        new() { Id = 3, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100 },
-        new() { Id = 4, OrderStatus = OrderStatus.Shipped, Quantity = 10, Total = 100 },
-        new() { Id = 5, OrderStatus = OrderStatus.Delivered, Quantity = 10, Total = 100 },
+        new() { Id = 1, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100, OrderDate = new DateTime(2025, 4, 7), CustomerName = "Jack" },
+        new() { Id = 2, OrderStatus = OrderStatus.Processing, Quantity = 10, Total = 100, OrderDate = new DateTime(2025, 4, 7), CustomerName = "Lisa" },
+        new() { Id = 3, OrderStatus = OrderStatus.Pending, Quantity = 10, Total = 100, OrderDate = new DateTime(2025, 4, 8), CustomerName = "Jack" },
+        new() { Id = 4, OrderStatus = OrderStatus.Shipped, Quantity = 10, Total = 100, OrderDate = new DateTime(2025, 4, 7), CustomerName = "Mary" },
+        new() { Id = 5, OrderStatus = OrderStatus.Delivered, Quantity = 10, Total = 100, OrderDate = new DateTime(2025, 4, 9), CustomerName = "Jack" },
     ];
 
     public async Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken = default)

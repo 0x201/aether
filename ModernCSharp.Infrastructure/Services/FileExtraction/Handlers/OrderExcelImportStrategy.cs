@@ -63,7 +63,7 @@ internal class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger
             var orderStatusStr = row.Cell("B").GetValue<string>();
             if (!Enum.TryParse(orderStatusStr, out OrderStatus orderStatus))
             {
-                logger.LogWarning("Invalid order status found in excel file.");
+                logger.LogWarning("Invalid order status found in {FilePath}.", _context.InputPath);
                 continue;
             }
 
@@ -73,6 +73,8 @@ internal class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger
                 OrderStatus = orderStatus,
                 Quantity = row.Cell("C").GetValue<int>(),
                 Total = row.Cell("D").GetValue<int>(),
+                OrderDate = row.Cell("E").GetValue<DateTime>(),
+                CustomerName = row.Cell("F").GetValue<string>(),
             };
 
             orders.Add(newOrder);
