@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-using ModernCSharp.ApplicationCore.Abstractions;
+﻿using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Models.FileExtraction;
 using ModernCSharp.ApplicationCore.Utils;
@@ -8,8 +6,7 @@ using ModernCSharp.ApplicationCore.Utils;
 namespace ModernCSharp.Infrastructure.Services.FileExtraction;
 
 public class FileImportService<T>(
-    IFileImportStrategyFactory<T> strategyFactory,
-    ILogger<FileImportService<T>> logger) : IFileImportService<T>
+    IFileImportStrategyFactory<T> strategyFactory) : IFileImportService<T>
 {
     public async Task<ImportResult<T>> ImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
     {
@@ -17,8 +14,7 @@ public class FileImportService<T>(
         {
             if (!FileIoUtils.ValidateImportContext<IFileImportContext>(context))
             {
-                logger.LogWarning("Invalid import context provided.");
-                return ImportResult<T>.Failure(FileImportErrors.InvalidContext);
+                return ImportResult<T>.Failure(["Invalid import context provided."]);
             }
 
             var strategy = strategyFactory.GetStrategy(context);
@@ -26,11 +22,11 @@ public class FileImportService<T>(
         }
         catch (NotSupportedException ex)
         {
-            return ImportResult<T>.Failure(new("", $"Unsupported file type. Error message: {ex.Message}"));
+            return ImportResult<T>.Failure([$"Unsupported file type. Error message: {ex.Message}"]);
         }
         catch (Exception ex)
         {
-            return ImportResult<T>.Failure(new("", $"Unsupported file type. Error message: {ex.Message}"));
+            return ImportResult<T>.Failure([$"Unsupported file type. Error message: {ex.Message}"]);
         }
     }
 }

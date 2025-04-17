@@ -21,11 +21,11 @@ public class Order : BaseAuditableEntity<int>
         get;
         set;
     }
-    public required string CustomerName
+    public string CustomerName
     {
         get;
         set;
-    }
+    } = string.Empty;
     public DateTime OrderDate
     {
         get;

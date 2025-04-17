@@ -3,6 +3,7 @@
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Utils;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
@@ -35,7 +36,7 @@ public class ImportOrderPresenter(
 
             var importedResult = await Import(View.FilePath);
 
-            if (importedResult.IsFailure) 
+            if (!importedResult.Succeeded) 
             {
                 View.ShowError($"Failed to import orders from {View.FilePath}. [Error]: {importedResult.Error}");
             }

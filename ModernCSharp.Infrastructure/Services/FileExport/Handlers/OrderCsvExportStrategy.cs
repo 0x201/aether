@@ -26,7 +26,7 @@ internal class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : 
         _context = exportContext;
     }
 
-    public async Task<IResult> ExportAsync(CancellationToken cancellationToken = default)
+    public async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -37,12 +37,12 @@ internal class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : 
         catch (OperationCanceledException)
         {
             logger.LogError("Export {FileType} operation  was cancelled.", _context!.FileType);
-            return Result.Failure(new("", $"Export {_context.FileType} operation  was cancelled."));
+            return Result.Failure([$"Export {_context.FileType} operation  was cancelled."]);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while exporting orders to {@OutputPath}.", _context!.OutputPath);
-            return Result.Failure(new("", $"An error occurred while exporting orders to {_context.OutputPath}."));
+            return Result.Failure([$"An error occurred while exporting orders to {_context.OutputPath}."]);
         }
     }
 

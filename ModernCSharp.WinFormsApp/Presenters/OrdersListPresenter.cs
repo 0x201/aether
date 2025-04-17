@@ -2,8 +2,8 @@
 
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Services;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
@@ -44,11 +44,11 @@ public class OrdersListPresenter(
         var context = exportContextFactory.CreateContext(FileType.OrderCsv, outputFileName, e.OrderToExport);
         var result = await fileExportService.ExportAsync(context);
 
-        if (result.IsFailure)
+        if (!result.Succeeded)
         {
             MessageBox.Show($"Failed to export orders. [Error]: {result.Error}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-        else 
+        else
         {
             MessageBox.Show($"Saved orders to {outputFileName}.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

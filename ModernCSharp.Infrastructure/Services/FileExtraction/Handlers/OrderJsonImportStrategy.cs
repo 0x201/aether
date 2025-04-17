@@ -37,12 +37,12 @@ internal class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) 
         catch (OperationCanceledException)
         {
             logger.LogError("Import {FileType} operation  was cancelled.", _context!.FileType);
-            return ImportResult<Order>.Failure(new("", $"Import {_context.FileType} operation  was cancelled."));
+            return ImportResult<Order>.Failure([$"Import {_context.FileType} operation  was cancelled."]);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while importing orders from {@InputPath}.", _context!.InputPath);
-            return ImportResult<Order>.Failure(new("", $"An error occurred while importing orders from {_context.InputPath}."));
+            return ImportResult<Order>.Failure([$"An error occurred while importing orders from {_context.InputPath}."]);
         }
     }
 

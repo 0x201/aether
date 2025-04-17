@@ -4,7 +4,7 @@ namespace ModernCSharp.Domain.Common;
 
 public abstract class BaseEntity<TKey> : IHasDomainEvents
 {
-    public required TKey Id
+    public TKey Id
     {
         get;
         set;

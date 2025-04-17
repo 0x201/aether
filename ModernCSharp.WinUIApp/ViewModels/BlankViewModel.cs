@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.Infrastructure.Services.FileContext;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
@@ -53,7 +53,7 @@ public partial class BlankViewModel(
             ProgressBarVisibility = true;
             var fileImportContext = importContextFactory.CreateContext(SelectedFileType, FilePath);
             var result = await fileImportService.ImportAsync(fileImportContext);
-            if (result.IsSuccess)
+            if (result.Succeeded)
             {
                 yield return (i * 100) / totalItems;
                 ImportResult = $"Successfully imported {result.Data.Count} records from {FilePath}";

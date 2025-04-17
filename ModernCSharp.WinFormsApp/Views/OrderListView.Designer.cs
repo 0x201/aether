@@ -147,7 +147,7 @@
             // 
             // orderBindingSource
             // 
-            orderBindingSource.DataSource = typeof(ApplicationCore.Models.Order);
+            orderBindingSource.DataSource = typeof(ModernCSharp.Domain.Entities.Order);
             // 
             // ExportButton
             // 
@@ -180,7 +180,7 @@
             // 
             // orderBindingSource1
             // 
-            orderBindingSource1.DataSource = typeof(ApplicationCore.Models.Order);
+            orderBindingSource1.DataSource = typeof(ModernCSharp.Domain.Entities.Order);
             // 
             // OrderListView
             // 
