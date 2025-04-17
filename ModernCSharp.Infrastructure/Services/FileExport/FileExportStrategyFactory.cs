@@ -1,5 +1,5 @@
-﻿using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
+﻿using ModernCSharp.ApplicationCore.Common.Models;
+using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models.FileExport;
 
 namespace ModernCSharp.Infrastructure.Services.FileExport;
@@ -11,7 +11,7 @@ public interface IFileExportStrategy<T>
         get;
     }
     void Initialize(IFileExportContext<T> context);
-    Task<IResult> ExportAsync(CancellationToken cancellationToken = default);
+    Task<Result> ExportAsync(CancellationToken cancellationToken = default);
     bool CanExport(FileType fileType) => FileTypes.Contains(fileType);
 }
 

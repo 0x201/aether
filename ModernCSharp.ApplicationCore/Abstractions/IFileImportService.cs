@@ -1,4 +1,4 @@
-﻿using ModernCSharp.ApplicationCore.Models;
+﻿using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Models.FileExtraction;
 
 namespace ModernCSharp.ApplicationCore.Abstractions;

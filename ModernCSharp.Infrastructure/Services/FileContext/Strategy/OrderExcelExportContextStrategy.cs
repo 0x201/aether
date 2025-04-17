@@ -1,5 +1,5 @@
 ﻿using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.ApplicationCore.Models.FileExport;
 using ModernCSharp.Infrastructure.Services.FileExport.Commands;
 

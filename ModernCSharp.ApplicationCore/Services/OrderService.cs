@@ -1,5 +1,7 @@
 ﻿using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.Domain.Entities;
+using ModernCSharp.Domain.Enums;
 
 namespace ModernCSharp.ApplicationCore.Services;
 

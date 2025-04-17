@@ -1,7 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.ApplicationCore.Common.Interfaces;
+using ModernCSharp.Domain.Constants;
+using ModernCSharp.Domain.Entities;
+using ModernCSharp.Infrastructure.Data;
+using ModernCSharp.Infrastructure.Data.Interceptors;
+using ModernCSharp.Infrastructure.Identity;
 using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.Infrastructure.Services.FileContext.Strategy;
 using ModernCSharp.Infrastructure.Services.FileExport;
@@ -13,6 +23,71 @@ namespace ModernCSharp.Infrastructure;
 
 public static class DependencyInjection
 {
+    public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+        builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
+
+        builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        {
+            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+#if (UsePostgreSQL)
+            options.UseNpgsql(connectionString).AddAsyncSeeding(sp);
+#elif (UseSqlite)
+            options.UseSqlite(connectionString).AddAsyncSeeding(sp);
+#else
+            options.UseSqlServer(connectionString).AddAsyncSeeding(sp);
+#endif
+        });
+
+#if (UseAspire)
+#if (UsePostgreSQL)
+        builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
+#elif (UseSqlServer)
+        builder.EnrichSqlServerDbContext<ApplicationDbContext>();
+#endif
+#endif
+
+        builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+        builder.Services.AddScoped<ApplicationDbContextInitializer>();
+
+
+#if (UseApiOnly)
+        builder.Services.AddAuthentication()
+            .AddBearerToken(IdentityConstants.BearerScheme);
+
+        builder.Services.AddAuthorizationBuilder();
+
+        builder.Services
+            .AddIdentityCore<ApplicationUser>()
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddApiEndpoints();
+#else
+        builder.Services
+            .AddDefaultIdentity<ApplicationUser>()
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+#endif
+
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddTransient<IIdentityService, IdentityService>();
+
+        builder.Services.AddAuthorization(options =>
+            options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+    }
+
+    public static void AddFileProcessServices(this IServiceCollection services)
+    {
+        services.AddFileContexts();
+        services.AddFileExporters();
+        services.AddFileImporters();
+    }
+
     public static IServiceCollection AddFileContexts(this IServiceCollection services)
     {
         services.AddSingleton<IFileExportContextStrategy<Order>, OrderCsvExportContextStrategy>();

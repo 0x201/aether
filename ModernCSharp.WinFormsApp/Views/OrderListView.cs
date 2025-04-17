@@ -1,7 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Linq;
-using System.Windows.Forms;
-
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.WinFormsApp.Enums;
@@ -16,6 +13,7 @@ public partial class OrderListView : BaseView, IOrderListView
         get;
         set;
     } = [];
+
     public string ExportFilePath
     {
         get;
@@ -26,7 +24,7 @@ public partial class OrderListView : BaseView, IOrderListView
     public event AsyncEventHandler<ExportOrdersEventArgs> ExportOrders;
     public event EventHandler ShowClearOrdersConfirmation;
 
-    private BindingSource _bindingSource = [];
+    private readonly BindingSource _bindingSource = [];
 
     public OrderListView()
     {
@@ -43,7 +41,8 @@ public partial class OrderListView : BaseView, IOrderListView
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"An error occurred while importing orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"An error occurred while importing orders: {ex.Message}", "Error", MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
         finally
         {
@@ -68,7 +67,8 @@ public partial class OrderListView : BaseView, IOrderListView
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"An error occurred while appending orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"An error occurred while appending orders: {ex.Message}", "Error", MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
         finally
         {
@@ -91,18 +91,14 @@ public partial class OrderListView : BaseView, IOrderListView
 
             if (OrderDataGridView is not null)
             {
-                foreach (DataGridViewRow row in OrderDataGridView.SelectedRows)
-                {
-                    var order = new Order
+                ordersToExport.AddRange(from DataGridViewRow row in OrderDataGridView.SelectedRows
+                    select new Order
                     {
                         Id = (int)row.Cells["Id"].Value,
                         Quantity = (int)row.Cells["Quantity"].Value,
                         OrderStatus = (OrderStatus)row.Cells["OrderStatus"].Value,
                         Total = (decimal)row.Cells["Total"].Value,
-                    };
-
-                    ordersToExport.Add(order);
-                }
+                    });
             }
 
             var folderBrowserDialog = new FolderBrowserDialog
@@ -123,7 +119,8 @@ public partial class OrderListView : BaseView, IOrderListView
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"An error occurred while exporting orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"An error occurred while exporting orders: {ex.Message}", "Error", MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
         finally
         {
@@ -133,23 +130,26 @@ public partial class OrderListView : BaseView, IOrderListView
 
     private void OrderDataGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
     {
-        DataGridViewColumn column = OrderDataGridView.Columns[e.ColumnIndex];
-        ListSortDirection direction = GetNextSortDirection(column);
+        var column = OrderDataGridView.Columns[e.ColumnIndex];
+        var direction = GetNextSortDirection(column);
 
         ApplySort(column.DataPropertyName, direction);
     }
 
     #region Sort
+
     private ListSortDirection GetNextSortDirection(DataGridViewColumn column)
     {
         if (OrderDataGridView.SortedColumn == column)
         {
-            return OrderDataGridView.SortOrder == SortOrder.Ascending ?
-                ListSortDirection.Descending :
-                ListSortDirection.Ascending;
+            return OrderDataGridView.SortOrder == SortOrder.Ascending
+                ? ListSortDirection.Descending
+                : ListSortDirection.Ascending;
         }
+
         return ListSortDirection.Ascending;
     }
+
     private void ApplySort(string propertyName, ListSortDirection direction)
     {
         _bindingSource.Sort = $"{propertyName} {(direction == ListSortDirection.Ascending ? "ASC" : "DESC")}";
@@ -172,6 +172,7 @@ public partial class OrderListView : BaseView, IOrderListView
     #endregion
 
     #region Filter
+
     private void FilterTextBox_TextChanged(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(FilterTextBox.Text))
@@ -184,12 +185,14 @@ public partial class OrderListView : BaseView, IOrderListView
 
             // 对 BindingList 进行过滤
             var filteredData = new BindingList<Order>(
-                [.. Orders.Where(o =>
+            [
+                .. Orders.Where(o =>
                     o.CustomerName.Contains(filterText, StringComparison.CurrentCultureIgnoreCase) ||
                     o.Id.ToString().Contains(filterText) ||
                     o.Total.ToString().Contains(filterText) ||
                     o.OrderDate.ToString().Contains(filterText)
-                )]);
+                )
+            ]);
 
             _bindingSource.DataSource = filteredData;
         }
@@ -198,12 +201,11 @@ public partial class OrderListView : BaseView, IOrderListView
         {
             ApplySort(
                 OrderDataGridView.SortedColumn.DataPropertyName,
-                OrderDataGridView.SortOrder == SortOrder.Ascending ?
-                    ListSortDirection.Ascending :
-                    ListSortDirection.Descending);
+                OrderDataGridView.SortOrder == SortOrder.Ascending
+                    ? ListSortDirection.Ascending
+                    : ListSortDirection.Descending);
         }
     }
+
     #endregion
-
-
 }

@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Logging;
 
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.ApplicationCore.Models.FileExtraction;
 using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
 

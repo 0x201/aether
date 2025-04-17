@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.ApplicationCore.Models.Errors;
+using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Models.FileExtraction;
 using ModernCSharp.ApplicationCore.Utils;
 

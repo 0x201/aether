@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.ApplicationCore.Models.Errors;
+using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Models.FileExport;
 using ModernCSharp.ApplicationCore.Utils;
 
@@ -12,7 +11,7 @@ public class FileExportService<T>(
     IFileExportStrategyFactory<T> strategyFactory,
     ILogger<FileExportService<T>> logger) : IFileExportService<T>
 {
-    public async Task<IResult> ExportAsync(IFileExportContext<T> context, CancellationToken cancellationToken = default)
+    public async Task<Result> ExportAsync(IFileExportContext<T> context, CancellationToken cancellationToken = default)
     {
         try
         {

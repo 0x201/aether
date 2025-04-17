@@ -2,9 +2,10 @@
 
 using Microsoft.Extensions.Logging;
 
+using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Models.FileExport;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.Infrastructure.Services.FileExport.Commands;
 
 namespace ModernCSharp.Infrastructure.Services.FileExport.Handlers;

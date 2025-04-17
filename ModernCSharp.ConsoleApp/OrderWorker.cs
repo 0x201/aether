@@ -2,9 +2,10 @@
 using Microsoft.Extensions.Logging;
 
 using ModernCSharp.ApplicationCore.Abstractions;
+using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
 using ModernCSharp.ApplicationCore.Services;
+using ModernCSharp.Domain.Entities;
 using ModernCSharp.Infrastructure.Services.FileContext;
 
 namespace ModernCSharp.ConsoleApp;
@@ -56,7 +57,7 @@ public class OrderWorker(
             (FileType.OrderJson, "D:\\orders.json", ordersToExport),
             (FileType.OrderExcel, "D:\\orders.xlsx", ordersToExport)
         ];
-        IResult result = null;
+        Result result = null;
         cancellationToken.ThrowIfCancellationRequested();
         foreach (var (fileType, filePath, orders) in exportTasks)
         {
@@ -64,7 +65,7 @@ public class OrderWorker(
 
             result = await fileExportService.ExportAsync(exportContext, cancellationToken);
 
-            if (result.IsFailure)
+            if (!result.Succeeded)
             {
                 logger.LogError("Failed to export {FileType} file to {FilePath}: {@Error}",
                     fileType, filePath, result.Error);
@@ -73,12 +74,12 @@ public class OrderWorker(
             logger.LogInformation("Successfully exported records to {InputPath}", filePath);
         }
 
-        if (result?.IsSuccess ?? false)
+        if (result?.Succeeded ?? false)
         {
             logger.LogInformation("Total exported files: {TotalRecords}", exportTasks.Count);
         }
 
-        return result?.IsSuccess ?? false;
+        return result?.Succeeded ?? false;
     }
 
     private async Task<bool> ImportAsync(CancellationToken cancellationToken = default)
@@ -99,7 +100,7 @@ public class OrderWorker(
 
             result = await fileImportService.ImportAsync(importContext, cancellationToken);
 
-            if (result.IsFailure)
+            if (!result.Succeeded)
             {
                 logger.LogError("Failed to import {FileType} file from {FilePath}: {@Error}",
                     fileType, filePath, result.Error);
@@ -111,11 +112,11 @@ public class OrderWorker(
             logger.LogInformation("Successfully imported {RecordCount} records from {InputPath}", result.Data.Count, filePath);
         }
 
-        if (result?.IsSuccess ?? false)
+        if (result?.Succeeded ?? false)
         {
             logger.LogInformation("Total imported records: {TotalRecords}", totalOrderRecords);
         }
 
-        return result?.IsSuccess ?? false;
+        return result?.Succeeded ?? false;
     }
 }

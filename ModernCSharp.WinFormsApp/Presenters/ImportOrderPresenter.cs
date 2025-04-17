@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Models;
+using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Utils;
 using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.WinFormsApp.Common;
