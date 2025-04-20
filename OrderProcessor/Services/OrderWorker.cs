@@ -1,17 +1,22 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ModernCSharp.ApplicationCore.Abstractions;
+using ModernCSharp.ApplicationCore.Common.Interfaces;
 using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.ApplicationCore.Services;
 using ModernCSharp.Domain.Entities;
+using ModernCSharp.Domain.Enums;
 using ModernCSharp.EventBus.Abstractions;
 using ModernCSharp.Infrastructure.Services.FileContext;
+using ModernCSharp.OrderProcessor.Events;
 
 namespace ModernCSharp.OrderProcessor.Services;
 
 public class OrderWorker(
     ILogger<OrderWorker> logger,
     IEventBus eventBus,
+    IApplicationDbContext dbContext,
     IOptions<BackgroundTaskOptions> options,
     IFileExportService<Order> fileExportService,
     IFileImportService<Order> fileImportService,
@@ -72,34 +77,14 @@ public class OrderWorker(
 
     private async ValueTask<List<int>> GetConfirmedGracePeriodOrders()
     {
-        try
-        {
-            using var conn = dataSource.CreateConnection();
-            using var command = conn.CreateCommand();
-            command.CommandText = """
-                                  SELECT "Id"
-                                  FROM ordering.orders
-                                  WHERE CURRENT_TIMESTAMP - "OrderDate" >= @GracePeriodTime AND "OrderStatus" = 'Submitted'
-                                  """;
-            command.Parameters.AddWithValue("GracePeriodTime", TimeSpan.FromMinutes(_options.GracePeriodTime));
+        var ids = await dbContext.Orders
+            .Where(x =>
+                x.OrderStatus == OrderStatus.Pending && (DateTime.UtcNow - x.OrderDate) >=
+                TimeSpan.FromMinutes(_options.GracePeriodTime))
+            .Select(x => x.Id)
+            .ToListAsync();
 
-            List<int> ids = [];
-
-            await conn.OpenAsync();
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                ids.Add(reader.GetInt32(0));
-            }
-
-            return ids;
-        }
-        catch (NpgsqlException exception)
-        {
-            logger.LogError(exception, "Fatal error establishing database connection");
-        }
-
-        return [];
+        return ids;
     }
 
     private async Task<bool> ExportAsync(CancellationToken cancellationToken = default)

@@ -10,14 +10,8 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<!--#if (UseAspire)-->
-		<!--#if (UsePostgreSQL)-->
-		<PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(AspireVersion)" />
-		<PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
-		<!--#endif-->
-		<!--#if (UseSqlServer)-->
 		<PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspireVersion)" />
 		<PackageVersion Include="Aspire.Hosting.SqlServer" Version="$(AspireVersion)" />
-		<!--#endif-->
 		<PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
 		<PackageVersion Include="Aspire.Hosting.Redis" Version="$(AspireVersion)" />
 		<PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="$(AspireVersion)" />
@@ -53,10 +47,6 @@
 		<PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
 		<PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfcoreVersion)" />
 		<PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfcoreVersion)" />
-		<!--#if (UsePostgreSQL)-->
-		<PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-		<PackageVersion Include="Testcontainers.PostgreSql" Version="4.0.0" />
-		<!--#endif-->
 		<!--#if (UseSqlite)-->
 		<PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfcoreVersion)" />
 		<!--#endif-->
