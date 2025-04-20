@@ -5,39 +5,44 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/Solution Items/" Id="8ec462fd-d22e-90a8-e5ce-7e832ba40c5d">
+  <Folder Name="/Solution Items/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="ModernCSharp.ApplicationCore/ModernCSharp.ApplicationCore.csproj" />
-  <Project Path="ModernCSharp.ConsoleApp/ModernCSharp.ConsoleApp.csproj" />
-  <Project Path="ModernCSharp.Domain/ModernCSharp.Domain.csproj" Id="c628af93-e39f-49e6-a494-8143900384bf" />
-  <Project Path="ModernCSharp.Infrastructure/ModernCSharp.Infrastructure.csproj" Id="a571ea02-90ee-485c-a8b6-0db80c4dc45c" />
-  <Project Path="ModernCSharp.WinFormsApp/ModernCSharp.WinFormsApp.csproj" />
-  <Project Path="ModernCSharp.WinUIApp.Core/ModernCSharp.WinUIApp.Core.csproj">
-    <Platform Solution="*|arm64" Project="arm64" />
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
+  <Project Path="Domain\Domain.csproj" />
+  <Project Path="EventBusRabbitMQ/EventBusRabbitMQ.csproj">
+    <Configuration Solution="Debug|arm64" Project="Debug|Any CPU" />
+    <Configuration Solution="Debug|x64" Project="Debug|Any CPU" />
+    <Configuration Solution="Debug|x86" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|arm64" Project="Release|Any CPU" />
+    <Configuration Solution="Release|x64" Project="Release|Any CPU" />
+    <Configuration Solution="Release|x86" Project="Release|Any CPU" />
   </Project>
+  <Project Path="EventBus/EventBus.csproj">
+    <Configuration Solution="Debug|arm64" Project="Debug|Any CPU" />
+    <Configuration Solution="Debug|x64" Project="Debug|Any CPU" />
+    <Configuration Solution="Debug|x86" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|arm64" Project="Release|Any CPU" />
+    <Configuration Solution="Release|x64" Project="Release|Any CPU" />
+    <Configuration Solution="Release|x86" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="ModernCSharp.ApplicationCore/ModernCSharp.ApplicationCore.csproj" />
+  <Project Path="ModernCSharp.Infrastructure/ModernCSharp.Infrastructure.csproj" />
+  <Project Path="ModernCSharp.WinUIApp.Core/ModernCSharp.WinUIApp.Core.csproj" />
   <Project Path="ModernCSharp.WinUIApp.Tests.MSTest/ModernCSharp.WinUIApp.Tests.MSTest.csproj">
-    <Platform Solution="*|Any CPU" Project="x64" />
-    <Platform Solution="*|arm64" Project="arm64" />
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
   </Project>
   <Project Path="ModernCSharp.WinUIApp/ModernCSharp.WinUIApp.csproj">
-    <Platform Solution="*|Any CPU" Project="x64" />
-    <Platform Solution="*|arm64" Project="arm64" />
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-    <Deploy />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
   </Project>
   <Project Path="ModernCSharp.WPFApp.Core/ModernCSharp.WPFApp.Core.csproj" />
   <Project Path="ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj" />
   <Project Path="ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj" />
-  <Project Path="ModernCSharp/ModernCSharp.ApiService/ModernCSharp.ApiService.csproj" />
-  <Project Path="ModernCSharp/ModernCSharp.AppHost/ModernCSharp.AppHost.csproj" Id="b2d51ecd-75b8-4162-b5b8-dcf38bb1652f" />
-  <Project Path="ModernCSharp/ModernCSharp.ServiceDefaults/ModernCSharp.ServiceDefaults.csproj" />
-  <Project Path="ModernCSharp/ModernCSharp.Tests/ModernCSharp.Tests.csproj" />
-  <Project Path="ModernCSharp/ModernCSharp.Web/ModernCSharp.Web.csproj" />
+  <Project Path="ModernCSharp.ApiService/ModernCSharp.ApiService.csproj" />
+  <Project Path="ModernCSharp.AppHost/ModernCSharp.AppHost.csproj" />
+  <Project Path="ModernCSharp.ServiceDefaults/ModernCSharp.ServiceDefaults.csproj" />
+  <Project Path="ModernCSharp.Tests/ModernCSharp.Tests.csproj" />
+  <Project Path="ModernCSharp.Web/ModernCSharp.Web.csproj" />
+  <Project Path="OrderProcessor/OrderProcessor.csproj" />
+  <Project Path="WinFormsApp/WinFormsApp.csproj" />
 </Solution>
