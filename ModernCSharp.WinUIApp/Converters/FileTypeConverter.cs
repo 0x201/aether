@@ -4,7 +4,7 @@ using ModernCSharp.ApplicationCore.Enums;
 
 namespace ModernCSharp.WinUIApp.Converters;
 
-public class FileTypeConverter : IValueConverter
+public partial class FileTypeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -12,15 +12,15 @@ public class FileTypeConverter : IValueConverter
         {
             if (!Enum.IsDefined(typeof(FileType), value))
             {
-                throw new ArgumentException("ExceptionEnumToBooleanConverterValueMustBeAnEnum");
+                throw new ArgumentException("ExceptionFileTypeToBooleanConverterValueMustBeAnEnum");
             }
 
-            var enumValue = Enum.Parse(typeof(FileType), enumString);
+            var enumValue = Enum.Parse<FileType>(enumString);
 
             return enumValue.Equals(value);
         }
 
-        throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
+        throw new ArgumentException("ExceptionFileTypeToBooleanConverterParameterMustBeAnEnumName");
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -30,6 +30,6 @@ public class FileTypeConverter : IValueConverter
             return Enum.Parse(typeof(FileType), enumString);
         }
 
-        throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
+        throw new ArgumentException("ExceptionFileTypeToBooleanConverterParameterMustBeAnEnumName");
     }
 }

@@ -15,8 +15,7 @@ public class PageService : IPageService
     public PageService()
     {
         Configure<MainViewModel, MainPage>();
-        Configure<BlankViewModel, BlankPage>();
-        Configure<DataGridViewModel, DataGridPage>();
+        Configure<OrdersViewModel, OrdersPage>();
         Configure<SettingsViewModel, SettingsPage>();
     }
 

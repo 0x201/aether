@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using ModernCSharp.ApplicationCore.Enums;
@@ -6,18 +6,21 @@ using ModernCSharp.WinUIApp.ViewModels;
 
 using Windows.Storage.Pickers;
 
-namespace ModernCSharp.WinUIApp.Views;
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
 
-public sealed partial class BlankPage : Page
+namespace ModernCSharp.WinUIApp.Controls;
+
+public sealed partial class ImportOrdersDialog : UserControl
 {
-    public BlankViewModel ViewModel
+    public ImportOrdersViewModel ViewModel
     {
         get;
     }
 
-    public BlankPage()
+    public ImportOrdersDialog()
     {
-        ViewModel = App.GetService<BlankViewModel>();
+        ViewModel = App.GetService<ImportOrdersViewModel>();
         InitializeComponent();
     }
 
@@ -26,9 +29,8 @@ public sealed partial class BlankPage : Page
         var orderFilePicker = new FileOpenPicker()
         {
             ViewMode = PickerViewMode.Thumbnail,
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+            SuggestedStartLocation = PickerLocationId.Desktop,
         };
-
         var window = App.MainWindow;
         var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
         WinRT.Interop.InitializeWithWindow.Initialize(orderFilePicker, hWnd);
@@ -36,24 +38,20 @@ public sealed partial class BlankPage : Page
         var fileExtension = MapFileType(ViewModel.SelectedFileType);
         orderFilePicker.FileTypeFilter.Add(fileExtension);
 
-        //orderFilePicker.FileTypeFilter.Add(".csv");
-        //orderFilePicker.FileTypeFilter.Add(".json");
-        //orderFilePicker.FileTypeFilter.Add(".xlsx");
-
         var selectedOrderFile = await orderFilePicker.PickSingleFileAsync();
 
         if (selectedOrderFile is not null)
         {
-            OrderFilePathTextBlock.Text = $"Order file path: {selectedOrderFile.Name}";
             ViewModel.FilePath = selectedOrderFile.Path;
         }
         else
         {
+            ViewModel.FilePath = string.Empty;
             OrderFilePathTextBlock.Text = "Operation cancelled.";
         }
     }
 
-    private string MapFileType(FileType fileType)
+    private static string MapFileType(FileType fileType)
     {
         return fileType switch
         {

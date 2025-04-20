@@ -1,11 +1,10 @@
-﻿using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
+﻿using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.Domain.Entities;
 using ModernCSharp.Domain.Enums;
 
 namespace ModernCSharp.ApplicationCore.Services;
 
-public class OrderService
+public class OrderService : IOrderService
 {
     private List<Order> Orders
     {

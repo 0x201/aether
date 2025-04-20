@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<RootNamespace>ModerCSharp.ApplicationCore</RootNamespace>
-		<AssemblyName>ModerCSharp.ApplicationCore</AssemblyName>
+		<RootNamespace>ModernCSharp.ApplicationCore</RootNamespace>
+		<AssemblyName>ModernCSharp.ApplicationCore</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" />
 		<PackageReference Include="ClosedXML" />
-		<PackageReference Include="CsvHelper"  />
+		<PackageReference Include="CsvHelper" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\ModernCSharp.Domain\ModernCSharp.Domain.csproj" />
+		<ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Ordering\Commands\DeleteOrder\" />

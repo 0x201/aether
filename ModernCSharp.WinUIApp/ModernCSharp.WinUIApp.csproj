@@ -18,6 +18,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Controls\AddOrderDialog.xaml" />
+	  <None Remove="Controls\ImportOrdersDialog.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,10 +27,16 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" />
+		<PackageReference Include="CommunityToolkit.WinUI.Animations" />
+		<PackageReference Include="CommunityToolkit.WinUI.Behaviors" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" />
-		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" />
-		<PackageReference Include="Microsoft.Extensions.Hosting"  />
-		<PackageReference Include="Microsoft.WindowsAppSDK"  />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
+		<PackageReference Include="CommunityToolkit.WinUI.Converters" />
+		<PackageReference Include="CommunityToolkit.WinUI.Extensions" />
+		<PackageReference Include="CommunityToolkit.WinUI.Helpers" />
+		<PackageReference Include="CommunityToolkit.WinUI.Triggers" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" />
 		<PackageReference Include="WinUIEx" />
 	</ItemGroup>
@@ -43,6 +50,9 @@
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<Page Update="Controls\ImportOrdersDialog.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Update="Controls\AddOrderDialog.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>

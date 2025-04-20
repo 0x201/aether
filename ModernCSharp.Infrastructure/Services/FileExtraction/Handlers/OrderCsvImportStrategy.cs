@@ -1,11 +1,13 @@
 ﻿using System.Globalization;
 
 using CsvHelper;
+using CsvHelper.Configuration;
 
 using Microsoft.Extensions.Logging;
 
 using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Enums;
+using ModernCSharp.ApplicationCore.Mappings;
 using ModernCSharp.ApplicationCore.Models.FileExtraction;
 using ModernCSharp.Domain.Entities;
 using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
@@ -49,8 +51,13 @@ internal class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : 
     private async Task<List<Order>> PerformImportAsync(CancellationToken cancellationToken = default)
     {
         await using var stream = new FileStream(_context!.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+        };
         using var reader = new StreamReader(stream);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        using var csv = new CsvReader(reader, config);
+        csv.Context.RegisterClassMap<OrderMapping>();
 
         List<Order> orders = [];
         await foreach (var order in csv.GetRecordsAsync<Order>(cancellationToken))

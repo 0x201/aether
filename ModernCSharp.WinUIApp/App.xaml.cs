@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 
+using ModernCSharp.ApplicationCore.Abstractions;
+using ModernCSharp.ApplicationCore.Services;
 using ModernCSharp.Infrastructure;
 using ModernCSharp.WinUIApp.Activation;
 using ModernCSharp.WinUIApp.Contracts.Services;
@@ -66,9 +68,13 @@ public partial class App : Microsoft.UI.Xaml.Application
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
 
+            services.AddFileContexts();
+            services.AddFileImporters();
+            services.AddFileExporters();
+
             // Core Services
-            services.AddSingleton<ISampleDataService, SampleDataService>();
             services.AddSingleton<IFileService, FileService>();
+            services.AddTransient<IOrderService, OrderService>();
             services.AddFileImporters();
             services.AddFileExporters();
 
@@ -78,14 +84,14 @@ public partial class App : Microsoft.UI.Xaml.Application
             // Views and ViewModels
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<SettingsPage>();
-            services.AddTransient<DataGridViewModel>();
-            services.AddTransient<DataGridPage>();
-            services.AddTransient<BlankViewModel>();
-            services.AddTransient<BlankPage>();
+            services.AddTransient<OrdersViewModel>();
+            services.AddTransient<OrdersPage>();
             services.AddTransient<MainViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
+
+            services.AddTransient<ImportOrdersViewModel>();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

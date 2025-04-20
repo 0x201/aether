@@ -1,0 +1,85 @@
+﻿<Page
+    x:Class="ModernCSharp.WinUIApp.Views.OrdersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:ModernCSharp.Domain.Entities"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d">
+
+    <RelativePanel x:Name="ContentArea">
+        <CommandBar
+            x:Name="OrderCommandBar"
+            Background="Transparent"
+            IsOpen="False"
+            DefaultLabelPosition="Right"
+            RelativePanel.AlignRightWithPanel="True">
+            <AppBarButton Icon="Add" Label="New"/>
+            <AppBarButton Icon="Folder" Label="Import" Command="{x:Bind ViewModel.OpenImportDialogCommand}" CommandParameter="{x:Bind XamlRoot}"/>
+            <AppBarButton Icon="Edit" Label="Edit"/>
+            <AppBarButton Icon="Filter" Label="Filter By"/>
+            <AppBarButton Icon="Bullets" Label="Group By"/>
+            <AppBarButton Icon="Refresh" Label="Reresh"/>
+        </CommandBar>
+
+        <ListView
+            x:Name="OrderListView"
+            ItemsSource="{x:Bind ViewModel.Orders, Mode=OneWay}"
+            RelativePanel.Below="OrderCommandBar"
+            SelectionMode="Single"
+            IsItemClickEnabled="false"
+            SelectionChanged="OrderListView_SelectionChanged"
+            RelativePanel.AlignHorizontalCenterWithPanel="True"
+            RelativePanel.AlignVerticalCenterWithPanel="True">
+            <ListView.Resources>
+                <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor" Color="Transparent" />
+            </ListView.Resources>
+            <ListView.HeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Order Id" FontWeight="Bold" MinWidth="100"/>
+                        <TextBlock Text="Customer Name" MinWidth="150"/>
+                        <TextBlock Text="Quantity" MinWidth="150"/>
+                        <TextBlock Text="Total" MinWidth="150"/>
+                        <TextBlock Text="Order Date" MinWidth="150"/>
+                        <TextBlock Text="Order Status" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.HeaderTemplate>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:Order">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock
+                            Text="{x:Bind Id}"
+                            FontWeight="Bold"
+                            HorizontalAlignment="Left"
+                            MinWidth="100" />
+                        <TextBlock
+                            Text="{x:Bind CustomerName, Mode=OneWay}"
+                            HorizontalAlignment="Left"
+                            MinWidth="150"/>
+                        <TextBlock
+                            Text="{x:Bind Quantity, Mode=OneWay}"
+                            HorizontalAlignment="Left"
+                            MinWidth="150"/>
+                        <TextBlock
+                            Text="{x:Bind Total, Mode=OneWay}"
+                            HorizontalAlignment="Left"
+                            MinWidth="150"/>
+                        <TextBlock Text="{x:Bind OrderDate}" MinWidth="150"/>
+                        <TextBlock Text="{x:Bind OrderStatus, Mode=OneWay}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style
+                    BasedOn="{StaticResource DefaultListViewItemStyle}"
+                    TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </RelativePanel>
+</Page>
