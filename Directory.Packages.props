@@ -96,6 +96,7 @@
 		<PackageVersion Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
 		<PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250401001" />
 		<PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
+		<PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />	
 		<PackageVersion Include="WinUIEx" Version="2.5.1" />
 		<!--CommunityToolkit.WinUI-->
 		<PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
