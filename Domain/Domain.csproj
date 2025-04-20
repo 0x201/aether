@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<RootNamespace>ModernCSharp.Domain</RootNamespace>
 		<PackageId>Domain</PackageId>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>

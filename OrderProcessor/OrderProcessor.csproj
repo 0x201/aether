@@ -4,12 +4,14 @@
 		<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
 		<AssemblyName>ModernCSharp.OrderProcessor</AssemblyName>
 		<RootNamespace>ModernCSharp.OrderProcessor</RootNamespace>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 		<Folder Include="Mappings\" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Domain\Domain.csproj" />
 	  <ProjectReference Include="..\EventBus\EventBus.csproj" />
 	  <ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
 	  <ProjectReference Include="..\ModernCSharp.Infrastructure\ModernCSharp.Infrastructure.csproj" />

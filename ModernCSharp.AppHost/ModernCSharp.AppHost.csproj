@@ -9,10 +9,11 @@
 		<Nullable>enable</Nullable>
 		<IsAspireHost>true</IsAspireHost>
 		<UserSecretsId>7b535cd2-6e8e-458d-88f7-279fe1570184</UserSecretsId>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\OrderProcessor\OrderProcessor.csproj" />
+		<ProjectReference Include="..\OrderProcessor\OrderProcessor.csproj" />
 		<ProjectReference Include="..\ModernCSharp.ApiService\ModernCSharp.ApiService.csproj" />
 		<ProjectReference Include="..\ModernCSharp.Web\ModernCSharp.Web.csproj" />
 	</ItemGroup>

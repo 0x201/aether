@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<RootNamespace>ModernCSharp.ApplicationCore</RootNamespace>
 		<AssemblyName>ModernCSharp.ApplicationCore</AssemblyName>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" />

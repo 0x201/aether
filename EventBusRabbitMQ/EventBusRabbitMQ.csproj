@@ -5,6 +5,7 @@
         <IsAotCompatible>true</IsAotCompatible>
         <RootNamespace>ModernCSharp.EventBusRabbitMQ</RootNamespace>
         <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+        <Platforms>AnyCPU;x64;x86</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

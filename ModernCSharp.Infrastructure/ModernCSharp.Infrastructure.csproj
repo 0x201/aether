@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<RootNamespace>ModernCSharp.Infrastructure</RootNamespace>
 		<AssemblyName>ModernCSharp.Infrastructure</AssemblyName>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,11 +35,11 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 		<!--#endif-->
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" >
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Caching.Hybrid"  />
+		<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
 	</ItemGroup>
 
 </Project>

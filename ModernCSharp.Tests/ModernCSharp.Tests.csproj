@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -12,7 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Aspire.Hosting.Testing" />
-		<PackageReference Include="MSTest"/>
+		<PackageReference Include="MSTest" />
 	</ItemGroup>
 
 	<ItemGroup>

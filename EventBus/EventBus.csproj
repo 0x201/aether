@@ -4,6 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <IsAotCompatible>true</IsAotCompatible>
         <RootNamespace>ModernCSharp.EventBus</RootNamespace>
+        <Platforms>AnyCPU;x64;x86</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
