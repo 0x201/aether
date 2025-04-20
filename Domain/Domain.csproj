@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>ModernCSharp.Domain</RootNamespace>
+		<PackageId>Domain</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MediatR" />
+	</ItemGroup>
+
+</Project>
