@@ -6,6 +6,7 @@
 		<AspnetVersion>9.0.4</AspnetVersion>
 		<EfcoreVersion>9.0.4</EfcoreVersion>
 		<MicrosoftExtensionsVersion>9.0.4</MicrosoftExtensionsVersion>
+		<CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<!--#if (UseAspire)-->
@@ -19,6 +20,8 @@
 		<!--#endif-->
 		<PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
 		<PackageVersion Include="Aspire.Hosting.Redis" Version="$(AspireVersion)" />
+		<PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="$(AspireVersion)" />
+		<PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />
 		<PackageVersion Include="Aspire.Hosting.Testing" Version="$(AspireVersion)" />
 		<PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="$(AspireVersion)" />
 		<PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.4.0" />
@@ -30,7 +33,6 @@
 		<PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.11.1" />
 		<PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.1" />
 		<!--#endif-->
-		<PackageVersion Include="Ardalis.GuardClauses" Version="4.6.0" />
 		<PackageVersion Include="AutoMapper" Version="14.0.0" />
 		<PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
 		<PackageVersion Include="Azure.Identity" Version="1.13.2" />
@@ -44,7 +46,6 @@
 		<PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
 		<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
 		<PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
-
 		<!--#if (!UseApiOnly)-->
 		<PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="$(AspnetVersion)" />
 		<!--#endif-->
@@ -69,8 +70,13 @@
 		<PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(MicrosoftExtensionsVersion)" />
 		<PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
 		<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
+		<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+		<PackageVersion Include="Microsoft.Extensions.Options" Version="$(MicrosoftExtensionsVersion)" />
+		<PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(MicrosoftExtensionsVersion)" />
+		<PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
 		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
 		<PackageVersion Include="Microsoft.VisualStudio.TestTools.UnitTesting" Version="$(AspireVersion)" />
+		<PackageVersion Include="Polly.Core" Version="8.5.2" />
 		<PackageVersion Include="Moq" Version="4.20.72" />
 		<PackageVersion Include="NSwag.AspNetCore" Version="14.2.0" />
 		<PackageVersion Include="NSwag.MSBuild" Version="14.2.0" />
@@ -87,11 +93,20 @@
 		<PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageVersion Include="MahApps.Metro" Version="2.4.10" />
 		<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.250402" />
 		<PackageVersion Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
 		<PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250401001" />
 		<PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
 		<PackageVersion Include="WinUIEx" Version="2.5.1" />
+		<!--CommunityToolkit.WinUI-->
+		<PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Behaviors" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Helpers" Version="$(CommunityToolkitWinUIVersion)" />
+		<PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="$(CommunityToolkitWinUIVersion)" />
+
 		<!--#if(!UseApiOnly)-->
 		<PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
 		<PackageVersion Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
