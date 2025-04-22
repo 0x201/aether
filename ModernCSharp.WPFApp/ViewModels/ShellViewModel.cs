@@ -40,7 +40,7 @@ public class ShellViewModel : ObservableObject
         new HamburgerMenuGlyphItem() { Label = Resources.ShellMainPage, Glyph = "\uE8A5", TargetPageType = typeof(MainViewModel) },
         new HamburgerMenuGlyphItem() { Label = Resources.ShellOrderListDetailsPage, Glyph = "\uE8A5", TargetPageType = typeof(OrderListDetailsViewModel) },
         new HamburgerMenuGlyphItem() { Label = Resources.ShellOrderDataGridPage, Glyph = "\uE8A5", TargetPageType = typeof(OrderDataGridViewModel) },
-        new HamburgerMenuGlyphItem() { Label = Resources.ShellBlankPage, Glyph = "\uE8A5", TargetPageType = typeof(BlankViewModel) },
+        new HamburgerMenuGlyphItem() { Label = Resources.ShellBlankPage, Glyph = "\uE8A5", TargetPageType = typeof(OrderViewModel) },
     };
 
     public ObservableCollection<HamburgerMenuItem> OptionMenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()

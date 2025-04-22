@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using ModernCSharp.ApplicationCore.Abstractions;
+using ModernCSharp.ApplicationCore.Services;
+using ModernCSharp.Infrastructure;
 using ModernCSharp.WPFApp.Contracts.Services;
 using ModernCSharp.WPFApp.Contracts.Views;
 using ModernCSharp.WPFApp.Core.Contracts.Services;
@@ -25,9 +28,9 @@ namespace ModernCSharp.WPFApp;
 // Tracking issue for improving this is https://github.com/dotnet/wpf/issues/1946
 public partial class App : System.Windows.Application
 {
-    private IHost _host;
+    private static IHost _host;
 
-    public T GetService<T>()
+    public static T GetService<T>()
         where T : class
         => _host.Services.GetService(typeof(T)) as T;
 
@@ -63,6 +66,12 @@ public partial class App : System.Windows.Application
         // Core Services
         services.AddSingleton<IFileService, FileService>();
 
+        services.AddFileContexts();
+        services.AddFileExporters();
+        services.AddFileImporters();
+
+        services.AddTransient<IOrderService, OrderService>();
+
         // Services
         services.AddSingleton<IApplicationInfoService, ApplicationInfoService>();
         services.AddSingleton<ISystemService, SystemService>();
@@ -85,8 +94,8 @@ public partial class App : System.Windows.Application
         services.AddTransient<OrderDataGridViewModel>();
         services.AddTransient<OrderDataGridPage>();
 
-        services.AddTransient<BlankViewModel>();
-        services.AddTransient<BlankPage>();
+        services.AddTransient<OrderViewModel>();
+        services.AddTransient<OrderPage>();
 
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<SettingsPage>();

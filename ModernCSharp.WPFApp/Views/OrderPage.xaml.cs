@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 using Microsoft.Win32;
 
@@ -6,12 +7,17 @@ using ModernCSharp.WPFApp.ViewModels;
 
 namespace ModernCSharp.WPFApp.Views;
 
-public partial class BlankPage : Page
+public partial class OrderPage : Page
 {
-    public BlankPage(BlankViewModel viewModel)
+    public OrderViewModel ViewModel
     {
+        get;
+    }
+
+    public OrderPage()
+    {
+        ViewModel = App.GetService<OrderViewModel>();
         InitializeComponent();
-        DataContext = viewModel;
     }
 
     private void OpenFileDialogButton_Click(object sender, System.Windows.RoutedEventArgs e)

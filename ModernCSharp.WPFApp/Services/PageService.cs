@@ -19,7 +19,7 @@ public class PageService : IPageService
         Configure<MainViewModel, MainPage>();
         Configure<OrderListDetailsViewModel, OrderListDetailsPage>();
         Configure<OrderDataGridViewModel, OrderDataGridPage>();
-        Configure<BlankViewModel, BlankPage>();
+        Configure<OrderViewModel, OrderPage>();
         Configure<SettingsViewModel, SettingsPage>();
     }
 

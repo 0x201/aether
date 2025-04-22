@@ -49,7 +49,7 @@ public class PagesTests
         services.AddTransient<OrderListDetailsViewModel>();
         services.AddTransient<OrderDataGridViewModel>();
         services.AddTransient<MainViewModel>();
-        services.AddTransient<BlankViewModel>();
+        services.AddTransient<OrderViewModel>();
 
         // Configuration
         services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));
@@ -147,7 +147,7 @@ public class PagesTests
     [TestMethod]
     public void TestBlankViewModelCreation()
     {
-        var vm = _host.Services.GetService(typeof(BlankViewModel));
+        var vm = _host.Services.GetService(typeof(OrderViewModel));
         Assert.IsNotNull(vm);
     }
 
@@ -156,8 +156,8 @@ public class PagesTests
     {
         if (_host.Services.GetService(typeof(IPageService)) is IPageService pageService)
         {
-            var pageType = pageService.GetPageType(typeof(BlankViewModel).FullName);
-            Assert.AreEqual(typeof(BlankPage), pageType);
+            var pageType = pageService.GetPageType(typeof(OrderViewModel).FullName);
+            Assert.AreEqual(typeof(OrderPage), pageType);
         }
         else
         {
