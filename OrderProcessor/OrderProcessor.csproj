@@ -11,16 +11,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Domain\Domain.csproj" />
-	  <ProjectReference Include="..\EventBus\EventBus.csproj" />
-	  <ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
-	  <ProjectReference Include="..\ModernCSharp.Infrastructure\ModernCSharp.Infrastructure.csproj" />
-	  <ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" />
-		<PackageReference Include="Aspire.Hosting.RabbitMQ" />
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+		<ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
+		<ProjectReference Include="..\EventBus\EventBus.csproj" />
+		<ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
+		<ProjectReference Include="..\ModernCSharp.Infrastructure\ModernCSharp.Infrastructure.csproj" />
+		<ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
 	</ItemGroup>
 
 </Project>

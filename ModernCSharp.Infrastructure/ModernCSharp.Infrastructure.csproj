@@ -11,23 +11,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--#if (UseAspire)-->
-		<!--#if (UseSqlServer)-->
 		<PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" />
-		<!--#endif-->
-		<!--#endif-->
 		<PackageReference Include="Azure.Identity" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
-		<!--#if (!UseApiOnly)-->
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
-		<!--#endif-->
-		<!--#if (UseSqlite)-->
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
-		<!--#endif-->
-		<!--#if (UseSqlServer)-->
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-		<!--#endif-->
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
 			<PrivateAssets>all</PrivateAssets>
