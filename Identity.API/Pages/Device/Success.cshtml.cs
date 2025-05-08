@@ -1,0 +1,15 @@
+// Copyright (c) Duende Software. All rights reserved.
+// See LICENSE in the project root for license information.
+
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace ModernCSharp.Identity.API.Pages.Device;
+
+[SecurityHeaders]
+[Authorize]
+public class SuccessModel : PageModel
+{
+    public void OnGet()
+    {
+    }
+}
