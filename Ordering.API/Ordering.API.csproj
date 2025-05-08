@@ -3,6 +3,7 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
     <ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
   </ItemGroup>
 

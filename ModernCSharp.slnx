@@ -22,7 +22,7 @@
   </Project>
   <Project Path="Identity.API/Identity.API.csproj" />
   <Project Path="IntegrationEventLogEF/IntegrationEventLogEF.csproj" Id="752ffec7-857e-4c0e-b930-7cb590c85371" />
-  <Project Path="ModernCSharp.ApiService/ModernCSharp.ApiService.csproj">
+  <Project Path="Ordering.API/Ordering.API.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
