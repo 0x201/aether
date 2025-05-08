@@ -3,7 +3,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.Domain.Entities;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.WPFApp.Contracts.ViewModels;
 
 namespace ModernCSharp.WPFApp.ViewModels;

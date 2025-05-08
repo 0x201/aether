@@ -1,4 +1,4 @@
-﻿using ModernCSharp.Domain.Entities;
+﻿using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 
 namespace ModernCSharp.WinFormsApp.Models;
 public class ExportOrdersEventArgs

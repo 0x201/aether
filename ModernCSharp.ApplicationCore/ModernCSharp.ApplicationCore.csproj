@@ -14,7 +14,7 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Domain\Domain.csproj" />
+		<ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Ordering\Commands\DeleteOrder\" />

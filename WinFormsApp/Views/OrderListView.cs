@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 
-using ModernCSharp.Domain.Entities;
-using ModernCSharp.Domain.Enums;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Models;
 
@@ -93,13 +92,20 @@ public partial class OrderListView : BaseView, IOrderListView
             if (OrderDataGridView is not null)
             {
                 ordersToExport.AddRange(from DataGridViewRow row in OrderDataGridView.SelectedRows
-                                        select new Order
-                                        {
-                                            Id = (int)row.Cells["Id"].Value,
-                                            Quantity = (int)row.Cells["Quantity"].Value,
-                                            OrderStatus = (OrderStatus)row.Cells["OrderStatus"].Value,
-                                            Total = (decimal)row.Cells["Total"].Value,
-                                        });
+                                        select new Order("12345",
+                                        "Jack",
+                                        new Address("", "", "", "", ""),
+                                        1,
+                                        "123",
+                                        "1234",
+                                        "12345",
+                                        new DateTime(2025, 12, 31)));
+                //{
+                //    Id = (int)row.Cells["Id"].Value,
+                //    Quantity = (int)row.Cells["Quantity"].Value,
+                //    OrderStatus = (OrderStatus)row.Cells["OrderStatus"].Value,
+                //    Total = (decimal)row.Cells["Total"].Value,
+                //});
             }
 
             var folderBrowserDialog = new FolderBrowserDialog

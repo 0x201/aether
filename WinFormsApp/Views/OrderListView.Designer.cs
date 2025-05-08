@@ -1,4 +1,6 @@
-﻿namespace ModernCSharp.WinFormsApp.Views
+﻿using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+
+namespace ModernCSharp.WinFormsApp.Views
 {
     partial class OrderListView
     {
@@ -147,7 +149,7 @@
             // 
             // orderBindingSource
             // 
-            orderBindingSource.DataSource = typeof(ModernCSharp.Domain.Entities.Order);
+            orderBindingSource.DataSource = typeof(Order);
             // 
             // ExportButton
             // 
@@ -180,7 +182,7 @@
             // 
             // orderBindingSource1
             // 
-            orderBindingSource1.DataSource = typeof(ModernCSharp.Domain.Entities.Order);
+            orderBindingSource1.DataSource = typeof(Order);
             // 
             // OrderListView
             // 

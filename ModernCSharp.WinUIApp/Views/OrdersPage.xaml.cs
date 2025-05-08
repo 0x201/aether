@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 
-using ModernCSharp.Domain.Entities;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.WinUIApp.ViewModels;
 
 namespace ModernCSharp.WinUIApp.Views;

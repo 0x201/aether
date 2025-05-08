@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-using ModernCSharp.Domain.Entities;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Models;

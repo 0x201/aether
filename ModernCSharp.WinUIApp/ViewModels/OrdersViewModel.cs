@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.Domain.Entities;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.WinUIApp.Contracts.ViewModels;
 using ModernCSharp.WinUIApp.Controls;
 

@@ -8,27 +8,25 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="Domain\Domain.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="EventBusRabbitMQ/EventBusRabbitMQ.csproj">
-    <Configuration Solution="Debug|arm64" Project="Debug|Any CPU" />
-    <Configuration Solution="Debug|x64" Project="Debug|Any CPU" />
-    <Configuration Solution="Debug|x86" Project="Debug|Any CPU" />
-    <Configuration Solution="Release|arm64" Project="Release|Any CPU" />
-    <Configuration Solution="Release|x64" Project="Release|Any CPU" />
-    <Configuration Solution="Release|x86" Project="Release|Any CPU" />
+  <Project Path="Ordering.Domain/Ordering.Domain.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
   <Project Path="EventBus/EventBus.csproj">
-    <Configuration Solution="Debug|arm64" Project="Debug|Any CPU" />
-    <Configuration Solution="Debug|x64" Project="Debug|Any CPU" />
-    <Configuration Solution="Debug|x86" Project="Debug|Any CPU" />
-    <Configuration Solution="Release|arm64" Project="Release|Any CPU" />
-    <Configuration Solution="Release|x64" Project="Release|Any CPU" />
-    <Configuration Solution="Release|x86" Project="Release|Any CPU" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="EventBusRabbitMQ/EventBusRabbitMQ.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="Identity.API/Identity.API.csproj" />
+  <Project Path="IntegrationEventLogEF/IntegrationEventLogEF.csproj" Id="752ffec7-857e-4c0e-b930-7cb590c85371" />
+  <Project Path="ModernCSharp.ApiService/ModernCSharp.ApiService.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="ModernCSharp.AppHost/ModernCSharp.AppHost.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
@@ -36,42 +34,8 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="ModernCSharp.Infrastructure/ModernCSharp.Infrastructure.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="ModernCSharp.WinUIApp.Core/ModernCSharp.WinUIApp.Core.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="ModernCSharp.WinUIApp.Tests.MSTest/ModernCSharp.WinUIApp.Tests.MSTest.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-    <Platform Solution="Debug|Any CPU" Project="x64" />
-  </Project>
-  <Project Path="ModernCSharp.WinUIApp/ModernCSharp.WinUIApp.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-    <Deploy Solution="*|x64" />
-    <Deploy Solution="*|x86" />
-  </Project>
-  <Project Path="ModernCSharp.WPFApp.Core/ModernCSharp.WPFApp.Core.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="ModernCSharp.ApiService/ModernCSharp.ApiService.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="ModernCSharp.AppHost/ModernCSharp.AppHost.csproj">
+  <Project Path="ModernCSharp.DDD/ModernCSharp.DDD.csproj" Id="cf2247b3-6fc4-4a93-9bf3-4f906072f079" />
+  <Project Path="Ordering.Infrastructure/Ordering.Infrastructure.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
@@ -87,10 +51,39 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
+  <Project Path="ModernCSharp.WinUIApp.Core/ModernCSharp.WinUIApp.Core.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="ModernCSharp.WinUIApp.Tests.MSTest/ModernCSharp.WinUIApp.Tests.MSTest.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
+  </Project>
+  <Project Path="ModernCSharp.WinUIApp/ModernCSharp.WinUIApp.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
+    <Deploy Solution="*|x64" />
+    <Deploy Solution="*|x86" />
+  </Project>
+  <Project Path="ModernCSharp.WPFApp.Core/ModernCSharp.WPFApp.Core.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
   <Project Path="OrderProcessor/OrderProcessor.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
+  <Project Path="Inventory.Domain/Inventory.Domain.csproj" Id="57ca883b-48e9-4f32-9e9c-51919ecf8b9c" />
   <Project Path="WinFormsApp/WinFormsApp.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />

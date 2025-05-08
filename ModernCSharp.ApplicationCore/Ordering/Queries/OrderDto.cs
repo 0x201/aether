@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-
-using ModernCSharp.Domain.Entities;
-using ModernCSharp.Domain.Enums;
+﻿using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 
 namespace ModernCSharp.ApplicationCore.Ordering.Queries;
 

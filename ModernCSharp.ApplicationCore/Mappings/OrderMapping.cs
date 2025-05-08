@@ -1,6 +1,6 @@
 ﻿using CsvHelper.Configuration;
 
-using ModernCSharp.Domain.Entities;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 
 namespace ModernCSharp.ApplicationCore.Mappings;
 public class OrderMapping : ClassMap<Order>

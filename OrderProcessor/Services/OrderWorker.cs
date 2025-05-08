@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Common.Interfaces;
 using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Domain.Entities;
-using ModernCSharp.Domain.Enums;
 using ModernCSharp.EventBus.Abstractions;
 using ModernCSharp.Infrastructure.Services.FileContext;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.OrderProcessor.Events;
 
 namespace ModernCSharp.OrderProcessor.Services;
@@ -16,13 +15,13 @@ namespace ModernCSharp.OrderProcessor.Services;
 public class OrderWorker(
     ILogger<OrderWorker> logger,
     IEventBus eventBus,
-    IApplicationDbContext dbContext,
+    IServiceScopeFactory serviceScopeFactory,
     IOptions<BackgroundTaskOptions> options,
     IFileExportService<Order> fileExportService,
     IFileImportService<Order> fileImportService,
     ExportContextFactory<Order> exportContextFactory,
     ImportContextFactory importContextFactory,
-    OrderService orderService) : BackgroundService
+    IOrderService orderService) : BackgroundService
 {
     private readonly BackgroundTaskOptions
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -77,10 +76,13 @@ public class OrderWorker(
 
     private async ValueTask<List<int>> GetConfirmedGracePeriodOrders()
     {
+        using var scope = serviceScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+
+        var timespan = DateTime.UtcNow.AddMinutes(_options.GracePeriodTime);
+
         var ids = await dbContext.Orders
-            .Where(x =>
-                x.OrderStatus == OrderStatus.Pending && (DateTime.UtcNow - x.OrderDate) >=
-                TimeSpan.FromMinutes(_options.GracePeriodTime))
+            .Where(x => x.OrderStatus == OrderStatus.Submitted && x.OrderDate >= timespan)
             .Select(x => x.Id)
             .ToListAsync();
 

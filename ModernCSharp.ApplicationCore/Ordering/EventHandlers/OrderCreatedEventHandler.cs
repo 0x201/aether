@@ -1,8 +1,6 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Logging;
 
-using Microsoft.Extensions.Logging;
-
-using ModernCSharp.Domain.Events;
+using ModernCSharp.Ordering.Domain.Events;
 
 namespace ModernCSharp.ApplicationCore.Ordering.EventHandlers;
 public class OrderCreatedEventHandler(ILogger<OrderCreatedEventHandler> logger) : INotificationHandler<OrderCreatedEvent>

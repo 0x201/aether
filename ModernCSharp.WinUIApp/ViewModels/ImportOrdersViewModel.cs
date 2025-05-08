@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml;
 
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.Domain.Entities;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.Infrastructure.Services.FileContext;
 
 namespace ModernCSharp.WinUIApp.ViewModels;

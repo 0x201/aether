@@ -1,9 +1,6 @@
-﻿using MediatR;
-
-using ModernCSharp.ApplicationCore.Common.Interfaces;
-using ModernCSharp.Domain.Entities;
-using ModernCSharp.Domain.Enums;
-using ModernCSharp.Domain.Events;
+﻿using ModernCSharp.ApplicationCore.Common.Interfaces;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Domain.Events;
 
 namespace ModernCSharp.ApplicationCore.Ordering.Commands.CreateOrder;
 
@@ -41,14 +38,14 @@ public class CreateOrderCommandHandler(IApplicationDbContext dbContext) : IReque
 {
     public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = new Order
-        {
-            OrderStatus = request.OrderStatus,
-            OrderDate = request.OrderDate,
-            CustomerName = request.CustomerName,
-            Quantity = request.Quantity,
-            Total = request.Total,
-        };
+        var entity = new Order(userId: "123", 
+            userName: request.CustomerName,
+            address: new Address("", "", "", "", ""),
+            cardTypeId: 1,
+            cardNumber: "",
+            cardSecurityNumber: "",
+            cardHolderName: "",
+            cardExpiration: DateTime.Now);
 
         entity.AddDomainEvent(new OrderCreatedEvent(entity));
 

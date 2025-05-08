@@ -11,11 +11,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Domain\Domain.csproj" />
+		<ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
 		<ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
 		<ProjectReference Include="..\EventBus\EventBus.csproj" />
 		<ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
-		<ProjectReference Include="..\ModernCSharp.Infrastructure\ModernCSharp.Infrastructure.csproj" />
+		<ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
 		<ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
 	</ItemGroup>
 

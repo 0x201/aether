@@ -1,5 +1,12 @@
+using Microsoft.FluentUI.AspNetCore.Components;
+
+using ModernCSharp.ApplicationCore;
+using ModernCSharp.ApplicationCore.Common.Interfaces;
+using ModernCSharp.Infrastructure;
+using ModernCSharp.Infrastructure.Data;
 using ModernCSharp.Web;
 using ModernCSharp.Web.Components;
+using ModernCSharp.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +18,14 @@ builder.AddRedisOutputCache("cache");
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddFluentUIComponents();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUser, CurrentUser>();
+
+builder.AddApplicationServices();
+builder.AddInfrastructureServices();
+
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
@@ -20,7 +35,11 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    await app.InitializeDatabaseAsync();
+}
+else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
