@@ -1,6 +1,4 @@
-using System.Text.Json.Serialization;
-
-namespace ModernCSharp.EventBus.Events;
+﻿namespace ModernCSharp.EventBus.Events;
 
 public record IntegrationEvent
 {
