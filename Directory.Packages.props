@@ -1,4 +1,4 @@
-<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+﻿<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -9,6 +9,8 @@
     <FluentUIVersion>4.11.8</FluentUIVersion>
     <MicrosoftExtensionsVersion>9.0.4</MicrosoftExtensionsVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
+    <DuendeVersion>7.2.3</DuendeVersion>
+    <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
@@ -23,11 +25,11 @@
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="4.11.8" />
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.11.8" />
     <!--OpenTelemetry-->
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.2" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.11.2" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.11.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
     <!--AspNetCore-->
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
@@ -62,6 +64,12 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <!--Duende.IdentityServer-->
+    <PackageVersion Include="Duende.IdentityServer" Version="$(DuendeVersion)" />
+    <PackageVersion Include="Duende.IdentityServer.AspNetIdentity" Version="$(DuendeVersion)" />
+    <PackageVersion Include="Duende.IdentityServer.EntityFramework" Version="$(DuendeVersion)" />
+    <PackageVersion Include="Duende.IdentityServer.EntityFramework.Storage" Version="7.1.1" />
+    <PackageVersion Include="Duende.IdentityServer.Storage" Version="$(DuendeVersion)" />
     <!--Testing-->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
@@ -69,14 +77,16 @@
     <PackageVersion Include="MSTest" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.2.1" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
+    <PackageVersion Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
+    <PackageVersion Include="SpecFlow.NUnit" Version="3.9.74" />
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="2.4.10" />
     <!--WinUI-->
     <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250401001" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.3916" />
     <PackageVersion Include="WinUIEx" Version="2.5.1" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
@@ -88,19 +98,18 @@
     <PackageVersion Include="CommunityToolkit.WinUI.Helpers" Version="$(CommunityToolkitWinUIVersion)" />
     <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="$(CommunityToolkitWinUIVersion)" />
 
-    <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
-    <PackageVersion Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
-    <PackageVersion Include="SpecFlow.NUnit" Version="3.9.74" />
+    <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
 
-    <!--3rd Party-->
+    <!--Miscellaneous-->
     <PackageVersion Include="AutoMapper" Version="14.0.0" />
     <PackageVersion Include="ClosedXML" Version="0.104.2" />
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
     <PackageVersion Include="FluentAssertions" Version="6.12.2" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="Polly.Core" Version="8.5.2" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.2.7" />
   </ItemGroup>
 </Project>
