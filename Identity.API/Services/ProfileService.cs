@@ -61,32 +61,6 @@ public class ProfileService(
         if (!string.IsNullOrWhiteSpace(user.LastName))
             claims.Add(new Claim("last_name", user.LastName));
 
-        if (!string.IsNullOrWhiteSpace(user.CardNumber))
-            claims.Add(new Claim("card_number", user.CardNumber));
-
-        if (!string.IsNullOrWhiteSpace(user.CardHolderName))
-            claims.Add(new Claim("card_holder", user.CardHolderName));
-
-        if (!string.IsNullOrWhiteSpace(user.SecurityNumber))
-            claims.Add(new Claim("card_security_number", user.SecurityNumber));
-
-        if (!string.IsNullOrWhiteSpace(user.Expiration))
-            claims.Add(new Claim("card_expiration", user.Expiration));
-
-        if (!string.IsNullOrWhiteSpace(user.City))
-            claims.Add(new Claim("address_city", user.City));
-
-        if (!string.IsNullOrWhiteSpace(user.Country))
-            claims.Add(new Claim("address_country", user.Country));
-
-        if (!string.IsNullOrWhiteSpace(user.State))
-            claims.Add(new Claim("address_state", user.State));
-
-        if (!string.IsNullOrWhiteSpace(user.Street))
-            claims.Add(new Claim("address_street", user.Street));
-
-        if (!string.IsNullOrWhiteSpace(user.ZipCode))
-            claims.Add(new Claim("address_zip_code", user.ZipCode));
 
         if (userManager.SupportsUserEmail)
         {
