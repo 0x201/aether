@@ -1,4 +1,4 @@
-var builder = DistributedApplication.CreateBuilder(args);
+﻿var builder = DistributedApplication.CreateBuilder(args);
 
 
 var cache = builder.AddRedis("cache");
@@ -15,7 +15,7 @@ var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", laun
     .WithExternalHttpEndpoints()
     .WithReference(identityDb);
 
-var apiService = builder.AddProject<Projects.ModernCSharp_ApiService>("apiservice")
+var apiService = builder.AddProject<Projects.Ordering_API>("apiservice")
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq);
 

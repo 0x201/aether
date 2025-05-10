@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 using ModernCSharp.DDD.Common;
-using ModernCSharp.Infrastructure.Data.Configurations;
+using ModernCSharp.Ordering.Infrastructure.Data.Configurations;
 using ModernCSharp.IntegrationEventLogEF;
 using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 
-namespace ModernCSharp.Infrastructure.Data;
+namespace ModernCSharp.Ordering.Infrastructure.Data;
 
 public class OrderingDbContext : DbContext, IUnitOfWork
 {

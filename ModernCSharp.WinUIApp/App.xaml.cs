@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.WinUIApp.Activation;
 using ModernCSharp.WinUIApp.Contracts.Services;
 using ModernCSharp.WinUIApp.Controls;

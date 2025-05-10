@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ModernCSharp.Infrastructure.Data;
+using ModernCSharp.Ordering.Infrastructure.Data;
 
 #nullable disable
 
-namespace ModernCSharp.Infrastructure.Data.Migrations
+namespace ModernCSharp.Ordering.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
     [Migration("20250428040547_Initial")]

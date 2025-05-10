@@ -8,8 +8,8 @@ using Microsoft.Extensions.Hosting;
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Common.Interfaces;
 using ModernCSharp.Domain.Constants;
-using ModernCSharp.Infrastructure.Data;
-using ModernCSharp.Infrastructure.Data.Interceptors;
+using ModernCSharp.Ordering.Infrastructure.Data;
+using ModernCSharp.Ordering.Infrastructure.Data.Interceptors;
 using ModernCSharp.Infrastructure.Identity;
 using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.Infrastructure.Services.FileContext.Strategy;
@@ -20,7 +20,7 @@ using ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
 using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.Ordering.Domain.Constants;
 
-namespace ModernCSharp.Infrastructure;
+namespace ModernCSharp.Ordering.Infrastructure;
 
 public static class DependencyInjection
 {

@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<RootNamespace>ModernCSharp.Infrastructure</RootNamespace>
-		<AssemblyName>ModernCSharp.Infrastructure</AssemblyName>
+		<RootNamespace>ModernCSharp.Ordering.Infrastructure</RootNamespace>
+		<AssemblyName>ModernCSharp.Ordering.Infrastructure</AssemblyName>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 

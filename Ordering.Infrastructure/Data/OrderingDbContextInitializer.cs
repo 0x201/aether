@@ -8,7 +8,7 @@ using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.Domain.Constants;
 using ModernCSharp.Infrastructure.Identity;
 
-namespace ModernCSharp.Infrastructure.Data;
+namespace ModernCSharp.Ordering.Infrastructure.Data;
 
 public static class InitializerExtensions
 {

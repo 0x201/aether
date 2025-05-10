@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using ModernCSharp.ApplicationCore.Common.Interfaces;
 using ModernCSharp.DDD.Common;
 
-namespace ModernCSharp.Infrastructure.Data.Interceptors;
+namespace ModernCSharp.Ordering.Infrastructure.Data.Interceptors;
 
 public class AuditableEntityInterceptor(
     IUser user,

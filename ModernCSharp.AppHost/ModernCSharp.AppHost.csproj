@@ -14,7 +14,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Identity.API\Identity.API.csproj" />
-		<ProjectReference Include="..\ModernCSharp.ApiService\Ordering.API.csproj" />
+		<ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />
 		<ProjectReference Include="..\OrderProcessor\OrderProcessor.csproj" />
 		<ProjectReference Include="..\ModernCSharp.Web\ModernCSharp.Web.csproj" />
 	</ItemGroup>

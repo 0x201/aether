@@ -1,9 +1,9 @@
 ﻿using MediatR;
 
 using ModernCSharp.DDD.Common;
-using ModernCSharp.Infrastructure.Data;
+using ModernCSharp.Ordering.Infrastructure.Data;
 
-namespace ModernCSharp.Infrastructure;
+namespace ModernCSharp.Ordering.Infrastructure;
 
 internal static class MediatorExtension
 {

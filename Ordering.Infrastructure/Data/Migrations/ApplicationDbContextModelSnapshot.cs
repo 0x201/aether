@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ModernCSharp.Infrastructure.Data;
+using ModernCSharp.Ordering.Infrastructure.Data;
 
 #nullable disable
 
-namespace ModernCSharp.Infrastructure.Data.Migrations
+namespace ModernCSharp.Ordering.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot

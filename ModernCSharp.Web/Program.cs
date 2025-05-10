@@ -1,9 +1,9 @@
-using Microsoft.FluentUI.AspNetCore.Components;
+﻿using Microsoft.FluentUI.AspNetCore.Components;
 
 using ModernCSharp.ApplicationCore;
 using ModernCSharp.ApplicationCore.Common.Interfaces;
-using ModernCSharp.Infrastructure;
-using ModernCSharp.Infrastructure.Data;
+using ModernCSharp.Ordering.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure.Data;
 using ModernCSharp.Web;
 using ModernCSharp.Web.Components;
 using ModernCSharp.Web.Services;

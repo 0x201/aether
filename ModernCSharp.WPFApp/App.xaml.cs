@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.WPFApp.Contracts.Services;
 using ModernCSharp.WPFApp.Contracts.Views;
 using ModernCSharp.WPFApp.Core.Contracts.Services;

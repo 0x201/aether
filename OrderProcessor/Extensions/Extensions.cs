@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using ModernCSharp.ApplicationCore.Abstractions;
 using ModernCSharp.ApplicationCore.Common.Interfaces;
 using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.OrderProcessor.Events;
 using ModernCSharp.OrderProcessor.Services;
 

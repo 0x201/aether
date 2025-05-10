@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 using ModernCSharp.DDD.Common;
 
-namespace ModernCSharp.Infrastructure.Data.Interceptors;
+namespace ModernCSharp.Ordering.Infrastructure.Data.Interceptors;
 
 public class DispatchDomainEventsInterceptor(
     IMediator mediator) : SaveChangesInterceptor
