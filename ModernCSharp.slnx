@@ -8,10 +8,8 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="Ordering.Domain/Ordering.Domain.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
+  <Project Path="Catalog.API/Catalog.API.csproj" />
+  <Project Path="Catalog.Domain/Catalog.Domain.csproj" Id="8270eef7-a0d6-4f4d-8cb7-5306b24d9ca3" />
   <Project Path="EventBus/EventBus.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
@@ -22,10 +20,7 @@
   </Project>
   <Project Path="Identity.API/Identity.API.csproj" />
   <Project Path="IntegrationEventLogEF/IntegrationEventLogEF.csproj" Id="752ffec7-857e-4c0e-b930-7cb590c85371" />
-  <Project Path="Ordering.API/Ordering.API.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
+  <Project Path="Inventory.Domain/Inventory.Domain.csproj" Id="57ca883b-48e9-4f32-9e9c-51919ecf8b9c" />
   <Project Path="ModernCSharp.AppHost/ModernCSharp.AppHost.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
@@ -35,10 +30,6 @@
     <Platform Solution="*|x86" Project="x86" />
   </Project>
   <Project Path="ModernCSharp.DDD/ModernCSharp.DDD.csproj" Id="cf2247b3-6fc4-4a93-9bf3-4f906072f079" />
-  <Project Path="Ordering.Infrastructure/Ordering.Infrastructure.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
   <Project Path="ModernCSharp.ServiceDefaults/ModernCSharp.ServiceDefaults.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
@@ -79,11 +70,22 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
+  <Project Path="Ordering.API/Ordering.API.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="Ordering.Domain/Ordering.Domain.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="Ordering.Infrastructure/Ordering.Infrastructure.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
   <Project Path="OrderProcessor/OrderProcessor.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="Inventory.Domain/Inventory.Domain.csproj" Id="57ca883b-48e9-4f32-9e9c-51919ecf8b9c" />
   <Project Path="WinFormsApp/WinFormsApp.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
