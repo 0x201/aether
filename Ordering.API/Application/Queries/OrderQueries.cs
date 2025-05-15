@@ -1,11 +1,6 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿namespace ModernCSharp.Ordering.API.Application.Queries;
 
-using ModernCSharp.ApplicationCore.Common.Interfaces;
-
-namespace ModernCSharp.ApiService.Application.Queries;
-
-public class OrderQueries(IApplicationDbContext context) : IOrderQueries
+public class OrderQueries(OrderingDbContext context) : IOrderQueries
 {
     public async Task<Order> GetOrderAsync(int id)
     {

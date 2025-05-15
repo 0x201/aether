@@ -1,4 +1,4 @@
-﻿namespace ModernCSharp.ApiService.Application.Queries;
+﻿namespace ModernCSharp.Ordering.API.Application.Queries;
 
 public interface IOrderQueries
 {

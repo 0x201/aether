@@ -1,17 +1,23 @@
-﻿var builder = DistributedApplication.CreateBuilder(args);
+var builder = DistributedApplication.CreateBuilder(args);
 
 
 var cache = builder.AddRedis("cache");
 
-var rabbitmq = builder.AddRabbitMQ("eventbus");
-var sqlserver = builder.AddSqlServer("sqlserver");
+var rabbitmqUsername = builder.AddParameter("eventbus-username", secret: true);
+var rabbitmqPassword = builder.AddParameter("eventbus-password", secret: true);
+var rabbitmq = builder.AddRabbitMQ("eventbus", userName: rabbitmqUsername, password: rabbitmqPassword)
+                      .WithLifetime(ContainerLifetime.Persistent)
+                      .WithManagementPlugin();
 
+var sqlserverPwd = builder.AddParameter("sqlserver-password", secret: true);
+var sqlserver = builder.AddSqlServer("sqlserver", password: sqlserverPwd)
+                       .WithLifetime(ContainerLifetime.Persistent);
 var identityDb = sqlserver.AddDatabase("identitydb");
 var orderDb = sqlserver.AddDatabase("orderingdb");
 
-var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
+//var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
-var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", launchProfileName)
+var identityApi = builder.AddProject<Projects.Identity_API>("identity-api")
     .WithExternalHttpEndpoints()
     .WithReference(identityDb);
 
@@ -30,8 +36,14 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithReference(cache).WaitFor(cache)
     .WithReference(apiService).WaitFor(apiService);
 
-identityApi.WithEnvironment("OrderingApiClient", apiService.GetEndpoint("http"))
-    .WithEnvironment("WebAppClient", webApp.GetEndpoint(launchProfileName));
+//identityApi.WithEnvironment("OrderingApiClient", apiService.GetEndpoint("http"))
+//    .WithEnvironment("WebAppClient", webApp.GetEndpoint(launchProfileName));
+
+
+builder.AddProject<Projects.Catalog_API>("catalog-api");
+
+//identityApi.WithEnvironment("OrderingApiClient", apiService.GetEndpoint("http"))
+//    .WithEnvironment("WebAppClient", webApp.GetEndpoint(launchProfileName));
 
 
 builder.Build().Run();

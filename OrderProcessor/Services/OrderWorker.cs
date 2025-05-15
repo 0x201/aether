@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Options;
 
 using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Common.Interfaces;
 using ModernCSharp.ApplicationCore.Common.Models;
 using ModernCSharp.ApplicationCore.Enums;
 using ModernCSharp.EventBus.Abstractions;
 using ModernCSharp.Infrastructure.Services.FileContext;
 using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.OrderProcessor.Events;
 
 namespace ModernCSharp.OrderProcessor.Services;
@@ -77,7 +77,7 @@ public class OrderWorker(
     private async ValueTask<List<int>> GetConfirmedGracePeriodOrders()
     {
         using var scope = serviceScopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
 
         var timespan = DateTime.UtcNow.AddMinutes(_options.GracePeriodTime);
 
