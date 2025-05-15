@@ -1,11 +1,6 @@
-﻿using MediatR;
+﻿namespace ModernCSharp.Ordering.Infrastructure;
 
-using ModernCSharp.DDD.Common;
-using ModernCSharp.Ordering.Infrastructure.Data;
-
-namespace ModernCSharp.Ordering.Infrastructure;
-
-internal static class MediatorExtension
+static class MediatorExtension
 {
     public static async Task DispatchDomainEventsAsync(this IMediator mediator, OrderingDbContext context)
     {
@@ -20,7 +15,7 @@ internal static class MediatorExtension
         domainEntries.ToList()
             .ForEach(entity => entity.Entity.ClearDomainEvents());
 
-        foreach (var domainEvent in domainEvents) 
+        foreach (var domainEvent in domainEvents)
         {
             await mediator.Publish(domainEvent);
         }

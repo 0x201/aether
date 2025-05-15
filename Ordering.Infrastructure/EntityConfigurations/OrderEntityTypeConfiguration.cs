@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 
-namespace ModernCSharp.Ordering.Infrastructure.Data.Configurations;
+namespace ModernCSharp.Ordering.Infrastructure.EntityConfigurations;
 
 public class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
 {

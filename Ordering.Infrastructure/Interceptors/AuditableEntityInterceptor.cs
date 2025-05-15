@@ -1,15 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿//using ModernCSharp.ApplicationCore.Common.Interfaces;
 
-using ModernCSharp.ApplicationCore.Common.Interfaces;
-using ModernCSharp.DDD.Common;
+namespace ModernCSharp.Ordering.Infrastructure.Interceptors;
 
-namespace ModernCSharp.Ordering.Infrastructure.Data.Interceptors;
-
-public class AuditableEntityInterceptor(
-    IUser user,
-    TimeProvider dateTime) : SaveChangesInterceptor
+public class AuditableEntityInterceptor: SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -23,7 +16,7 @@ public class AuditableEntityInterceptor(
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private void UpdateEntities(DbContext? context)
+    private void UpdateEntities(DbContext context)
     {
         if (context is null)
         {
@@ -34,13 +27,13 @@ public class AuditableEntityInterceptor(
         {
             if (entry.State is EntityState.Added or EntityState.Modified || entry.HasChangedOwnedEntities())
             {
-                var utcNow = dateTime.GetUtcNow();
+                var utcNow = DateTime.UtcNow;
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Entity.CreatedBy = user.Id;
+                    entry.Entity.CreatedBy = "";
                     entry.Entity.Created = utcNow;
                 }
-                entry.Entity.LastModifiedBy = user.Id;
+                entry.Entity.LastModifiedBy = "";
                 entry.Entity.LastModified = utcNow;
             }
         }

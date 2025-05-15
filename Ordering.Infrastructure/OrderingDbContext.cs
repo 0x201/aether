@@ -1,21 +1,10 @@
-﻿
-using System.Data;
+﻿using ModernCSharp.IntegrationEventLogEF;
 
-using MediatR;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-
-using ModernCSharp.DDD.Common;
-using ModernCSharp.Ordering.Infrastructure.Data.Configurations;
-using ModernCSharp.IntegrationEventLogEF;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-
-namespace ModernCSharp.Ordering.Infrastructure.Data;
+namespace ModernCSharp.Ordering.Infrastructure;
 
 public class OrderingDbContext : DbContext, IUnitOfWork
 {
-    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Order> Orders { get; set; }
 
     private readonly IMediator _mediator;
 
@@ -32,7 +21,7 @@ public class OrderingDbContext : DbContext, IUnitOfWork
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 
-        System.Diagnostics.Debug.WriteLine("OrderingContext::ctor ->" + this.GetHashCode());
+        System.Diagnostics.Debug.WriteLine("OrderingContext::ctor ->" + GetHashCode());
     }
 
     public IDbContextTransaction GetCurrentTransaction() => _currentTransaction;
@@ -42,6 +31,7 @@ public class OrderingDbContext : DbContext, IUnitOfWork
     {
         builder.HasDefaultSchema("ordering");
         builder.ApplyConfiguration(new OrderEntityTypeConfiguration());
+        builder.ApplyConfiguration(new ClientRequestEntityTypeConfiguration());
         builder.UseIntegrationEventLogs();
     }
 

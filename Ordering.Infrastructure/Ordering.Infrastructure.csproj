@@ -9,7 +9,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
 		<ProjectReference Include="..\IntegrationEventLogEF\IntegrationEventLogEF.csproj" />
-		<ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
