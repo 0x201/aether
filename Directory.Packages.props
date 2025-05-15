@@ -6,7 +6,7 @@
     <AspnetVersion>9.0.4</AspnetVersion>
     <EfcoreVersion>9.0.4</EfcoreVersion>
     <MSTestVersion>3.8.3</MSTestVersion>
-    <FluentUIVersion>4.11.8</FluentUIVersion>
+    <FluentUIVersion>4.11.9</FluentUIVersion>
     <MicrosoftExtensionsVersion>9.0.4</MicrosoftExtensionsVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.3</DuendeVersion>
@@ -22,8 +22,6 @@
     <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="$(AspireVersion)" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="4.11.8" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.11.8" />
     <!--OpenTelemetry-->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
@@ -54,6 +52,8 @@
     <!--FluentUI-->
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="$(FluentUIVersion)" />
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="$(FluentUIVersion)" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="$(FluentUIVersion)" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="$(FluentUIVersion)" />
     <!--CommunityToolkit-->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <!--EntityFramework & Data-->
@@ -110,6 +110,6 @@
     <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="Polly.Core" Version="8.5.2" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.2.7" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.3.0" />
   </ItemGroup>
 </Project>
