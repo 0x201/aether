@@ -1,6 +1,4 @@
-﻿using ModernCSharp.IntegrationEventLogEF;
-
-namespace ModernCSharp.Ordering.Infrastructure;
+﻿namespace ModernCSharp.Ordering.Infrastructure;
 
 public class OrderingDbContext : DbContext, IUnitOfWork
 {
@@ -11,6 +9,11 @@ public class OrderingDbContext : DbContext, IUnitOfWork
     private IDbContextTransaction _currentTransaction;
 
     public bool HasActiveTransaction => _currentTransaction != null;
+
+    public OrderingDbContext()
+    {
+        
+    }
 
     public OrderingDbContext(DbContextOptions<OrderingDbContext> options) : base(options)
     {

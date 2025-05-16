@@ -5,13 +5,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Platforms>AnyCPU;x64;x86</Platforms>
+		<UserSecretsId>840f4ddf-3a16-4730-b477-761b37d28fea</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Identity.API\Identity.API.csproj" />
-		<ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
-		<ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
 		<ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -20,14 +19,13 @@
 		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" />
 		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" />
 		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+		<PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Services\" />
 	</ItemGroup>
 
 </Project>

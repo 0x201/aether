@@ -1,18 +1,25 @@
-﻿using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileContext;
 
-namespace ModernCSharp.Infrastructure.Services.FileContext;
-
-public interface IFileExportContextStrategy<T>
+public interface IFileContextStrategy
 {
-    bool CanHandle(FileType fileType);
-    IFileExportContext<T> CreateContext(string outputPath, List<T> data);
+    FileType SupportedFileType { get; }
+    bool CanHandle(FileType fileType) => SupportedFileType == fileType;
 }
+
+public interface IFileExportContextStrategy<T> : IFileContextStrategy
+{
+    IFileExportContext<T> CreateContext(string outputPath, IEnumerable<T> data);
+}
+
+public interface IFileImportContextStrategy : IFileContextStrategy
+{
+    IFileImportContext CreateContext(string inputPath);
+}
+
 
 public class ExportContextFactory<T>(IEnumerable<IFileExportContextStrategy<T>> strategies)
 {
-    public IFileExportContext<T> CreateContext(FileType fileType, string outputPath, List<T> dataToExport)
+    public IFileExportContext<T> CreateContext(FileType fileType, string outputPath, IEnumerable<T> dataToExport)
     {
         var strategy = strategies.FirstOrDefault(s => s.CanHandle(fileType));
         return strategy?.CreateContext(outputPath, dataToExport) ??
@@ -20,11 +27,6 @@ public class ExportContextFactory<T>(IEnumerable<IFileExportContextStrategy<T>> 
     }
 }
 
-public interface IFileImportContextStrategy
-{
-    bool CanHandle(FileType fileType);
-    IFileImportContext CreateContext(string inputPath);
-}
 
 public class ImportContextFactory(IEnumerable<IFileImportContextStrategy> strategies)
 {

@@ -1,6 +1,4 @@
-﻿//using ModernCSharp.ApplicationCore.Common.Interfaces;
-
-namespace ModernCSharp.Ordering.Infrastructure.Interceptors;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Interceptors;
 
 public class AuditableEntityInterceptor: SaveChangesInterceptor
 {

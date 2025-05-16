@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-using ModernCSharp.ApiService.Application.Queries;
-using ModernCSharp.ApplicationCore.Abstractions;
 
 namespace ModernCSharp.ApiService.Apis;
 

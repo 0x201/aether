@@ -1,15 +1,11 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Repositories;
+﻿
+namespace ModernCSharp.Ordering.Infrastructure.Repositories;
 
-public class OrderRepository : IOrderRepository
+public class OrderRepository(OrderingDbContext context) : IOrderRepository
 {
-    private readonly OrderingDbContext _context;
+    private readonly OrderingDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
     public IUnitOfWork UnitOfWork => _context;
-
-    public OrderRepository(OrderingDbContext context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
 
     public Order Add(Order order)
     {
@@ -31,5 +27,10 @@ public class OrderRepository : IOrderRepository
     public void Update(Order order)
     {
         _context.Entry(order).State = EntityState.Modified;
+    }
+
+    public async Task<IEnumerable<Order>> GetOrdersAsync()
+    {
+        return await _context.Orders.AsNoTracking().ToListAsync();
     }
 }

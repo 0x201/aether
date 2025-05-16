@@ -1,4 +1,4 @@
-var builder = DistributedApplication.CreateBuilder(args);
+﻿var builder = DistributedApplication.CreateBuilder(args);
 
 
 var cache = builder.AddRedis("cache");
@@ -9,11 +9,11 @@ var rabbitmq = builder.AddRabbitMQ("eventbus", userName: rabbitmqUsername, passw
                       .WithLifetime(ContainerLifetime.Persistent)
                       .WithManagementPlugin();
 
-var sqlserverPwd = builder.AddParameter("sqlserver-password", secret: true);
-var sqlserver = builder.AddSqlServer("sqlserver", password: sqlserverPwd)
+var sqlServerPwd = builder.AddParameter("sqlserver-password", secret: true);
+var sqlServer = builder.AddSqlServer("sqlserver", password: sqlServerPwd)
                        .WithLifetime(ContainerLifetime.Persistent);
-var identityDb = sqlserver.AddDatabase("identitydb");
-var orderDb = sqlserver.AddDatabase("orderingdb");
+var identityDb = sqlServer.AddDatabase("identitydb");
+var orderDb = sqlServer.AddDatabase("orderingdb");
 
 //var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
@@ -21,11 +21,11 @@ var identityApi = builder.AddProject<Projects.Identity_API>("identity-api")
     .WithExternalHttpEndpoints()
     .WithReference(identityDb);
 
-var apiService = builder.AddProject<Projects.Ordering_API>("apiservice")
+var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq);
 
-builder.AddProject<Projects.OrderProcessor>("orderprocessor")
+builder.AddProject<Projects.OrderProcessor>("order-processor")
     .WithReference(cache).WaitFor(cache)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderDb);
@@ -34,7 +34,7 @@ builder.AddProject<Projects.OrderProcessor>("orderprocessor")
 var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithExternalHttpEndpoints()
     .WithReference(cache).WaitFor(cache)
-    .WithReference(apiService).WaitFor(apiService);
+    .WithReference(orderingApi).WaitFor(orderingApi);
 
 //identityApi.WithEnvironment("OrderingApiClient", apiService.GetEndpoint("http"))
 //    .WithEnvironment("WebAppClient", webApp.GetEndpoint(launchProfileName));
@@ -49,11 +49,11 @@ builder.AddProject<Projects.Catalog_API>("catalog-api");
 builder.Build().Run();
 
 
-static bool ShouldUseHttpForEndpoints()
-{
-    const string EnvVarName = "MODERNCSHARP_USE_HTTP_ENDPOINTS";
-    var envValue = Environment.GetEnvironmentVariable(EnvVarName);
+//static bool ShouldUseHttpForEndpoints()
+//{
+//    const string EnvVarName = "MODERNCSHARP_USE_HTTP_ENDPOINTS";
+//    var envValue = Environment.GetEnvironmentVariable(EnvVarName);
 
-    // Attempt to parse the environment variable value; return true if it's exactly "1".
-    return int.TryParse(envValue, out var result) && result == 1;
-}
+//    // Attempt to parse the environment variable value; return true if it's exactly "1".
+//    return int.TryParse(envValue, out var result) && result == 1;
+//}

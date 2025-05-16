@@ -1,20 +1,8 @@
-﻿using System.Globalization;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport.Handlers;
 
-using CsvHelper;
-
-using Microsoft.Extensions.Logging;
-
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileExport.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileExport.Handlers;
-
-internal class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : IFileExportStrategy<Order>
+public class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : IFileExportStrategy<Order>
 {
-    private OrderCsvExportContext? _context;
+    private OrderCsvExportContext _context;
     public List<FileType> FileTypes => [FileType.OrderCsv];
 
     public void Initialize(IFileExportContext<Order> context)
@@ -48,7 +36,7 @@ internal class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : 
 
     private async Task PerformExportAsync(CancellationToken cancellationToken = default)
     {
-        if (_context!.DataToExport.Count == 0)
+        if (!_context!.DataToExport.Any())
         {
             logger.LogInformation("No order to export.");
             return;

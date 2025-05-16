@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-
-namespace ModernCSharp.Ordering.Infrastructure.EntityConfigurations;
+﻿namespace ModernCSharp.Ordering.Infrastructure.EntityConfigurations;
 
 public class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
 {
@@ -16,6 +11,8 @@ public class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Id)
             .IsRequired()
             .ValueGeneratedOnAdd();
+
+        builder.OwnsOne(x => x.Address);
 
         builder.Property(x => x.Quantity)
             .HasColumnType("decimal(18,2)")
@@ -39,7 +36,8 @@ public class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
             .IsRequired();
 
         builder.Property(x => x.CreatedBy)
-            .HasColumnType("nvarchar(500)");
+            .HasColumnType("nvarchar(500)")
+            .IsRequired();
 
         builder.Property(x => x.LastModifiedBy)
             .HasColumnType("nvarchar(500)");

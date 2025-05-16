@@ -1,12 +1,7 @@
 ﻿using Microsoft.FluentUI.AspNetCore.Components;
 
-using ModernCSharp.ApplicationCore;
-using ModernCSharp.ApplicationCore.Common.Interfaces;
-using ModernCSharp.Ordering.Infrastructure;
-using ModernCSharp.Ordering.Infrastructure.Data;
 using ModernCSharp.Web;
 using ModernCSharp.Web.Components;
-using ModernCSharp.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,31 +15,17 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddFluentUIComponents();
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUser, CurrentUser>();
-
-builder.AddApplicationServices();
-builder.AddInfrastructureServices();
+builder.AddApplicationService();
 
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
+        client.BaseAddress = new("https+http://ordering-api");
     });
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    await app.InitializeDatabaseAsync();
-}
-else
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+app.UseExceptionHandler("/Error", createScopeForErrors: true);
+app.UseHsts();
 
 app.UseHttpsRedirection();
 

@@ -1,8 +1,4 @@
-﻿using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-
-namespace ModernCSharp.Infrastructure.Services.FileExport;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport;
 
 public interface IFileExportStrategy<T>
 {

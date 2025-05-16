@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using ModernCSharp.Ordering.Infrastructure.Idempotency;
-
-namespace ModernCSharp.Ordering.Infrastructure.EntityConfigurations;
+﻿namespace ModernCSharp.Ordering.Infrastructure.EntityConfigurations;
 
 public class ClientRequestEntityTypeConfiguration : IEntityTypeConfiguration<ClientRequest>
 {

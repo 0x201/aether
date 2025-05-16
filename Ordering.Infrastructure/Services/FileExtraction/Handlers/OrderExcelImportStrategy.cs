@@ -1,18 +1,8 @@
-﻿using ClosedXML.Excel;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction.Handlers;
 
-using Microsoft.Extensions.Logging;
-
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
-
-internal class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger) : IFileImportStrategy<Order>
+public class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger) : IFileImportStrategy<Order>
 {
-    private OrderExcelImportContext? _context;
+    private OrderExcelImportContext _context;
 
     public List<FileType> FileTypes => [FileType.OrderExcel];
 

@@ -1,20 +1,8 @@
-﻿using System.Text.Json;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport.Handlers;
 
-using Microsoft.Extensions.Logging;
-
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Constants;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileExport.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileExport.Handlers;
-
-internal class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) : IFileExportStrategy<Order>
+public class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) : IFileExportStrategy<Order>
 {
-    private OrderJsonExportContext? _context;
+    private OrderJsonExportContext _context;
     public List<FileType> FileTypes => [FileType.OrderJson];
 
     public void Initialize(IFileExportContext<Order> context)
@@ -48,7 +36,7 @@ internal class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) 
 
     private async Task PerformExportAsync(CancellationToken cancellationToken = default)
     {
-        if (_context!.DataToExport.Count == 0)
+        if (!_context!.DataToExport.Any())
         {
             logger.LogInformation("No order to export.");
             return;

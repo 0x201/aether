@@ -1,8 +1,4 @@
-﻿using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-
-namespace ModernCSharp.Infrastructure.Services.FileExtraction;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction;
 
 public interface IFileImportStrategy<T>
 {
@@ -20,7 +16,7 @@ public interface IFileImportStrategyFactory<T>
     IFileImportStrategy<T> GetStrategy(IFileImportContext context);
 }
 
-internal class FileImportStrategyFactory<T>(IEnumerable<IFileImportStrategy<T>> strategies) : IFileImportStrategyFactory<T>
+public class FileImportStrategyFactory<T>(IEnumerable<IFileImportStrategy<T>> strategies) : IFileImportStrategyFactory<T>
 {
     public IFileImportStrategy<T> GetStrategy(IFileImportContext context)
     {

@@ -1,9 +1,4 @@
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.ApplicationCore.Utils;
-
-namespace ModernCSharp.Infrastructure.Services.FileExport;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport;
 
 public class FileExportService<T>(
     IFileExportStrategyFactory<T> strategyFactory) : IFileExportService<T>

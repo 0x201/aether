@@ -1,22 +1,8 @@
-﻿using System.Globalization;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction.Handlers;
 
-using CsvHelper;
-using CsvHelper.Configuration;
-
-using Microsoft.Extensions.Logging;
-
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Mappings;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
-
-internal class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : IFileImportStrategy<Order>
+public class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : IFileImportStrategy<Order>
 {
-    private OrderCsvImportContext? _context;
+    private OrderCsvImportContext _context;
     public List<FileType> FileTypes => [FileType.OrderCsv];
 
     public void Initialize(IFileImportContext context)

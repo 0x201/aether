@@ -1,24 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.Infrastructure.Services.FileContext;
-using ModernCSharp.Infrastructure.Services.FileContext.Strategy;
-using ModernCSharp.Infrastructure.Services.FileExport;
-using ModernCSharp.Infrastructure.Services.FileExport.Handlers;
-using ModernCSharp.Infrastructure.Services.FileExtraction;
-using ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
-
-namespace ModernCSharp.Ordering.Infrastructure;
+﻿namespace ModernCSharp.Ordering.Infrastructure;
 
 public static class DependencyInjection
 {
 
-    public static void AddFileProcessServices(this IHostApplicationBuilder builder)
+    public static void AddFileProcessServices(this IServiceCollection services)
     {
-        builder.Services.AddFileContexts();
-        builder.Services.AddFileExporters();
-        builder.Services.AddFileImporters();
+        services.AddFileContexts();
+        services.AddFileExporters();
+        services.AddFileImporters();
     }
 
     public static IServiceCollection AddFileContexts(this IServiceCollection services)

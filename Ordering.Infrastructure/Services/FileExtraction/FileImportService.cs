@@ -1,9 +1,4 @@
-﻿using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-using ModernCSharp.ApplicationCore.Utils;
-
-namespace ModernCSharp.Infrastructure.Services.FileExtraction;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction;
 
 public class FileImportService<T>(
     IFileImportStrategyFactory<T> strategyFactory) : IFileImportService<T>

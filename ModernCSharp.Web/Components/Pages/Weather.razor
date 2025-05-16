@@ -17,7 +17,7 @@
 <FluentPaginator State="@pagination" />
 
 @code {
-    PaginationState pagination = new PaginationState() { ItemsPerPage = 2 };
+    PaginationState pagination = new PaginationState() { ItemsPerPage = 10 };
 
     private IQueryable<WeatherForecast>? forecasts;
 

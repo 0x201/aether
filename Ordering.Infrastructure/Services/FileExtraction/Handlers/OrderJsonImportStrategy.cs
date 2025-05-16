@@ -1,20 +1,8 @@
-﻿using System.Text.Json;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction.Handlers;
 
-using Microsoft.Extensions.Logging;
-
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Constants;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileExtraction.Handlers;
-
-internal class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) : IFileImportStrategy<Order>
+public class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) : IFileImportStrategy<Order>
 {
-    private OrderJsonImportContext? _context;
+    private OrderJsonImportContext _context;
     public List<FileType> FileTypes => [FileType.OrderJson];
 
     public void Initialize(IFileImportContext context)
@@ -51,6 +39,6 @@ internal class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) 
         using var stream = new FileStream(_context!.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var orderWrapper = await JsonSerializer.DeserializeAsync<JsonWrapper<Order>>(stream, JsonSerializationConstants.DefaultOptions, cancellationToken);
 
-        return orderWrapper!.Items;
+        return [..orderWrapper!.Items];
     }
 }

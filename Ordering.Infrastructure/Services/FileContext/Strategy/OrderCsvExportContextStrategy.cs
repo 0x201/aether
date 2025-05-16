@@ -1,11 +1,6 @@
-﻿using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExport;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileExport.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileContext.Strategy;
-internal class OrderCsvExportContextStrategy : IFileExportContextStrategy<Order>
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileContext.Strategy;
+public class OrderCsvExportContextStrategy : IFileExportContextStrategy<Order>
 {
-    public bool CanHandle(FileType fileType) => fileType == FileType.OrderCsv;
-    public IFileExportContext<Order> CreateContext(string outputPath, List<Order> data) => new OrderCsvExportContext(FileType.OrderCsv, outputPath, data);
+    public FileType SupportedFileType => FileType.OrderCsv;
+    public IFileExportContext<Order> CreateContext(string outputPath, IEnumerable<Order> data) => new OrderCsvExportContext(FileType.OrderCsv, outputPath, data);
 }

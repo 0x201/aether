@@ -1,10 +1,7 @@
-﻿using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Models.FileExtraction;
-using ModernCSharp.Infrastructure.Services.FileExtraction.Commands;
-
-namespace ModernCSharp.Infrastructure.Services.FileContext.Strategy;
-internal class OrderCsvImportContextStrategy : IFileImportContextStrategy
+﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileContext.Strategy;
+public class OrderCsvImportContextStrategy : IFileImportContextStrategy
 {
-    public bool CanHandle(FileType fileType) => fileType == FileType.OrderCsv;
+    public FileType SupportedFileType => FileType.OrderCsv;
+
     public IFileImportContext CreateContext(string outputPath) => new OrderCsvImportContext(FileType.OrderCsv, outputPath);
 }

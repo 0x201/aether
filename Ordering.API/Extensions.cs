@@ -1,4 +1,8 @@
-﻿namespace ModernCSharp.Ordering.API;
+﻿using ModernCSharp.Ordering.API.Infrastructure;
+using ModernCSharp.Ordering.Application.Common.Interfaces;
+using ModernCSharp.Ordering.Application.Queries;
+
+namespace ModernCSharp.Ordering.API;
 
 internal static class Extensions
 {
@@ -10,7 +14,7 @@ internal static class Extensions
 
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
-        builder.Services.AddDbContext<OrderingDbContext>((sp, options) =>
+        services.AddDbContext<OrderingDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.UseSqlServer(connectionString);
@@ -18,11 +22,15 @@ internal static class Extensions
 
         builder.EnrichSqlServerDbContext<OrderingDbContext>();
 
+        services.AddMigration<OrderingDbContext, OrderingDbContextSeed>();
+
         builder.AddRabbitMqEventBus("eventbus")
             .AddEventBusSubscriptions();
 
         services.AddHttpContextAccessor();
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         services.AddMediatR(cfg =>
         {
@@ -32,7 +40,6 @@ internal static class Extensions
         });
 
         services.AddScoped<IOrderQueries, OrderQueries>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IRequestManager, RequestManager>();
     }
 
