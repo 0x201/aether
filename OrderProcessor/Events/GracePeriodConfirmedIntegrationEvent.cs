@@ -1,6 +1,4 @@
-using ModernCSharp.EventBus.Events;
-
-namespace ModernCSharp.OrderProcessor.Events;
+﻿namespace ModernCSharp.Ordering.OrderProcessor.Events;
 
 public record GracePeriodConfirmedIntegrationEvent(int OrderId) : IntegrationEvent
 {

@@ -1,9 +1,9 @@
-﻿using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+﻿using ModernCSharp.Ordering.Application.Queries;
 
 namespace ModernCSharp.WinFormsApp.Models;
 public class ExportOrdersEventArgs
 {
-    public List<Order> OrderToExport
+    public IEnumerable<Order> OrderToExport
     {
         get;
         set;

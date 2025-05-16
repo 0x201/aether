@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Application.Queries;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Models;
 
@@ -92,14 +92,12 @@ public partial class OrderListView : BaseView, IOrderListView
             if (OrderDataGridView is not null)
             {
                 ordersToExport.AddRange(from DataGridViewRow row in OrderDataGridView.SelectedRows
-                                        select new Order("12345",
-                                        "Jack",
-                                        new Address("", "", "", "", ""),
-                                        1,
-                                        "123",
-                                        "1234",
-                                        "12345",
-                                        new DateTime(2025, 12, 31)));
+                                        select new Order
+                                        {
+                                            ordernumber = 12345,
+                                            username = "Jack",
+                                            date = new DateTime(2025, 12, 31)
+                                        });
                 //{
                 //    Id = (int)row.Cells["Id"].Value,
                 //    Quantity = (int)row.Cells["Quantity"].Value,
@@ -194,10 +192,10 @@ public partial class OrderListView : BaseView, IOrderListView
             var filteredData = new BindingList<Order>(
             [
                 .. Orders.Where(o =>
-                    o.CustomerName.Contains(filterText, StringComparison.CurrentCultureIgnoreCase) ||
-                    o.Id.ToString().Contains(filterText) ||
-                    o.Total.ToString().Contains(filterText) ||
-                    o.OrderDate.ToString().Contains(filterText)
+                    o.username.Contains(filterText, StringComparison.CurrentCultureIgnoreCase) ||
+                    o.ordernumber.ToString().Contains(filterText) ||
+                    o.total.ToString().Contains(filterText) ||
+                    o.date.ToString().Contains(filterText)
                 )
             ]);
 

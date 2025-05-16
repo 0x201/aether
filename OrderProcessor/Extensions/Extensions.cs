@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Common.Interfaces;
-using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Ordering.Infrastructure;
-using ModernCSharp.OrderProcessor.Events;
-using ModernCSharp.OrderProcessor.Services;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace ModernCSharp.OrderProcessor.Extensions;
+using ModernCSharp.Ordering.Application.Common.Interfaces;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Infrastructure.Interceptors;
+using ModernCSharp.Ordering.Infrastructure.Repositories;
+using ModernCSharp.Ordering.OrderProcessor.Services;
+
+namespace ModernCSharp.Ordering.OrderProcessor.Extensions;
 
 internal static class Extensions
 {
@@ -17,7 +18,16 @@ internal static class Extensions
         var services = builder.Services;
         services.AddTransient<IUser, CurrentUser>();
 
-        builder.AddInfrastructureServices();
+        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
+        services.AddDbContext<OrderingDbContext>((sp, options) =>
+            {
+                var connectionString = builder.Configuration.GetConnectionString("orderingdb");
+
+                options
+                    .UseSqlServer(connectionString)
+                    .AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
+            });
 
         builder.AddRabbitMqEventBus("eventbus")
                .ConfigureJsonOptions(options => options.TypeInfoResolverChain.Add(IntegrationEventContext.Default));
@@ -25,9 +35,8 @@ internal static class Extensions
         services.AddOptions<BackgroundTaskOptions>()
             .BindConfiguration(nameof(BackgroundTaskOptions));
 
-        services.AddTransient<IOrderService, OrderService>();
-
-        builder.AddFileProcessServices();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderQueries, OrderQueries>();
 
         services.AddHttpContextAccessor();
 

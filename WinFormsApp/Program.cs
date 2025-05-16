@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ModernCSharp.ApplicationCore.Services;
+using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.Ordering.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure.Repositories;
 using ModernCSharp.WinFormsApp.Presenters;
 
 namespace ModernCSharp.WinFormsApp;
@@ -36,7 +38,8 @@ internal static class Program
         return Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
-                services.AddScoped<OrderService>();
+                services.AddScoped<IOrderRepository, OrderRepository>();
+                services.AddScoped<IOrderQueries, OrderQueries>();
                 services.AddFileContexts();
                 services.AddFileExporters();
                 services.AddFileImporters();

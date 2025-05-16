@@ -2,15 +2,13 @@
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<RootNamespace>ModernCSharp.Identity.API</RootNamespace>
 		<UserSecretsId>1439e202-d273-4438-8e75-cfd46a93f803</UserSecretsId>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
-	    <PackageReference Include="Automapper" />
+	  <PackageReference Include="Automapper" />
 		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" />
 		<PackageReference Include="Duende.IdentityServer.EntityFramework" />
 		<PackageReference Include="Duende.IdentityServer.Storage" />

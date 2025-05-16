@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
 
-using ModernCSharp.ApplicationCore.Common.Interfaces;
+using ModernCSharp.Ordering.Application.Common.Interfaces;
 
-namespace ModernCSharp.OrderProcessor;
+namespace ModernCSharp.Ordering.OrderProcessor;
 
 public class CurrentUser(IHttpContextAccessor httpContextAccessor) : IUser
 {
-    public string? Id => httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+    public string Id => httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 }

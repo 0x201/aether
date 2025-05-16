@@ -2,9 +2,10 @@
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
 		<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
-		<AssemblyName>ModernCSharp.OrderProcessor</AssemblyName>
-		<RootNamespace>ModernCSharp.OrderProcessor</RootNamespace>
+		<AssemblyName>ModernCSharp.Ordering.OrderProcessor</AssemblyName>
+		<RootNamespace>ModernCSharp.Ordering.OrderProcessor</RootNamespace>
 		<Platforms>AnyCPU;x64;x86</Platforms>
+		<UserSecretsId>1d6a7db4-1fc6-4616-ac01-29d0cc9d5188</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
 		<Folder Include="Mappings\" />
@@ -13,7 +14,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
 		<ProjectReference Include="..\EventBus\EventBus.csproj" />
-		<ProjectReference Include="..\ModernCSharp.ApplicationCore\ModernCSharp.ApplicationCore.csproj" />
+		<ProjectReference Include="..\Ordering.Application\Ordering.Application.csproj" />
 		<ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
 		<ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
 	</ItemGroup>

@@ -6,14 +6,13 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Application.Queries;
 using ModernCSharp.WinUIApp.Contracts.ViewModels;
 using ModernCSharp.WinUIApp.Controls;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
 
-public partial class OrdersViewModel(IOrderService orderService) : ObservableRecipient, INavigationAware
+public partial class OrdersViewModel(IOrderQueries orderService) : ObservableRecipient, INavigationAware
 {
     [ObservableProperty]
     private ObservableCollection<Order> _orders = [];

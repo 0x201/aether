@@ -1,27 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿
+using MediatR;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.EventBus.Abstractions;
-using ModernCSharp.Infrastructure.Services.FileContext;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Ordering.Infrastructure;
-using ModernCSharp.OrderProcessor.Events;
+using ModernCSharp.Ordering.Application.Commands;
 
-namespace ModernCSharp.OrderProcessor.Services;
+using OrderStatus = ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate.OrderStatus;
+
+namespace ModernCSharp.Ordering.OrderProcessor.Services;
+
 
 public class OrderWorker(
     ILogger<OrderWorker> logger,
     IEventBus eventBus,
+    IMediator mediator,
     IServiceScopeFactory serviceScopeFactory,
     IOptions<BackgroundTaskOptions> options,
     IFileExportService<Order> fileExportService,
     IFileImportService<Order> fileImportService,
     ExportContextFactory<Order> exportContextFactory,
-    ImportContextFactory importContextFactory,
-    IOrderService orderService) : BackgroundService
+    ImportContextFactory importContextFactory) : BackgroundService
 {
     private readonly BackgroundTaskOptions
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -91,9 +87,12 @@ public class OrderWorker(
 
     private async Task<bool> ExportAsync(CancellationToken cancellationToken = default)
     {
-        var ordersToExport = await orderService.GetOrdersAsync(cancellationToken);
+        using var scope = serviceScopeFactory.CreateScope();
+        var orderQueries = scope.ServiceProvider.GetRequiredService<IOrderQueries>();
 
-        List<(FileType Type, string Path, List<Order> OrdersToExport)> exportTasks =
+        var ordersToExport = await orderQueries.GetOrdersAsync();
+
+        List<(FileType Type, string Path, IEnumerable<Order> OrdersToExport)> exportTasks =
         [
             (FileType.OrderCsv, "D:\\orders.csv", ordersToExport),
             (FileType.OrderJson, "D:\\orders.json", ordersToExport),
@@ -150,11 +149,30 @@ public class OrderWorker(
                     fileType, filePath, result.Error);
                 break;
             }
+            List<CreateOrderCommand> createOrderCommands = [];
+            foreach (var order in result.Data)
+            {
+                if (!Enum.TryParse<OrderStatus>(order.status, out var status))
+                {
+                    throw new InvalidOperationException($"Unsupported order status. Status: {order.status}");
+                }
+                createOrderCommands.Add(new CreateOrderCommand()
+                {
+                    CustomerName = order.username,
+                    OrderDate = order.date,
+                    OrderStatus = status,
+                    Quantity = order.quantity,
+                    Total = order.total,
+                });
+            }
 
-            await orderService.InsertManyAsync(result.Data);
+            var bulkInsertOrderCommand = new BulkInsertOrdersCommand
+            {
+                OrdersToInsert = createOrderCommands
+            };
+            await mediator.Send(bulkInsertOrderCommand, cancellationToken);
             totalOrderRecords += result.Data.Count;
-            logger.LogInformation("Successfully imported {RecordCount} records from {InputPath}", result.Data.Count,
-                filePath);
+            logger.LogInformation("Successfully imported {RecordCount} records from {InputPath}", result.Data.Count, filePath);
         }
 
         if (result?.Succeeded ?? false)

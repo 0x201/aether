@@ -7,8 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Services;
+using ModernCSharp.Ordering.Application.Queries;
 using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.WPFApp.Contracts.Services;
 using ModernCSharp.WPFApp.Contracts.Views;
@@ -70,7 +69,7 @@ public partial class App : System.Windows.Application
         services.AddFileExporters();
         services.AddFileImporters();
 
-        services.AddTransient<IOrderService, OrderService>();
+        services.AddTransient<IOrderQueries, OrderQueries>();
 
         // Services
         services.AddSingleton<IApplicationInfoService, ApplicationInfoService>();

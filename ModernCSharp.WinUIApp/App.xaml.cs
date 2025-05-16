@@ -2,8 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Services;
+using ModernCSharp.Ordering.Application.Queries;
 using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.WinUIApp.Activation;
 using ModernCSharp.WinUIApp.Contracts.Services;
@@ -68,13 +67,12 @@ public partial class App : Microsoft.UI.Xaml.Application
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
 
-            services.AddFileContexts();
-            services.AddFileImporters();
-            services.AddFileExporters();
+
 
             // Core Services
             services.AddSingleton<IFileService, FileService>();
-            services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<IOrderQueries, OrderQueries>();
+            services.AddFileContexts();
             services.AddFileImporters();
             services.AddFileExporters();
 

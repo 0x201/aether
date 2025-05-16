@@ -25,7 +25,7 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="ModernCSharp.ApplicationCore/ModernCSharp.ApplicationCore.csproj">
+  <Project Path="Ordering.Application/Ordering.Application.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Data;
 
-using ModernCSharp.ApplicationCore.Enums;
+using ModernCSharp.Ordering.Domain.Enums;
 
 namespace ModernCSharp.WinUIApp.Converters;
 

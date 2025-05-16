@@ -5,10 +5,10 @@ using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Xaml;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileContext;
+using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Ordering.Domain.Abstractions;
+using ModernCSharp.Ordering.Domain.Enums;
+using ModernCSharp.Ordering.Infrastructure.Services.FileContext;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
 

@@ -2,21 +2,22 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Application.Queries;
 using ModernCSharp.WPFApp.Contracts.ViewModels;
+
+using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.WPFApp.ViewModels;
 
 public partial class OrderViewModel : ObservableObject, INavigationAware
 {
-    private readonly IOrderService _orderService;
+    private readonly IOrderQueries _orderService;
 
     [ObservableProperty]
     public ObservableCollection<Order> _orders = [];
     public OrderViewModel()
     {
-        _orderService = App.GetService<IOrderService>();
+        _orderService = App.GetService<IOrderQueries>();
     }
 
     public void OnNavigatedFrom() => throw new NotImplementedException();

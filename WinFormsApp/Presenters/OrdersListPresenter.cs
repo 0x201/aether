@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Enums;
-using ModernCSharp.ApplicationCore.Services;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileContext;
+using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Ordering.Domain.Abstractions;
+using ModernCSharp.Ordering.Domain.Enums;
+using ModernCSharp.Ordering.Infrastructure.Services.FileContext;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Models;
@@ -17,7 +16,7 @@ public class OrdersListPresenter(
     IServiceProvider serviceProvider,
     IFileExportService<Order> fileExportService,
     ExportContextFactory<Order> exportContextFactory,
-    OrderService orderService) : AbstractPresenter<IOrderListView>(view)
+    IOrderQueries orderService) : AbstractPresenter<IOrderListView>(view)
 {
     private List<Order> _orders;
 
@@ -79,7 +78,7 @@ public class OrdersListPresenter(
 
     public async Task<List<Order>> GetOrders()
     {
-        return await orderService.GetOrdersAsync();
+        return [..await orderService.GetOrdersAsync()];
     }
 
     public void ImportData(IEnumerable<Order> orders)

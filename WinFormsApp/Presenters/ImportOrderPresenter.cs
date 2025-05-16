@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using ModernCSharp.ApplicationCore.Abstractions;
-using ModernCSharp.ApplicationCore.Common.Models;
-using ModernCSharp.ApplicationCore.Utils;
-using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Infrastructure.Services.FileContext;
+using ModernCSharp.Ordering.Domain.Common.Models;
+using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Ordering.Domain.Abstractions;
+using ModernCSharp.Ordering.Domain.Utils;
+using ModernCSharp.Ordering.Infrastructure.Services.FileContext;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Views;
@@ -18,7 +18,7 @@ public class ImportOrderPresenter(
     ImportContextFactory importContextFactory) : AbstractPresenter<IImportView>(view)
 {
     public async override Task InitializeAsync()
-    {  
+    {
         View.ImportRequested += OnImportRequested;
 
         await base.InitializeAsync();
@@ -36,7 +36,7 @@ public class ImportOrderPresenter(
 
             var importedResult = await Import(View.FilePath);
 
-            if (!importedResult.Succeeded) 
+            if (!importedResult.Succeeded)
             {
                 View.ShowError($"Failed to import orders from {View.FilePath}. [Error]: {importedResult.Error}");
             }

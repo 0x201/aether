@@ -1,7 +1,7 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-using ModernCSharp.ApplicationCore.Enums;
+using ModernCSharp.Ordering.Domain.Enums;
 using ModernCSharp.WinUIApp.ViewModels;
 
 using Windows.Storage.Pickers;
