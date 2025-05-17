@@ -1,6 +1,6 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using Duende.IdentityServer.Services;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ModernCSharp.Identity.API.Pages.Account.Logout;
@@ -13,10 +13,7 @@ public class LoggedOut : PageModel
 
     public LoggedOutViewModel View { get; set; } = default!;
 
-    public LoggedOut(IIdentityServerInteractionService interactionService)
-    {
-        _interactionService = interactionService;
-    }
+    public LoggedOut(IIdentityServerInteractionService interactionService) => _interactionService = interactionService;
 
     public async Task OnGet(string? logoutId)
     {

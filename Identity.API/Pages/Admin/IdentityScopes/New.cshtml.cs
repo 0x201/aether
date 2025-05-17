@@ -1,7 +1,8 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using ModernCSharp.Identity.API.Pages;
 
 namespace ModernCSharp.Identity.API.Pages.Admin.IdentityScopes;
 
@@ -11,10 +12,7 @@ public class NewModel : PageModel
 {
     private readonly IdentityScopeRepository _repository;
 
-    public NewModel(IdentityScopeRepository repository)
-    {
-        _repository = repository;
-    }
+    public NewModel(IdentityScopeRepository repository) => _repository = repository;
 
     [BindProperty]
     public IdentityScopeModel InputModel { get; set; } = default!;

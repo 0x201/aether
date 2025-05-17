@@ -1,9 +1,22 @@
-﻿namespace ModernCSharp.Identity.API;
+﻿
+using Microsoft.AspNetCore.Identity;
 
-public class UserSeed(ILogger<UserSeed> logger, UserManager<ApplicationUser> userManager) : IDbSeeder<ApplicationDbContext>
+namespace ModernCSharp.Identity.API;
+
+public class UserSeed(
+    ILogger<UserSeed> logger,
+    UserManager<ApplicationUser> userManager,
+    RoleManager<IdentityRole> roleManager) : IDbSeeder<ApplicationDbContext>
 {
     public async Task SeedAsync(ApplicationDbContext context)
     {
+        var adminRoleExist = await roleManager.RoleExistsAsync("Admin");
+
+        if (!adminRoleExist) 
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+        }
+
         var alice = await userManager.FindByNameAsync("alice");
 
         if (alice == null)
@@ -13,10 +26,7 @@ public class UserSeed(ILogger<UserSeed> logger, UserManager<ApplicationUser> use
                 UserName = "alice",
                 Email = "AliceSmith@email.com",
                 EmailConfirmed = true,
-                Id = Guid.NewGuid().ToString(),
-                LastName = "Smith",
-                Name = "Alice",
-                PhoneNumber = "1234567890",
+                Id = Guid.CreateVersion7().ToString(),
             };
 
             var result = await userManager.CreateAsync(alice, "Pass123$");
@@ -30,6 +40,7 @@ public class UserSeed(ILogger<UserSeed> logger, UserManager<ApplicationUser> use
             {
                 logger.LogDebug("alice created");
             }
+
         }
         else
         {
@@ -48,10 +59,7 @@ public class UserSeed(ILogger<UserSeed> logger, UserManager<ApplicationUser> use
                 UserName = "bob",
                 Email = "BobSmith@email.com",
                 EmailConfirmed = true,
-                Id = Guid.NewGuid().ToString(),
-                LastName = "Smith",
-                Name = "Bob",
-                PhoneNumber = "1234567890",
+                Id = Guid.CreateVersion7().ToString(),
             };
 
             var result = await userManager.CreateAsync(bob, "Pass123$");
@@ -64,6 +72,13 @@ public class UserSeed(ILogger<UserSeed> logger, UserManager<ApplicationUser> use
             if (logger.IsEnabled(LogLevel.Debug))
             {
                 logger.LogDebug("bob created");
+            }
+
+            var addToRoleResult = await userManager.AddToRoleAsync(bob, "Admin");
+
+            if (!addToRoleResult.Succeeded)
+            {
+                throw new Exception($"Failed to add role: {string.Join(", ", addToRoleResult.Errors)}");
             }
         }
         else

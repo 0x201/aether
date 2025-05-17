@@ -1,7 +1,6 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using Duende.IdentityServer.EntityFramework.DbContexts;
 
-using Duende.IdentityServer.EntityFramework.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace ModernCSharp.Identity.API.Pages.Portal;
 
@@ -16,10 +15,7 @@ public class ClientRepository
 {
     private readonly ConfigurationDbContext _context;
 
-    public ClientRepository(ConfigurationDbContext context)
-    {
-        _context = context;
-    }
+    public ClientRepository(ConfigurationDbContext context) => _context = context;
 
     public async Task<IEnumerable<ThirdPartyInitiatedLoginLink>> GetClientsWithLoginUris(string? filter = null)
     {

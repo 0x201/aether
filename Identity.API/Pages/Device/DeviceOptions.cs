@@ -1,7 +1,4 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
-namespace ModernCSharp.Identity.API.Pages.Device;
+﻿namespace ModernCSharp.Identity.API.Pages.Device;
 
 public static class DeviceOptions
 {

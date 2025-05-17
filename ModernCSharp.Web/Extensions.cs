@@ -65,7 +65,7 @@ public static class Extensions
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("orders");
-            options.Scope.Add("basket");
+            //options.Scope.Add("basket");
         });
 
         // Blazor auth services

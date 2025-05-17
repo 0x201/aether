@@ -1,7 +1,14 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using Duende.IdentityModel;
+using Duende.IdentityServer.Events;
+using Duende.IdentityServer.Extensions;
+using Duende.IdentityServer.Services;
 
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using ModernCSharp.Identity.API.Pages;
 
 namespace ModernCSharp.Identity.API.Pages.Account.Logout;
 
@@ -12,7 +19,7 @@ public class Index : PageModel
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IEventService _events;
 
-    [BindProperty] 
+    [BindProperty]
     public string? LogoutId { get; set; }
 
     public Index(IIdentityServerInteractionService interaction, IEventService events)
@@ -41,7 +48,7 @@ public class Index : PageModel
                 showLogoutPrompt = false;
             }
         }
-            
+
         if (showLogoutPrompt == false)
         {
             // if the request for logout was properly authenticated from IdentityServer, then
@@ -60,7 +67,7 @@ public class Index : PageModel
             // this captures necessary info from the current logged in user
             // this can still return null if there is no context needed
             LogoutId ??= await _interaction.CreateLogoutContextAsync();
-                
+
             // delete local authentication cookie
             await HttpContext.SignOutAsync();
 
@@ -72,7 +79,7 @@ public class Index : PageModel
             Telemetry.Metrics.UserLogout(idp);
 
             // if it's a local login we can ignore this workflow
-            if (idp != null && idp != IdentityServerConstants.LocalIdentityProvider)
+            if (idp != null && idp != Duende.IdentityServer.IdentityServerConstants.LocalIdentityProvider)
             {
                 // we need to see if the provider supports external logout
                 if (await HttpContext.GetSchemeSupportsSignOutAsync(idp))

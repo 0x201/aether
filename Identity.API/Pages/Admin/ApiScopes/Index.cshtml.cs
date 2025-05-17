@@ -1,6 +1,4 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ModernCSharp.Identity.API.Pages.Admin.ApiScopes;
@@ -11,10 +9,7 @@ public class IndexModel : PageModel
 {
     private readonly ApiScopeRepository _repository;
 
-    public IndexModel(ApiScopeRepository repository)
-    {
-        _repository = repository;
-    }
+    public IndexModel(ApiScopeRepository repository) => _repository = repository;
 
     public IEnumerable<ApiScopeSummaryModel> Scopes { get; private set; } = default!;
     public string? Filter { get; set; }

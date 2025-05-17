@@ -1,10 +1,11 @@
-﻿// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using System.ComponentModel.DataAnnotations;
 
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Mappers;
+using Duende.IdentityServer.Models;
 
+using Microsoft.EntityFrameworkCore;
 
 namespace ModernCSharp.Identity.API.Pages.Admin.Clients;
 
@@ -22,7 +23,7 @@ public class CreateClientModel : ClientSummaryModel
     public string Secret { get; set; } = default!;
 }
 
-public class ClientModel : CreateClientModel, IValidatableObject
+public class EditClientModel : CreateClientModel, IValidatableObject
 {
     [Required]
     public string AllowedScopes { get; set; } = default!;
@@ -61,10 +62,7 @@ public class ClientRepository
 {
     private readonly ConfigurationDbContext _context;
 
-    public ClientRepository(ConfigurationDbContext context)
-    {
-        _context = context;
-    }
+    public ClientRepository(ConfigurationDbContext context) => _context = context;
 
     public async Task<IEnumerable<ClientSummaryModel>> GetAllAsync(string? filter = null)
     {
@@ -89,7 +87,7 @@ public class ClientRepository
         return await result.ToArrayAsync();
     }
 
-    public async Task<ClientModel?> GetByIdAsync(string id)
+    public async Task<EditClientModel?> GetByIdAsync(string id)
     {
         var client = await _context.Clients
             .Include(x => x.AllowedGrantTypes)
@@ -101,7 +99,7 @@ public class ClientRepository
 
         if (client == null) return null;
 
-        return new ClientModel
+        return new EditClientModel
         {
             ClientId = client.ClientId,
             Name = client.ClientName,
@@ -118,13 +116,13 @@ public class ClientRepository
 
     public async Task CreateAsync(CreateClientModel model)
     {
-        ArgumentNullException.ThrowIfNull(model);   
+        ArgumentNullException.ThrowIfNull(model);
         var client = new Duende.IdentityServer.Models.Client();
         client.ClientId = model.ClientId.Trim();
         client.ClientName = model.Name?.Trim();
 
         client.ClientSecrets.Add(new Duende.IdentityServer.Models.Secret(model.Secret.Sha256()));
-        
+
         if (model.Flow == Flow.ClientCredentials)
         {
             client.AllowedGrantTypes = GrantTypes.ClientCredentials;
@@ -136,15 +134,15 @@ public class ClientRepository
         }
 
 #pragma warning disable CA1849 // Call async methods when in an async method
-// CA1849 Suppressed because AddAsync is only needed for value generators that
-// need async database access (e.g., HiLoValueGenerator), and we don't use those
-// generators
+        // CA1849 Suppressed because AddAsync is only needed for value generators that
+        // need async database access (e.g., HiLoValueGenerator), and we don't use those
+        // generators
         _context.Clients.Add(client.ToEntity());
 #pragma warning restore CA1849 // Call async methods when in an async method
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(ClientModel model)
+    public async Task UpdateAsync(EditClientModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
         var client = await _context.Clients
@@ -161,7 +159,7 @@ public class ClientRepository
             client.ClientName = model.Name?.Trim();
         }
 
-        var scopes = model.AllowedScopes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+        var scopes = model.AllowedScopes.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var currentScopes = (client.AllowedScopes.Select(x => x.Scope) ?? Enumerable.Empty<string>()).ToArray();
 
         var scopesToAdd = scopes.Except(currentScopes).ToArray();

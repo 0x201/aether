@@ -1,7 +1,13 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using Duende.IdentityServer.Events;
+using Duende.IdentityServer.Extensions;
+using Duende.IdentityServer.Services;
+using Duende.IdentityServer.Stores;
 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using ModernCSharp.Identity.API.Pages;
 
 namespace ModernCSharp.Identity.API.Pages.Grants;
 
@@ -26,7 +32,7 @@ public class Index : PageModel
     }
 
     public ViewModel View { get; set; } = default!;
-        
+
     public async Task OnGet()
     {
         var grants = await _interaction.GetAllUserGrantsAsync();
@@ -46,7 +52,7 @@ public class Index : PageModel
                     ClientLogoUrl = client.LogoUri,
                     ClientUrl = client.ClientUri,
                     Description = grant.Description,
-                    Created = grant.CreationTime, 
+                    Created = grant.CreationTime,
                     Expires = grant.Expiration,
                     IdentityGrantNames = resources.IdentityResources.Select(x => x.DisplayName ?? x.Name).ToArray(),
                     ApiGrantNames = resources.ApiScopes.Select(x => x.DisplayName ?? x.Name).ToArray()

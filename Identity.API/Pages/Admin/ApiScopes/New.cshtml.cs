@@ -1,6 +1,5 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ModernCSharp.Identity.API.Pages.Admin.ApiScopes;
@@ -11,14 +10,11 @@ public class NewModel : PageModel
 {
     private readonly ApiScopeRepository _repository;
 
-    public NewModel(ApiScopeRepository repository)
-    {
-        _repository = repository;
-    }
+    public NewModel(ApiScopeRepository repository) => _repository = repository;
 
     [BindProperty]
     public ApiScopeModel InputModel { get; set; } = default!;
-        
+
     public void OnGet()
     {
     }

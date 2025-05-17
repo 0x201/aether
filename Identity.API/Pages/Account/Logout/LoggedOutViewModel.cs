@@ -1,10 +1,4 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
-namespace ModernCSharp.Identity.API.Pages.Account.Logout;
+﻿namespace ModernCSharp.Identity.API.Pages.Account.Logout;
 
 public class LoggedOutViewModel
 {

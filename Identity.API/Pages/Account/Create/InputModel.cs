@@ -1,5 +1,4 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ModernCSharp.Identity.API.Pages.Account.Create;
 

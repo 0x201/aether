@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ModernCSharp.Identity.API.Data;
+using ModernCSharp.Identity.API;
 
 #nullable disable
 
-namespace ModernCSharp.Identity.API.Data.Migrations
+namespace ModernCSharp.Identity.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250516102957_Intitial")]
-    partial class Intitial
+    [Migration("20250517103742_AddDefaultUsers")]
+    partial class AddDefaultUsers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,7 +158,7 @@ namespace ModernCSharp.Identity.API.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ModernCSharp.Identity.API.Models.ApplicationUser", b =>
+            modelBuilder.Entity("ModernCSharp.Identity.API.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -177,19 +177,11 @@ namespace ModernCSharp.Identity.API.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -242,7 +234,7 @@ namespace ModernCSharp.Identity.API.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ModernCSharp.Identity.API.Models.ApplicationUser", null)
+                    b.HasOne("ModernCSharp.Identity.API.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -251,7 +243,7 @@ namespace ModernCSharp.Identity.API.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ModernCSharp.Identity.API.Models.ApplicationUser", null)
+                    b.HasOne("ModernCSharp.Identity.API.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -266,7 +258,7 @@ namespace ModernCSharp.Identity.API.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernCSharp.Identity.API.Models.ApplicationUser", null)
+                    b.HasOne("ModernCSharp.Identity.API.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -275,7 +267,7 @@ namespace ModernCSharp.Identity.API.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("ModernCSharp.Identity.API.Models.ApplicationUser", null)
+                    b.HasOne("ModernCSharp.Identity.API.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

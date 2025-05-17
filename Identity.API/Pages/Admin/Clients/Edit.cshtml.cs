@@ -1,6 +1,5 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ModernCSharp.Identity.API.Pages.Admin.Clients;
@@ -11,13 +10,10 @@ public class EditModel : PageModel
 {
     private readonly ClientRepository _repository;
 
-    public EditModel(ClientRepository repository)
-    {
-        _repository = repository;
-    }
+    public EditModel(ClientRepository repository) => _repository = repository;
 
     [BindProperty]
-    public ClientModel InputModel { get; set; } = default!;
+    public EditClientModel InputModel { get; set; } = default!;
     [BindProperty]
     public string? Button { get; set; }
 
@@ -30,7 +26,7 @@ public class EditModel : PageModel
         }
         else
         {
-            InputModel = model; 
+            InputModel = model;
             return Page();
         }
     }

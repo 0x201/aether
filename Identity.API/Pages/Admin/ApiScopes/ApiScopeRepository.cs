@@ -1,9 +1,10 @@
-// Copyright (c) Duende Software. All rights reserved.
-// See LICENSE in the project root for license information.
+﻿using System.ComponentModel.DataAnnotations;
 
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Mappers;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace ModernCSharp.Identity.API.Pages.Admin.ApiScopes;
 
@@ -24,10 +25,7 @@ public class ApiScopeRepository
 {
     private readonly ConfigurationDbContext _context;
 
-    public ApiScopeRepository(ConfigurationDbContext context)
-    {
-        _context = context;
-    }
+    public ApiScopeRepository(ConfigurationDbContext context) => _context = context;
 
     public async Task<IEnumerable<ApiScopeSummaryModel>> GetAllAsync(string? filter = null)
     {
@@ -74,16 +72,16 @@ public class ApiScopeRepository
             DisplayName = model.DisplayName?.Trim()
         };
 
-        var claims = model.UserClaims?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray() ?? Enumerable.Empty<string>();
+        var claims = model.UserClaims?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
         if (claims.Any())
         {
             scope.UserClaims = claims.ToList();
         }
 
 #pragma warning disable CA1849 // Call async methods when in an async method
-// CA1849 Suppressed because AddAsync is only needed for value generators that
-// need async database access (e.g., HiLoValueGenerator), and we don't use those
-// generators
+        // CA1849 Suppressed because AddAsync is only needed for value generators that
+        // need async database access (e.g., HiLoValueGenerator), and we don't use those
+        // generators
         _context.ApiScopes.Add(scope.ToEntity());
 #pragma warning restore CA1849 // Call async methods when in an async method
         await _context.SaveChangesAsync();
@@ -103,7 +101,7 @@ public class ApiScopeRepository
             scope.DisplayName = model.DisplayName?.Trim();
         }
 
-        var claims = model.UserClaims?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray() ?? Enumerable.Empty<string>();
+        var claims = model.UserClaims?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
         var currentClaims = (scope.UserClaims.Select(x => x.Type) ?? Enumerable.Empty<string>()).ToArray();
 
         var claimsToAdd = claims.Except(currentClaims).ToArray();
