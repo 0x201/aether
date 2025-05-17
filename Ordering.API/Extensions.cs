@@ -1,6 +1,5 @@
 ﻿using ModernCSharp.Ordering.API.Infrastructure;
-using ModernCSharp.Ordering.Application.Common.Interfaces;
-using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.ServiceDefaults;
 
 namespace ModernCSharp.Ordering.API;
 
@@ -9,6 +8,8 @@ internal static class Extensions
     public static void AddApplicationService(this IHostApplicationBuilder builder)
     {
         var services = builder.Services;
+
+        builder.AddDefaultAuthentication();
 
         var connectionString = builder.Configuration.GetConnectionString("orderingdb");
 

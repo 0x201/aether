@@ -1,4 +1,6 @@
-﻿namespace ModernCSharp.Ordering.Application.Queries;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+
+namespace ModernCSharp.Ordering.Application.Queries;
 
 public class OrderQueries(IOrderRepository orderRepository) : IOrderQueries
 {
@@ -22,7 +24,24 @@ public class OrderQueries(IOrderRepository orderRepository) : IOrderQueries
     {
         var orders = await orderRepository.GetOrdersAsync();
 
-        return orders.Select(order => new Order 
+        return orders
+            .Select(order => new Order
+            {
+                ordernumber = order.Id,
+                date = order.OrderDate,
+                total = order.Total,
+                quantity = order.Quantity,
+                status = order.OrderStatus.ToString(),
+            });
+    }
+
+    public async Task<IEnumerable<Order>> GetOrdersFromUserAsync(string userId)
+    {
+        var orders = await orderRepository.GetOrdersAsync();
+
+        return orders
+            .Where(order => order.Buyer.IdentityGuid == userId)
+            .Select(order => new Order 
             {
                 ordernumber = order.Id,
                 date = order.OrderDate,

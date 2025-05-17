@@ -4,6 +4,7 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<RootNamespace>ModernCSharp.Identity.API</RootNamespace>
 		<UserSecretsId>1439e202-d273-4438-8e75-cfd46a93f803</UserSecretsId>
+    <Nullable>enable</Nullable>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 

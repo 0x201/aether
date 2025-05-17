@@ -1,21 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
-
-namespace ModernCSharp.ApiService.Apis;
+using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 public static class OrderApi
 {
-    public static RouteGroupBuilder MapOrdersApi(this RouteGroupBuilder app)
+    public static RouteGroupBuilder MapOrdersApiV1(this IEndpointRouteBuilder app)
     {
-        //app.MapGet("orders", GetOrderAsync);
+        var api = app.MapGroup("api/orders").HasApiVersion(1.0);
 
-        return app;
+        api.MapGet("/", GetOrdersByUserAsync);
+
+        return api;
     }
 
-    //public static async Task<Results<Ok<Order>, NotFound>> GetOrderAsync(int orderId, [FromServices] IOrderService orderService)
-    //{
-
-    //    return await orderService.GetOrdersAsync();
-    //}
+    public static async Task<Ok<IEnumerable<Order>>> GetOrdersByUserAsync([AsParameters] OrderService services)
+    {
+        var userId = services.IdentityService.GetUserIdentity();
+        var orders = await services.Queries.GetOrdersFromUserAsync(userId);
+        return TypedResults.Ok(orders);
+    }
 }

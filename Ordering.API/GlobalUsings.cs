@@ -8,3 +8,8 @@ global using ModernCSharp.Ordering.Infrastructure;
 global using ModernCSharp.Ordering.Infrastructure.Idempotency;
 global using ModernCSharp.Ordering.Infrastructure.Interceptors;
 global using ModernCSharp.Ordering.Infrastructure.Repositories;
+
+global using MediatR;
+
+global using ModernCSharp.Ordering.Application.Common.Interfaces;
+global using ModernCSharp.Ordering.Application.Queries;

@@ -1,3 +1,5 @@
+﻿using ModernCSharp.Identity.API.Pages;
+
 namespace ModernCSharp.Identity.API;
 
 internal static class HostingExtensions
@@ -6,7 +8,7 @@ internal static class HostingExtensions
     {
         builder.AddServiceDefaults();
 
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddRazorPages();
 
         builder.AddSqlServerDbContext<ApplicationDbContext>("identitydb");
 
@@ -26,6 +28,7 @@ internal static class HostingExtensions
             options.Events.RaiseSuccessEvents = true;
         })
         .AddInMemoryIdentityResources(Config.IdentityResources)
+        .AddTestUsers(TestUsers.Users)
         .AddInMemoryApiScopes(Config.ApiScopes)
         .AddInMemoryApiResources(Config.ApiResources)
         .AddInMemoryClients(Config.GetClients(builder.Configuration))
@@ -47,7 +50,7 @@ internal static class HostingExtensions
         app.UseIdentityServer();
         app.UseAuthorization();
 
-        app.MapDefaultControllerRoute();
+        app.MapRazorPages().RequireAuthorization();
 
         return app;
     }
