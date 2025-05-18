@@ -41,5 +41,17 @@
     </ItemGroup>
     <Message Importance="Normal" Text="Installing pnpm packages for %(ViteVueAppPackageJsons.RelativeDir)" Condition="!Exists('%(ViteVueAppPackageJsons.RootDir)%(ViteVueAppPackageJsons.Directory)/node_modules')" />
     <Exec Command="pnpm install" WorkingDirectory="%(ViteVueAppPackageJsons.RootDir)%(ViteVueAppPackageJsons.Directory)" Condition="!Exists('%(ViteVueAppPackageJsons.RootDir)%(ViteVueAppPackageJsons.Directory)/node_modules')" />
+
+    <ItemGroup>
+      <ViteReactAppPackageJsons Include="..\..\vite-react-app\package.json"/>
+    </ItemGroup>
+    <Message Importance="Normal" Text="Installing pnpm packages for %(ViteReactAppPackageJsons.RelativeDir)" Condition="!Exists('%(ViteReactAppPackageJsons.RootDir)%(ViteReactAppPackageJsons.Directory)/node_modules')" />
+    <Exec Command="pnpm install" WorkingDirectory="%(ViteReactAppPackageJsons.RootDir)%(ViteReactAppPackageJsons.Directory)" Condition="!Exists('%(ViteReactAppPackageJsons.RootDir)%(ViteReactAppPackageJsons.Directory)/node_modules')" />
+
+    <ItemGroup>
+      <AngularAppPackageJsons Include="..\..\angular-app\package.json"/>
+    </ItemGroup>
+    <Message Importance="Normal" Text="Installing pnpm packages for %(AngularAppPackageJsons.RelativeDir)" Condition="!Exists('%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)/node_modules')" />
+    <Exec Command="pnpm install" WorkingDirectory="%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)" Condition="!Exists('%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)/node_modules')" />
   </Target>
 </Project>

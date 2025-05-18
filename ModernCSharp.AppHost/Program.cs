@@ -52,6 +52,16 @@ var viteVueApp = builder.AddPnpmApp("vite-vue-app", @"..\..\vite-vue-app", "dev"
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
+var viteReactApp = builder.AddPnpmApp("vite-react-app", @"..\..\vite-react-app", "dev")
+    .WithHttpEndpoint(port: 5174, isProxied: false)
+    .WithExternalHttpEndpoints()
+    .WithReference(orderingApi);
+
+var angularApp = builder.AddPnpmApp("angular-app", @"..\..\angular-app", "start")
+    .WithHttpEndpoint(port: 4200, isProxied: false)
+    .WithExternalHttpEndpoints()
+    .WithReference(orderingApi);
+
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\..\fastapi-demo", "main.py")
     .WithHttpEndpoint(port: 8000, isProxied: false)
