@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nest",
+      "runtimeArgs": ["start", "--inspect-brk", "--watch", "--debug"],
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "trace": true,
+      "preLaunchTask": "pnpm: start:debug"
+    }
+  ]
+}
