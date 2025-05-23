@@ -4,7 +4,10 @@
 		{
 			"type": "shell",
 			"command": "pnpm",
-			"args": ["run", "start:debug"],
+			"args": [
+				"run",
+				"start:debug"
+			],
 			"problemMatcher": [],
 			"label": "pnpm: start:debug",
 			"detail": "nest start --watch --debug"

@@ -9,7 +9,7 @@ export interface IAuditable {
 
 export class BaseAuditableEntity implements IAuditable {
   
-  @CreateDateColumn({ name: 'createdTime' })
+  @CreateDateColumn()
   createdTime: string;
 
   @Column({ default: '', length: 200 })

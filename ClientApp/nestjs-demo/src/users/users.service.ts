@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, In, DataSource, } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { genSalt, hash } from 'bcrypt';
 import { SignInUserCommand } from './commands/login-user.command';
-import { UserConstants } from './constants';
 import { SignUpUserCommand } from './commands/signup-user.command';
 import { UserDto } from './dtos/user.dto';
 import { plainToClass } from 'class-transformer';
@@ -21,12 +19,12 @@ export class UsersService {
     private readonly utilsService: UtilsService
   ) { }
 
-  async findOne(input: SignInUserCommand): Promise<User | null> {
+  async findOne(input: SignInUserCommand): Promise<User> {
     return await this.userRepository.findOne({
       where: {
         username: input.username,
       },
-      relations: ['roles'],
+      relations: ['userRoles', 'userRoles.role'],
     });
   }
 
@@ -39,8 +37,8 @@ export class UsersService {
     try {
       const roles: Role[] = await queryRunner.manager.find(Role, { where: { name: In([...input.roles]) } });
       user.username = input.username;
-      const salt = await genSalt(UserConstants.saltRound);
-      user.password = await hash(input.password, salt);
+      const [pwd, salt] = await this.utilsService.getPwdHash(input.password)
+      user.password = pwd;
       user.salt = salt;
       user.nickname = input.nickname;
       user.createdTime = this.utilsService.getNowString();

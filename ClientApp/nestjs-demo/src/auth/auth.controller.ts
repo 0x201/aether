@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Get,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { SignInUserCommand } from 'src/users/commands/login-user.command';
