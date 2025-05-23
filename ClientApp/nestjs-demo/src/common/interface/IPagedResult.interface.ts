@@ -1,10 +1,3 @@
-interface IAuditable {
-  createdTime: string;
-  createdBy: string;
-  lastModifiedTime: string;
-  lastModifiedBy: string;
-}
-
 interface IFilteredResultQuery {
   filter: string | null;
 }

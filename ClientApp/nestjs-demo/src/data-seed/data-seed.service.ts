@@ -103,6 +103,7 @@ export class DataSeedService {
         password: await hash('1q2w3E!', salt),
         salt: salt,
         nickname: 'admin',
+        isActive: true,
         roles: [{ id: 1, name: 'admin' }],
       });
       console.log("Seeding user data - End");

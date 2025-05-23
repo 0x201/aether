@@ -1,5 +1,5 @@
 import { Book } from 'src/books/entities/book.entity';
-import { IAuditable } from 'src/common/interface/IPagedResult.interface';
+import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity('authors')
-export class Author implements IAuditable {
+export class Author extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,18 +22,6 @@ export class Author implements IAuditable {
 
   @Column({ default: true })
   isActive: boolean;
-
-  @CreateDateColumn({ name: 'createdTime' })
-  createdTime: string;
-
-  @Column({ default: '' })
-  createdBy: string;
-
-  @UpdateDateColumn({ name: 'lastModifiedTime', nullable: true })
-  lastModifiedTime: string;
-
-  @Column({ nullable: true })
-  lastModifiedBy: string;
 
   @OneToMany(() => Book, (b) => b.author)
   books: Book[];

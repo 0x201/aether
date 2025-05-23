@@ -8,10 +8,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from './role.entity';
-import { IAuditable } from 'src/common/interface/IPagedResult.interface';
+import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
 
 @Entity('users')
-export class User implements IAuditable {
+export class User extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,21 +27,14 @@ export class User implements IAuditable {
   @Column()
   nickname: string;
 
-  @CreateDateColumn({ name: 'createdTime' })
-  createdTime: string;
+  @Column()
+  isActive: boolean;
 
-  @Column({
-    nullable: true,
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({
+    name: 'user_role_mapping',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
   })
-  createdBy: string;
-
-  @UpdateDateColumn({ name: 'lastModifiedTime', nullable: true })
-  lastModifiedTime: string;
-
-  @Column({ nullable: true })
-  lastModifiedBy: string;
-
-  @ManyToMany(() => Role)
-  @JoinTable()
   roles: Role[];
 }
