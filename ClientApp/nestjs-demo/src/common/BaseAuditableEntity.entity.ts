@@ -12,12 +12,12 @@ export class BaseAuditableEntity implements IAuditable {
   @CreateDateColumn({ name: 'createdTime' })
   createdTime: string;
 
-  @Column({ default: '' })
+  @Column({ default: '', length: 200 })
   createdBy: string;
 
   @UpdateDateColumn({ name: 'lastModifiedTime', nullable: true })
   lastModifiedTime: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 200 })
   lastModifiedBy: string;
 }

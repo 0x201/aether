@@ -12,5 +12,5 @@ export class CreateBookCommand {
   @ApiProperty()
   price: number;
   @ApiProperty()
-  authorId: number;
+  authorIds: number[];
 }

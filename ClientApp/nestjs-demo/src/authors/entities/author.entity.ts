@@ -1,12 +1,10 @@
-import { Book } from 'src/books/entities/book.entity';
+import { BookAuthor } from 'src/books/entities/book-author.entity';
 import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
 import {
   Column,
-  CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('authors')
@@ -14,15 +12,15 @@ export class Author extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50, nullable: false })
   firstName: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50, nullable: false })
   lastName: string;
 
-  @Column({ default: true })
+  @Column({ default: true, nullable: false })
   isActive: boolean;
 
-  @OneToMany(() => Book, (b) => b.author)
-  books: Book[];
+  @OneToMany(() => BookAuthor, (ba) => ba.author)
+  bookAuthors: BookAuthor[];
 }

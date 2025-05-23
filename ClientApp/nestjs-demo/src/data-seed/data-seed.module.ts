@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { DataSeedService } from './data-seed.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Book } from 'src/books/entities/book.entity';
-import { Author } from 'src/authors/entities/author.entity';
-import { Role } from 'src/users/entities/role.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UsersModule } from 'src/users/users.module';
+import { RolesModule } from 'src/roles/roles.module';
+import { BooksModule } from 'src/books/books.module';
+import { AuthorsModule } from 'src/authors/authors.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Book, Author, Role, User])
+    UsersModule,
+    RolesModule,
+    BooksModule,
+    AuthorsModule
   ],
   providers: [DataSeedService],
   exports: [DataSeedService]

@@ -1,40 +1,34 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  Index,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
-import { Role } from './role.entity';
 import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
+import { UserRole } from './user-role.entity';
 
 @Entity('users')
+@Index('IDX_USER_USERNAME', ['username'], { unique: true })
 export class User extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 200, nullable: false })
   username: string;
 
-  @Column()
+  @Column({type: 'varchar', length: 200, nullable: false})
   password: string;
 
-  @Column()
+  @Column({type: 'varchar', length: 128, nullable: false})
   salt: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 200 })
   nickname: string;
 
-  @Column()
+  @Column({ default: true, nullable: false })
   isActive: boolean;
 
-  @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable({
-    name: 'user_role_mapping',
-    joinColumn: { name: 'userId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
-  })
-  roles: Role[];
+  @OneToMany(() => UserRole, (ur) => ur.user)
+  userRoles: UserRole[];
 }

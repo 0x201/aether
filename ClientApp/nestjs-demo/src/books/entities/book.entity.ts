@@ -1,40 +1,40 @@
-import { Author } from 'src/authors/entities/author.entity';
 import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
 
 import {
   Column,
-  CreateDateColumn,
   Entity,
-  ManyToOne,
+  Index,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
+import { BookAuthor } from './book-author.entity';
 
 @Entity('books')
+@Index('IDX_BOOK_TITLE', ['title'], { unique: true })
+@Index('IDX_BOOK_ISBN', ['isbn'], { unique: true })
 export class Book extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    unique: true,
-  })
+  @Column({ type: 'varchar', nullable: false, length: 512 })
   title: string;
 
-  @Column('decimal', { precision: 18, scale: 2 })
+  @Column({ type: 'decimal', precision: 18, scale: 2, nullable: false })
   price: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 16, nullable: false })
   isbn: string;
 
-  @Column({ length: 2048 })
+  @Column({ type: 'varchar', length: 2048 })
   description: string;
 
-  @Column()
+  // 1999-01-01
+  @Column({ type: 'varchar', length: 10 })
   publishDate: string;
 
-  @Column({ default: true })
+  @Column({ default: true, nullable: false })
   isActive: boolean;
 
-  @ManyToOne(() => Author, (author) => author.books, { cascade: true })
-  author: Author;
+  @OneToMany(() => BookAuthor, ba => ba.book)
+  bookAuthors: BookAuthor[];
 }

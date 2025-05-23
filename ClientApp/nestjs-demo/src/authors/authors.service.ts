@@ -57,4 +57,8 @@ export class AuthorsService {
     });
     await this.authorRepository.remove(authorToDelete);
   }
+
+  async count(): Promise<number> {
+    return this.authorRepository.count();
+  }
 }

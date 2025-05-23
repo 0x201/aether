@@ -36,7 +36,6 @@ interface ITimeRangedQuery {
 interface IPagedResult<T> extends IListResult<T>, IHasTotalCount {}
 
 export {
-  IAuditable,
   IFilteredResultQuery,
   IHasTotalCount,
   ILimitedResultQuery,

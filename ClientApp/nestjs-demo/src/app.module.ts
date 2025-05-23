@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSeedModule } from './data-seed/data-seed.module';
 import { SharedModule } from './shared/shared.module';
+import { RolesModule } from './roles/roles.module';
 import config from './conifg/config';
 
 @Module({
@@ -33,6 +34,7 @@ import config from './conifg/config';
     UsersModule,
     DataSeedModule,
     SharedModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

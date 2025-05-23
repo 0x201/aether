@@ -13,15 +13,17 @@ import { SignUpUserCommand } from 'src/users/commands/signup-user.command';
 import { compare } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { JwtConfig } from './jwt.config';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
   private readonly jwtConfig: JwtConfig;
 
   constructor(
-    private jwtService: JwtService,
-    private userService: UsersService,
-    private configService: ConfigService,
+    private readonly jwtService: JwtService,
+    private readonly userService: UsersService,
+    private readonly rolesService: RolesService,
+    private readonly configService: ConfigService,
   ) {
     this.jwtConfig = this.configService.get<JwtConfig>('jwtConfig');
   }
@@ -39,7 +41,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     const roles: string[] =
-      user.roles.length == 0 ? [] : user.roles.map((x) => x.name);
+      user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
     const payload: JwtPayload = {
       sub: user.id.toString(),
       username: user.username,
@@ -51,14 +53,19 @@ export class AuthService {
   }
 
   async signUp(input: SignUpUserCommand): Promise<any> {
-    if (!(await this.userService.checkDuplicateUsername(input.username))) {
+    const user = await this.userService.findOne(input);
+    const userExists = user !== null;
+
+    if (userExists) {
       throw new BadRequestException({
         status: HttpStatus.BAD_REQUEST,
         message: 'User has already exists!',
       });
     }
     if (input.roles.length > 0) {
-      if (!(await this.userService.checkRolesExisted(input.roles))) {
+      const roles = await this.rolesService.findByNames(input.roles);
+      const rolesExist = !roles && roles.length > 0;
+      if (!rolesExist) {
         throw new NotFoundException({
           status: HttpStatus.NOT_FOUND,
           message: 'Not found roles!',
@@ -69,7 +76,7 @@ export class AuthService {
     if (res) {
       return {
         status: HttpStatus.OK,
-        message: 'User was registered successfully!',
+        message: 'User registered successfully!',
       };
     }
   }
