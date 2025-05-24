@@ -44,10 +44,10 @@ export class BooksService {
         booksToSave.push(book);
 
         command.authorIds.forEach((authorId) => {
-          bookAuthorsToSave.push({
-            bookId: -1, // placeholder, will be replaced
-            authorId: authorId,
-          } as BookAuthor);
+          const bookAuthor = new BookAuthor();
+          bookAuthor.bookId = -1; // placeholder, will be replaced
+          bookAuthor.authorId = authorId;
+          bookAuthorsToSave.push(bookAuthor);
         });
       }
 
@@ -94,10 +94,10 @@ export class BooksService {
       book.isbn = command.isbn;
 
       command.authorIds.forEach((authorId) => {
-        bookAuthorsToSave.push({
-          bookId: null!,
-          authorId: authorId,
-        } as BookAuthor);
+        const bookAuthor = new BookAuthor();
+        bookAuthor.bookId = -1; // placeholder, will be replaced
+        bookAuthor.authorId = authorId;
+        bookAuthorsToSave.push(bookAuthor);
       });
 
       const savedBooks = await queryRunner.manager.save(booksToAdd);
@@ -121,7 +121,8 @@ export class BooksService {
   async findAll(query: BookQuery): Promise<[Book[], number]> {
     let qb = this.bookRepository
       .createQueryBuilder('book')
-      .innerJoin('book.author', 'author');
+      .leftJoinAndSelect('book.bookAuthors', 'bookAuthor')
+      .leftJoinAndSelect('bookAuthor.author', 'author');
     if (query.filter) {
       qb = qb.andWhere('book.title like :title', { title: query.filter + '%' });
     }
@@ -145,7 +146,11 @@ export class BooksService {
   }
 
   async findOne(id: number): Promise<Book> {
-    return await this.bookRepository.findOne({ where: { id: id } });
+    const book = await this.bookRepository.findOne({
+      relations: ['bookAuthors', 'bookAuthors.author'],
+      where: { id: id }
+    });
+    return book;
   }
 
   async update(id: number, command: UpdateBookCommand) {

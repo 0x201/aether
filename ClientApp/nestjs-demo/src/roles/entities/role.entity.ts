@@ -15,10 +15,10 @@ export class Role extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 200, nullable: false })
+  @Column({ type: 'varchar', length: 200 })
   name: string;
 
-  @Column({ default: true, nullable: false })
+  @Column({ default: true })
   isActive: boolean;
 
   @OneToMany(() => UserRole, ur => ur.role)

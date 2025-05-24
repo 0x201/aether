@@ -3,8 +3,8 @@ import { User } from "./user.entity";
 import { Role } from "src/roles/entities/role.entity";
 
 @Entity('user_role')
-@Index('IDX_USER_ROLE_USER_ID', ['userId'])
-@Index('IDX_USER_ROLE_ROLE_ID', ['roleId'])
+@Index('IDX_USER_ROLE_USER_ID', ['userId'], { unique: true })
+@Index('IDX_USER_ROLE_ROLE_ID', ['roleId'], { unique: true })
 export class UserRole {
     @PrimaryColumn({ name: 'user_id' })
     userId: number;

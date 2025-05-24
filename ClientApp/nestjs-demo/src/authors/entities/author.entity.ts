@@ -12,13 +12,13 @@ export class Author extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50})
   firstName: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50 })
   lastName: string;
 
-  @Column({ default: true, nullable: false })
+  @Column({ default: true })
   isActive: boolean;
 
   @OneToMany(() => BookAuthor, (ba) => ba.author)

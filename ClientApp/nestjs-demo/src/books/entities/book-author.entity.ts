@@ -5,8 +5,8 @@ import { Author } from "src/authors/entities/author.entity";
 
 
 @Entity('book_author')
-@Index('IDX_BOOK_AUTHOR_AUTHOR_ID', ['authorId'])
-@Index('IDX_BOOK_AUTHOR_BOOK_ID', ['bookId'])
+@Index('IDX_BOOK_AUTHOR_AUTHOR_ID', ['authorId'], { unique: true })
+@Index('IDX_BOOK_AUTHOR_BOOK_ID', ['bookId'], { unique: true })
 export class BookAuthor {
     @PrimaryColumn({ name: 'book_id' })
     bookId: number;
@@ -14,15 +14,11 @@ export class BookAuthor {
     @PrimaryColumn({ name: 'author_id' })
     authorId: number;
 
-    @ManyToOne(() => Book, (book) => book.bookAuthors, {
-        onDelete: 'CASCADE',
-    })
+    @ManyToOne(() => Book, (book) => book.bookAuthors)
     @JoinColumn({ name: 'book_id', foreignKeyConstraintName: 'FK_BOOK_AUTHOR_BOOK_ID' })
     book: Book;
 
-    @ManyToOne(() => Author, (author) => author.bookAuthors, {
-        onDelete: 'CASCADE',
-    })
+    @ManyToOne(() => Author, (author) => author.bookAuthors)
     @JoinColumn({ name: 'author_id', foreignKeyConstraintName: 'FK_BOOK_AUTHOR_AUTHOR_ID' })
     author: Author;
 }
