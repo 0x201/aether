@@ -1,7 +1,6 @@
-from typing import Optional, Union, Dict
+from typing import Optional
 
 from fastapi import HTTPException
-
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from starlette import status
@@ -12,9 +11,6 @@ from app.schemas.author import AuthorUpdate, AuthorCreate
 
 
 class CRUDAuthor(CRUDBase[Author, AuthorCreate, AuthorUpdate]):
-    def get_author_by_fullname(self, db: Session, full_name: str) -> Optional[Author]:
-        return db.query(Author).filter(Author.full_name == full_name).first()
-
     def get(self, db: Session, author_id: int) -> Optional[Author]:
         author = super().get(db, author_id)
         if not author:

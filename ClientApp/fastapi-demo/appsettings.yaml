@@ -2,7 +2,7 @@
   server: localhost
   port: 3306
   user_name: root
-  password: 
+  password: Pass123$
   database: bookstore
 
 sqlserver:
@@ -14,6 +14,7 @@ sqlserver:
   password: 
   database: bookstore
 
+pwd_salt: 'salt'
 
 cors_origins:
   - "http://localhost:3000"

@@ -1,22 +1,22 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
+    username: Optional[str] = None
     is_active: Optional[bool] = True
-    is_superuser: bool = False
-    full_name: Optional[str] = None
+    nickname: Optional[str] = None
 
 
 class UserCreate(UserBase):
-    email: EmailStr
+    username: str
     password: str
 
 
 class UserUpdate(UserBase):
     password: Optional[str] = None
+    salt: Optional[str] = None
 
 
 class UserInDBBase(UserBase):
@@ -31,4 +31,4 @@ class User(UserInDBBase):
 
 
 class UserInDB(UserInDBBase):
-    hashed_password: str
+    password: str

@@ -1,17 +1,15 @@
-from typing import TYPE_CHECKING
-
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Index
 from sqlalchemy.orm import relationship
 
-from app.db.base_class import Base
-
-if TYPE_CHECKING:
-    from .item import Item  # noqa: F401
+from app.db.base_class import Base, Auditable
 
 
-class Role(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(32), index=True)
-    is_active = Column(Boolean, default=True)
+class Role(Base, Auditable):
+    __tablename__ = 'roles'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(200), nullable=False)
+    is_active = Column(Boolean, name='isActive', default=True, nullable=False)
+    users = relationship("User", secondary="user_role", back_populates="roles")
 
-    users = relationship("User", back_populates="role")
+
+Index('IDX_ROLE_NAME', Role.name, unique=True)

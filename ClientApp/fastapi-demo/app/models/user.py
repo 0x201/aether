@@ -1,16 +1,17 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, String, Integer, Index
 from sqlalchemy.orm import relationship
+from app.db.base_class import Base, Auditable
 
-from app.db.base_class import Base
+
+class User(Base, Auditable):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(200), nullable=False)
+    nickname = Column(String(200))
+    password = Column(String(200), nullable=False)
+    salt = Column(String(128), nullable=False)
+    is_active = Column(Boolean, name="isActive", default=True, nullable=False)
+    roles = relationship("Role", secondary="user_role", back_populates="users")
 
 
-class User(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String(128), index=True)
-    email = Column(String(128), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(128), nullable=False)
-    is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
-    role_id = Column(Integer, ForeignKey("roles.id"))
-
-    role = relationship("Role", back_populates="users")
+Index('IDX_USER_USERNAME', User.username, unique=True)

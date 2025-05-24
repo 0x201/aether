@@ -1,19 +1,14 @@
-from typing import TYPE_CHECKING
-
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.db.base_class import Base
-
-if TYPE_CHECKING:
-    from .book import Book  # noqa: F401
+from app.db.base_class import Base, Auditable
 
 
-class Author(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    first_name = Column(String(32))
-    last_name = Column(String(32))
-    full_name = Column(String(64))
-    is_active = Column(Boolean, default=True)
+class Author(Base, Auditable):
+    __tablename__ = 'authors'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    first_name = Column(String(50), name="firstName", nullable=False)
+    last_name = Column(String(50), name="lastName", nullable=False)
+    is_active = Column(Boolean, default=True, name="isActive", nullable=False)
 
-    books = relationship("Book", back_populates="author")
+    books = relationship("Book", secondary='book_author', back_populates="authors")

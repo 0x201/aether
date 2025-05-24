@@ -1,13 +1,10 @@
 from typing import Union, Any
 from datetime import datetime, timedelta
 
+import bcrypt
 import jwt
-from passlib.context import CryptContext
 
 from appsettings import appsettings
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 ALGORITHM = "HS256"
 
 
@@ -26,9 +23,11 @@ def create_access_token(
     return encoded_jwt
 
 
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+def get_password_hash(password: str) -> (bytes, bytes):
+    salt = bcrypt.gensalt(appsettings.PWDSalt)
+    password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return salt, password
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: bytes, hashed_password: bytes) -> bool:
+    return bcrypt.checkpw(plain_password, hashed_password)

@@ -21,7 +21,7 @@ class AppSettings:
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     MYSQL_CONNECTION_STRING: Optional[str] = (
-        f"mysql+pymysql://{config['mysql']['user_name']}:{config['mysql']['password']}@{config['mysql']['server']}:"
+        f"mysql+mysqlconnector://{config['mysql']['user_name']}:{config['mysql']['password']}@{config['mysql']['server']}:"
         f"{config['mysql']['port']}/{config['mysql']['database']}?charset=utf8"
     )
     SQLSERVER_CONNECTION_STRING: Optional[str] = (
@@ -35,6 +35,7 @@ class AppSettings:
     NPPA_SUFFIX: Optional[str] = config["nppa"]["suffix"]
     HOST: Optional[str] = config["host"]
     PORT: Optional[int] = config["port"]
+    PWDSalt: str = config["pwd_salt"]
 
 
 appsettings = AppSettings()

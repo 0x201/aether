@@ -1,8 +1,9 @@
 from app.db.base_class import Base  # noqa
 from app.models.book import Book  # noqa
 from app.models.author import Author  # noqa
-from app.models.user import User  # noqa
-from app.models.role import Role  # noqa
+from app.models.user import User # noqa
+from app.models.role import Role # noqa
+from app.models.user_role import UserRole # noqa
 from app.models.game_audit import GameAudit  # noqa
 from app.models.network_game_audit import NetworkGameAudit  # noqa
 from app.models.game_revocation_audit import GameRevocationAudit  # noqa
