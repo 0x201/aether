@@ -92,7 +92,7 @@
     <!--WinUI-->
     <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.3916" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageVersion Include="WinUIEx" Version="2.5.1" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
@@ -103,9 +103,7 @@
     <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="$(CommunityToolkitWinUIVersion)" />
     <PackageVersion Include="CommunityToolkit.WinUI.Helpers" Version="$(CommunityToolkitWinUIVersion)" />
     <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="$(CommunityToolkitWinUIVersion)" />
-
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
-
     <!--Miscellaneous-->
     <PackageVersion Include="AutoMapper" Version="14.0.0" />
     <PackageVersion Include="ClosedXML" Version="0.105.0" />
