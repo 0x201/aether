@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.2.1</AspireVersion>
+    <AspireVersion>9.3.0</AspireVersion>
     <AspnetVersion>9.0.5</AspnetVersion>
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>3.8.3</MSTestVersion>
