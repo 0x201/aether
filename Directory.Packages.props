@@ -90,7 +90,7 @@
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="2.4.10" />
     <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250401001" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
     <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.3916" />
     <PackageVersion Include="WinUIEx" Version="2.5.1" />
