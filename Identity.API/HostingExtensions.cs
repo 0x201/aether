@@ -23,7 +23,11 @@ internal static class HostingExtensions
 
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) => 
         {
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString,
+                sqlActionOptions =>
+                {
+                    sqlActionOptions.EnableRetryOnFailure(5);
+                });
         });
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

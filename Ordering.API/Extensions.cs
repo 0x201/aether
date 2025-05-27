@@ -18,7 +18,7 @@ internal static class Extensions
         services.AddDbContext<OrderingDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString, sqlBuilderOptions => { sqlBuilderOptions.EnableRetryOnFailure(5); });
         });
 
         builder.EnrichSqlServerDbContext<OrderingDbContext>();
