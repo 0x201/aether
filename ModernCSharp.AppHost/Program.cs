@@ -1,26 +1,47 @@
 ﻿var builder = DistributedApplication.CreateBuilder(args);
 
-var cache = builder.AddRedis("cache");
-
-var rabbitmqUsername = builder.AddParameter("eventbus-username", secret: true);
-var rabbitmqPassword = builder.AddParameter("eventbus-password", secret: true);
-var rabbitmq = builder.AddRabbitMQ("eventbus", userName: rabbitmqUsername, password: rabbitmqPassword)
+#pragma warning disable ASPIREPROXYENDPOINTS001
+var redis = builder.AddRedis("redis")
+                   .WithLifetime(ContainerLifetime.Persistent)
+                   .WithEndpointProxySupport(false)
+                   .WithRedisInsight(config => 
+                   {
+                       config.WithEndpointProxySupport(false);
+                       config.WithContainerName("redis-insight");
+                       config.WithLifetime(ContainerLifetime.Persistent);
+                   })
+                   .WithContainerName("redis");
+var rabbitmq = builder.AddRabbitMQ("eventbus")
                       .WithLifetime(ContainerLifetime.Persistent)
-                      .WithManagementPlugin();
+                      .WithManagementPlugin()
+                      .WithEndpointProxySupport(false)
+                      .WithContainerName("eventbus");
+var mysql = builder.AddMySql("mysql")
+                   .WithLifetime(ContainerLifetime.Persistent)
+                   .WithEndpointProxySupport(false)
+                   .WithContainerName("mysql");
+var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
+                       .WithLifetime(ContainerLifetime.Persistent)
+                       .WithEndpointProxySupport(false)
+                       .WithContainerName("sql-server");
+#pragma warning disable ASPIREPROXYENDPOINTS001 
 
-var sqlServerPwd = builder.AddParameter("sqlserver-password", secret: true);
-var sqlServer = builder.AddSqlServer("sqlserver", password: sqlServerPwd)
-                       .WithLifetime(ContainerLifetime.Persistent);
+var bookstoreDb = mysql.AddDatabase("bookstore");
 var identityDb = sqlServer.AddDatabase("identitydb");
 var orderDb = sqlServer.AddDatabase("orderingdb");
+var catalogDb = sqlServer.AddDatabase("catalogdb");
 
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
 var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", "https")
     .WithExternalHttpEndpoints()
-    .WithReference(identityDb);
+    .WithReference(identityDb).WaitFor(identityDb);
 
 var identityEndpoint = identityApi.GetEndpoint("https");
+
+var catalogApi = builder.AddProject<Projects.Catalog_API>("catalog-api")
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
+    .WithReference(catalogDb);
 
 var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
@@ -29,21 +50,22 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
     .WithEnvironment("Identity__Url", identityEndpoint);
 
 builder.AddProject<Projects.OrderProcessor>("order-processor")
-    .WithReference(cache).WaitFor(cache)
+    .WithReference(redis)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderDb)
     .WaitFor(orderingApi);
 
-
 var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithExternalHttpEndpoints()
-    .WithReference(cache).WaitFor(cache)
-    .WithReference(orderingApi).WaitFor(orderingApi)
+    .WithReference(orderingApi)
+    .WithReference(catalogApi)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
 var nestjsApp = builder.AddPnpmApp("nestjs-app", @"..\ClientApp\nestjs-demo", "start")
     .WithHttpEndpoint(port: 3000, isProxied: false)
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 
 nestjsApp.WithUrl($"{nestjsApp.GetEndpoint("http")}/docs", "NestJs App Swagger Docs");
 
@@ -65,7 +87,8 @@ var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\ClientApp\fastapi-demo", "main.py")
     .WithHttpEndpoint(port: 8000, isProxied: false)
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 #pragma warning restore ASPIREHOSTINGPYTHON001
 
 fastapiApp.WithUrl($"{fastapiApp.GetEndpoint("http")}/docs", "FastApi App Swagger Docs");
@@ -74,9 +97,6 @@ fastapiApp.WithUrl($"{fastapiApp.GetEndpoint("http")}/docs", "FastApi App Swagge
 webApp.WithEnvironment("CallBackUrl", webApp.GetEndpoint("https"));
 identityApi.WithEnvironment("OrderingApiClient", orderingApi.GetEndpoint("https"))
            .WithEnvironment("WebAppClient", webApp.GetEndpoint("https"));
-
-
-builder.AddProject<Projects.Catalog_API>("catalog-api");
 
 
 builder.Build().Run();
