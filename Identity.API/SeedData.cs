@@ -1,21 +1,17 @@
-﻿using Duende.IdentityServer.EntityFramework.DbContexts;
+﻿
+using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace ModernCSharp.Identity.API;
 
-public class SeedData
+public class ConfigurationSeed(ILogger<ConfigurationSeed> logger, IConfiguration configuration) : IDbSeeder<ConfigurationDbContext>
 {
-    public static void EnsureSeedData(WebApplication app)
+    public async Task SeedAsync(ConfigurationDbContext context)
     {
-        using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+        await context.Database.MigrateAsync();
 
-        var context = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-        context.Database.Migrate();
-        EnsureSeedData(context, app.Logger, app.Configuration);
+        EnsureSeedData(context, logger, configuration);
     }
 
     private static void EnsureSeedData(ConfigurationDbContext context, ILogger logger, IConfiguration configuration)
@@ -78,5 +74,15 @@ public class SeedData
         {
             logger.LogDebug("OIDC IdentityProviders already populated");
         }
+    }
+}
+
+public class PersistedGrantSeed(ILogger<PersistedGrantSeed> logger) : IDbSeeder<PersistedGrantDbContext>
+{
+    public async Task SeedAsync(PersistedGrantDbContext context)
+    {
+        logger.LogInformation("Start to migrate Persisted Grant");
+        await context.Database.MigrateAsync();
+        logger.LogInformation("Migration Persisted Grant completed");
     }
 }

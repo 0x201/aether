@@ -1,10 +1,9 @@
 ﻿using Duende.IdentityServer;
+using Duende.IdentityServer.EntityFramework.DbContexts;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
-using ModernCSharp.Identity.API.Pages;
 using ModernCSharp.Identity.API.Pages.Admin.ApiScopes;
 using ModernCSharp.Identity.API.Pages.Admin.IdentityScopes;
 using ModernCSharp.Identity.API.Pages.Portal;
@@ -21,7 +20,7 @@ internal static class HostingExtensions
 
         var connectionString = builder.Configuration.GetConnectionString("identitydb");
 
-        builder.Services.AddDbContext<ApplicationDbContext>((sp, options) => 
+        builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString,
                 sqlActionOptions =>
@@ -35,6 +34,8 @@ internal static class HostingExtensions
             .AddDefaultTokenProviders();
 
         builder.Services.AddMigration<ApplicationDbContext, UserSeed>();
+        builder.Services.AddMigration<ConfigurationDbContext, ConfigurationSeed>();
+        builder.Services.AddMigration<PersistedGrantDbContext, PersistedGrantSeed>();
 
         var isBuilder = builder.Services
             .AddIdentityServer(options =>
