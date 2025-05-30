@@ -24,9 +24,10 @@ import config from './conifg/config';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        return configService.get<TypeOrmModuleOptions>('mysqlConnection');
+        var options = configService.get<TypeOrmModuleOptions>('dataSource');
+        return options;
       },
-      name: '',
+      name: 'dataSource', 
     }),
     BooksModule,
     AuthorsModule,
