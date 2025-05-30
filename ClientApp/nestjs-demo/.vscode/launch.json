@@ -10,8 +10,7 @@
       "restart": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "trace": true,
-      "preLaunchTask": "pnpm: start:debug"
+      "trace": true
     }
   ]
 }
