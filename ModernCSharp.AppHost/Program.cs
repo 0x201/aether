@@ -1,30 +1,33 @@
 ﻿var builder = DistributedApplication.CreateBuilder(args);
 
-#pragma warning disable ASPIREPROXYENDPOINTS001
+
 var redis = builder.AddRedis("redis")
                    .WithLifetime(ContainerLifetime.Persistent)
-                   .WithEndpointProxySupport(false)
                    .WithRedisInsight(config => 
                    {
-                       config.WithEndpointProxySupport(false);
+                       config.WithHostPort(6378);
                        config.WithContainerName("redis-insight");
                        config.WithLifetime(ContainerLifetime.Persistent);
                    })
+                   .WithHostPort(6379)
                    .WithContainerName("redis");
+
+#pragma warning disable ASPIREPROXYENDPOINTS001
 var rabbitmq = builder.AddRabbitMQ("eventbus")
                       .WithLifetime(ContainerLifetime.Persistent)
-                      .WithManagementPlugin()
                       .WithEndpointProxySupport(false)
+                      .WithManagementPlugin()
                       .WithContainerName("eventbus");
+
 var mysql = builder.AddMySql("mysql")
                    .WithLifetime(ContainerLifetime.Persistent)
                    .WithEndpointProxySupport(false)
                    .WithContainerName("mysql");
-var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
+
+var sqlServer = builder.AddSqlServer("sqlserver")
                        .WithLifetime(ContainerLifetime.Persistent)
-                       .WithEndpointProxySupport(false)
+                       .WithHostPort(14330)
                        .WithContainerName("sql-server");
-#pragma warning disable ASPIREPROXYENDPOINTS001 
 
 var bookstoreDb = mysql.AddDatabase("bookstore");
 var identityDb = sqlServer.AddDatabase("identitydb");
