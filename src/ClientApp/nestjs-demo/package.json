@@ -18,7 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typeorm": "ts-node ./node_modules/typeorm/cli",
+    "typeorm:run-migrations": "pnpm run typeorm migration:run -d ./typeorm.config.ts",
+    "typeorm:generate-migrations": "pnpm run typeorm -d ./typeorm.config.ts migration:generate ./migrations/$pnpm_config_name",
+    "typeorm:create-migrations": "pnpm run typeorm migration:create ./migrations/$pnpm_config_name",
+    "typeorm:revert-migrations": "pnpm run typeorm -d ./typeorm.config.ts  migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.1",
@@ -31,6 +36,7 @@
     "bcrypt": "^6.0.0",
     "cache-manager": "^6.4.3",
     "class-transformer": "^0.5.1",
+    "dotenv": "^16.5.0",
     "moment": "^2.30.1",
     "mongoose": "^8.15.0",
     "mysql2": "^3.14.1",
