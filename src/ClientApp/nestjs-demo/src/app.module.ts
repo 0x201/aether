@@ -22,12 +22,13 @@ import config from './conifg/config';
     }),
     CacheModule.register(),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        var options = configService.get<TypeOrmModuleOptions>('dataSource');
+        var options = configService.get<TypeOrmModuleOptions>('mysqlConnection');
         return options;
       },
-      name: 'dataSource', 
+      name: '', 
     }),
     BooksModule,
     AuthorsModule,
