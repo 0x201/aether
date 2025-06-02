@@ -1,6 +1,6 @@
 ﻿namespace ModernCSharp.Ordering.Application.Commands;
 
-public record CreateOrderCommand : IRequest<int>
+public record CreateOrderCommand : IRequest<bool>
 {
     public OrderStatus OrderStatus
     {

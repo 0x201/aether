@@ -1,22 +1,34 @@
-﻿namespace ModernCSharp.Ordering.Application.Commands;
+﻿using Microsoft.Extensions.Logging;
+using ModernCSharp.Ordering.Application.IntegrationEvents;
+using ModernCSharp.Ordering.Application.IntegrationEvents.Events;
 
-public class CreateOrderCommandHandler(IOrderRepository orderRepository) : IRequestHandler<CreateOrderCommand, int>
+namespace ModernCSharp.Ordering.Application.Commands;
+
+public class CreateOrderCommandHandler(
+    IOrderingIntegrationEventService orderingIntegrationEventService,
+    IOrderRepository orderRepository,
+    ILogger<CreateOrderCommandHandler> logger) : IRequestHandler<CreateOrderCommand, bool>
 {
-    public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CreateOrderCommand message, CancellationToken cancellationToken)
     {
-        var entity = new Order(userId: "123",
-            userName: request.CustomerName,
-            address: new Address("", "", "", "", ""),
+        var orderStartedIntegrationEvent = new OrderStartedIntegrationEvent(message.CustomerName);
+        await orderingIntegrationEventService.AddAndSaveEventAsync(orderStartedIntegrationEvent);
+
+
+        var address = new Address("", "", "", "", "");
+        var order = new Order(userId: "123",
+            userName: message.CustomerName,
+            address: address,
             cardTypeId: 1,
             cardNumber: "",
             cardSecurityNumber: "",
             cardHolderName: "",
             cardExpiration: DateTime.Now);
 
-        entity.AddDomainEvent(new OrderCreatedEvent(entity));
+        logger.LogInformation("Creating Order - Order: {@Order}", order);
 
-        orderRepository.Add(entity);
+        orderRepository.Add(order);
 
-        return entity.Id;
+        return await orderRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
     }
 }
