@@ -6,7 +6,7 @@ public interface IAuditable
         get; set;
     }
 
-    string? CreatedBy
+    string CreatedBy
     {
         get; set;
     }
@@ -16,7 +16,7 @@ public interface IAuditable
         get; set;
     }
 
-    string? LastModifiedBy
+    string LastModifiedBy
     {
         get; set;
     }

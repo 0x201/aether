@@ -6,8 +6,8 @@ namespace ModernCSharp.Identity.API.Pages.Portal;
 
 public class ThirdPartyInitiatedLoginLink
 {
-    public string? LinkText { get; set; }
-    public string? InitiateLoginUri { get; set; }
+    public string LinkText { get; set; }
+    public string InitiateLoginUri { get; set; }
 }
 
 
@@ -17,7 +17,7 @@ public class ClientRepository
 
     public ClientRepository(ConfigurationDbContext context) => _context = context;
 
-    public async Task<IEnumerable<ThirdPartyInitiatedLoginLink>> GetClientsWithLoginUris(string? filter = null)
+    public async Task<IEnumerable<ThirdPartyInitiatedLoginLink>> GetClientsWithLoginUris(string filter = null)
     {
         var query = _context.Clients
             .Where(c => c.InitiateLoginUri != null);

@@ -35,7 +35,7 @@ public class Consent : PageModel
     [BindProperty]
     public InputModel Input { get; set; } = default!;
 
-    public async Task<IActionResult> OnGet(string? id)
+    public async Task<IActionResult> OnGet(string id)
     {
         if (!await SetViewModelAsync(id))
         {
@@ -60,7 +60,7 @@ public class Consent : PageModel
             return RedirectToPage("/Home/Error/Index");
         }
 
-        CompleteBackchannelLoginRequest? result = null;
+        CompleteBackchannelLoginRequest result = null;
 
         // user clicked 'no' - send back the standard 'access_denied' response
         if (Input.Button == "no")
@@ -121,7 +121,7 @@ public class Consent : PageModel
         return Page();
     }
 
-    private async Task<bool> SetViewModelAsync(string? id)
+    private async Task<bool> SetViewModelAsync(string id)
     {
         ArgumentNullException.ThrowIfNull(id);
 

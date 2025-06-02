@@ -12,9 +12,9 @@ public class IndexModel : PageModel
     public IndexModel(IdentityScopeRepository repository) => _repository = repository;
 
     public IEnumerable<IdentityScopeSummaryModel> Scopes { get; private set; } = default!;
-    public string? Filter { get; set; }
+    public string Filter { get; set; }
 
-    public async Task OnGetAsync(string? filter)
+    public async Task OnGetAsync(string filter)
     {
         Filter = filter;
         Scopes = await _repository.GetAllAsync(filter);

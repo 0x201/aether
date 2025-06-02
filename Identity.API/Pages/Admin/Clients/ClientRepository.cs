@@ -13,7 +13,7 @@ public class ClientSummaryModel
 {
     [Required]
     public string ClientId { get; set; } = default!;
-    public string? Name { get; set; }
+    public string Name { get; set; }
     [Required]
     public Flow Flow { get; set; }
 }
@@ -28,11 +28,11 @@ public class EditClientModel : CreateClientModel, IValidatableObject
     [Required]
     public string AllowedScopes { get; set; } = default!;
 
-    public string? RedirectUri { get; set; }
-    public string? InitiateLoginUri { get; set; }
-    public string? PostLogoutRedirectUri { get; set; }
-    public string? FrontChannelLogoutUri { get; set; }
-    public string? BackChannelLogoutUri { get; set; }
+    public string RedirectUri { get; set; }
+    public string InitiateLoginUri { get; set; }
+    public string PostLogoutRedirectUri { get; set; }
+    public string FrontChannelLogoutUri { get; set; }
+    public string BackChannelLogoutUri { get; set; }
 
     private static readonly string[] memberNames = new[] { "RedirectUri" };
 
@@ -64,7 +64,7 @@ public class ClientRepository
 
     public ClientRepository(ConfigurationDbContext context) => _context = context;
 
-    public async Task<IEnumerable<ClientSummaryModel>> GetAllAsync(string? filter = null)
+    public async Task<IEnumerable<ClientSummaryModel>> GetAllAsync(string filter = null)
     {
         var grants = new[] { GrantType.AuthorizationCode, GrantType.ClientCredentials };
 
@@ -87,7 +87,7 @@ public class ClientRepository
         return await result.ToArrayAsync();
     }
 
-    public async Task<EditClientModel?> GetByIdAsync(string id)
+    public async Task<EditClientModel> GetByIdAsync(string id)
     {
         var client = await _context.Clients
             .Include(x => x.AllowedGrantTypes)

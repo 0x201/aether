@@ -12,12 +12,12 @@ public class IdentityScopeSummaryModel
 {
     [Required]
     public string Name { get; set; } = default!;
-    public string? DisplayName { get; set; }
+    public string DisplayName { get; set; }
 }
 
 public class IdentityScopeModel : IdentityScopeSummaryModel
 {
-    public string? UserClaims { get; set; }
+    public string UserClaims { get; set; }
 }
 
 
@@ -27,7 +27,7 @@ public class IdentityScopeRepository
 
     public IdentityScopeRepository(ConfigurationDbContext context) => _context = context;
 
-    public async Task<IEnumerable<IdentityScopeSummaryModel>> GetAllAsync(string? filter = null)
+    public async Task<IEnumerable<IdentityScopeSummaryModel>> GetAllAsync(string filter = null)
     {
         var query = _context.IdentityResources
             .Include(x => x.UserClaims)
@@ -47,7 +47,7 @@ public class IdentityScopeRepository
         return await result.ToArrayAsync();
     }
 
-    public async Task<IdentityScopeModel?> GetByIdAsync(string id)
+    public async Task<IdentityScopeModel> GetByIdAsync(string id)
     {
         var scope = await _context.IdentityResources
             .Include(x => x.UserClaims)

@@ -32,25 +32,25 @@
   </ItemGroup>
   <Target Name="RestorePnpm" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
     <ItemGroup>
-      <NestJsAppPackageJsons Include="..\..\nestjs-demo\package.json"/>
+      <NestJsAppPackageJsons Include="..\ClientApp\nestjs-demo\package.json"/>
     </ItemGroup>
     <Message Importance="Normal" Text="Installing pnpm packages for %(NestJsAppPackageJsons.RelativeDir)" Condition="!Exists('%(NestJsAppPackageJsons.RootDir)%(NestJsAppPackageJsons.Directory)/node_modules')" />
     <Exec Command="pnpm install" WorkingDirectory="%(NestJsAppPackageJsons.RootDir)%(NestJsAppPackageJsons.Directory)" Condition="!Exists('%(NestJsAppPackageJsons.RootDir)%(NestJsAppPackageJsons.Directory)/node_modules')" />
 
     <ItemGroup>
-      <ViteVueAppPackageJsons Include="..\..\vite-vue-app\package.json"/>
+      <ViteVueAppPackageJsons Include="..\ClientApp\vite-vue-app\package.json"/>
     </ItemGroup>
     <Message Importance="Normal" Text="Installing pnpm packages for %(ViteVueAppPackageJsons.RelativeDir)" Condition="!Exists('%(ViteVueAppPackageJsons.RootDir)%(ViteVueAppPackageJsons.Directory)/node_modules')" />
     <Exec Command="pnpm install" WorkingDirectory="%(ViteVueAppPackageJsons.RootDir)%(ViteVueAppPackageJsons.Directory)" Condition="!Exists('%(ViteVueAppPackageJsons.RootDir)%(ViteVueAppPackageJsons.Directory)/node_modules')" />
 
     <ItemGroup>
-      <ViteReactAppPackageJsons Include="..\..\vite-react-app\package.json"/>
+      <ViteReactAppPackageJsons Include="..\ClientApp\vite-react-app\package.json"/>
     </ItemGroup>
     <Message Importance="Normal" Text="Installing pnpm packages for %(ViteReactAppPackageJsons.RelativeDir)" Condition="!Exists('%(ViteReactAppPackageJsons.RootDir)%(ViteReactAppPackageJsons.Directory)/node_modules')" />
     <Exec Command="pnpm install" WorkingDirectory="%(ViteReactAppPackageJsons.RootDir)%(ViteReactAppPackageJsons.Directory)" Condition="!Exists('%(ViteReactAppPackageJsons.RootDir)%(ViteReactAppPackageJsons.Directory)/node_modules')" />
 
     <ItemGroup>
-      <AngularAppPackageJsons Include="..\..\angular-app\package.json"/>
+      <AngularAppPackageJsons Include="..\ClientApp\angular-app\package.json"/>
     </ItemGroup>
     <Message Importance="Normal" Text="Installing pnpm packages for %(AngularAppPackageJsons.RelativeDir)" Condition="!Exists('%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)/node_modules')" />
     <Exec Command="pnpm install" WorkingDirectory="%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)" Condition="!Exists('%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)/node_modules')" />

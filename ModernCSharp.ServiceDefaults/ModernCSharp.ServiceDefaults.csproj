@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<IsAspireSharedProject>true</IsAspireSharedProject>
 		<Platforms>AnyCPU;x64;x86</Platforms>
+    <Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

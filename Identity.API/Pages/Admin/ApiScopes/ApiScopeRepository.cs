@@ -12,12 +12,12 @@ public class ApiScopeSummaryModel
 {
     [Required]
     public string Name { get; set; } = default!;
-    public string? DisplayName { get; set; }
+    public string DisplayName { get; set; }
 }
 
 public class ApiScopeModel : ApiScopeSummaryModel
 {
-    public string? UserClaims { get; set; } = default!;
+    public string UserClaims { get; set; } = default!;
 }
 
 
@@ -27,7 +27,7 @@ public class ApiScopeRepository
 
     public ApiScopeRepository(ConfigurationDbContext context) => _context = context;
 
-    public async Task<IEnumerable<ApiScopeSummaryModel>> GetAllAsync(string? filter = null)
+    public async Task<IEnumerable<ApiScopeSummaryModel>> GetAllAsync(string filter = null)
     {
         var query = _context.ApiScopes
             .Include(x => x.UserClaims)
@@ -47,7 +47,7 @@ public class ApiScopeRepository
         return await result.ToArrayAsync();
     }
 
-    public async Task<ApiScopeModel?> GetByIdAsync(string id)
+    public async Task<ApiScopeModel> GetByIdAsync(string id)
     {
         var scope = await _context.ApiScopes
             .Include(x => x.UserClaims)

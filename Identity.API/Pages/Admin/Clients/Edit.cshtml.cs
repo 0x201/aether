@@ -15,7 +15,7 @@ public class EditModel : PageModel
     [BindProperty]
     public EditClientModel InputModel { get; set; } = default!;
     [BindProperty]
-    public string? Button { get; set; }
+    public string Button { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string id)
     {

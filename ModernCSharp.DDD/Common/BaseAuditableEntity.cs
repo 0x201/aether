@@ -7,7 +7,7 @@ public abstract class BaseAuditableEntity<TKey> : Entity<TKey>, IAuditable
         get; set;
     }
 
-    public string? CreatedBy
+    public string CreatedBy
     {
         get; set;
     }
@@ -17,7 +17,7 @@ public abstract class BaseAuditableEntity<TKey> : Entity<TKey>, IAuditable
         get; set;
     }
 
-    public string? LastModifiedBy
+    public string LastModifiedBy
     {
         get; set;
     }

@@ -20,7 +20,7 @@ public class Index : PageModel
     private readonly IEventService _events;
 
     [BindProperty]
-    public string? LogoutId { get; set; }
+    public string LogoutId { get; set; }
 
     public Index(IIdentityServerInteractionService interaction, IEventService events)
     {
@@ -28,7 +28,7 @@ public class Index : PageModel
         _events = events;
     }
 
-    public async Task<IActionResult> OnGet(string? logoutId)
+    public async Task<IActionResult> OnGet(string logoutId)
     {
         LogoutId = logoutId;
 
