@@ -17,7 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ModernCSharp.AppHost\ModernCSharp.AppHost.csproj" />
+		<ProjectReference Include="..\..\src\ModernCSharp.AppHost\ModernCSharp.AppHost.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

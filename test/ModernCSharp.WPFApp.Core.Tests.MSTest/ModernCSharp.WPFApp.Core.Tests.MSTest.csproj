@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernCSharp.WPFApp.Core\ModernCSharp.WPFApp.Core.csproj" />
+    <ProjectReference Include="..\..\src\ModernCSharp.WPFApp.Core\ModernCSharp.WPFApp.Core.csproj" />
   </ItemGroup>
 
 </Project>
