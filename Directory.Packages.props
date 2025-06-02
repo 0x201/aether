@@ -5,7 +5,7 @@
     <AspireVersion>9.3.0</AspireVersion>
     <AspnetVersion>9.0.5</AspnetVersion>
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
-    <MSTestVersion>3.8.3</MSTestVersion>
+    <MSTestVersion>3.9.1</MSTestVersion>
     <FluentUIVersion>4.11.9</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.3</DuendeVersion>
