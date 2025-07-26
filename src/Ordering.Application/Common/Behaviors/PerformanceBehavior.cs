@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 
-using Microsoft.Extensions.Logging;
-
 namespace ModernCSharp.Ordering.Application.Common.Behaviors;
 
 public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull

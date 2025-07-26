@@ -1,7 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.Helpers;
+﻿using ModernCSharp.WinUIApp.Helpers;
 
 namespace ModernCSharp.WinUIApp.Services;
 

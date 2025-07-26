@@ -1,4 +1,5 @@
-﻿namespace ModernCSharp.Ordering.Domain.Mappings;
+﻿namespace ModernCSharp.Ordering.Application.Mappings;
+
 public class OrderMapping : ClassMap<Order>
 {
     public OrderMapping()

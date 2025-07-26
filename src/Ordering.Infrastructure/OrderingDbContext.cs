@@ -1,4 +1,6 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure;
+﻿using ModernCSharp.Ordering.Infrastructure.Extensions;
+
+namespace ModernCSharp.Ordering.Infrastructure;
 
 public class OrderingDbContext : DbContext, IUnitOfWork
 {
@@ -12,7 +14,7 @@ public class OrderingDbContext : DbContext, IUnitOfWork
 
     public OrderingDbContext()
     {
-        
+
     }
 
     public OrderingDbContext(DbContextOptions<OrderingDbContext> options) : base(options)

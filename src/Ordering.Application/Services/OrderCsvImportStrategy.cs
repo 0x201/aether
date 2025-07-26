@@ -1,20 +1,11 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction.Handlers;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
-public class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger) : IFileImportStrategy<Order>
+namespace ModernCSharp.Ordering.Application.Services;
+
+public class OrderCsvImportStrategy(ILogger<OrderCsvImportStrategy> logger)
+    : FileImportStrategyBase<Order>(FileType.OrderCsv)
 {
-    private OrderCsvImportContext _context;
-    public List<FileType> FileTypes => [FileType.OrderCsv];
-
-    public void Initialize(IFileImportContext context)
-    {
-        if (context is not OrderCsvImportContext importContext)
-        {
-            throw new ArgumentException($"Invalid file import context. Expected {typeof(OrderCsvImportContext)}, but got {context.GetType()}.");
-        }
-        _context = importContext;
-    }
-
-    public async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
+    public override async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
     {
         try
         {

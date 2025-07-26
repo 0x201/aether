@@ -1,7 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-
-namespace ModernCSharp.WinUIApp.Helpers;
+﻿namespace ModernCSharp.WinUIApp.Helpers;
 
 // Helper class to set the navigation target for a NavigationViewItem.
 //

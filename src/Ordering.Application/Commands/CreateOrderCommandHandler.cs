@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using ModernCSharp.Ordering.Application.IntegrationEvents;
+﻿using ModernCSharp.Ordering.Application.IntegrationEvents;
 using ModernCSharp.Ordering.Application.IntegrationEvents.Events;
 
 namespace ModernCSharp.Ordering.Application.Commands;

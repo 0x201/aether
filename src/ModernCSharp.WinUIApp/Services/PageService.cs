@@ -1,12 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.ViewModels;
-using ModernCSharp.WinUIApp.Views;
-
-namespace ModernCSharp.WinUIApp.Services;
+﻿namespace ModernCSharp.WinUIApp.Services;
 
 public class PageService : IPageService
 {

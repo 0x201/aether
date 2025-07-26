@@ -1,9 +1,5 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
+﻿using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Xaml.Interactivity;
-
-using ModernCSharp.WinUIApp.Contracts.Services;
 
 namespace ModernCSharp.WinUIApp.Behaviors;
 

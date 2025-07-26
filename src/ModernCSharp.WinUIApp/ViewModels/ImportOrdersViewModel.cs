@@ -1,20 +1,9 @@
-﻿using System.Collections.ObjectModel;
-
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-using Microsoft.UI.Xaml;
-
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.Ordering.Domain.Abstractions;
-using ModernCSharp.Ordering.Domain.Enums;
-using ModernCSharp.Ordering.Infrastructure.Services.FileContext;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
 
 public partial class ImportOrdersViewModel(
-    IFileImportService<Order> fileImportService,
-    ImportContextFactory importContextFactory) : ObservableRecipient
+    IMediator mediator) : ObservableRecipient
 {
     [ObservableProperty] public double currentProgress = 0;
     [ObservableProperty] private FileType selectedFileType = FileType.OrderJson;
@@ -49,7 +38,7 @@ public partial class ImportOrdersViewModel(
     private async IAsyncEnumerable<int> ImportCoreAsync()
     {
         ProgressBarVisibility = Visibility.Visible;
-        var fileImportContext = importContextFactory.CreateContext(SelectedFileType, FilePath);
+        var fileImportContext = new FileImportContext(SelectedFileType, FilePath);
 
         for (var i = 0; i <= 100; i += 10)
         {
@@ -57,7 +46,7 @@ public partial class ImportOrdersViewModel(
             yield return i;
         }
 
-        var result = await fileImportService.ImportAsync(fileImportContext);
+        var result = await mediator.Send(new ImportOrderCommand { ImportContext = fileImportContext });
         if (result.Succeeded)
         {
             ImportResult = $"Successfully imported {result.Data.Count} records from {FilePath}";

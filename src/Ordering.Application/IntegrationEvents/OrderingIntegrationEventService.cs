@@ -1,5 +1,4 @@
-using Microsoft.Extensions.Logging;
-using ModernCSharp.EventBus.Abstractions;
+﻿using ModernCSharp.EventBus.Abstractions;
 using ModernCSharp.EventBus.Events;
 using ModernCSharp.IntegrationEventLogEF.Services;
 using ModernCSharp.Ordering.Infrastructure;

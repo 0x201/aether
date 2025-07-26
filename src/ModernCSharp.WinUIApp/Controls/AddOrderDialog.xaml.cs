@@ -1,6 +1,4 @@
-using Microsoft.UI.Xaml.Controls;
-
-namespace ModernCSharp.WinUIApp.Controls;
+﻿namespace ModernCSharp.WinUIApp.Controls;
 
 public sealed partial class AddOrderDialog : UserControl
 {

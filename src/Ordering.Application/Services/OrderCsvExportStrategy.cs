@@ -1,20 +1,11 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport.Handlers;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
-public class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger) : IFileExportStrategy<Order>
+namespace ModernCSharp.Ordering.Application.Services;
+
+public class OrderCsvExportStrategy(ILogger<OrderCsvExportStrategy> logger)
+    : FileExportStrategyBase<Order>(FileType.OrderCsv)
 {
-    private OrderCsvExportContext _context;
-    public List<FileType> FileTypes => [FileType.OrderCsv];
-
-    public void Initialize(IFileExportContext<Order> context)
-    {
-        if (context is not OrderCsvExportContext exportContext)
-        {
-            throw new ArgumentException($"Invalid file export context. Expected {typeof(OrderCsvExportContext)}, but got {context.GetType()}.");
-        }
-        _context = exportContext;
-    }
-
-    public async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
+    public override async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
     {
         try
         {

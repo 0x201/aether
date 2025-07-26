@@ -1,10 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.Ordering.Domain.Enums;
-using ModernCSharp.WinUIApp.ViewModels;
-
-using Windows.Storage.Pickers;
+﻿using Windows.Storage.Pickers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using ModernCSharp.Ordering.Application.Commands;
 using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.Ordering.Domain.Abstractions;
-using ModernCSharp.Ordering.Domain.Enums;
-using ModernCSharp.Ordering.Infrastructure.Services.FileContext;
+using ModernCSharp.Shared.FileServices;
+using ModernCSharp.Shared.FileServices.Export;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Models;
@@ -14,8 +16,7 @@ namespace ModernCSharp.WinFormsApp.Presenters;
 public class OrdersListPresenter(
     IOrderListView view,
     IServiceProvider serviceProvider,
-    IFileExportService<Order> fileExportService,
-    ExportContextFactory<Order> exportContextFactory,
+    IMediator mediator,
     IOrderQueries orderService) : AbstractPresenter<IOrderListView>(view)
 {
     private List<Order> _orders;
@@ -40,8 +41,8 @@ public class OrdersListPresenter(
 
         var outputFileName = Path.Combine(e.ExportFilePath, "orders.csv");
 
-        var context = exportContextFactory.CreateContext(FileType.OrderCsv, outputFileName, e.OrderToExport);
-        var result = await fileExportService.ExportAsync(context);
+        var context = new FileExportContext<Order>(FileType.OrderCsv, outputFileName, e.OrderToExport);
+        var result = await mediator.Send(new ExportOrderCommand { ExportContext = context });
 
         if (!result.Succeeded)
         {
@@ -78,7 +79,7 @@ public class OrdersListPresenter(
 
     public async Task<List<Order>> GetOrders()
     {
-        return [..await orderService.GetOrdersAsync()];
+        return [.. await orderService.GetOrdersAsync()];
     }
 
     public void ImportData(IEnumerable<Order> orders)

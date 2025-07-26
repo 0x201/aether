@@ -1,8 +1,4 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
-
-namespace ModernCSharp.Ordering.Application.Common.Behaviors;
+﻿namespace ModernCSharp.Ordering.Application.Common.Behaviors;
 public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
     private readonly ILogger<TRequest> _logger;

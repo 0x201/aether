@@ -1,4 +1,4 @@
-﻿using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+﻿using ModernCSharp.Ordering.Application.Queries;
 
 namespace ModernCSharp.WinFormsApp.Views
 {
@@ -35,21 +35,19 @@ namespace ModernCSharp.WinFormsApp.Views
             AppendButton = new Button();
             ImportButton = new Button();
             OrderDataGridView = new DataGridView();
-            idDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            CustomerName = new DataGridViewTextBoxColumn();
-            OrderDate = new DataGridViewTextBoxColumn();
-            orderStatusDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            ordernumberDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            dateDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            statusDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             quantityDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             totalDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            usernameDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             orderBindingSource = new BindingSource(components);
             ExportButton = new Button();
             ClearButton = new Button();
             FilterTextBox = new TextBox();
-            orderBindingSource1 = new BindingSource(components);
             MainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)OrderDataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)orderBindingSource).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)orderBindingSource1).BeginInit();
             SuspendLayout();
             // 
             // MainPanel
@@ -72,14 +70,14 @@ namespace ModernCSharp.WinFormsApp.Views
             MainPanel.RowCount = 2;
             MainPanel.RowStyles.Add(new RowStyle());
             MainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            MainPanel.Size = new Size(800, 510);
+            MainPanel.Size = new Size(800, 450);
             MainPanel.TabIndex = 5;
             // 
             // AppendButton
             // 
             AppendButton.Location = new Point(89, 3);
             AppendButton.Name = "AppendButton";
-            AppendButton.Size = new Size(80, 30);
+            AppendButton.Size = new Size(80, 26);
             AppendButton.TabIndex = 2;
             AppendButton.Text = "Append";
             AppendButton.UseVisualStyleBackColor = true;
@@ -89,7 +87,7 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             ImportButton.Location = new Point(3, 3);
             ImportButton.Name = "ImportButton";
-            ImportButton.Size = new Size(80, 30);
+            ImportButton.Size = new Size(80, 26);
             ImportButton.TabIndex = 1;
             ImportButton.Text = "Import";
             ImportButton.UseVisualStyleBackColor = true;
@@ -100,52 +98,52 @@ namespace ModernCSharp.WinFormsApp.Views
             OrderDataGridView.AutoGenerateColumns = false;
             OrderDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             OrderDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            OrderDataGridView.Columns.AddRange(new DataGridViewColumn[] { idDataGridViewTextBoxColumn, CustomerName, OrderDate, orderStatusDataGridViewTextBoxColumn, quantityDataGridViewTextBoxColumn, totalDataGridViewTextBoxColumn });
+            OrderDataGridView.Columns.AddRange(new DataGridViewColumn[] { ordernumberDataGridViewTextBoxColumn, dateDataGridViewTextBoxColumn, statusDataGridViewTextBoxColumn, quantityDataGridViewTextBoxColumn, totalDataGridViewTextBoxColumn, usernameDataGridViewTextBoxColumn });
             MainPanel.SetColumnSpan(OrderDataGridView, 5);
             OrderDataGridView.DataSource = orderBindingSource;
             OrderDataGridView.Dock = DockStyle.Fill;
-            OrderDataGridView.Location = new Point(3, 39);
+            OrderDataGridView.Location = new Point(3, 35);
             OrderDataGridView.Name = "OrderDataGridView";
             OrderDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            OrderDataGridView.Size = new Size(794, 468);
+            OrderDataGridView.Size = new Size(794, 412);
             OrderDataGridView.TabIndex = 0;
             OrderDataGridView.ColumnHeaderMouseClick += OrderDataGridView_ColumnHeaderMouseClick;
             // 
-            // idDataGridViewTextBoxColumn
+            // ordernumberDataGridViewTextBoxColumn
             // 
-            idDataGridViewTextBoxColumn.DataPropertyName = "Id";
-            idDataGridViewTextBoxColumn.HeaderText = "Id";
-            idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
+            ordernumberDataGridViewTextBoxColumn.DataPropertyName = "ordernumber";
+            ordernumberDataGridViewTextBoxColumn.HeaderText = "Order No.";
+            ordernumberDataGridViewTextBoxColumn.Name = "ordernumberDataGridViewTextBoxColumn";
             // 
-            // CustomerName
+            // dateDataGridViewTextBoxColumn
             // 
-            CustomerName.DataPropertyName = "CustomerName";
-            CustomerName.HeaderText = "Customer Name";
-            CustomerName.Name = "CustomerName";
+            dateDataGridViewTextBoxColumn.DataPropertyName = "date";
+            dateDataGridViewTextBoxColumn.HeaderText = "Order Date";
+            dateDataGridViewTextBoxColumn.Name = "dateDataGridViewTextBoxColumn";
             // 
-            // OrderDate
+            // statusDataGridViewTextBoxColumn
             // 
-            OrderDate.DataPropertyName = "OrderDate";
-            OrderDate.HeaderText = "Order Date";
-            OrderDate.Name = "OrderDate";
-            // 
-            // orderStatusDataGridViewTextBoxColumn
-            // 
-            orderStatusDataGridViewTextBoxColumn.DataPropertyName = "OrderStatus";
-            orderStatusDataGridViewTextBoxColumn.HeaderText = "OrderStatus";
-            orderStatusDataGridViewTextBoxColumn.Name = "orderStatusDataGridViewTextBoxColumn";
+            statusDataGridViewTextBoxColumn.DataPropertyName = "status";
+            statusDataGridViewTextBoxColumn.HeaderText = "Order Status";
+            statusDataGridViewTextBoxColumn.Name = "statusDataGridViewTextBoxColumn";
             // 
             // quantityDataGridViewTextBoxColumn
             // 
-            quantityDataGridViewTextBoxColumn.DataPropertyName = "Quantity";
+            quantityDataGridViewTextBoxColumn.DataPropertyName = "quantity";
             quantityDataGridViewTextBoxColumn.HeaderText = "Quantity";
             quantityDataGridViewTextBoxColumn.Name = "quantityDataGridViewTextBoxColumn";
             // 
             // totalDataGridViewTextBoxColumn
             // 
-            totalDataGridViewTextBoxColumn.DataPropertyName = "Total";
+            totalDataGridViewTextBoxColumn.DataPropertyName = "total";
             totalDataGridViewTextBoxColumn.HeaderText = "Total";
             totalDataGridViewTextBoxColumn.Name = "totalDataGridViewTextBoxColumn";
+            // 
+            // usernameDataGridViewTextBoxColumn
+            // 
+            usernameDataGridViewTextBoxColumn.DataPropertyName = "username";
+            usernameDataGridViewTextBoxColumn.HeaderText = "Username";
+            usernameDataGridViewTextBoxColumn.Name = "usernameDataGridViewTextBoxColumn";
             // 
             // orderBindingSource
             // 
@@ -155,7 +153,7 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             ExportButton.Location = new Point(717, 3);
             ExportButton.Name = "ExportButton";
-            ExportButton.Size = new Size(80, 30);
+            ExportButton.Size = new Size(80, 26);
             ExportButton.TabIndex = 4;
             ExportButton.Text = "Export";
             ExportButton.UseVisualStyleBackColor = true;
@@ -165,7 +163,7 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             ClearButton.Location = new Point(631, 3);
             ClearButton.Name = "ClearButton";
-            ClearButton.Size = new Size(80, 30);
+            ClearButton.Size = new Size(80, 26);
             ClearButton.TabIndex = 3;
             ClearButton.Text = "Clear";
             ClearButton.UseVisualStyleBackColor = true;
@@ -180,15 +178,11 @@ namespace ModernCSharp.WinFormsApp.Views
             FilterTextBox.TabIndex = 5;
             FilterTextBox.TextChanged += FilterTextBox_TextChanged;
             // 
-            // orderBindingSource1
-            // 
-            orderBindingSource1.DataSource = typeof(Order);
-            // 
             // OrderListView
             // 
-            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 510);
+            ClientSize = new Size(800, 450);
             Controls.Add(MainPanel);
             Name = "OrderListView";
             Text = "Order List";
@@ -196,7 +190,6 @@ namespace ModernCSharp.WinFormsApp.Views
             MainPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)OrderDataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)orderBindingSource).EndInit();
-            ((System.ComponentModel.ISupportInitialize)orderBindingSource1).EndInit();
             ResumeLayout(false);
         }
 
@@ -210,12 +203,11 @@ namespace ModernCSharp.WinFormsApp.Views
         private Button ExportButton;
         private BindingSource orderBindingSource;
         private TextBox FilterTextBox;
-        private BindingSource orderBindingSource1;
-        private DataGridViewTextBoxColumn idDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn CustomerName;
-        private DataGridViewTextBoxColumn OrderDate;
-        private DataGridViewTextBoxColumn orderStatusDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn ordernumberDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn dateDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn statusDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn quantityDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn totalDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn usernameDataGridViewTextBoxColumn;
     }
 }

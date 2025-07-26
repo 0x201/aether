@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace ModernCSharp.Ordering.Application.Common.Models;
+﻿namespace ModernCSharp.Ordering.Application.Common.Models;
 
 public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)
 {

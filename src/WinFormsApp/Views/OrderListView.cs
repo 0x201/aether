@@ -94,16 +94,13 @@ public partial class OrderListView : BaseView, IOrderListView
                 ordersToExport.AddRange(from DataGridViewRow row in OrderDataGridView.SelectedRows
                                         select new Order
                                         {
-                                            ordernumber = 12345,
-                                            username = "Jack",
-                                            date = new DateTime(2025, 12, 31)
+                                            ordernumber = (int)row.Cells[0].Value,
+                                            date = (DateTime)row.Cells[1].Value,
+                                            status = (string)row.Cells[2].Value,
+                                            quantity = (int)row.Cells[3].Value,
+                                            total = (decimal)row.Cells[4].Value,
+                                            username = (string)row.Cells[5].Value,
                                         });
-                //{
-                //    Id = (int)row.Cells["Id"].Value,
-                //    Quantity = (int)row.Cells["Quantity"].Value,
-                //    OrderStatus = (OrderStatus)row.Cells["OrderStatus"].Value,
-                //    Total = (decimal)row.Cells["Total"].Value,
-                //});
             }
 
             var folderBrowserDialog = new FolderBrowserDialog

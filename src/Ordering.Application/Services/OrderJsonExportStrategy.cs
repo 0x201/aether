@@ -1,20 +1,10 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport.Handlers;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
-public class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) : IFileExportStrategy<Order>
+namespace ModernCSharp.Ordering.Application.Services;
+
+public class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) : FileExportStrategyBase<Order>(FileType.OrderJson)
 {
-    private OrderJsonExportContext _context;
-    public List<FileType> FileTypes => [FileType.OrderJson];
-
-    public void Initialize(IFileExportContext<Order> context)
-    {
-        if (context is not OrderJsonExportContext exportContext)
-        {
-            throw new ArgumentException($"Invalid file export context. Expected {typeof(OrderJsonExportContext)}, but got {context.GetType()}.");
-        }
-        _context = exportContext;
-    }
-
-    public async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
+    public override async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
     {
         try
         {

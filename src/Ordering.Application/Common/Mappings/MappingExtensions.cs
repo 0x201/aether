@@ -1,11 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-
-using Microsoft.EntityFrameworkCore;
-
-using ModernCSharp.Ordering.Application.Common.Models;
-
-namespace ModernCSharp.Ordering.Application.Common.Mappings;
+﻿namespace ModernCSharp.Ordering.Application.Common.Mappings;
 public static class MappingExtensions
 {
     public static Task<PaginatedList<TDestination>> PaginatedListAsync<TDestination>(this IQueryable<TDestination> queryable, int pageNumber, int pageSize, CancellationToken cancellationToken = default) where TDestination : class

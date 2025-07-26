@@ -1,20 +1,10 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExtraction.Handlers;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
-public class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) : IFileImportStrategy<Order>
+namespace ModernCSharp.Ordering.Application.Services;
+
+public class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) : FileImportStrategyBase<Order>(FileType.OrderJson)
 {
-    private OrderJsonImportContext _context;
-    public List<FileType> FileTypes => [FileType.OrderJson];
-
-    public void Initialize(IFileImportContext context)
-    {
-        if (context is not OrderJsonImportContext importContext)
-        {
-            throw new ArgumentException($"Invalid file import context. Expected {typeof(OrderJsonImportContext)}, but got {context.GetType()}.");
-        }
-        _context = importContext;
-    }
-
-    public async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
+    public override async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -39,6 +29,6 @@ public class OrderJsonImportStrategy(ILogger<OrderJsonImportStrategy> logger) : 
         using var stream = new FileStream(_context!.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var orderWrapper = await JsonSerializer.DeserializeAsync<JsonWrapper<Order>>(stream, JsonSerializationConstants.DefaultOptions, cancellationToken);
 
-        return [..orderWrapper!.Items];
+        return [.. orderWrapper!.Items];
     }
 }

@@ -7,7 +7,7 @@ public class ValidationException : Exception
     {
         get;
     }
-    public ValidationException(IEnumerable<ValidationFailure> failures) 
+    public ValidationException(IEnumerable<ValidationFailure> failures)
         : this()
     {
         Errors = failures

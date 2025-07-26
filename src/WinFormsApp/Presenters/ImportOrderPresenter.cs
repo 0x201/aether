@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR;
 
-using ModernCSharp.Ordering.Domain.Common.Models;
+using Microsoft.Extensions.DependencyInjection;
+
+using ModernCSharp.Ordering.Application.Commands;
 using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.Ordering.Domain.Abstractions;
-using ModernCSharp.Ordering.Domain.Utils;
-using ModernCSharp.Ordering.Infrastructure.Services.FileContext;
+using ModernCSharp.Shared.FileServices;
+using ModernCSharp.Shared.FileServices.Import;
+using ModernCSharp.Shared.Utils;
 using ModernCSharp.WinFormsApp.Common;
 using ModernCSharp.WinFormsApp.Enums;
 using ModernCSharp.WinFormsApp.Views;
@@ -13,9 +15,8 @@ namespace ModernCSharp.WinFormsApp.Presenters;
 
 public class ImportOrderPresenter(
     IImportView view,
-    IFileImportService<Order> importService,
-    IServiceProvider serviceProvider,
-    ImportContextFactory importContextFactory) : AbstractPresenter<IImportView>(view)
+    IMediator mediator,
+    IServiceProvider serviceProvider) : AbstractPresenter<IImportView>(view)
 {
     public async override Task InitializeAsync()
     {
@@ -63,8 +64,8 @@ public class ImportOrderPresenter(
     {
         var extension = Path.GetExtension(filePath);
         var fileType = FileIoUtils.MapToFileType(extension);
-        var importContext = importContextFactory.CreateContext(fileType, filePath);
-        return await importService.ImportAsync(importContext);
+        var importContext = new FileImportContext(fileType, filePath);
+        return await mediator.Send(new ImportOrderCommand { ImportContext = importContext });
     }
 
 

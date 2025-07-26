@@ -1,20 +1,10 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Services.FileExport.Handlers;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
-public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) : IFileExportStrategy<Order>
+namespace ModernCSharp.Ordering.Application.Services;
+
+public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) : FileExportStrategyBase<Order>(FileType.OrderExcel)
 {
-    private OrderExcelExportContext _context;
-    public List<FileType> FileTypes => [FileType.OrderExcel];
-
-    public void Initialize(IFileExportContext<Order> context)
-    {
-        if (context is not OrderExcelExportContext exportContext)
-        {
-            throw new ArgumentException($"Invalid file export context. Expected {typeof(OrderExcelExportContext)}, but got {context.GetType()}.");
-        }
-        _context = exportContext;
-    }
-
-    public async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
+    public override async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -33,6 +23,7 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) 
             return Result.Failure([$"An error occurred while exporting orders to {_context.OutputPath}."]);
         }
     }
+
     private Task PerformExportAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -59,12 +50,12 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) 
         foreach (var order in _context.DataToExport)
         {
             var currentRow = ws.Row(contentRowIndex);
-            currentRow.Cell("A").SetValue(order.Id);
-            currentRow.Cell("B").SetValue(order.OrderStatus.ToString());
-            currentRow.Cell("C").SetValue(order.Quantity);
-            currentRow.Cell("D").SetValue(order.Total);
-            currentRow.Cell("E").SetValue(order.OrderDate);
-            currentRow.Cell("F").SetValue(order.CustomerName);
+            currentRow.Cell("A").SetValue(order.ordernumber);
+            currentRow.Cell("B").SetValue(order.status);
+            currentRow.Cell("C").SetValue(order.quantity);
+            currentRow.Cell("D").SetValue(order.total);
+            currentRow.Cell("E").SetValue(order.date);
+            currentRow.Cell("F").SetValue(order.username);
 
             contentRowIndex++;
         }

@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="using:ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate"
+    xmlns:local="using:ModernCSharp.Ordering.Application.Queries"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d">
 
@@ -51,24 +51,24 @@
                 <DataTemplate x:DataType="local:Order">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock
-                            Text="{x:Bind Id}"
+                            Text="{x:Bind ordernumber}"
                             FontWeight="Bold"
                             HorizontalAlignment="Left"
                             MinWidth="100" />
                         <TextBlock
-                            Text="{x:Bind CustomerName, Mode=OneWay}"
+                            Text="{x:Bind username, Mode=OneWay}"
                             HorizontalAlignment="Left"
                             MinWidth="150"/>
                         <TextBlock
-                            Text="{x:Bind Quantity, Mode=OneWay}"
+                            Text="{x:Bind quantity, Mode=OneWay}"
                             HorizontalAlignment="Left"
                             MinWidth="150"/>
                         <TextBlock
-                            Text="{x:Bind Total, Mode=OneWay}"
+                            Text="{x:Bind total, Mode=OneWay}"
                             HorizontalAlignment="Left"
                             MinWidth="150"/>
-                        <TextBlock Text="{x:Bind OrderDate}" MinWidth="150"/>
-                        <TextBlock Text="{x:Bind OrderStatus, Mode=OneWay}" />
+                        <TextBlock Text="{x:Bind date}" MinWidth="150"/>
+                        <TextBlock Text="{x:Bind status, Mode=OneWay}" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

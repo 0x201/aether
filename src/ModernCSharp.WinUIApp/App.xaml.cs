@@ -1,29 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.UI.Xaml;
+﻿using ModernCSharp.Ordering.Application;
+using ModernCSharp.Ordering.Infrastructure.Interceptors;
 
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.Ordering.Infrastructure;
-using ModernCSharp.WinUIApp.Activation;
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.Controls;
-using ModernCSharp.WinUIApp.Core.Contracts.Services;
-using ModernCSharp.WinUIApp.Core.Services;
-using ModernCSharp.WinUIApp.Models;
-using ModernCSharp.WinUIApp.Services;
-using ModernCSharp.WinUIApp.ViewModels;
-using ModernCSharp.WinUIApp.Views;
+using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.WinUIApp;
 
-// To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
 public partial class App : Microsoft.UI.Xaml.Application
 {
-    // The .NET Generic Host provides dependency injection, configuration, logging, and other services.
-    // https://docs.microsoft.com/dotnet/core/extensions/generic-host
-    // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
-    // https://docs.microsoft.com/dotnet/core/extensions/configuration
-    // https://docs.microsoft.com/dotnet/core/extensions/logging
     public IHost Host
     {
         get;
@@ -47,56 +30,76 @@ public partial class App : Microsoft.UI.Xaml.Application
     public App()
     {
         InitializeComponent();
+        var builder = Microsoft.Extensions.Hosting.Host
+            .CreateApplicationBuilder();
 
-        Host = Microsoft.Extensions.Hosting.Host.
-        CreateDefaultBuilder().
-        UseContentRoot(AppContext.BaseDirectory).
-        ConfigureServices((context, services) =>
-        {
-            // Default Activation Handler
-            services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+        builder.AddApplicationServices();
 
-            // Other Activation Handlers
+        ConfigureServices(builder);
 
-            // Services
-            services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-            services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
-            services.AddTransient<INavigationViewService, NavigationViewService>();
-
-            services.AddSingleton<IActivationService, ActivationService>();
-            services.AddSingleton<IPageService, PageService>();
-            services.AddSingleton<INavigationService, NavigationService>();
-
-
-
-            // Core Services
-            services.AddSingleton<IFileService, FileService>();
-            services.AddTransient<IOrderQueries, OrderQueries>();
-            services.AddFileContexts();
-            services.AddFileImporters();
-            services.AddFileExporters();
-
-            // UserControls
-            services.AddTransient<AddOrderDialog>();
-
-            // Views and ViewModels
-            services.AddTransient<SettingsViewModel>();
-            services.AddTransient<SettingsPage>();
-            services.AddTransient<OrdersViewModel>();
-            services.AddTransient<OrdersPage>();
-            services.AddTransient<MainViewModel>();
-            services.AddTransient<MainPage>();
-            services.AddTransient<ShellPage>();
-            services.AddTransient<ShellViewModel>();
-
-            services.AddTransient<ImportOrdersViewModel>();
-
-            // Configuration
-            services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
-        }).
-        Build();
-
+        Host = builder.Build();
         UnhandledException += App_UnhandledException;
+    }
+
+
+    static void ConfigureServices(HostApplicationBuilder builder)
+    {
+        // Default Activation Handler
+        builder.Services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+
+        // Other Activation Handlers
+
+        // Services
+        builder.Services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+        builder.Services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+        builder.Services.AddTransient<INavigationViewService, NavigationViewService>();
+
+        builder.Services.AddSingleton<IActivationService, ActivationService>();
+        builder.Services.AddSingleton<IPageService, PageService>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+
+        builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
+        builder.Services.AddDbContext<OrderingDbContext>((sp, options) =>
+        {
+            var connectionString = builder.Configuration.GetConnectionString("orderingdb");
+
+            options
+                .UseSqlServer(connectionString)
+                .AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
+        });
+
+        // Core Services
+        builder.Services.AddSingleton<IFileService, FileService>();
+        builder.Services.AddTransient<IOrderQueries, OrderQueries>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+        builder.Services.AddFileProcessor<Order>()
+            .AddFileImportStrategy<OrderCsvImportStrategy, Order>()
+            .AddFileImportStrategy<OrderExcelImportStrategy, Order>()
+            .AddFileImportStrategy<OrderJsonImportStrategy, Order>()
+            .AddFileExportStrategy<OrderCsvExportStrategy, Order>()
+            .AddFileExportStrategy<OrderExcelExportStrategy, Order>()
+            .AddFileExportStrategy<OrderJsonExportStrategy, Order>();
+
+
+        // UserControls
+        builder.Services.AddTransient<AddOrderDialog>();
+
+        // Views and ViewModels
+        builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<OrdersViewModel>();
+        builder.Services.AddTransient<OrdersPage>();
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<ShellPage>();
+        builder.Services.AddTransient<ShellViewModel>();
+
+        builder.Services.AddTransient<ImportOrdersViewModel>();
+
+        // Configuration
+        builder.Services.Configure<LocalSettingsOptions>(builder.Configuration.GetSection(nameof(LocalSettingsOptions)));
     }
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

@@ -1,9 +1,6 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using ModernCSharp.WinUIApp.Contracts.Services;
+﻿using Microsoft.UI.Xaml.Input;
+
 using ModernCSharp.WinUIApp.Helpers;
-using ModernCSharp.WinUIApp.ViewModels;
 
 using Windows.System;
 

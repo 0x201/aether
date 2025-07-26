@@ -1,7 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.WinUIApp.ViewModels;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.WinUIApp.Views;
 

@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-
+﻿
 namespace ModernCSharp.Ordering.Application.Queries;
 
 public class OrderQueries(IOrderRepository orderRepository) : IOrderQueries
@@ -41,7 +40,7 @@ public class OrderQueries(IOrderRepository orderRepository) : IOrderQueries
 
         return orders
             .Where(order => order.Buyer.IdentityGuid == userId)
-            .Select(order => new Order 
+            .Select(order => new Order
             {
                 ordernumber = order.Id,
                 date = order.OrderDate,

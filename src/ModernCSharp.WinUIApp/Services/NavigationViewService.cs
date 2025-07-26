@@ -1,10 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.WinUIApp.Contracts.Services;
 using ModernCSharp.WinUIApp.Helpers;
-using ModernCSharp.WinUIApp.ViewModels;
 
 namespace ModernCSharp.WinUIApp.Services;
 

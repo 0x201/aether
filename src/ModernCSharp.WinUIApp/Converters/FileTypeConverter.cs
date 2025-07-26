@@ -1,7 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Data;
 
-using ModernCSharp.Ordering.Domain.Enums;
-
 namespace ModernCSharp.WinUIApp.Converters;
 
 public partial class FileTypeConverter : IValueConverter

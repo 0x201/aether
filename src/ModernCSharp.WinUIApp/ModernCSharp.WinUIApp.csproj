@@ -47,9 +47,11 @@
 		<PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" />
 		<PackageReference Include="WinUIEx" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
 		<ProjectReference Include="..\Ordering.Application\Ordering.Application.csproj" />
 		<ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
 		<ProjectReference Include="..\ModernCSharp.WinUIApp.Core\ModernCSharp.WinUIApp.Core.csproj" />
@@ -76,5 +78,6 @@
 		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
 		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
 		<SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion>
+		<UserSecretsId>dbdaa953-5a6d-41ae-ad11-7f415f63495d</UserSecretsId>
 	</PropertyGroup>
 </Project>

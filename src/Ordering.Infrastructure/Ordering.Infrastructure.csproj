@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<RootNamespace>ModernCSharp.Ordering.Infrastructure</RootNamespace>
@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
 		<ProjectReference Include="..\IntegrationEventLogEF\IntegrationEventLogEF.csproj" />
+		<ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -20,6 +21,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Migrations\" />
+	  <Folder Include="Services\" />
 	</ItemGroup>
 
 </Project>

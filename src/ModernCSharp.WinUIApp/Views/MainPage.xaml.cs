@@ -1,8 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.WinUIApp.ViewModels;
-
-namespace ModernCSharp.WinUIApp.Views;
+﻿namespace ModernCSharp.WinUIApp.Views;
 
 public sealed partial class MainPage : Page
 {

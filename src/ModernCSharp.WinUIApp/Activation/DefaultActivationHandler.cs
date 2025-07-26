@@ -1,9 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.ViewModels;
-
-namespace ModernCSharp.WinUIApp.Activation;
+﻿namespace ModernCSharp.WinUIApp.Activation;
 
 public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
 {

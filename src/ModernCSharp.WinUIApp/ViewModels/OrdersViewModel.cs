@@ -1,22 +1,10 @@
-﻿using System.Collections.ObjectModel;
-
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.WinUIApp.Contracts.ViewModels;
-using ModernCSharp.WinUIApp.Controls;
+﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
 
 public partial class OrdersViewModel(IOrderQueries orderService) : ObservableRecipient, INavigationAware
 {
-    [ObservableProperty]
-    private ObservableCollection<Order> _orders = [];
-
+    [ObservableProperty] private ObservableCollection<Order> _orders = [];
     [ObservableProperty] private Order _selectedOrder;
 
     [RelayCommand]

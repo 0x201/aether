@@ -1,9 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-using Microsoft.UI.Xaml.Navigation;
-
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.Views;
+﻿using Microsoft.UI.Xaml.Navigation;
 
 namespace ModernCSharp.WinUIApp.ViewModels;
 

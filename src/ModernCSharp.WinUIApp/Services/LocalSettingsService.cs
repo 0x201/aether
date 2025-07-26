@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.Core.Contracts.Services;
 using ModernCSharp.WinUIApp.Core.Helpers;
 using ModernCSharp.WinUIApp.Helpers;
-using ModernCSharp.WinUIApp.Models;
+
 using Windows.Storage;
 
 namespace ModernCSharp.WinUIApp.Services;

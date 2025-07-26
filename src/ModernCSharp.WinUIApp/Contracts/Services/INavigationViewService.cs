@@ -1,6 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-
-namespace ModernCSharp.WinUIApp.Contracts.Services;
+﻿namespace ModernCSharp.WinUIApp.Contracts.Services;
 
 public interface INavigationViewService
 {

@@ -1,4 +1,4 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure;
+﻿namespace ModernCSharp.Ordering.Infrastructure.Extensions;
 
 static class MediatorExtension
 {

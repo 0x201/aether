@@ -1,6 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-
-namespace ModernCSharp.WinUIApp.Helpers;
+﻿namespace ModernCSharp.WinUIApp.Helpers;
 
 public static class FrameExtensions
 {

@@ -1,11 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-
-using ModernCSharp.WinUIApp.Activation;
-using ModernCSharp.WinUIApp.Contracts.Services;
-using ModernCSharp.WinUIApp.Views;
-
-namespace ModernCSharp.WinUIApp.Services;
+﻿namespace ModernCSharp.WinUIApp.Services;
 
 public class ActivationService : IActivationService
 {
