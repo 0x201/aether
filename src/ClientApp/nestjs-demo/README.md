@@ -10,7 +10,7 @@ $ pnpm install
 
 ## Database migrations
 
-> npx typeorm-ts-node-commonjs migration:run -d ./src/config/typeorm.config.ts
+> pnpm run typeorm:run-migrations
 
 ## Running the app
 

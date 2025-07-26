@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { genSalt, hash } from 'bcrypt';
-import * as moment from 'moment';
+import moment from 'moment';
 import { EncryptionConstants } from './constants/encryption.constant';
 
 @Injectable()
 export class UtilsService {
-  getNowString(): string {
-    return moment().format('YYYY-MM-DD HH:mm:ss');
+  getNowString(format: string = 'YYYY-MM-DD HH:mm:ss'): string {
+    return moment().format(format);
   }
 
   async getPwdHash(plainedPwd: string): Promise<[string, string]> {

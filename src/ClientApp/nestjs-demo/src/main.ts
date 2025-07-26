@@ -2,22 +2,24 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { INestApplication } from '@nestjs/common';
-
-const allowList = ['http://localhost:8081'];
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],
   });
+
+  const configService = app.get(ConfigService);
+
   app.enableCors({
-    origin: allowList,
+    origin: configService.get('CORS_ALLOW_ORIGINS'),
     credentials: true,
   });
   app.setGlobalPrefix('/api', { exclude: ['/health'] });
 
   useSwaggerModule(app);
 
-  await app.listen(3000);
+  await app.listen(configService.get<number>('HTTP_PORT') || 3000);
 }
 
 function useSwaggerModule(app: INestApplication) {

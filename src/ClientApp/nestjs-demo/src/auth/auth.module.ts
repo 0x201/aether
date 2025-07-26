@@ -17,6 +17,7 @@ import { RolesModule } from 'src/roles/roles.module';
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         global: true,
@@ -37,4 +38,4 @@ import { RolesModule } from 'src/roles/roles.module';
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }
