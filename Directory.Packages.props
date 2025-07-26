@@ -2,18 +2,18 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.3.0</AspireVersion>
-    <AspnetVersion>9.0.5</AspnetVersion>
+    <AspireVersion>9.3.1</AspireVersion>
+    <AspnetVersion>9.0.7</AspnetVersion>
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
-    <MSTestVersion>3.9.1</MSTestVersion>
-    <FluentUIVersion>4.11.9</FluentUIVersion>
+    <MSTestVersion>3.9.3</MSTestVersion>
+    <FluentUIVersion>4.12.1</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
-    <DuendeVersion>7.2.3</DuendeVersion>
+    <DuendeVersion>7.2.4</DuendeVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
-    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="9.3.2" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.NodeJS" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
@@ -24,7 +24,7 @@
     <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="$(AspireVersion)" />
-    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.5.0" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.6.0" />
     <!--OpenTelemetry-->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
@@ -37,7 +37,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspnetVersion)" />
     <PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
     <!-- Version together with Asp.Versioning -->
@@ -57,13 +57,13 @@
     <PackageVersion Include="Microsoft.Extensions.Options" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(AspireVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.5.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.7.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.7.0" />
     <!--FluentUI-->
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="$(FluentUIVersion)" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="$(FluentUIVersion)" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="$(FluentUIVersion)" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="$(FluentUIVersion)" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.12.1" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="4.12.1" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />
     <!--CommunityToolkit-->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <!--EntityFramework & Data-->
@@ -82,19 +82,22 @@
     <PackageVersion Include="Duende.IdentityServer.Storage" Version="$(DuendeVersion)" />
     <!--Testing-->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MSTest" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
+    <PackageVersion Include="xunit.v3" Version="3.0.0" />
+    <PackageVersion Include="xunit.v3.abstraction" Version="2.0.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.3" />
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="2.4.10" />
     <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
-    <PackageVersion Include="WinUIEx" Version="2.5.1" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />
+    <PackageVersion Include="WinUIEx" Version="2.6.0" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
     <PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="$(CommunityToolkitWinUIVersion)" />
@@ -106,16 +109,16 @@
     <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="$(CommunityToolkitWinUIVersion)" />
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
     <!--Miscellaneous-->
-    <PackageVersion Include="AutoMapper" Version="14.0.0" />
+    <PackageVersion Include="AutoMapper" Version="15.0.1" />
     <PackageVersion Include="ClosedXML" Version="0.105.0" />
-    <PackageVersion Include="CsvHelper" Version="33.0.1" />
+    <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.2" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
-    <PackageVersion Include="MediatR" Version="12.5.0" />
+    <PackageVersion Include="MediatR" Version="13.0.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Polly.Core" Version="8.5.2" />
+    <PackageVersion Include="Polly.Core" Version="8.6.2" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.4.7" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.6.4" />
   </ItemGroup>
 </Project>
