@@ -1,14 +1,18 @@
-﻿using System.IO;
-using System.Reflection;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Threading;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using ModernCSharp.Ordering.Application;
 using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Ordering.Application.Services;
 using ModernCSharp.Ordering.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure.Interceptors;
+using ModernCSharp.Shared;
 using ModernCSharp.WPFApp.Contracts.Services;
 using ModernCSharp.WPFApp.Contracts.Views;
 using ModernCSharp.WPFApp.Core.Contracts.Services;
@@ -39,68 +43,82 @@ public partial class App : System.Windows.Application
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
-        var appLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var builder = Host.CreateApplicationBuilder(e.Args);
+        builder.AddApplicationServices();
 
-        // For more information about .NET generic host see  https://docs.microsoft.com/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-3.0
-        _host = Host.CreateDefaultBuilder(e.Args)
-                .ConfigureAppConfiguration(c =>
-                {
-                    c.SetBasePath(appLocation);
-                })
-                .ConfigureServices(ConfigureServices)
-                .Build();
+        ConfigureServices(builder);
+
+        _host = builder.Build();
 
         await _host.StartAsync();
     }
 
-    private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
+    private void ConfigureServices(HostApplicationBuilder builder)
     {
         // TODO: Register your services, viewmodels and pages here
 
         // App Host
-        services.AddHostedService<ApplicationHostService>();
+        builder.Services.AddHostedService<ApplicationHostService>();
+
+        builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
+        builder.Services.AddDbContext<OrderingDbContext>((sp, options) =>
+        {
+            var connectionString = builder.Configuration.GetConnectionString("orderingdb");
+
+            options
+                .UseSqlServer(connectionString)
+                .AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
+        });
+
+
+
 
         // Activation Handlers
 
         // Core Services
-        services.AddSingleton<IFileService, FileService>();
+        builder.Services.AddSingleton<IFileService, FileService>();
 
-        services.AddFileContexts();
-        services.AddFileExporters();
-        services.AddFileImporters();
+        builder.Services.AddFileProcessor<Order>()
+            .AddFileImportStrategy<OrderCsvImportStrategy, Order>()
+            .AddFileImportStrategy<OrderExcelImportStrategy, Order>()
+            .AddFileImportStrategy<OrderJsonImportStrategy, Order>()
+            .AddFileExportStrategy<OrderCsvExportStrategy, Order>()
+            .AddFileExportStrategy<OrderExcelExportStrategy, Order>()
+            .AddFileExportStrategy<OrderJsonExportStrategy, Order>();
 
-        services.AddTransient<IOrderQueries, OrderQueries>();
+        builder.Services.AddTransient<IOrderQueries, OrderQueries>();
 
         // Services
-        services.AddSingleton<IApplicationInfoService, ApplicationInfoService>();
-        services.AddSingleton<ISystemService, SystemService>();
-        services.AddSingleton<IPersistAndRestoreService, PersistAndRestoreService>();
-        services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
-        services.AddSingleton<ISampleDataService, SampleDataService>();
-        services.AddSingleton<IPageService, PageService>();
-        services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<IApplicationInfoService, ApplicationInfoService>();
+        builder.Services.AddSingleton<ISystemService, SystemService>();
+        builder.Services.AddSingleton<IPersistAndRestoreService, PersistAndRestoreService>();
+        builder.Services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+        builder.Services.AddSingleton<ISampleDataService, SampleDataService>();
+        builder.Services.AddSingleton<IPageService, PageService>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         // Views and ViewModels
-        services.AddTransient<IShellWindow, ShellWindow>();
-        services.AddTransient<ShellViewModel>();
+        builder.Services.AddTransient<IShellWindow, ShellWindow>();
+        builder.Services.AddTransient<ShellViewModel>();
 
-        services.AddTransient<MainViewModel>();
-        services.AddTransient<MainPage>();
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<MainPage>();
 
-        services.AddTransient<OrderListDetailsViewModel>();
-        services.AddTransient<OrderListDetailsPage>();
+        builder.Services.AddTransient<OrderListDetailsViewModel>();
+        builder.Services.AddTransient<OrderListDetailsPage>();
 
-        services.AddTransient<OrderDataGridViewModel>();
-        services.AddTransient<OrderDataGridPage>();
+        builder.Services.AddTransient<OrderDataGridViewModel>();
+        builder.Services.AddTransient<OrderDataGridPage>();
 
-        services.AddTransient<OrderViewModel>();
-        services.AddTransient<OrderPage>();
+        builder.Services.AddTransient<OrderViewModel>();
+        builder.Services.AddTransient<OrderPage>();
 
-        services.AddTransient<SettingsViewModel>();
-        services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<SettingsPage>();
 
         // Configuration
-        services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));
+        builder.Services.Configure<AppConfig>(builder.Configuration.GetSection(nameof(AppConfig)));
     }
 
     private async void OnExit(object sender, ExitEventArgs e)

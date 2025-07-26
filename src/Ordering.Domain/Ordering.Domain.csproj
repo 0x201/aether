@@ -11,12 +11,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Abstractions\" />
 	  <Folder Include="Common\" />
 	  <Folder Include="Entities\" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ModernCSharp.DDD\ModernCSharp.DDD.csproj" />
+	  <ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

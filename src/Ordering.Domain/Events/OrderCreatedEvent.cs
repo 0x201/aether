@@ -1,5 +1,5 @@
-﻿using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.DDD.Common;
+﻿using ModernCSharp.DDD.Common;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 
 namespace ModernCSharp.Ordering.Domain.Events;
 

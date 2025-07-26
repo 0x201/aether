@@ -12,7 +12,7 @@ public class UserSeed(
     {
         var adminRoleExist = await roleManager.RoleExistsAsync("Admin");
 
-        if (!adminRoleExist) 
+        if (!adminRoleExist)
         {
             await roleManager.CreateAsync(new IdentityRole("Admin"));
         }

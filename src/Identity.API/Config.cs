@@ -11,7 +11,7 @@ public static class Config
             new IdentityResources.Profile(),
         ];
 
-    public static IEnumerable<ApiResource> ApiResources => 
+    public static IEnumerable<ApiResource> ApiResources =>
         [
             new ApiResource("orders", "Orders Service")
         ];

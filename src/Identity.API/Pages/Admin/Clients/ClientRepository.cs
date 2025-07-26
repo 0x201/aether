@@ -5,8 +5,6 @@ using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace ModernCSharp.Identity.API.Pages.Admin.Clients;
 
 public class ClientSummaryModel

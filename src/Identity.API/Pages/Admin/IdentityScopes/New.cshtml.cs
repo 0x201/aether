@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-using ModernCSharp.Identity.API.Pages;
-
 namespace ModernCSharp.Identity.API.Pages.Admin.IdentityScopes;
 
 [SecurityHeaders]

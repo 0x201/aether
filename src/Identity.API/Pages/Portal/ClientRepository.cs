@@ -1,7 +1,5 @@
 ﻿using Duende.IdentityServer.EntityFramework.DbContexts;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace ModernCSharp.Identity.API.Pages.Portal;
 
 public class ThirdPartyInitiatedLoginLink

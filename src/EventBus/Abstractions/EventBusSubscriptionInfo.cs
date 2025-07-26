@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
 namespace ModernCSharp.EventBus.Abstractions;
@@ -14,12 +14,12 @@ public class EventBusSubscriptionInfo
     {
         get;
     } = new(DefaultSerializerOptions);
-    
+
     internal static readonly JsonSerializerOptions DefaultSerializerOptions = new()
     {
         TypeInfoResolver = JsonSerializer.IsReflectionEnabledByDefault ? CreateDefaultTypeResolver() : JsonTypeInfoResolver.Combine()
     };
-    
+
 #pragma warning disable IL2026
 #pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
     private static IJsonTypeInfoResolver CreateDefaultTypeResolver()

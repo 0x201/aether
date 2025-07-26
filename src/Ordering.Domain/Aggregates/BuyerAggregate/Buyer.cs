@@ -25,7 +25,7 @@ public class Buyer : BaseAuditableEntity<int>, IAggregateRoot
     protected Buyer()
     {
 
-        _paymentMethods = new List<PaymentMethod>();
+        _paymentMethods = [];
     }
 
     public Buyer(string identity, string name) : this()

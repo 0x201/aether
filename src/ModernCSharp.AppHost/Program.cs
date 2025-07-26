@@ -1,35 +1,32 @@
 ﻿var builder = DistributedApplication.CreateBuilder(args);
 
-
-var redis = builder.AddRedis("redis")
+#pragma warning disable ASPIREPROXYENDPOINTS001
+var redis = builder.AddRedis("redis", port: 6379)
                    .WithLifetime(ContainerLifetime.Persistent)
-                   .WithRedisInsight(config => 
+                   .WithEndpointProxySupport(false)
+                   .WithRedisInsight(config =>
                    {
                        config.WithHostPort(6378);
                        config.WithContainerName("redis-insight");
                        config.WithLifetime(ContainerLifetime.Persistent);
                    })
-                   .WithHostPort(6379)
+                   .WithDataVolume()
                    .WithContainerName("redis");
 
-#pragma warning disable ASPIREPROXYENDPOINTS001
-var rabbitmq = builder.AddRabbitMQ("eventbus")
+var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
                       .WithLifetime(ContainerLifetime.Persistent)
                       .WithEndpointProxySupport(false)
                       .WithManagementPlugin()
+                      .WithDataVolume()
                       .WithContainerName("eventbus");
 
-var mysql = builder.AddMySql("mysql")
-                   .WithLifetime(ContainerLifetime.Persistent)
-                   .WithEndpointProxySupport(false)
-                   .WithContainerName("mysql");
-
-var sqlServer = builder.AddSqlServer("sqlserver")
+var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
+                       .WithEndpointProxySupport(false)
                        .WithLifetime(ContainerLifetime.Persistent)
-                       .WithHostPort(14330)
+                       .WithDataVolume()
                        .WithContainerName("sql-server");
 
-var bookstoreDb = mysql.AddDatabase("bookstore");
+var bookstoreDb = sqlServer.AddDatabase("bookstoredb");
 var identityDb = sqlServer.AddDatabase("identitydb");
 var orderDb = sqlServer.AddDatabase("orderingdb");
 var catalogDb = sqlServer.AddDatabase("catalogdb");
@@ -73,17 +70,17 @@ var nestjsApp = builder.AddPnpmApp("nestjs-app", @"..\ClientApp\nestjs-demo", "s
 nestjsApp.WithUrl($"{nestjsApp.GetEndpoint("http")}/docs", "NestJs App Swagger Docs");
 
 var viteVueApp = builder.AddPnpmApp("vite-vue-app", @"..\ClientApp\vite-vue-app", "dev")
-    .WithHttpEndpoint(port: 5173, isProxied: false)
+    .WithHttpEndpoint(port: 3001, isProxied: false)
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 var viteReactApp = builder.AddPnpmApp("vite-react-app", @"..\ClientApp\vite-react-app", "dev")
-    .WithHttpEndpoint(port: 5174, isProxied: false)
+    .WithHttpEndpoint(port: 3002, isProxied: false)
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", "start")
-    .WithHttpEndpoint(port: 4200, isProxied: false)
+    .WithHttpEndpoint(port: 3003, isProxied: false)
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 

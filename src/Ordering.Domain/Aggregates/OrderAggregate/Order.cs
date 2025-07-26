@@ -20,16 +20,19 @@ public class Order : BaseAuditableEntity<int>, IAggregateRoot
         get;
         private set;
     }
+
     public decimal Total
     {
         get;
         set;
     }
+
     public string CustomerName
     {
         get;
         set;
     } = string.Empty;
+
     public DateTime OrderDate
     {
         get;
@@ -70,7 +73,7 @@ public class Order : BaseAuditableEntity<int>, IAggregateRoot
 
     protected Order()
     {
-        _orderItems = new List<OrderItem>();
+        _orderItems = [];
     }
 
 

@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 
 using ModernCSharp.Identity.API.Pages.Consent;
-using ModernCSharp.Identity.API.Pages;
 
 namespace ModernCSharp.Identity.API.Pages.Device;
 

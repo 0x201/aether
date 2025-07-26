@@ -4,8 +4,6 @@ using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Mappers;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace ModernCSharp.Identity.API.Pages.Admin.ApiScopes;
 
 public class ApiScopeSummaryModel

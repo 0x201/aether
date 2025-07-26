@@ -1,10 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
+
 using Polly.Retry;
 
 namespace ModernCSharp.EventBusRabbitMQ;
@@ -195,7 +198,7 @@ public sealed class RabbitMQEventBus(
 
         // Deserialize the event
         var integrationEvent = DeserializeMessage(message, eventType);
-        
+
         // REVIEW: This could be done in parallel
 
         // Get all the handlers using the event type as the key

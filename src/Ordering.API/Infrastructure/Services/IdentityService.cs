@@ -1,8 +1,4 @@
-﻿
-using ModernCSharp.Ordering.Application.Common.Interfaces;
-using ModernCSharp.Ordering.Application.Common.Models;
-
-namespace ModernCSharp.Ordering.API.Infrastructure.Services;
+﻿namespace ModernCSharp.Ordering.API.Infrastructure.Services;
 
 public class IdentityService(IHttpContextAccessor context) : IIdentityService
 {

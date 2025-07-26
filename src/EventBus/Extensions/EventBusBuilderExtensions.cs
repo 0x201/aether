@@ -1,5 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+
 using ModernCSharp.EventBus.Abstractions;
 
 namespace Microsoft.Extensions.DependencyInjection;

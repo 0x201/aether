@@ -1,4 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+
 using ModernCSharp.EventBusRabbitMQ;
 
 namespace Microsoft.Extensions.Hosting;
