@@ -1,4 +1,6 @@
-﻿namespace ModernCSharp.Ordering.API.Infrastructure.Services;
+﻿using ModernCSharp.Shared.FileServices;
+
+namespace ModernCSharp.Ordering.API.Infrastructure.Services;
 
 public class IdentityService(IHttpContextAccessor context) : IIdentityService
 {

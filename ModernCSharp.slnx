@@ -25,10 +25,6 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="src/Ordering.Application/Ordering.Application.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
   <Project Path="src/ModernCSharp.DDD/ModernCSharp.DDD.csproj" Id="cf2247b3-6fc4-4a93-9bf3-4f906072f079" />
   <Project Path="src/ModernCSharp.ServiceDefaults/ModernCSharp.ServiceDefaults.csproj">
     <Platform Solution="*|x64" Project="x64" />
@@ -55,11 +51,15 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-    <Project Path="src/ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj">
+  <Project Path="src/ModernCSharp.WPFApp/ModernCSharp.WPFApp.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
   <Project Path="src/Ordering.API/Ordering.API.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="src/Ordering.Application/Ordering.Application.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
@@ -79,17 +79,16 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="test/ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj">
+  <Project Path="test/ModernCSharp.Tests/ModernCSharp.Tests.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="test/Ordering.Infrastructure.Testing/Ordering.Infrastructure.Testing.csproj" />
   <Project Path="test/ModernCSharp.WinUIApp.Tests.MSTest/ModernCSharp.WinUIApp.Tests.MSTest.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
     <Platform Solution="Debug|Any CPU" Project="x64" />
   </Project>
-    <Project Path="test/ModernCSharp.Tests/ModernCSharp.Tests.csproj">
+  <Project Path="test/ModernCSharp.WPFApp.Tests.MSTest/ModernCSharp.WPFApp.Tests.MSTest.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>

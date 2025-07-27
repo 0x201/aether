@@ -66,18 +66,20 @@ namespace ModernCSharp.WinFormsApp.Views
             MainPanel.Controls.Add(FilterTextBox, 2, 0);
             MainPanel.Dock = DockStyle.Fill;
             MainPanel.Location = new Point(0, 0);
+            MainPanel.Margin = new Padding(4, 5, 4, 5);
             MainPanel.Name = "MainPanel";
             MainPanel.RowCount = 2;
             MainPanel.RowStyles.Add(new RowStyle());
             MainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            MainPanel.Size = new Size(800, 450);
+            MainPanel.Size = new Size(1143, 750);
             MainPanel.TabIndex = 5;
             // 
             // AppendButton
             // 
-            AppendButton.Location = new Point(89, 3);
+            AppendButton.Location = new Point(126, 5);
+            AppendButton.Margin = new Padding(4, 5, 4, 5);
             AppendButton.Name = "AppendButton";
-            AppendButton.Size = new Size(80, 26);
+            AppendButton.Size = new Size(114, 43);
             AppendButton.TabIndex = 2;
             AppendButton.Text = "Append";
             AppendButton.UseVisualStyleBackColor = true;
@@ -85,9 +87,10 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             // ImportButton
             // 
-            ImportButton.Location = new Point(3, 3);
+            ImportButton.Location = new Point(4, 5);
+            ImportButton.Margin = new Padding(4, 5, 4, 5);
             ImportButton.Name = "ImportButton";
-            ImportButton.Size = new Size(80, 26);
+            ImportButton.Size = new Size(114, 43);
             ImportButton.TabIndex = 1;
             ImportButton.Text = "Import";
             ImportButton.UseVisualStyleBackColor = true;
@@ -102,10 +105,12 @@ namespace ModernCSharp.WinFormsApp.Views
             MainPanel.SetColumnSpan(OrderDataGridView, 5);
             OrderDataGridView.DataSource = orderBindingSource;
             OrderDataGridView.Dock = DockStyle.Fill;
-            OrderDataGridView.Location = new Point(3, 35);
+            OrderDataGridView.Location = new Point(4, 58);
+            OrderDataGridView.Margin = new Padding(4, 5, 4, 5);
             OrderDataGridView.Name = "OrderDataGridView";
+            OrderDataGridView.RowHeadersWidth = 62;
             OrderDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            OrderDataGridView.Size = new Size(794, 412);
+            OrderDataGridView.Size = new Size(1135, 687);
             OrderDataGridView.TabIndex = 0;
             OrderDataGridView.ColumnHeaderMouseClick += OrderDataGridView_ColumnHeaderMouseClick;
             // 
@@ -113,36 +118,42 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             ordernumberDataGridViewTextBoxColumn.DataPropertyName = "ordernumber";
             ordernumberDataGridViewTextBoxColumn.HeaderText = "Order No.";
+            ordernumberDataGridViewTextBoxColumn.MinimumWidth = 8;
             ordernumberDataGridViewTextBoxColumn.Name = "ordernumberDataGridViewTextBoxColumn";
             // 
             // dateDataGridViewTextBoxColumn
             // 
             dateDataGridViewTextBoxColumn.DataPropertyName = "date";
             dateDataGridViewTextBoxColumn.HeaderText = "Order Date";
+            dateDataGridViewTextBoxColumn.MinimumWidth = 8;
             dateDataGridViewTextBoxColumn.Name = "dateDataGridViewTextBoxColumn";
             // 
             // statusDataGridViewTextBoxColumn
             // 
             statusDataGridViewTextBoxColumn.DataPropertyName = "status";
             statusDataGridViewTextBoxColumn.HeaderText = "Order Status";
+            statusDataGridViewTextBoxColumn.MinimumWidth = 8;
             statusDataGridViewTextBoxColumn.Name = "statusDataGridViewTextBoxColumn";
             // 
             // quantityDataGridViewTextBoxColumn
             // 
             quantityDataGridViewTextBoxColumn.DataPropertyName = "quantity";
             quantityDataGridViewTextBoxColumn.HeaderText = "Quantity";
+            quantityDataGridViewTextBoxColumn.MinimumWidth = 8;
             quantityDataGridViewTextBoxColumn.Name = "quantityDataGridViewTextBoxColumn";
             // 
             // totalDataGridViewTextBoxColumn
             // 
             totalDataGridViewTextBoxColumn.DataPropertyName = "total";
             totalDataGridViewTextBoxColumn.HeaderText = "Total";
+            totalDataGridViewTextBoxColumn.MinimumWidth = 8;
             totalDataGridViewTextBoxColumn.Name = "totalDataGridViewTextBoxColumn";
             // 
             // usernameDataGridViewTextBoxColumn
             // 
             usernameDataGridViewTextBoxColumn.DataPropertyName = "username";
             usernameDataGridViewTextBoxColumn.HeaderText = "Username";
+            usernameDataGridViewTextBoxColumn.MinimumWidth = 8;
             usernameDataGridViewTextBoxColumn.Name = "usernameDataGridViewTextBoxColumn";
             // 
             // orderBindingSource
@@ -151,9 +162,10 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             // ExportButton
             // 
-            ExportButton.Location = new Point(717, 3);
+            ExportButton.Location = new Point(1025, 5);
+            ExportButton.Margin = new Padding(4, 5, 4, 5);
             ExportButton.Name = "ExportButton";
-            ExportButton.Size = new Size(80, 26);
+            ExportButton.Size = new Size(114, 43);
             ExportButton.TabIndex = 4;
             ExportButton.Text = "Export";
             ExportButton.UseVisualStyleBackColor = true;
@@ -161,9 +173,10 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             // ClearButton
             // 
-            ClearButton.Location = new Point(631, 3);
+            ClearButton.Location = new Point(903, 5);
+            ClearButton.Margin = new Padding(4, 5, 4, 5);
             ClearButton.Name = "ClearButton";
-            ClearButton.Size = new Size(80, 26);
+            ClearButton.Size = new Size(114, 43);
             ClearButton.TabIndex = 3;
             ClearButton.Text = "Clear";
             ClearButton.UseVisualStyleBackColor = true;
@@ -172,18 +185,20 @@ namespace ModernCSharp.WinFormsApp.Views
             // FilterTextBox
             // 
             FilterTextBox.Dock = DockStyle.Fill;
-            FilterTextBox.Location = new Point(175, 3);
+            FilterTextBox.Location = new Point(248, 5);
+            FilterTextBox.Margin = new Padding(4, 5, 4, 5);
             FilterTextBox.Name = "FilterTextBox";
-            FilterTextBox.Size = new Size(450, 23);
+            FilterTextBox.Size = new Size(647, 31);
             FilterTextBox.TabIndex = 5;
             FilterTextBox.TextChanged += FilterTextBox_TextChanged;
             // 
             // OrderListView
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1143, 750);
             Controls.Add(MainPanel);
+            Margin = new Padding(4, 5, 4, 5);
             Name = "OrderListView";
             Text = "Order List";
             MainPanel.ResumeLayout(false);

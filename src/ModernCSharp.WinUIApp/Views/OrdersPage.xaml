@@ -1,85 +1,126 @@
-﻿<Page
-    x:Class="ModernCSharp.WinUIApp.Views.OrdersPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="using:ModernCSharp.Ordering.Application.Queries"
-    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d">
+﻿<Page x:Class="ModernCSharp.WinUIApp.Views.OrdersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="using:ModernCSharp.Ordering.Application.Queries"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      mc:Ignorable="d">
+
+    <Page.Resources>
+        <DataTemplate x:Key="OrderHeaderTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Order Id"
+                           MinWidth="100"
+                           Grid.Column="0" />
+                <TextBlock Text="Customer Name"
+                           MinWidth="150"
+                           Grid.Column="1" />
+                <TextBlock Text="#Unit"
+                           MinWidth="50"
+                           Grid.Column="2" />
+                <TextBlock Text="Total"
+                           MinWidth="50"
+                           Grid.Column="3" />
+                <TextBlock Text="Order Date"
+                           MinWidth="150"
+                           Grid.Column="4" />
+                <TextBlock Text="Order Status"
+                           MinWidth="150"
+                           Grid.Column="6" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OrderItemTemplate" x:DataType="local:Order">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Bind ordernumber}"
+                           MinWidth="100"
+                           Grid.Column="0" />
+                <TextBlock Text="{x:Bind username, Mode=OneWay}"
+                           MinWidth="150"
+                           Grid.Column="1"/>
+                <TextBlock Text="{x:Bind quantity, Mode=OneWay}"
+                           MinWidth="50"
+                           Grid.Column="2"/>
+                <TextBlock Text="{x:Bind total, Mode=OneWay}"
+                           MinWidth="50"
+                           Grid.Column="3"/>
+                <TextBlock Text="{x:Bind date, Mode=OneWay, Converter={StaticResource DateTimeToStringConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}"
+                           MinWidth="150"
+                           Grid.Column="4"/>
+                <TextBlock Text="{x:Bind status, Mode=OneWay}"
+                           MinWidth="150"
+                           Grid.Column="5"/>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
 
     <RelativePanel x:Name="ContentArea">
-        <CommandBar
-            x:Name="OrderCommandBar"
-            Background="Transparent"
-            IsOpen="False"
-            DefaultLabelPosition="Right"
-            RelativePanel.AlignRightWithPanel="True">
-            <AppBarButton Icon="Add" Label="New"/>
-            <AppBarButton Icon="Folder" Label="Import" Command="{x:Bind ViewModel.OpenImportDialogCommand}" CommandParameter="{x:Bind XamlRoot}"/>
-            <AppBarButton Icon="Edit" Label="Edit"/>
-            <AppBarButton Icon="Filter" Label="Filter By"/>
-            <AppBarButton Icon="Bullets" Label="Group By"/>
-            <AppBarButton Icon="Refresh" Label="Reresh"/>
+        <CommandBar x:Name="OrderCommandBar"
+                    Background="Transparent"
+                    IsOpen="False"
+                    DefaultLabelPosition="Right"
+                    RelativePanel.AlignRightWithPanel="True">
+            <AppBarButton Icon="Add"
+                          Label="New" />
+            <AppBarButton Icon="Folder"
+                          Label="Import"
+                          Command="{x:Bind ViewModel.OpenImportDialogCommand}"
+                          CommandParameter="{x:Bind XamlRoot}" />
+            <AppBarButton Icon="Edit"
+                          Label="Edit" />
+            <AppBarButton Icon="Filter"
+                          Label="Filter By" />
+            <AppBarButton Icon="Bullets"
+                          Label="Group By" />
+            <AppBarButton Icon="Refresh"
+                          Label="Reresh" />
         </CommandBar>
 
-        <ListView
-            x:Name="OrderListView"
-            ItemsSource="{x:Bind ViewModel.Orders, Mode=OneWay}"
-            RelativePanel.Below="OrderCommandBar"
-            SelectionMode="Single"
-            IsItemClickEnabled="false"
-            SelectionChanged="OrderListView_SelectionChanged"
-            RelativePanel.AlignHorizontalCenterWithPanel="True"
-            RelativePanel.AlignVerticalCenterWithPanel="True">
+        <ListView x:Name="OrderListView"
+                  ItemsSource="{x:Bind ViewModel.Orders, Mode=OneWay}"
+                  ItemTemplate="{StaticResource OrderItemTemplate}"
+                  HeaderTemplate="{StaticResource OrderHeaderTemplate}"
+                  RelativePanel.Below="OrderCommandBar"
+                  SelectionMode="Single"
+                  IsItemClickEnabled="false"
+                  SelectionChanged="OrderListView_SelectionChanged"
+                  RelativePanel.AlignHorizontalCenterWithPanel="True"
+                  RelativePanel.AlignVerticalCenterWithPanel="True">
             <ListView.Resources>
-                <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor" Color="Transparent" />
+                <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor"
+                                 Color="Transparent" />
             </ListView.Resources>
-            <ListView.HeaderTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Order Id" FontWeight="Bold" MinWidth="100"/>
-                        <TextBlock Text="Customer Name" MinWidth="150"/>
-                        <TextBlock Text="Quantity" MinWidth="150"/>
-                        <TextBlock Text="Total" MinWidth="150"/>
-                        <TextBlock Text="Order Date" MinWidth="150"/>
-                        <TextBlock Text="Order Status" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.HeaderTemplate>
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="local:Order">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock
-                            Text="{x:Bind ordernumber}"
-                            FontWeight="Bold"
-                            HorizontalAlignment="Left"
-                            MinWidth="100" />
-                        <TextBlock
-                            Text="{x:Bind username, Mode=OneWay}"
-                            HorizontalAlignment="Left"
-                            MinWidth="150"/>
-                        <TextBlock
-                            Text="{x:Bind quantity, Mode=OneWay}"
-                            HorizontalAlignment="Left"
-                            MinWidth="150"/>
-                        <TextBlock
-                            Text="{x:Bind total, Mode=OneWay}"
-                            HorizontalAlignment="Left"
-                            MinWidth="150"/>
-                        <TextBlock Text="{x:Bind date}" MinWidth="150"/>
-                        <TextBlock Text="{x:Bind status, Mode=OneWay}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
-                <Style
-                    BasedOn="{StaticResource DefaultListViewItemStyle}"
-                    TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Style BasedOn="{StaticResource DefaultListViewItemStyle}"
+                       TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment"
+                            Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment"
+                            Value="Center" />
+                    <Setter Property="Padding"
+                            Value="0" />
+                    <Setter Property="Margin"
+                            Value="0" />
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
     </RelativePanel>
+
 </Page>
