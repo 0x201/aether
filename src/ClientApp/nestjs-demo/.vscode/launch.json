@@ -9,7 +9,6 @@
       "runtimeArgs": ["start", "--inspect-brk", "--watch", "--debug"],
       "restart": true,
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
       "trace": true
     }
   ]

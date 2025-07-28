@@ -1,4 +1,4 @@
-import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
+import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 
 import {
   Column,

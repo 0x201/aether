@@ -1,6 +1,6 @@
 import { Entity, Index, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Book } from "./book.entity";
-import { Author } from "src/authors/entities/author.entity";
+import { Author } from "../../authors/entities/author.entity";
 
 
 

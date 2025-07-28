@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { genSalt, hash } from 'bcrypt';
-import moment from 'moment';
+import * as moment from 'moment';
 import { EncryptionConstants } from './constants/encryption.constant';
 
 @Injectable()

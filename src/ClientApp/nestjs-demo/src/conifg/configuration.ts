@@ -23,10 +23,10 @@ export default () => ({
     },
     options: {
       encrypt: process.env.DB_ENCRYPT === 'true',
-      trustServerCertificate: true,
+      trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true',
     },
     logging: process.env.DB_LOGGING === 'true',
-    autoLoadEntities: true,
+    autoLoadEntities: process.env.DB_AUTOLOADENTITIES === 'true' || false,
     entities: ['src/**/*.entity{.ts,.js}'],
     migrations: ['src/database/migrations/*{.ts,.js}'],
     synchronize: process.env.DB_SYNCHRONIZE === 'true',

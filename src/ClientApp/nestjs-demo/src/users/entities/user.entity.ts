@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
+import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 import { UserRole } from './user-role.entity';
 
 @Entity('users')

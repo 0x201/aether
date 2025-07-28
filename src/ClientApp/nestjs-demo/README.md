@@ -10,7 +10,7 @@ $ pnpm install
 
 ## Database migrations
 
-> pnpm run typeorm:run-migrations
+> pnpm run migrations:run
 
 ## Running the app
 

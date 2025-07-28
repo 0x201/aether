@@ -1,5 +1,5 @@
-import { BookAuthor } from 'src/books/entities/book-author.entity';
-import { BaseAuditableEntity } from 'src/common/BaseAuditableEntity.entity';
+import { BookAuthor } from '../../books/entities/book-author.entity';
+import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 import {
   Column,
   Entity,
@@ -12,13 +12,13 @@ export class Author extends BaseAuditableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 50})
+  @Column({name: 'FirstName', type: 'varchar', length: 50})
   firstName: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({name: 'LastName', type: 'varchar', length: 50 })
   lastName: string;
 
-  @Column({ default: true })
+  @Column({name: 'IsActive', default: true })
   isActive: boolean;
 
   @OneToMany(() => BookAuthor, (ba) => ba.author)

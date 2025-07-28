@@ -24,7 +24,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isAllowAnonymous = this.reflector.getAllAndOverride<boolean>(
-      IS_ALLOW_ANONYMOUS,
+      ALLOW_ANONYMOUS,
       [context.getHandler(), context.getClass()],
     );
 
@@ -54,5 +54,5 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-export const IS_ALLOW_ANONYMOUS = 'isAllowAnonymous';
-export const AllowAnonymous = () => SetMetadata(IS_ALLOW_ANONYMOUS, true);
+export const ALLOW_ANONYMOUS = 'AllowAnonymous';
+export const AllowAnonymous = () => SetMetadata(ALLOW_ANONYMOUS, true);
