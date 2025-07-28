@@ -13,6 +13,7 @@
     <PropertyColumn Property="@(order => order.OrderNumber)" Sortable="true" />
     <PropertyColumn Property="@(order => order.Date)" Sortable="true" />
     <PropertyColumn Property="@(order => order.Status)" Sortable="true" />
+    <PropertyColumn Property="@(order => order.Quantity)" Sortable="true" />
     <PropertyColumn Property="@(order => order.Total)" Sortable="true" />
 </FluentDataGrid>
 <FluentPaginator State="@pagination" />
