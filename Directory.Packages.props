@@ -10,6 +10,7 @@
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.4</DuendeVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
+    <AspireCommunityVersion>9.6.0</AspireCommunityVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
@@ -24,7 +25,8 @@
     <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="$(AspireVersion)" />
-    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.6.0" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="$(AspireCommunityVersion)" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Python.Extensions" Version="$(AspireCommunityVersion)" />
     <!--OpenTelemetry-->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
