@@ -16,7 +16,7 @@ var redis = builder.AddRedis("redis", port: 6379)
 var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
                       .WithLifetime(ContainerLifetime.Persistent)
                       .WithEndpointProxySupport(false)
-                      .WithManagementPlugin()
+                      .WithManagementPlugin(port: 15672)
                       .WithDataVolume()
                       .WithContainerName("eventbus");
 
@@ -63,30 +63,30 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
 var nestjsApp = builder.AddPnpmApp("nestjs-app", @"..\ClientApp\nestjs-demo", "start")
-    .WithHttpEndpoint(port: 3000, isProxied: false)
+    .WithHttpEndpoint(targetPort: 3000, env: "HTTP_PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 
 nestjsApp.WithUrl($"{nestjsApp.GetEndpoint("http")}/docs", "NestJs App Swagger Docs");
 
-var viteVueApp = builder.AddPnpmApp("vite-vue-app", @"..\ClientApp\vite-vue-app", "dev")
-    .WithHttpEndpoint(port: 3001, isProxied: false)
+var viteVueApp = builder.AddViteApp("vite-vue-app", @"..\ClientApp\vite-vue-app", "pnpm")
+    .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
-var viteReactApp = builder.AddPnpmApp("vite-react-app", @"..\ClientApp\vite-react-app", "dev")
-    .WithHttpEndpoint(port: 3002, isProxied: false)
+var viteReactApp = builder.AddViteApp("vite-react-app", @"..\ClientApp\vite-react-app", "pnpm")
+    .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", "start")
-    .WithHttpEndpoint(port: 3003, isProxied: false)
+    .WithHttpEndpoint(targetPort: 4200, env: "HTTP_PORT")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\ClientApp\fastapi-demo", "main.py")
-    .WithHttpEndpoint(port: 8000, isProxied: false)
+    .WithHttpEndpoint(targetPort: 8000, env: "HTTP_PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 #pragma warning restore ASPIREHOSTINGPYTHON001
