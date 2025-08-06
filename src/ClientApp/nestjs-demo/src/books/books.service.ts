@@ -6,7 +6,7 @@ import { CreateBookCommand } from './commands/create-book.command';
 import { UpdateBookCommand } from './commands/update-book.command';
 import { Book } from './entities/book.entity';
 import { BookAuthor } from './entities/book-author.entity';
-import { Author } from 'src/authors/entities/author.entity';
+import { Author } from '../authors/entities/author.entity';
 
 @Injectable()
 export class BooksService {

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.0" />
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.0" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
@@ -31,16 +31,4 @@
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" />
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.Python.Extensions" />
   </ItemGroup>
-  <Target Name="RestorePnpm" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
-    <ItemGroup>
-      <NestJsAppPackageJsons Include="..\ClientApp\nestjs-demo\package.json"/>
-    </ItemGroup>
-    <Message Importance="Normal" Text="Installing pnpm packages for %(NestJsAppPackageJsons.RelativeDir)" Condition="!Exists('%(NestJsAppPackageJsons.RootDir)%(NestJsAppPackageJsons.Directory)/node_modules')" />
-    <Exec Command="pnpm install" WorkingDirectory="%(NestJsAppPackageJsons.RootDir)%(NestJsAppPackageJsons.Directory)" Condition="!Exists('%(NestJsAppPackageJsons.RootDir)%(NestJsAppPackageJsons.Directory)/node_modules')" />
-    <ItemGroup>
-      <AngularAppPackageJsons Include="..\ClientApp\angular-app\package.json"/>
-    </ItemGroup>
-    <Message Importance="Normal" Text="Installing pnpm packages for %(AngularAppPackageJsons.RelativeDir)" Condition="!Exists('%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)/node_modules')" />
-    <Exec Command="pnpm install" WorkingDirectory="%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)" Condition="!Exists('%(AngularAppPackageJsons.RootDir)%(AngularAppPackageJsons.Directory)/node_modules')" />
-  </Target>
 </Project>

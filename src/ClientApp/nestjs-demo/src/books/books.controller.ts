@@ -9,7 +9,7 @@ import {
   Query,
   HttpException,
 } from '@nestjs/common';
-import { PagedResultResponse } from 'src/common/response/ListResultResponse';
+import { PagedResultResponse } from '../common/response/ListResultResponse';
 import { BooksService } from './books.service';
 import { BookDto } from './dtos/book.dto';
 import { BookQuery } from './queries/book.query';

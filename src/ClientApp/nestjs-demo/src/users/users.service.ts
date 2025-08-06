@@ -6,9 +6,9 @@ import { SignInUserCommand } from './commands/login-user.command';
 import { SignUpUserCommand } from './commands/signup-user.command';
 import { UserDto } from './dtos/user.dto';
 import { plainToClass } from 'class-transformer';
-import { UtilsService } from 'src/shared/utils';
+import { UtilsService } from '../shared/utils';
 import { UserRole } from './entities/user-role.entity';
-import { Role } from 'src/roles/entities/role.entity';
+import { Role } from '../roles/entities/role.entity';
 
 
 @Injectable()

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBookCommand } from 'src/books/commands/create-book.command';
-import { BooksService } from 'src/books/books.service';
-import { AuthorsService } from 'src/authors/authors.service';
-import { UsersService } from 'src/users/users.service';
-import { RolesService } from 'src/roles/roles.service';
+import { CreateBookCommand } from '../books/commands/create-book.command';
+import { BooksService } from '../books/books.service';
+import { AuthorsService } from '../authors/authors.service';
+import { UsersService } from '../users/users.service';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class DataSeedService {

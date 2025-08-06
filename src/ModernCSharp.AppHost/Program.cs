@@ -1,9 +1,7 @@
 ﻿var builder = DistributedApplication.CreateBuilder(args);
 
-#pragma warning disable ASPIREPROXYENDPOINTS001
 var redis = builder.AddRedis("redis", port: 6379)
                    .WithLifetime(ContainerLifetime.Persistent)
-                   .WithEndpointProxySupport(false)
                    .WithRedisInsight(config =>
                    {
                        config.WithHostPort(6378);
@@ -15,13 +13,11 @@ var redis = builder.AddRedis("redis", port: 6379)
 
 var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
                       .WithLifetime(ContainerLifetime.Persistent)
-                      .WithEndpointProxySupport(false)
                       .WithManagementPlugin(port: 15672)
                       .WithDataVolume()
                       .WithContainerName("eventbus");
 
 var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
-                       .WithEndpointProxySupport(false)
                        .WithLifetime(ContainerLifetime.Persistent)
                        .WithDataVolume()
                        .WithContainerName("sql-server");
@@ -31,7 +27,7 @@ var identityDb = sqlServer.AddDatabase("identitydb");
 var orderDb = sqlServer.AddDatabase("orderingdb");
 var catalogDb = sqlServer.AddDatabase("catalogdb");
 
-var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
+//var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
 var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", "https")
     .WithExternalHttpEndpoints()
@@ -63,7 +59,7 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
 var nestjsApp = builder.AddPnpmApp("nestjs-app", @"..\ClientApp\nestjs-demo", "start")
-    .WithHttpEndpoint(targetPort: 3000, env: "HTTP_PORT")
+    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 
@@ -71,23 +67,26 @@ nestjsApp.WithUrl($"{nestjsApp.GetEndpoint("http")}/docs", "NestJs App Swagger D
 
 var viteVueApp = builder.AddViteApp("vite-vue-app", @"..\ClientApp\vite-vue-app", "pnpm")
     .WithPnpmPackageInstallation()
-    .WithExternalHttpEndpoints()
-    .WithReference(orderingApi);
+    .WithReference(orderingApi)
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints();
 
 var viteReactApp = builder.AddViteApp("vite-react-app", @"..\ClientApp\vite-react-app", "pnpm")
     .WithPnpmPackageInstallation()
+    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", "start")
-    .WithHttpEndpoint(targetPort: 4200, env: "HTTP_PORT")
+    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
-var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\ClientApp\fastapi-demo", "main.py")
-    .WithHttpEndpoint(targetPort: 8000, env: "HTTP_PORT")
+var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\ClientApp\fastapi-demo", "./.venv/Scripts/uvicorn.exe", ["main:app"])
+    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
+    .WithOtlpExporter()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 #pragma warning restore ASPIREHOSTINGPYTHON001
 

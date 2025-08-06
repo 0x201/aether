@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import './tracing';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],

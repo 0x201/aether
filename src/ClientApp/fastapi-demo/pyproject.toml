@@ -5,23 +5,20 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "alembic>=1.16.2",
-    "bcrypt>=4.3.0",
-    "beautifulsoup4>=4.13.4",
-    "black>=25.1.0",
-    "fastapi>=0.115.14",
-    "mysql-connector-python>=9.3.0",
-    "playwright>=1.53.0",
-    "PyJWT>=2.10.1",
-    "pymssql>=2.3.6",
-    "python-multipart>=0.0.20",
-    "pytest>=8.4.1",
-    "PyYAML>=6.0.2",
-    "requests>=2.32.4",
-    "sqlmodel>=0.0.24",
-    "uvicorn>=0.35.0",
+    "alembic",
+    "bcrypt",
+    "beautifulsoup4",
+    "black",
+    "fastapi",
+    "playwright",
+    "PyJWT",
+    "pymssql",
+    "pytest",
+    "PyYAML",
+    "requests",
+    "uvicorn,
 ]
-#[[tool.uv.index]]
-##url = "https://mirrors.aliyun.com/pypi/simple/"
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
 #url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-#default = true
+default = true

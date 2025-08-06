@@ -8,8 +8,8 @@ import {
   Request,
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
-import { SignInUserCommand } from 'src/users/commands/login-user.command';
-import { SignUpUserCommand } from 'src/users/commands/signup-user.command';
+import { SignInUserCommand } from '../users/commands/login-user.command';
+import { SignUpUserCommand } from '../users/commands/signup-user.command';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AllowAnonymous } from './auth.guard';

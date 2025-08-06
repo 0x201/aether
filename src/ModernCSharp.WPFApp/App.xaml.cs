@@ -44,6 +44,9 @@ public partial class App : System.Windows.Application
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         var builder = Host.CreateApplicationBuilder(e.Args);
+
+        builder.AddServiceDefaults();
+
         builder.AddApplicationServices();
 
         ConfigureServices(builder);
