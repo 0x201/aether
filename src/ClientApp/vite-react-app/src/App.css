@@ -1,42 +1,713 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  height: 100vh;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+    'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-weight: 500;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.app-main {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Workflow Editor Styles */
+.workflow-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e1e5e9;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar button {
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #dae0e5;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toolbar button.primary {
+  background-color: #2575fc;
+  color: white;
+  border-color: #2575fc;
+}
+
+.toolbar button.primary:hover:not(:disabled) {
+  background-color: #1c68f0;
+  border-color: #1c68f0;
+  box-shadow: 0 2px 6px rgba(37, 117, 252, 0.3);
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 0.25rem;
+}
+
+.zoom-controls button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid #e1e5e9;
+}
+
+.zoom-controls span {
+  min-width: 50px;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.workflow-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  cursor: grab;
+}
+
+.workflow-canvas:active {
+  cursor: grabbing;
+}
+
+.background-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(#e9ecef 1px, transparent 1px),
+    linear-gradient(90deg, #e9ecef 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+.connections-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.nodes-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+
+/* Workflow Node Styles */
+.workflow-node {
+  position: absolute;
+  min-width: 160px;
+  min-height: 70px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: all;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  padding: 1rem;
+  box-sizing: border-box;
+  border: 2px solid #e9ecef;
+  font-weight: 500;
+  color: #333;
+  will-change: transform;
+  transform: translate(0, 0);
+}
+
+.workflow-node:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translate(0, -2px);
+  border-color: #dee2e6;
+}
+
+.workflow-node.selected {
+  box-shadow: 0 0 0 2px #2575fc, 0 4px 12px rgba(37, 117, 252, 0.25);
+  border-color: #2575fc;
+  transform: translate(0, -2px);
+}
+
+.workflow-node.connecting {
+  box-shadow: 0 0 0 2px #28a745, 0 4px 12px rgba(40, 167, 69, 0.25);
+  border-color: #28a745;
+}
+
+/* 基于Airflow风格的节点类型样式 */
+.workflow-node.node-type-start {
+  background-color: #e8f5e9;
+  border-color: #4caf50;
+  color: #2e7d32;
+}
+
+.workflow-node.node-type-end {
+  background-color: #ffebee;
+  border-color: #f44336;
+  color: #c62828;
+}
+
+.workflow-node.node-type-bash {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+  color: #1565c0;
+}
+
+.workflow-node.node-type-python {
+  background-color: #fff3e0;
+  border-color: #ff9800;
+  color: #ef6c00;
+}
+
+.workflow-node.node-type-email {
+  background-color: #f3e5f5;
+  border-color: #9c27b0;
+  color: #6a1b9a;
+}
+
+.workflow-node.node-type-http {
+  background-color: #e0f7fa;
+  border-color: #00bcd4;
+  color: #00838f;
+}
+
+.workflow-node.node-type-sql {
+  background-color: #fbe9e7;
+  border-color: #ff5722;
+  color: #d84315;
+}
+
+.workflow-node.node-type-branch {
+  background-color: #fffde7;
+  border-color: #ffeb3b;
+  color: #333;
+}
+
+.workflow-node.node-type-subdag {
+  background-color: #efebe9;
+  border-color: #795548;
+  color: #4e342e;
+}
+
+.workflow-node.node-type-sensor {
+  background-color: #e0f2f1;
+  border-color: #009688;
+  color: #00695c;
+}
+
+.workflow-node.node-type-dummy {
+  background-color: #f5f5f5;
+  border-color: #9e9e9e;
+  color: #616161;
+}
+
+.workflow-node.node-type-custom {
+  background-color: #eceff1;
+  border-color: #607d8b;
+  color: #37474f;
+}
+
+/* 节点状态样式 */
+.workflow-node.status-running {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+.workflow-node.status-success {
+  box-shadow: 0 0 0 2px #4caf50, 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.workflow-node.status-failed {
+  box-shadow: 0 0 0 2px #f44336, 0 0 10px rgba(244, 67, 54, 0.3);
+}
+
+.workflow-node.status-skipped {
+  box-shadow: 0 0 0 2px #ff9800, 0 0 10px rgba(255, 152, 0, 0.3);
+}
+
+.workflow-node.status-upstream_failed {
+  box-shadow: 0 0 0 2px #9c27b0, 0 0 10px rgba(156, 39, 176, 0.3);
+}
+
+.workflow-node.status-retry {
+  box-shadow: 0 0 0 2px #ffeb3b, 0 0 10px rgba(255, 235, 59, 0.3);
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  overflow: hidden;
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.node-operator-icon {
+  font-size: 1.1rem;
+  margin-right: 0.5rem;
+  min-width: 24px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.node-title {
+  flex: 1;
+  min-width: 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.node-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.node-type-label {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.node-status {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  margin-top: auto;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.25rem;
+}
+
+.status-indicator.status-success {
+  background-color: #4caf50;
+}
+
+.status-indicator.status-failed {
+  background-color: #f44336;
+}
+
+.status-indicator.status-running {
+  background-color: #2196f3;
+}
+
+.status-indicator.status-skipped {
+  background-color: #ff9800;
+}
+
+.status-indicator.status-upstream_failed {
+  background-color: #9c27b0;
+}
+
+.status-indicator.status-retry {
+  background-color: #ffeb3b;
+}
+
+.node-duration {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+/* Handles */
+.handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: #ffffff;
+  border: 2px solid #6c757d;
+  border-radius: 50%;
+  pointer-events: all;
+  cursor: crosshair;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.handle:hover {
+  transform: scale(1.2);
+  background-color: #2575fc;
+  border-color: #2575fc;
+}
+
+.handle-input {
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.handle-output {
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.handle-output.top {
+  right: 50%;
+  top: -7px;
+  transform: translateX(50%);
+}
+
+.handle-output.bottom {
+  right: 50%;
+  bottom: -7px;
+  top: auto;
+  transform: translateX(50%);
+}
+
+/* Delete Button */
+.delete-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #f44336;
+  color: white;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  pointer-events: all;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.workflow-node:hover .delete-button,
+.delete-button:hover {
+  opacity: 1;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+  transform: scale(1.1);
+}
+
+/* Connection Styles */
+.connection-line {
+  stroke: #6c757d;
+  stroke-width: 2;
+  fill: none;
+  marker-end: url(#arrowhead);
+}
+
+.connection-line.active {
+  stroke: #2575fc;
+  stroke-width: 3;
+}
+
+/* Node Editor Styles */
+.node-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.node-editor {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.node-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.node-editor-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  color: #333;
+  background-color: #e9ecef;
+}
+
+.node-editor-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2575fc;
+  box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.15);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.node-editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+}
+
+.save-button,
+.cancel-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #e1e5e9;
+}
+
+.cancel-button:hover {
+  background-color: #e9ecef;
+  border-color: #dae0e5;
+}
+
+.save-button {
+  background-color: #2575fc;
+  color: white;
+  border: 1px solid #2575fc;
+}
+
+.save-button:hover {
+  background-color: #1c68f0;
+  border-color: #1c68f0;
+  box-shadow: 0 2px 6px rgba(37, 117, 252, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .toolbar button {
+    width: 100%;
+    text-align: left;
+    justify-content: flex-start;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  .zoom-controls {
+    margin-left: 0;
+    margin-top: 1rem;
+    justify-content: center;
+    padding: 0.5rem;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  
+  .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  
+  .node-editor {
+    width: 95%;
+    max-width: 95%;
+    max-height: 95vh;
+  }
+  
+  .app-header {
+    padding: 0 1rem;
+    height: 50px;
+  }
+  
+  .app-header h1 {
+    font-size: 1.25rem;
+  }
 }
