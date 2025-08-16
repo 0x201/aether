@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Airflow风格的节点数据结构
 interface AirflowTaskData {
@@ -64,6 +64,7 @@ interface WorkflowNodeProps {
   onDragStart: (nodeId: string, x: number, y: number) => void;
   onEdit: () => void;
   connecting: boolean;
+  isDragging?: boolean;
 }
 
 const WorkflowNode: React.FC<WorkflowNodeProps> = ({
@@ -75,12 +76,14 @@ const WorkflowNode: React.FC<WorkflowNodeProps> = ({
   onCompleteConnection,
   onDragStart,
   onEdit,
-  connecting
+  connecting,
+  isDragging = false
 }) => {
   const getNodeClass = () => {
     let baseClass = 'workflow-node';
     if (isSelected) baseClass += ' selected';
     if (connecting) baseClass += ' connecting';
+    if (isDragging) baseClass += ' dragging';
     
     // 基于Airflow风格的类型类
     baseClass += ` node-type-${node.type}`;

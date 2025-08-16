@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import WorkflowNode from './WorkflowNode';
 import WorkflowConnection from './WorkflowConnection';
 import NodeEditor from './NodeEditor';
@@ -89,9 +89,11 @@ const WorkflowEditor: React.FC = () => {
   
   const [connections, setConnections] = useState<Connection[]>([]);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [selectedConnection, setSelectedConnection] = useState<string | null>(null);
   const [editingNode, setEditingNode] = useState<string | null>(null);
   const [connecting, setConnecting] = useState<{ nodeId: string; handleType: 'source' | 'target'; handleId?: string } | null>(null);
   const [dragging, setDragging] = useState<{ nodeId: string; offset: { x: number; y: number } } | null>(null);
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
   const [panning, setPanning] = useState<{ isPanning: boolean; offset: { x: number; y: number } }>({ isPanning: false, offset: { x: 0, y: 0 } });
   const [viewport, setViewport] = useState({ x: 0, y: 0, zoom: 1 });
   const [executing, setExecuting] = useState(false);
@@ -107,84 +109,76 @@ const WorkflowEditor: React.FC = () => {
     );
   };
 
+  // 根据ID获取节点
+  const getNodeById = useCallback((id: string) => {
+    return nodes.find(node => node.id === id);
+  }, [nodes]);
+
+  // 添加新节点
   const addNode = (type: AirflowTask['type'], x: number, y: number) => {
     const newNode: AirflowTask = {
       id: Date.now().toString(),
       type,
       position: { x, y },
-      data: { 
-        label: `${type} task`,
-        operatorType: type
+      data: {
+        label: `${type.charAt(0).toUpperCase() + type.slice(1)} Task`,
+        operatorType: type === 'start' || type === 'end' ? type : 'DummyOperator'
       }
     };
-    
-    // 根据节点类型设置默认标签
-    switch (type) {
-      case 'start':
-        newNode.data.label = 'Start';
-        break;
-      case 'end':
-        newNode.data.label = 'End';
-        break;
-      case 'bash':
-        newNode.data.label = 'Bash Task';
-        break;
-      case 'python':
-        newNode.data.label = 'Python Task';
-        break;
-      case 'email':
-        newNode.data.label = 'Email Task';
-        break;
-      case 'http':
-        newNode.data.label = 'HTTP Task';
-        break;
-      case 'sql':
-        newNode.data.label = 'SQL Task';
-        break;
-      case 'branch':
-        newNode.data.label = 'Branch Task';
-        break;
-      case 'subdag':
-        newNode.data.label = 'SubDAG Task';
-        break;
-      case 'sensor':
-        newNode.data.label = 'Sensor Task';
-        break;
-      case 'dummy':
-        newNode.data.label = 'Dummy Task';
-        break;
-      case 'custom':
-        newNode.data.label = 'Custom Task';
-        break;
-    }
     
     setNodes([...nodes, newNode]);
   };
 
-  const updateNode = (nodeId: string, updatedData: Partial<AirflowTask>) => {
-    setNodes(nodes.map(node => {
-      if (node.id === nodeId) {
-        return { ...node, ...updatedData };
-      }
-      return node;
-    }));
-  };
-
+  // 删除节点
   const deleteNode = (nodeId: string) => {
-    // Remove the node
+    // 删除节点
     setNodes(nodes.filter(node => node.id !== nodeId));
-    // Remove connections to/from this node
+    
+    // 删除相关的连接
     setConnections(connections.filter(
       conn => conn.sourceNodeId !== nodeId && conn.targetNodeId !== nodeId
     ));
+    
+    // 清除选择
     if (selectedNode === nodeId) {
       setSelectedNode(null);
     }
+    
+    // 清除编辑状态
     if (editingNode === nodeId) {
       setEditingNode(null);
     }
   };
 
+  // 删除连接
+  const deleteConnection = (connectionId: string) => {
+    setConnections(connections.filter(conn => conn.id !== connectionId));
+    
+    // 清除选择
+    if (selectedConnection === connectionId) {
+      setSelectedConnection(null);
+    }
+  };
+
+  // 编辑节点
+  const handleEditNode = (nodeId: string) => {
+    setEditingNode(nodeId);
+  };
+
+  // 保存节点编辑
+  const handleSaveNode = (nodeId: string, updatedData: AirflowTaskData) => {
+    setNodes(nodes.map(node => 
+      node.id === nodeId ? { ...node, data: updatedData } : node
+    ));
+    setEditingNode(null);
+  };
+
+  // 取消编辑
+  const handleCancelEdit = () => {
+    setEditingNode(null);
+  };
+
+  // 连接相关函数
   const startConnection = (nodeId: string, handleType: 'source' | 'target', handleId?: string) => {
     setConnecting({ nodeId, handleType, handleId });
   };
@@ -233,6 +227,7 @@ const WorkflowEditor: React.FC = () => {
         y: y - (node.position.y * viewport.zoom + viewport.y)
       }
     });
+    setDraggingNodeId(nodeId);
   };
 
   const onDrag = (x: number, y: number) => {
@@ -254,6 +249,7 @@ const WorkflowEditor: React.FC = () => {
 
   const endDrag = () => {
     setDragging(null);
+    setDraggingNodeId(null);
   };
 
   // Panning functions
@@ -388,7 +384,17 @@ const WorkflowEditor: React.FC = () => {
         nodeId: node.id,
         nodeLabel: node.data.label,
         nodeType: node.type,
-        result: `Executed Python function from ${node.data.label}`,
+        result: `Executed Python script from ${node.data.label}`,
+        timestamp: new Date().toISOString()
+      };
+      updateNodeStatus(nodeId, 'success');
+    } else if (node.type === 'email') {
+      outputData = {
+        ...(inputData as object || {}),
+        nodeId: node.id,
+        nodeLabel: node.data.label,
+        nodeType: node.type,
+        result: `Sent email from ${node.data.label}`,
         timestamp: new Date().toISOString()
       };
       updateNodeStatus(nodeId, 'success');
@@ -412,13 +418,33 @@ const WorkflowEditor: React.FC = () => {
         timestamp: new Date().toISOString()
       };
       updateNodeStatus(nodeId, 'success');
-    } else if (node.type === 'email') {
+    } else if (node.type === 'branch') {
       outputData = {
         ...(inputData as object || {}),
         nodeId: node.id,
         nodeLabel: node.data.label,
         nodeType: node.type,
-        result: `Sent email from ${node.data.label}`,
+        result: `Evaluated branch condition from ${node.data.label}`,
+        timestamp: new Date().toISOString()
+      };
+      updateNodeStatus(nodeId, 'success');
+    } else if (node.type === 'subdag') {
+      outputData = {
+        ...(inputData as object || {}),
+        nodeId: node.id,
+        nodeLabel: node.data.label,
+        nodeType: node.type,
+        result: `Executed SubDAG from ${node.data.label}`,
+        timestamp: new Date().toISOString()
+      };
+      updateNodeStatus(nodeId, 'success');
+    } else if (node.type === 'sensor') {
+      outputData = {
+        ...(inputData as object || {}),
+        nodeId: node.id,
+        nodeLabel: node.data.label,
+        nodeType: node.type,
+        result: `Sensor check from ${node.data.label}`,
         timestamp: new Date().toISOString()
       };
       updateNodeStatus(nodeId, 'success');
@@ -428,106 +454,62 @@ const WorkflowEditor: React.FC = () => {
         nodeId: node.id,
         nodeLabel: node.data.label,
         nodeType: node.type,
-        result: `Executed dummy task from ${node.data.label}`,
+        result: `Dummy task executed from ${node.data.label}`,
         timestamp: new Date().toISOString()
       };
       updateNodeStatus(nodeId, 'success');
-    } else if (node.type !== 'branch') {
-      // For other node types (except branch nodes), pass through or add node info
+    } else {
+      // Default case for custom or other node types
       outputData = {
         ...(inputData as object || {}),
         nodeId: node.id,
         nodeLabel: node.data.label,
         nodeType: node.type,
+        result: `Executed task from ${node.data.label}`,
         timestamp: new Date().toISOString()
       };
       updateNodeStatus(nodeId, 'success');
     }
     
-    // Special handling for branch nodes
-    let outgoingConnections = connections.filter(conn => conn.sourceNodeId === nodeId);
+    // Find all downstream connections
+    const downstreamConnections = connections.filter(conn => conn.sourceNodeId === nodeId);
     
-    if (node.type === 'branch') {
-      // For branch nodes, make a decision based on input data
-      let branchResult = false;
-      
-      try {
-        // Simple condition evaluation
-        if (inputData && typeof inputData === 'object') {
-          // Check if inputData has a "value" property
-          if ('value' in (inputData as object)) {
-            const value = (inputData as { value: unknown }).value;
-            branchResult = typeof value === 'number' ? value > 5 : !!value;
-          } else {
-            // Default to true for non-empty objects
-            branchResult = true;
-          }
-        } else {
-          // For simple values, use truthiness
-          branchResult = !!inputData;
-        }
-      } catch (e) {
-        console.warn('Error evaluating branch condition:', e);
-        // Default to false if there's an error
-        branchResult = false;
-      }
-      
-      console.log(`Branch node ${nodeId} evaluated condition as:`, branchResult);
-      
-      // Filter connections based on branch result
-      if (branchResult) {
-        // Take the "true" path (top connection)
-        outgoingConnections = outgoingConnections.filter(conn => conn.sourceHandle === 'true');
-      } else {
-        // Take the "false" path (bottom connection)
-        outgoingConnections = outgoingConnections.filter(conn => conn.sourceHandle === 'false');
-      }
-      
-      // Add branch result to output data
-      outputData = {
-        ...(inputData as object || {}),
-        nodeId: node.id,
-        nodeLabel: node.data.label,
-        nodeType: node.type,
-        branchResult: branchResult,
-        timestamp: new Date().toISOString()
-      };
-      
-      updateNodeStatus(nodeId, 'success');
+    // Execute all downstream nodes
+    for (const conn of downstreamConnections) {
+      await executeNode(conn.targetNodeId, new Set(visitedNodes), outputData);
     }
     
-    // Execute connected nodes and pass the output data
-    let result: unknown = outputData;
-    for (const connection of outgoingConnections) {
-      console.log(`Following connection from ${nodeId} to ${connection.targetNodeId}`);
-      result = await executeNode(connection.targetNodeId, visitedNodes, outputData);
-    }
-    
-    return result; // Return the final result
+    return outputData;
   };
 
-  const getNodeById = (id: string) => nodes.find(node => node.id === id);
-
-  const handleEditNode = (nodeId: string) => {
-    setEditingNode(nodeId);
-  };
-
-  const handleSaveNode = (nodeId: string, updatedData: AirflowTaskData) => {
-    updateNode(nodeId, { data: updatedData });
-    setEditingNode(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingNode(null);
-  };
-
-  // Handle mouse events on canvas
+  // Handle mouse down on canvas
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 1 || (e.button === 0 && e.ctrlKey)) { // Middle mouse or Ctrl+Left click for panning
+    // Only handle if clicking on the canvas itself, not on a node or connection
+    if (e.target === e.currentTarget) {
+      // Deselect any selected node or connection
+      if (selectedNode) {
+        setSelectedNode(null);
+      }
+      
+      if (selectedConnection) {
+        setSelectedConnection(null);
+      }
+      
+      // Start panning
       startPanning(e.clientX, e.clientY);
-    } else if (e.button === 0) { // Left click
-      setSelectedNode(null);
     }
+  };
+
+  // Handle mouse up on canvas
+  const handleCanvasMouseUp = () => {
+    endDrag();
+    endPanning();
+  };
+
+  // Handle mouse move on canvas
+  const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    onDrag(e.clientX, e.clientY);
+    onPanning(e.clientX, e.clientY);
   };
 
   // Handle mouse wheel for zooming
@@ -540,8 +522,12 @@ const WorkflowEditor: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Delete selected node with Delete key
-      if (e.key === 'Delete' && selectedNode) {
-        deleteNode(selectedNode);
+      if (e.key === 'Delete') {
+        if (selectedNode) {
+          deleteNode(selectedNode);
+        } else if (selectedConnection) {
+          deleteConnection(selectedConnection);
+        }
       }
     };
 
@@ -549,7 +535,7 @@ const WorkflowEditor: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedNode]);
+  }, [selectedNode, selectedConnection]);
 
   return (
     <div className="workflow-editor">
@@ -588,14 +574,8 @@ const WorkflowEditor: React.FC = () => {
       <div 
         className="workflow-canvas" 
         ref={canvasRef}
-        onMouseUp={() => {
-          endDrag();
-          endPanning();
-        }}
-        onMouseMove={(e) => {
-          onDrag(e.clientX, e.clientY);
-          onPanning(e.clientX, e.clientY);
-        }}
+        onMouseUp={handleCanvasMouseUp}
+        onMouseMove={handleCanvasMouseMove}
         onMouseDown={handleCanvasMouseDown}
         onWheel={handleWheel}
         >
@@ -627,6 +607,16 @@ const WorkflowEditor: React.FC = () => {
             >
               <polygon points="0 0, 10 3.5, 0 7" fill="#6c757d" />
             </marker>
+            <marker
+              id="arrowhead-selected"
+              markerWidth="10"
+              markerHeight="7"
+              refX="9"
+              refY="3.5"
+              orient="auto"
+            >
+              <polygon points="0 0, 10 3.5, 0 7" fill="#2575fc" />
+            </marker>
           </defs>
           {connections.map(conn => {
             const sourceNode = getNodeById(conn.sourceNodeId);
@@ -639,6 +629,13 @@ const WorkflowEditor: React.FC = () => {
                 connection={conn}
                 sourceNode={sourceNode}
                 targetNode={targetNode}
+                isDragging={draggingNodeId === conn.sourceNodeId || draggingNodeId === conn.targetNodeId}
+                isSelected={selectedConnection === conn.id}
+                onSelect={() => {
+                  setSelectedNode(null);
+                  setSelectedConnection(conn.id);
+                }}
+                onDelete={() => deleteConnection(conn.id)}
               />
             );
           })}
@@ -650,13 +647,17 @@ const WorkflowEditor: React.FC = () => {
               key={node.id}
               node={node}
               isSelected={selectedNode === node.id}
-              onSelect={() => setSelectedNode(node.id)}
+              onSelect={() => {
+                setSelectedConnection(null);
+                setSelectedNode(node.id);
+              }}
               onDelete={() => deleteNode(node.id)}
               onStartConnection={startConnection}
               onCompleteConnection={completeConnection}
               onDragStart={startDrag}
               onEdit={() => handleEditNode(node.id)}
               connecting={!!connecting}
+              isDragging={draggingNodeId === node.id}
             />
           ))}
         </div>
