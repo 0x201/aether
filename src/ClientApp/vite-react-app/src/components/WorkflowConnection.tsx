@@ -36,9 +36,9 @@ const WorkflowConnection: React.FC<WorkflowConnectionProps> = ({
 }) => {
   // Calculate positions for the connection line
   const sourceX = sourceNode.position.x + 120; // Node width
-  const sourceY = sourceNode.position.y + 30;  // Half node height
+  const sourceY = sourceNode.position.y + 35;  // Half node height
   const targetX = targetNode.position.x;
-  const targetY = targetNode.position.y + 30;  // Half node height
+  const targetY = targetNode.position.y + 35;  // Half node height
 
   // Calculate the path for the connection line
   const calculatePath = useMemo(() => {
@@ -72,7 +72,7 @@ const WorkflowConnection: React.FC<WorkflowConnectionProps> = ({
         className={isDragging ? 'connection-line-dragging' : 'connection-line'}
       />
       {isSelected && (
-        <g>
+        <g className="connection-delete-button">
           {/* Delete button in the middle of the connection */}
           <circle
             cx={(sourceX + targetX) / 2}

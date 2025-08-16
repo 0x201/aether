@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 
 // Airflow风格的节点数据结构
 interface AirflowTaskData {
@@ -58,12 +58,13 @@ interface WorkflowNodeProps {
   node: AirflowTask;
   isSelected: boolean;
   onSelect: () => void;
-  onDelete: () => void;
-  onStartConnection: (nodeId: string, handleType: 'source' | 'target') => void;
-  onCompleteConnection: (nodeId: string, handleType: 'source' | 'target') => void;
+  onDelete: (nodeId: string) => void;
+  onStartConnection: (nodeId: string, handleType: 'source' | 'target', handleId?: string) => void;
+  onCompleteConnection: (nodeId: string, handleType: 'source' | 'target', handleId?: string) => void;
   onDragStart: (nodeId: string, x: number, y: number) => void;
   onEdit: () => void;
   connecting: boolean;
+  onNodeStatusChange: (nodeId: string, status: AirflowTask['status']) => void;
   isDragging?: boolean;
 }
 
@@ -127,6 +128,12 @@ const WorkflowNode: React.FC<WorkflowNodeProps> = ({
           return '🔘';
         case 'custom':
           return '🔧';
+        case 'extract':
+          return '📤';
+        case 'validate':
+          return '✅';
+        case 'load':
+          return '📥';
         default:
           return '';
       }
@@ -155,11 +162,17 @@ const WorkflowNode: React.FC<WorkflowNodeProps> = ({
         case 'sensor':
           return 'Sensor';
         case 'dummy':
-          return 'Dummy';
+          return 'Task';
         case 'custom':
           return 'Custom';
+        case 'extract':
+          return 'Extract';
+        case 'validate':
+          return 'Validate';
+        case 'load':
+          return 'Load';
         default:
-          return node.data.label || node.type;
+          return node.type.charAt(0).toUpperCase() + node.type.slice(1);
       }
     };
 
@@ -246,7 +259,7 @@ const WorkflowNode: React.FC<WorkflowNodeProps> = ({
           className="delete-button" 
           onClick={(e) => {
             e.stopPropagation();
-            onDelete();
+            onDelete(node.id);
           }}
         >
           ×

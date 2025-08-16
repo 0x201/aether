@@ -1,9 +1,9 @@
-﻿<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>9.4.0</AspireVersion>
-    <AspnetVersion>9.0.7</AspnetVersion>
+    <AspnetVersion>9.0.8</AspnetVersion>
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>3.9.3</MSTestVersion>
     <FluentUIVersion>4.12.1</FluentUIVersion>

@@ -37,7 +37,7 @@ interface AirflowTaskData {
 
 interface AirflowTask {
   id: string;
-  type: 'start' | 'end' | 'bash' | 'python' | 'email' | 'http' | 'sql' | 'branch' | 'subdag' | 'sensor' | 'dummy' | 'custom';
+  type: 'start' | 'end' | 'bash' | 'python' | 'email' | 'http' | 'sql' | 'branch' | 'subdag' | 'sensor' | 'dummy' | 'custom' | 'extract' | 'validate' | 'load';
   position: { x: number; y: number };
   data: AirflowTaskData;
   status?: 'pending' | 'running' | 'success' | 'failed' | 'skipped' | 'upstream_failed' | 'retry' | 'no_status';
