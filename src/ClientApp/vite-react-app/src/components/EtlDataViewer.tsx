@@ -1,16 +1,199 @@
 import React, { useState, useEffect } from 'react';
 import workflowService from '../services/workflowService';
-import type { EtlDatabaseInfo, EtlTableInfo, EtlTableData } from '../services/workflowService';
+import type { EtlDatabaseInfo, EtlTableInfo, EtlTableData, EtlExecutionResult } from '../services/workflowService';
+import styled from 'styled-components';
+
+// Styled Components
+const EtlDataViewerContainer = styled.div`
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+`;
+
+const ViewerHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  padding: 10px 0;
+  z-index: 10;
+`;
+
+const ViewerControls = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+`;
+
+const ControlButton = styled.button<{ disabled?: boolean }>`
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.6 : 1};
+`;
+
+const IntervalSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const ErrorMessage = styled.div`
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+`;
+
+const ExecutionResult = styled.div<{ success: boolean }>`
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  background-color: ${props => props.success ? '#d4edda' : '#f8d7da'};
+  border: 1px solid ${props => props.success ? '#c3e6cb' : '#f5c6cb'};
+`;
+
+const ExecutionTitle = styled.h3`
+  margin-top: 0;
+  color: ${props => props.color === 'success' ? '#155724' : '#721c24'};
+`;
+
+const StepResult = styled.div`
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+`;
+
+const StepHeader = styled.h4`
+  margin-top: 0;
+`;
+
+const StepDetails = styled.div`
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+`;
+
+const DetailsTitle = styled.h5`
+  margin-top: 0;
+`;
+
+const DetailsList = styled.ul`
+  margin: 10px 0;
+  padding-left: 20px;
+`;
+
+const DetailItem = styled.li`
+  margin: 5px 0;
+`;
+
+const DataViewerContent = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 20px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const SelectorContainer = styled.div`
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 15px;
+`;
+
+const SelectorTitle = styled.h3`
+  margin-top: 0;
+`;
+
+const SelectorList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const SelectorItem = styled.li<{ selected?: boolean }>`
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #dee2e6;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: #e9ecef;
+  }
+  
+  ${props => props.selected && `
+    background-color: #007bff;
+    color: white;
+  `}
+`;
+
+const TableDataContainer = styled.div`
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 15px;
+`;
+
+const DataTableContainer = styled.div`
+  max-height: 400px;
+  overflow-y: auto;
+`;
+
+const DataTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+`;
+
+const TableHeader = styled.thead`
+  background-color: #e9ecef;
+`;
+
+const TableHeaderCell = styled.th`
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+  position: sticky;
+  top: 0;
+`;
+
+const TableBodyCell = styled.td`
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+`;
+
+const TableRow = styled.tr`
+  &:hover {
+    background-color: #f8f9fa;
+  }
+`;
 
 const EtlDataViewer: React.FC = () => {
   const [databases, setDatabases] = useState<EtlDatabaseInfo[]>([]);
   const [tables, setTables] = useState<EtlTableInfo[]>([]);
   const [tableData, setTableData] = useState<EtlTableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [executing, setExecuting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDatabase, setSelectedDatabase] = useState<string>('');
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [refreshInterval, setRefreshInterval] = useState<number>(5000); // 5 seconds
+  const [executionResult, setExecutionResult] = useState<EtlExecutionResult | null>(null);
 
   // 获取ETL数据库列表
   const fetchDatabases = async () => {
@@ -65,6 +248,31 @@ const EtlDataViewer: React.FC = () => {
     }
   };
 
+  // 执行ETL工作流
+  const executeEtlWorkflow = async () => {
+    try {
+      setExecuting(true);
+      setError(null);
+      
+      // 执行ETL工作流 (使用ID 4，这是我们的ETL工作流)
+      const result = await workflowService.executeEtlWorkflow('4');
+      setExecutionResult(result);
+      
+      // 显示执行结果
+      if (result.success) {
+        alert(`ETL workflow executed successfully! Processed ${result.stepResults.reduce((acc, step) => acc + step.rowsAffected, 0)} rows.`);
+      } else {
+        alert(`ETL workflow failed: ${result.message}`);
+      }
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to execute ETL workflow';
+      setError(errorMessage);
+      console.error('Error executing ETL workflow:', err);
+    } finally {
+      setExecuting(false);
+    }
+  };
+
   // 刷新所有数据
   const refreshData = async () => {
     setLoading(true);
@@ -107,81 +315,61 @@ const EtlDataViewer: React.FC = () => {
     }
   }, [selectedDatabase, selectedTable]);
 
-  // 手动刷新
-  const handleRefresh = () => {
-    refreshData();
-  };
-
   // 更改刷新间隔
   const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRefreshInterval(Number(e.target.value));
   };
 
-  // 获取表头
-  const getTableHeaders = (data: EtlTableData[]): string[] => {
-    if (!data || data.length === 0) return [];
-    
-    const headers = new Set<string>();
-    data.forEach(row => {
-      if (row && typeof row === 'object') {
-        Object.keys(row).forEach(key => headers.add(key));
-      }
-    });
-    
-    return Array.from(headers);
-  };
-
-  // 渲染表格数据
-  const renderTableData = (data: EtlTableData[]) => {
-    if (!data || data.length === 0) {
-      return (
-        <div className="no-data">
-          <p>No data available</p>
-        </div>
-      );
-    }
-
-    const headers = getTableHeaders(data);
+  // 渲染执行结果详情
+  const renderExecutionResult = () => {
+    if (!executionResult) return null;
 
     return (
-      <div className="table-container">
-        <table className="etl-table">
-          <thead>
-            <tr>
-              {headers.map(header => (
-                <th key={header}>{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index}>
-                {headers.map(header => (
-                  <td key={`${index}-${header}`}>
-                    {row && typeof row === 'object' && row.hasOwnProperty(header) 
-                      ? typeof row[header] === 'object' && row[header] !== null
-                        ? JSON.stringify(row[header]) 
-                        : String(row[header] ?? '')
-                      : ''}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ExecutionResult success={executionResult.success}>
+        <ExecutionTitle color={executionResult.success ? 'success' : 'failed'}>
+          ETL Execution Result
+        </ExecutionTitle>
+        <p><strong>Status:</strong> {executionResult.success ? 'Success' : 'Failed'}</p>
+        <p><strong>Message:</strong> {executionResult.message}</p>
+        <p><strong>Execution Time:</strong> {new Date(executionResult.endTime).getTime() - new Date(executionResult.startTime).getTime()} ms</p>
+        <details>
+          <summary>Step Details</summary>
+          {executionResult.stepResults.map((step, index) => (
+            <StepResult key={index}>
+              <StepHeader>{step.stepName} ({step.stepType})</StepHeader>
+              <p>Status: {step.success ? 'Success' : 'Failed'}</p>
+              <p>Message: {step.message}</p>
+              <p>Rows Affected: {step.rowsAffected}</p>
+              <p>Execution Time: {new Date(step.endTime).getTime() - new Date(step.startTime).getTime()} ms</p>
+              {step.details && (
+                <StepDetails>
+                  <DetailsTitle>Details:</DetailsTitle>
+                  <DetailsList>
+                    {Object.entries(step.details).map(([key, value]) => (
+                      <DetailItem key={key}><strong>{key}:</strong> {JSON.stringify(value)}</DetailItem>
+                    ))}
+                  </DetailsList>
+                </StepDetails>
+              )}
+            </StepResult>
+          ))}
+        </details>
+      </ExecutionResult>
     );
   };
 
   return (
-    <div className="etl-data-viewer">
-      <div className="viewer-header">
+    <EtlDataViewerContainer>
+      <ViewerHeader>
         <h2>ETL Data Viewer</h2>
-        <div className="viewer-controls">
-          <button onClick={handleRefresh} disabled={loading}>
+        <ViewerControls>
+          <ControlButton onClick={refreshData} disabled={loading}>
             {loading ? 'Refreshing...' : 'Refresh'}
-          </button>
-          <div className="interval-selector">
+          </ControlButton>
+          <ControlButton onClick={executeEtlWorkflow} disabled={executing}>
+            {executing ? 'Executing...' : 'Run ETL Workflow'}
+          </ControlButton>
+          <IntervalSelector>
             <label htmlFor="refresh-interval">Refresh interval: </label>
             <select 
               id="refresh-interval"
@@ -193,64 +381,94 @@ const EtlDataViewer: React.FC = () => {
               <option value={10000}>10 seconds</option>
               <option value={30000}>30 seconds</option>
             </select>
-          </div>
-        </div>
-      </div>
+          </IntervalSelector>
+        </ViewerControls>
+      </ViewerHeader>
 
       {error && (
-        <div className="error-message">
+        <ErrorMessage>
           Error: {error}
-        </div>
+        </ErrorMessage>
       )}
 
-      <div className="viewer-content">
-        <div className="database-selector">
-          <label htmlFor="database-select">Select database: </label>
-          <select 
-            id="database-select"
-            value={selectedDatabase} 
-            onChange={(e) => setSelectedDatabase(e.target.value)}
-          >
-            <option value="">-- Select Database --</option>
-            {databases.map(database => (
-              <option key={database.name} value={database.name}>
-                {database.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      {executionResult && renderExecutionResult()}
 
-        {selectedDatabase && (
-          <div className="table-selector">
-            <label htmlFor="table-select">Select table: </label>
-            <select 
-              id="table-select"
-              value={selectedTable} 
-              onChange={(e) => setSelectedTable(e.target.value)}
-              disabled={tables.length === 0}
-            >
-              <option value="">-- Select Table --</option>
-              {tables.map(table => (
-                <option key={table.name} value={table.name}>
-                  {table.name} ({tableData.length} rows)
-                </option>
+      <DataViewerContent>
+        <SelectorContainer>
+          <SelectorTitle>Databases</SelectorTitle>
+          {databases.length > 0 ? (
+            <SelectorList>
+              {databases.map((db, index) => (
+                <SelectorItem 
+                  key={`${db.name}-${index}`} 
+                  selected={selectedDatabase === db.name}
+                  onClick={() => setSelectedDatabase(db.name)}
+                >
+                  {db.name}
+                </SelectorItem>
               ))}
-            </select>
-          </div>
-        )}
+            </SelectorList>
+          ) : (
+            <p>No databases found.</p>
+          )}
+        </SelectorContainer>
 
-        {selectedDatabase && selectedTable && (
-          <div className="table-data">
-            <h3>{selectedDatabase}.{selectedTable}</h3>
-            {renderTableData(tableData)}
-          </div>
-        )}
+        <SelectorContainer>
+          <SelectorTitle>Tables</SelectorTitle>
+          {selectedDatabase ? (
+            tables.length > 0 ? (
+              <SelectorList>
+                {tables.map((table, index) => (
+                  <SelectorItem 
+                    key={`${table.name}-${index}`} 
+                    selected={selectedTable === table.name}
+                    onClick={() => setSelectedTable(table.name)}
+                  >
+                    {table.name}
+                  </SelectorItem>
+                ))}
+              </SelectorList>
+            ) : (
+              <p>No tables found in {selectedDatabase}.</p>
+            )
+          ) : (
+            <p>Please select a database first.</p>
+          )}
+        </SelectorContainer>
 
-        {!selectedDatabase && !loading && (
-          <p>Please select a database to view ETL data</p>
-        )}
-      </div>
-    </div>
+        <TableDataContainer>
+          <SelectorTitle>Table Data</SelectorTitle>
+          {selectedTable ? (
+            tableData.length > 0 ? (
+              <DataTableContainer>
+                <DataTable>
+                  <TableHeader>
+                    <tr>
+                      {Object.keys(tableData[0]).map(key => (
+                        <TableHeaderCell key={key}>{key}</TableHeaderCell>
+                      ))}
+                    </tr>
+                  </TableHeader>
+                  <tbody>
+                    {tableData.map((row, index) => (
+                      <TableRow key={index}>
+                        {Object.values(row).map((value, cellIndex) => (
+                          <TableBodyCell key={cellIndex}>{String(value)}</TableBodyCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </tbody>
+                </DataTable>
+              </DataTableContainer>
+            ) : (
+              <p>No data found in table {selectedTable}.</p>
+            )
+          ) : (
+            <p>Please select a table to view data.</p>
+          )}
+        </TableDataContainer>
+      </DataViewerContent>
+    </EtlDataViewerContainer>
   );
 };
 

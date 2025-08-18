@@ -1,7 +1,8 @@
-using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Workflow.API.Models;
 
+[Index(nameof(Name))]
 public class WorkflowModel
 {
     public string Id { get; set; } = string.Empty;

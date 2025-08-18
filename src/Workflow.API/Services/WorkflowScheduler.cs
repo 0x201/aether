@@ -1,4 +1,7 @@
 using Workflow.API.Models;
+using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Workflow.API.Services;
 
@@ -7,10 +10,11 @@ public class WorkflowScheduler : IWorkflowScheduler
     private readonly INodeExecutor _nodeExecutor;
     private readonly Dictionary<string, bool> _runningWorkflows = new();
     private readonly List<ExecutionLog> _executionLogs = new();
+    private readonly ConcurrentDictionary<string, TaskInstance> _taskInstances = new();
 
     public WorkflowScheduler(INodeExecutor nodeExecutor)
     {
-        _nodeExecutor = nodeExecutor ?? throw new ArgumentNullException(nameof(nodeExecutor));
+        _nodeExecutor = nodeExecutor;
     }
 
     public async Task<string> ScheduleWorkflowAsync(WorkflowModel workflow)
@@ -18,19 +22,8 @@ public class WorkflowScheduler : IWorkflowScheduler
         var workflowInstanceId = Guid.NewGuid().ToString();
         _runningWorkflows[workflowInstanceId] = true;
 
-        // 记录工作流开始执行的日志
-        await LogExecutionAsync(new ExecutionLog
-        {
-            Id = Guid.NewGuid().ToString(),
-            WorkflowId = workflow.Id,
-            WorkflowName = workflow.Name,
-            Status = "running",
-            Message = $"Workflow '{workflow.Name}' started",
-            Timestamp = DateTime.UtcNow
-        });
-
         // 在后台执行工作流
-        _ = Task.Run(async () => await ExecuteWorkflowAsync(workflow, workflowInstanceId));
+        _ = System.Threading.Tasks.Task.Run(async () => await ExecuteWorkflowAsync(workflow, workflowInstanceId));
 
         return workflowInstanceId;
     }
@@ -38,12 +31,12 @@ public class WorkflowScheduler : IWorkflowScheduler
     public Task<bool> CancelWorkflowAsync(string workflowInstanceId)
     {
         var result = _runningWorkflows.Remove(workflowInstanceId);
-        return Task.FromResult(result);
+        return System.Threading.Tasks.Task.FromResult(result);
     }
 
     public Task<IEnumerable<string>> GetRunningWorkflowsAsync()
     {
-        return Task.FromResult(_runningWorkflows.Keys.AsEnumerable());
+        return System.Threading.Tasks.Task.FromResult(_runningWorkflows.Keys.AsEnumerable());
     }
 
     public Task<IEnumerable<ExecutionLog>> GetExecutionLogsAsync()
@@ -54,7 +47,7 @@ public class WorkflowScheduler : IWorkflowScheduler
             .Take(100)
             .ToList();
             
-        return Task.FromResult(recentLogs.AsEnumerable());
+        return System.Threading.Tasks.Task.FromResult(recentLogs.AsEnumerable());
     }
 
     public Task<IEnumerable<ExecutionLog>> GetWorkflowExecutionLogsAsync(string workflowInstanceId)
@@ -64,16 +57,16 @@ public class WorkflowScheduler : IWorkflowScheduler
             .OrderByDescending(log => log.Timestamp)
             .ToList();
             
-        return Task.FromResult(workflowLogs.AsEnumerable());
+        return System.Threading.Tasks.Task.FromResult(workflowLogs.AsEnumerable());
     }
 
     public Task LogExecutionAsync(ExecutionLog log)
     {
         _executionLogs.Add(log);
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    private async Task ExecuteWorkflowAsync(WorkflowModel workflow, string workflowInstanceId)
+    private async System.Threading.Tasks.Task ExecuteWorkflowAsync(WorkflowModel workflow, string workflowInstanceId)
     {
         try
         {
@@ -137,7 +130,7 @@ public class WorkflowScheduler : IWorkflowScheduler
         }
     }
 
-    private async Task ExecuteNodeAndChildrenAsync(WorkflowNode node, WorkflowModel workflow, object? inputData, string workflowInstanceId)
+    private async System.Threading.Tasks.Task ExecuteNodeAndChildrenAsync(WorkflowNode node, WorkflowModel workflow, object? inputData, string workflowInstanceId)
     {
         // 检查工作流是否已被取消
         // 注意：在实际实现中，您可能需要更复杂的取消机制
@@ -191,45 +184,115 @@ public class WorkflowScheduler : IWorkflowScheduler
                 // 特殊处理决策节点
                 if ((node.Type == "decision" || node.Type == "branch") && outputData != null)
                 {
-                    // 根据决策结果选择路径
-                    bool decisionResult = GetDecisionResult(outputData);
-                    bool isTruePath = connection.SourceHandle == "true";
-                    
-                    Console.WriteLine($"Decision result: {decisionResult}, Connection path: {connection.SourceHandle}");
-                    
-                    if ((decisionResult && isTruePath) || (!decisionResult && !isTruePath))
+                    try
                     {
-                        Console.WriteLine($"Following path to node: {targetNode.Data.Label}");
-                        await ExecuteNodeAndChildrenAsync(targetNode, workflow, outputData, workflowInstanceId);
+                        string outputJson = System.Text.Json.JsonSerializer.Serialize(outputData);
+                        var doc = System.Text.Json.JsonDocument.Parse(outputJson);
+                        
+                        // 检查决策结果
+                        if (doc.RootElement.TryGetProperty("decisionResult", out var decisionElement))
+                        {
+                            bool shouldExecute = decisionElement.GetBoolean();
+                            if (!shouldExecute)
+                            {
+                                Console.WriteLine($"Skipping node {targetNode.Data.Label} based on decision result");
+                                continue;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // 如果解析失败，继续执行所有路径
                     }
                 }
-                else
-                {
-                    // 正常执行后续节点
-                    Console.WriteLine($"Following path to node: {targetNode.Data.Label}");
-                    await ExecuteNodeAndChildrenAsync(targetNode, workflow, outputData, workflowInstanceId);
-                }
+                
+                await ExecuteNodeAndChildrenAsync(targetNode, workflow, outputData, workflowInstanceId);
             }
         }
     }
 
-    private bool GetDecisionResult(object decisionOutput)
+    public async Task<string> ScheduleTaskAsync(WorkflowTask task, string workflowId)
+    {
+        var taskInstanceId = Guid.NewGuid().ToString();
+        
+        var taskInstance = new TaskInstance
+        {
+            TaskId = task.Id,
+            WorkflowId = workflowId,
+            WorkflowInstanceId = taskInstanceId,
+            State = TaskState.Queued,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        
+        _taskInstances[taskInstanceId] = taskInstance;
+        
+        // 在后台执行任务
+        _ = System.Threading.Tasks.Task.Run(async () => await ExecuteTaskAsync(task, taskInstance));
+        
+        return taskInstanceId;
+    }
+
+    private async System.Threading.Tasks.Task ExecuteTaskAsync(WorkflowTask task, TaskInstance taskInstance)
     {
         try
         {
-            var json = System.Text.Json.JsonSerializer.Serialize(decisionOutput);
-            var doc = System.Text.Json.JsonDocument.Parse(json);
+            // 更新任务状态为运行中
+            await UpdateTaskInstanceStateAsync(taskInstance.WorkflowInstanceId, TaskState.Running);
             
-            if (doc.RootElement.TryGetProperty("decisionResult", out var resultElement))
+            // 执行任务
+            var result = await _nodeExecutor.ExecuteNodeAsync(task.Type, null);
+            
+            // 更新任务状态为成功
+            var resultJson = System.Text.Json.JsonSerializer.Serialize(result);
+            await UpdateTaskInstanceStateAsync(taskInstance.WorkflowInstanceId, TaskState.Success, resultJson);
+        }
+        catch (Exception ex)
+        {
+            // 更新任务状态为失败
+            await UpdateTaskInstanceStateAsync(taskInstance.WorkflowInstanceId, TaskState.Failed, null, ex.Message);
+        }
+    }
+
+    public Task<bool> CancelTaskAsync(string taskInstanceId)
+    {
+        return System.Threading.Tasks.Task.FromResult(_taskInstances.TryRemove(taskInstanceId, out _));
+    }
+
+    public Task<TaskInstance?> GetTaskInstanceAsync(string taskId, string workflowInstanceId)
+    {
+        var taskInstance = _taskInstances.Values
+            .FirstOrDefault(ti => ti.TaskId == taskId && ti.WorkflowInstanceId == workflowInstanceId);
+        return System.Threading.Tasks.Task.FromResult(taskInstance);
+    }
+
+    public Task<IEnumerable<TaskInstance>> GetTaskInstancesAsync(string workflowInstanceId)
+    {
+        var taskInstances = _taskInstances.Values
+            .Where(ti => ti.WorkflowInstanceId == workflowInstanceId)
+            .ToList();
+        return System.Threading.Tasks.Task.FromResult(taskInstances.AsEnumerable());
+    }
+
+    public Task UpdateTaskInstanceStateAsync(string taskInstanceId, TaskState state, string? resultData = null, string? log = null)
+    {
+        if (_taskInstances.TryGetValue(taskInstanceId, out var taskInstance))
+        {
+            taskInstance.State = state;
+            taskInstance.ResultData = resultData;
+            taskInstance.Log = log;
+            taskInstance.UpdatedAt = DateTime.UtcNow;
+            
+            if (state == TaskState.Running)
             {
-                return resultElement.GetBoolean();
+                taskInstance.StartTime = DateTime.UtcNow;
+            }
+            else if (state is TaskState.Success or TaskState.Failed)
+            {
+                taskInstance.EndTime = DateTime.UtcNow;
             }
         }
-        catch
-        {
-            // 如果解析失败，默认为false
-        }
         
-        return false;
+        return Task.CompletedTask;
     }
 }

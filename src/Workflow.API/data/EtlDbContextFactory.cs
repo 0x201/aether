@@ -8,8 +8,7 @@ public class EtlDbContextFactory : IDesignTimeDbContextFactory<EtlDbContext>
     public EtlDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<EtlDbContext>();
-        var dbPath = Path.Combine(AppContext.BaseDirectory, "data", "etl_metadata.db");
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=WorkflowEtlDb;Trusted_Connection=true;MultipleActiveResultSets=true");
 
         return new EtlDbContext(optionsBuilder.Options);
     }

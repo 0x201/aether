@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using System.Text.Json;
 
 namespace Workflow.API.Services;
 
@@ -56,7 +58,7 @@ public class EtlExecutionException : Exception
 
 public class EtlService : IEtlService
 {
-    private readonly string _databaseRootPath;
+    private readonly string _connectionString;
     private readonly ILogger<EtlService> _logger;
     private readonly IDbContextFactory<EtlDbContext> _contextFactory;
 
@@ -64,28 +66,19 @@ public class EtlService : IEtlService
     {
         _logger = logger;
         _contextFactory = contextFactory;
-        _databaseRootPath = Path.Combine(AppContext.BaseDirectory, "data", "etl_databases");
-        
-        // 确保数据库根目录存在
-        if (!Directory.Exists(_databaseRootPath))
-        {
-            Directory.CreateDirectory(_databaseRootPath);
-        }
+        _connectionString = "Server=(localdb)\\mssqllocaldb;Trusted_Connection=true;MultipleActiveResultSets=true";
     }
 
-    private EtlDatabaseContext CreateDbContext(string databasePath)
+    private SqlConnection CreateConnection()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<EtlDatabaseContext>();
-        optionsBuilder.UseSqlite($"Data Source={databasePath}");
-        var context = new EtlDatabaseContext(optionsBuilder.Options);
-        return context;
+        return new SqlConnection(_connectionString);
     }
 
     public async Task<string> CreateDatabaseAsync(string databaseName)
     {
         var startTime = DateTime.UtcNow;
         _logger.LogInformation("Creating database {DatabaseName} at {StartTime}", databaseName, startTime);
-        
+
         try
         {
             // 验证数据库名称
@@ -94,38 +87,31 @@ public class EtlService : IEtlService
                 throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
             }
 
-            // 清理数据库名称，防止路径遍历攻击
+            // 清理数据库名称，防止SQL注入
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
+
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
 
             // 检查数据库是否已存在
-            if (File.Exists(databasePath))
+            var checkDbCommand = new SqlCommand(
+                "SELECT database_id FROM sys.databases WHERE name = @dbName", connection);
+            checkDbCommand.Parameters.AddWithValue("@dbName", safeDatabaseName);
+
+            var dbExists = await checkDbCommand.ExecuteScalarAsync() != null;
+            if (dbExists)
             {
-                _logger.LogWarning("Database {DatabaseName} already exists", databaseName);
-                return databasePath;
+                _logger.LogInformation("Database {DatabaseName} already exists", safeDatabaseName);
+                return safeDatabaseName;
             }
 
-            // Use EF Core to create the database and metadata table
-            using var context = CreateDbContext(databasePath);
-            await context.Database.EnsureCreatedAsync();
-            
-            // Create metadata table
-            var createMetaTableSql = @"
-                CREATE TABLE IF NOT EXISTS __etl_metadata (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    table_name TEXT NOT NULL,
-                    column_name TEXT NOT NULL,
-                    data_type TEXT NOT NULL,
-                    is_primary_key INTEGER NOT NULL,
-                    is_nullable INTEGER NOT NULL,
-                    default_value TEXT,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )";
-            
-            await context.Database.ExecuteSqlRawAsync(createMetaTableSql);
+            // 创建数据库
+            var createDbCommand = new SqlCommand(
+                $"CREATE DATABASE [{safeDatabaseName}]", connection);
+            await createDbCommand.ExecuteNonQueryAsync();
 
-            _logger.LogInformation("Database {DatabaseName} created successfully at {DatabasePath}", databaseName, databasePath);
-            return databasePath;
+            _logger.LogInformation("Database {DatabaseName} created successfully", safeDatabaseName);
+            return safeDatabaseName;
         }
         catch (Exception ex)
         {
@@ -138,32 +124,44 @@ public class EtlService : IEtlService
     {
         var startTime = DateTime.UtcNow;
         _logger.LogInformation("Dropping database {DatabaseName} at {StartTime}", databaseName, startTime);
-        
+
         try
         {
-            var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
-
-            if (!File.Exists(databasePath))
+            if (string.IsNullOrWhiteSpace(databaseName))
             {
-                _logger.LogWarning("Database {DatabaseName} does not exist", databaseName);
                 return false;
             }
 
-            // Close any connections to the database
-            using var context = CreateDbContext(databasePath);
-            await context.Database.CloseConnectionAsync();
-            
-            // 删除数据库文件
-            File.Delete(databasePath);
-            
-            _logger.LogInformation("Database {DatabaseName} dropped successfully", databaseName);
+            var safeDatabaseName = SanitizeDatabaseName(databaseName);
+
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            // 检查数据库是否存在
+            var checkDbCommand = new SqlCommand(
+                "SELECT database_id FROM sys.databases WHERE name = @dbName", connection);
+            checkDbCommand.Parameters.AddWithValue("@dbName", safeDatabaseName);
+
+            var dbExists = await checkDbCommand.ExecuteScalarAsync() != null;
+            if (!dbExists)
+            {
+                _logger.LogInformation("Database {DatabaseName} does not exist", safeDatabaseName);
+                return false;
+            }
+
+            // 设置数据库为单用户模式并删除
+            var dropDbCommand = new SqlCommand($@"
+                ALTER DATABASE [{safeDatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                DROP DATABASE [{safeDatabaseName}];", connection);
+            await dropDbCommand.ExecuteNonQueryAsync();
+
+            _logger.LogInformation("Database {DatabaseName} dropped successfully", safeDatabaseName);
             return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to drop database {DatabaseName}", databaseName);
-            throw new EtlExecutionException($"Failed to drop database {databaseName}: {ex.Message}", ex);
+            return false;
         }
     }
 
@@ -172,16 +170,21 @@ public class EtlService : IEtlService
         try
         {
             var databases = new List<string>();
-            var files = Directory.GetFiles(_databaseRootPath, "*.db");
 
-            foreach (var file in files)
+            using var connection = CreateConnection();
+            connection.Open();
+
+            var command = new SqlCommand(@"
+                SELECT name FROM sys.databases 
+                WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb')", connection);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                var fileName = Path.GetFileNameWithoutExtension(file);
-                databases.Add(fileName);
+                databases.Add(reader["name"].ToString() ?? string.Empty);
             }
 
-
-            return databases;
+            return databases.Where(d => !string.IsNullOrEmpty(d));
         }
         catch (Exception ex)
         {
@@ -192,73 +195,60 @@ public class EtlService : IEtlService
 
     public async Task<bool> CreateTableAsync(string databaseName, string tableName, IEnumerable<ColumnDefinition> columns)
     {
+        var startTime = DateTime.UtcNow;
+        _logger.LogInformation("Creating table {TableName} in database {DatabaseName} at {StartTime}",
+            tableName, databaseName, startTime);
+
         try
         {
-            if (string.IsNullOrWhiteSpace(databaseName))
-                throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
-            
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new ArgumentException("Table name cannot be null or empty", nameof(tableName));
-            
-            if (columns == null)
-                throw new ArgumentNullException(nameof(columns));
+            if (string.IsNullOrWhiteSpace(databaseName) || string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentException("Database name and table name cannot be null or empty");
+            }
 
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
+            var safeTableName = SanitizeTableName(tableName);
+            var columnList = columns.ToList();
 
-            if (!File.Exists(databasePath))
-                throw new EtlExecutionException($"Database {databaseName} does not exist");
+            if (!columnList.Any())
+            {
+                throw new ArgumentException("Table must have at least one column");
+            }
 
-            using var context = CreateDbContext(databasePath);
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            // 切换到指定数据库
+            var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
+            await useDbCommand.ExecuteNonQueryAsync();
+
+            // 检查表是否已存在
+            var checkTableCommand = new SqlCommand(
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @tableName", connection);
+            checkTableCommand.Parameters.AddWithValue("@tableName", safeTableName);
+
+            var tableExists = await checkTableCommand.ExecuteScalarAsync() != null;
+            if (tableExists)
+            {
+                _logger.LogInformation("Table {TableName} already exists in database {DatabaseName}",
+                    safeTableName, safeDatabaseName);
+                return false;
+            }
 
             // 构建CREATE TABLE语句
-            var columnDefinitions = columns.ToList();
-            if (!columnDefinitions.Any())
-            {
-                throw new EtlExecutionException("At least one column must be defined");
-            }
+            var columnDefinitions = columnList.Select(c =>
+                $"[{c.Name}] {MapToSqlType(c.DataType)}" +
+                (c.IsPrimaryKey ? " PRIMARY KEY" : "") +
+                (c.IsNullable ? "" : " NOT NULL") +
+                (c.DefaultValue != null ? $" DEFAULT {FormatDefaultValue(c.DefaultValue, c.DataType)}" : "")
+            );
 
-            var columnSqlParts = columnDefinitions.Select(column => {
-                var columnSql = $"[{column.Name}] {MapToSqliteType(column.DataType)}";
-                
-                if (column.IsPrimaryKey)
-                {
-                    columnSql += " PRIMARY KEY";
-                }
-                
-                if (!column.IsNullable)
-                {
-                    columnSql += " NOT NULL";
-                }
-                
-                if (column.DefaultValue != null)
-                {
-                    columnSql += $" DEFAULT ({FormatDefaultValue(column.DefaultValue)})";
-                }
-                
-                return columnSql;
-            });
+            var createTableSql = $"CREATE TABLE [{safeTableName}] ({string.Join(", ", columnDefinitions)})";
+            var createTableCommand = new SqlCommand(createTableSql, connection);
+            await createTableCommand.ExecuteNonQueryAsync();
 
-            var createTableSql = $"CREATE TABLE IF NOT EXISTS [{tableName}] ({string.Join(", ", columnSqlParts)})";
-            
-            await context.Database.ExecuteSqlRawAsync(createTableSql);
-
-            // 将表结构信息存储到元数据表中
-            foreach (var column in columnDefinitions)
-            {
-                var insertMetaSql = @"
-                    INSERT INTO __etl_metadata (table_name, column_name, data_type, is_primary_key, is_nullable, default_value)
-                    VALUES ({0}, {1}, {2}, {3}, {4}, {5})";
-                
-                await context.Database.ExecuteSqlRawAsync(insertMetaSql,
-                    tableName,
-                    column.Name,
-                    column.DataType,
-                    column.IsPrimaryKey ? 1 : 0,
-                    column.IsNullable ? 1 : 0,
-                    column.DefaultValue?.ToString() ?? (object)DBNull.Value);
-            }
-
+            _logger.LogInformation("Table {TableName} created successfully in database {DatabaseName}",
+                safeTableName, safeDatabaseName);
             return true;
         }
         catch (Exception ex)
@@ -270,36 +260,52 @@ public class EtlService : IEtlService
 
     public async Task<bool> DropTableAsync(string databaseName, string tableName)
     {
+        var startTime = DateTime.UtcNow;
+        _logger.LogInformation("Dropping table {TableName} from database {DatabaseName} at {StartTime}",
+            tableName, databaseName, startTime);
+
         try
         {
-            if (string.IsNullOrWhiteSpace(databaseName))
-                throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
-            
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new ArgumentException("Table name cannot be null or empty", nameof(tableName));
+            if (string.IsNullOrWhiteSpace(databaseName) || string.IsNullOrWhiteSpace(tableName))
+            {
+                return false;
+            }
 
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
+            var safeTableName = SanitizeTableName(tableName);
 
-            if (!File.Exists(databasePath))
-                throw new EtlExecutionException($"Database {databaseName} does not exist");
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
 
-            using var context = CreateDbContext(databasePath);
+            // 切换到指定数据库
+            var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
+            await useDbCommand.ExecuteNonQueryAsync();
+
+            // 检查表是否存在
+            var checkTableCommand = new SqlCommand(
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @tableName", connection);
+            checkTableCommand.Parameters.AddWithValue("@tableName", safeTableName);
+
+            var tableExists = await checkTableCommand.ExecuteScalarAsync() != null;
+            if (!tableExists)
+            {
+                _logger.LogInformation("Table {TableName} does not exist in database {DatabaseName}",
+                    safeTableName, safeDatabaseName);
+                return false;
+            }
 
             // 删除表
-            var dropTableSql = $"DROP TABLE IF EXISTS [{tableName}]";
-            await context.Database.ExecuteSqlRawAsync(dropTableSql);
+            var dropTableCommand = new SqlCommand($"DROP TABLE [{safeTableName}]", connection);
+            await dropTableCommand.ExecuteNonQueryAsync();
 
-            // 从元数据表中删除相关信息
-            var deleteMetaSql = "DELETE FROM __etl_metadata WHERE table_name = {0}";
-            await context.Database.ExecuteSqlRawAsync(deleteMetaSql, tableName);
-
+            _logger.LogInformation("Table {TableName} dropped successfully from database {DatabaseName}",
+                safeTableName, safeDatabaseName);
             return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to drop table {TableName} from database {DatabaseName}", tableName, databaseName);
-            throw new EtlExecutionException($"Failed to drop table {tableName} from database {databaseName}: {ex.Message}", ex);
+            return false;
         }
     }
 
@@ -308,30 +314,30 @@ public class EtlService : IEtlService
         try
         {
             if (string.IsNullOrWhiteSpace(databaseName))
+            {
                 throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
+            }
 
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
-
-            if (!File.Exists(databasePath))
-                throw new EtlExecutionException($"Database {databaseName} does not exist");
-
-            using var context = CreateDbContext(databasePath);
-
             var tables = new List<string>();
-            
-            var querySql = "SELECT name FROM sqlite_master WHERE type='table' AND name != '__etl_metadata'";
-            using var command = context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = querySql;
-            await context.Database.OpenConnectionAsync();
-            
+
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            // 切换到指定数据库
+            var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
+            await useDbCommand.ExecuteNonQueryAsync();
+
+            var command = new SqlCommand(
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'", connection);
+
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                tables.Add(reader.GetString(0));
+                tables.Add(reader["TABLE_NAME"].ToString() ?? string.Empty);
             }
 
-            return tables;
+            return tables.Where(t => !string.IsNullOrEmpty(t));
         }
         catch (Exception ex)
         {
@@ -342,79 +348,81 @@ public class EtlService : IEtlService
 
     public async Task<long> InsertDataAsync(string databaseName, string tableName, IEnumerable<Dictionary<string, object?>> data)
     {
+        var startTime = DateTime.UtcNow;
+        _logger.LogInformation("Inserting data into table {TableName} in database {DatabaseName} at {StartTime}",
+            tableName, databaseName, startTime);
+
         try
         {
-            if (string.IsNullOrWhiteSpace(databaseName))
-                throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
-            
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new ArgumentException("Table name cannot be null or empty", nameof(tableName));
-            
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
-            var dataList = data.ToList();
-            if (!dataList.Any())
-                return 0;
+            if (string.IsNullOrWhiteSpace(databaseName) || string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentException("Database name and table name cannot be null or empty");
+            }
 
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
+            var safeTableName = SanitizeTableName(tableName);
+            var dataList = data.ToList();
 
-            if (!File.Exists(databasePath))
-                throw new EtlExecutionException($"Database {databaseName} does not exist");
+            if (!dataList.Any())
+            {
+                return 0;
+            }
 
-            using var context = CreateDbContext(databasePath);
-            await context.Database.OpenConnectionAsync();
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
+
+            // 切换到指定数据库
+            var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
+            await useDbCommand.ExecuteNonQueryAsync();
 
             // 获取表的列信息
-            var columns = new List<string>();
-            using var columnInfoCommand = context.Database.GetDbConnection().CreateCommand();
-            columnInfoCommand.CommandText = $"PRAGMA table_info([{tableName}])";
-            using (var reader = await columnInfoCommand.ExecuteReaderAsync())
+            var columnsCommand = new SqlCommand(
+                @"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE 
+                  FROM INFORMATION_SCHEMA.COLUMNS 
+                  WHERE TABLE_NAME = @tableName", connection);
+            columnsCommand.Parameters.AddWithValue("@tableName", safeTableName);
+
+            var columnInfo = new Dictionary<string, (string DataType, bool IsNullable)>();
+            using (var reader = await columnsCommand.ExecuteReaderAsync())
             {
                 while (await reader.ReadAsync())
                 {
-                    columns.Add(reader.GetString(1)); // Column name is at index 1
+                    columnInfo[reader["COLUMN_NAME"].ToString() ?? ""] = (
+                        reader["DATA_TYPE"].ToString() ?? "",
+                        reader["IS_NULLABLE"].ToString() == "YES"
+                    );
                 }
             }
 
-            if (!columns.Any())
-                throw new EtlExecutionException($"Table {tableName} does not exist or has no columns");
+            if (!columnInfo.Any())
+            {
+                throw new EtlExecutionException($"Table {safeTableName} not found or has no columns");
+            }
 
             // 构建INSERT语句
-            var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
-            var parameterPlaceholders = string.Join(", ", columns.Select(c => $"@{c}"));
-            var insertSql = $"INSERT INTO [{tableName}] ({columnNames}) VALUES ({parameterPlaceholders})";
+            var firstRow = dataList.First();
+            var columns = firstRow.Keys.Where(k => columnInfo.ContainsKey(k)).ToList();
+            var insertSql = $"INSERT INTO [{safeTableName}] ([{string.Join("], [", columns)}]) VALUES ";
 
-            var insertedRows = 0L;
-            
+            var rowsAffected = 0L;
+
+            // 批量插入数据
             foreach (var row in dataList)
             {
-                using var insertCmd = context.Database.GetDbConnection().CreateCommand();
-                insertCmd.CommandText = insertSql;
-                
-                // 为每一列添加参数
-                foreach (var column in columns)
+                var values = columns.Select(column =>
                 {
-                    var parameter = insertCmd.CreateParameter();
-                    parameter.ParameterName = $"@{column}";
-                    
-                    if (row.ContainsKey(column) && row[column] != null)
-                    {
-                        parameter.Value = row[column];
-                    }
-                    else
-                    {
-                        parameter.Value = DBNull.Value;
-                    }
-                    
-                    insertCmd.Parameters.Add(parameter);
-                }
-                
-                insertedRows += await insertCmd.ExecuteNonQueryAsync();
+                    var value = row.ContainsKey(column) ? row[column] : null;
+                    return FormatValueForSql(value, columnInfo[column].DataType);
+                });
+
+                var insertRowSql = $"{insertSql}({string.Join(", ", values)})";
+                var insertCommand = new SqlCommand(insertRowSql, connection);
+                rowsAffected += await insertCommand.ExecuteNonQueryAsync();
             }
 
-            return insertedRows;
+            _logger.LogInformation("Inserted {RowsAffected} rows into table {TableName} in database {DatabaseName}",
+                rowsAffected, safeTableName, safeDatabaseName);
+            return rowsAffected;
         }
         catch (Exception ex)
         {
@@ -427,43 +435,42 @@ public class EtlService : IEtlService
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(databaseName))
-                throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
-            
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new ArgumentException("Table name cannot be null or empty", nameof(tableName));
+            if (string.IsNullOrWhiteSpace(databaseName) || string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentException("Database name and table name cannot be null or empty");
+            }
 
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
-            var databasePath = Path.Combine(_databaseRootPath, $"{safeDatabaseName}.db");
+            var safeTableName = SanitizeTableName(tableName);
 
-            if (!File.Exists(databasePath))
-                throw new EtlExecutionException($"Database {databaseName} does not exist");
+            using var connection = CreateConnection();
+            await connection.OpenAsync();
 
-            using var context = CreateDbContext(databasePath);
+            // 切换到指定数据库
+            var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
+            await useDbCommand.ExecuteNonQueryAsync();
 
-            var result = new List<Dictionary<string, object?>>();
-            
-            var selectSql = $"SELECT * FROM [{tableName}] LIMIT {limit}";
-            using var command = context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = selectSql;
-            await context.Database.OpenConnectionAsync();
-            
+            // 查询数据
+            var selectSql = $"SELECT TOP {limit} * FROM [{safeTableName}]";
+            var command = new SqlCommand(selectSql, connection);
+
+            var results = new List<Dictionary<string, object?>>();
             using var reader = await command.ExecuteReaderAsync();
-            var columnCount = reader.FieldCount;
-            
+            var columns = Enumerable.Range(0, reader.FieldCount)
+                .Select(i => reader.GetName(i))
+                .ToArray();
+
             while (await reader.ReadAsync())
             {
                 var row = new Dictionary<string, object?>();
-                for (int i = 0; i < columnCount; i++)
+                for (int i = 0; i < columns.Length; i++)
                 {
-                    var columnName = reader.GetName(i);
-                    var value = reader.IsDBNull(i) ? null : reader.GetValue(i);
-                    row[columnName] = value;
+                    row[columns[i]] = await reader.IsDBNullAsync(i) ? null : reader[i];
                 }
-                result.Add(row);
+                results.Add(row);
             }
 
-            return result;
+            return results;
         }
         catch (Exception ex)
         {
@@ -478,17 +485,20 @@ public class EtlService : IEtlService
         {
             WorkflowId = workflow.Id,
             ExecutionId = Guid.NewGuid().ToString(),
-            StartTime = DateTime.UtcNow,
-            Success = true
+            Success = true,
+            StartTime = DateTime.UtcNow
         };
 
+        string databaseName = "";
         try
         {
-            // Create a dedicated database for this workflow execution
-            var databaseName = $"etl_workflow_{workflow.Id}_{executionResult.ExecutionId.Substring(0, 8)}";
+            _logger.LogInformation("Starting ETL workflow execution for workflow {WorkflowId}", workflow.Id);
+
+            // 创建临时数据库用于ETL过程
+            databaseName = $"etl_temp_{Guid.NewGuid():N}";
             await CreateDatabaseAsync(databaseName);
 
-            // Process each node in the workflow
+            // 遍历工作流节点并执行
             foreach (var node in workflow.Nodes)
             {
                 var stepResult = new EtlStepResult
@@ -504,8 +514,7 @@ public class EtlService : IEtlService
                     {
                         case "extract":
                             // Handle extract node
-                            stepResult.Success = true;
-                            stepResult.Message = "Extract step completed";
+                            stepResult = await ExecuteExtractStep(node, databaseName);
                             break;
                         case "transform":
                             // Handle transform node
@@ -514,13 +523,16 @@ public class EtlService : IEtlService
                             break;
                         case "validate":
                             // Handle validate node
-                            stepResult.Success = true;
-                            stepResult.Message = "Validate step completed";
+                            stepResult = await ExecuteValidateStep(node, databaseName);
                             break;
                         case "load":
                             // Handle load node
+                            stepResult = await ExecuteLoadStep(node, databaseName);
+                            break;
+                        case "start":
+                        case "end":
                             stepResult.Success = true;
-                            stepResult.Message = "Load step completed";
+                            stepResult.Message = $"{node.Type} step completed";
                             break;
                         default:
                             stepResult.Success = true;
@@ -542,15 +554,9 @@ public class EtlService : IEtlService
                 }
             }
 
-            // Clean up the temporary database
-            try
-            {
-                await DropDatabaseAsync(databaseName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to clean up temporary database {DatabaseName}", databaseName);
-            }
+            executionResult.Message = executionResult.Success ?
+                "Workflow executed successfully" :
+                "Workflow execution completed with errors";
         }
         catch (Exception ex)
         {
@@ -560,10 +566,20 @@ public class EtlService : IEtlService
         }
         finally
         {
+            // Clean up the temporary database
+            try
+            {
+                if (!string.IsNullOrEmpty(databaseName))
+                {
+                    await DropDatabaseAsync(databaseName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to clean up temporary database {DatabaseName}", databaseName);
+            }
+
             executionResult.EndTime = DateTime.UtcNow;
-            executionResult.Message = executionResult.Success ? 
-                "Workflow executed successfully" : 
-                "Workflow execution completed with errors";
         }
 
         return executionResult;
@@ -572,41 +588,302 @@ public class EtlService : IEtlService
     // Helper methods
     private string SanitizeDatabaseName(string databaseName)
     {
-        // Remove or replace characters that are not safe for file names
-        var invalidChars = Path.GetInvalidFileNameChars();
+        // Remove or replace characters that are not safe for database names
+        var invalidChars = new[] { '\\', '/', ':', '*', '?', '"', '<', '>', '|', '.' };
         var sanitizedName = string.Join("_", databaseName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
         return string.IsNullOrWhiteSpace(sanitizedName) ? "default" : sanitizedName;
     }
 
-    private string MapToSqliteType(string dataType)
+    private string SanitizeTableName(string tableName)
+    {
+        // Remove or replace characters that are not safe for table names
+        var invalidChars = new[] { '\\', '/', ':', '*', '?', '"', '<', '>', '|', '.' };
+        var sanitizedName = string.Join("_", tableName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
+        return string.IsNullOrWhiteSpace(sanitizedName) ? "default_table" : sanitizedName;
+    }
+
+    private string MapToSqlType(string dataType)
     {
         return dataType.ToUpperInvariant() switch
         {
-            "STRING" or "TEXT" => "TEXT",
-            "INT" or "INTEGER" => "INTEGER",
-            "LONG" => "INTEGER",
-            "DOUBLE" or "FLOAT" => "REAL",
-            "DECIMAL" => "REAL",
-            "BOOLEAN" or "BOOL" => "INTEGER",
-            "DATETIME" or "DATE" => "TEXT",
-            "BLOB" => "BLOB",
-            _ => "TEXT"
+            "STRING" or "TEXT" => "NVARCHAR(MAX)",
+            "INT" or "INTEGER" => "INT",
+            "LONG" => "BIGINT",
+            "DOUBLE" or "FLOAT" => "FLOAT",
+            "DECIMAL" => "DECIMAL(18,2)",
+            "BOOLEAN" or "BOOL" => "BIT",
+            "DATETIME" or "DATE" => "DATETIME2",
+            "BLOB" => "VARBINARY(MAX)",
+            _ => "NVARCHAR(MAX)"
         };
     }
 
-    private string FormatDefaultValue(object? defaultValue)
+    private string FormatDefaultValue(object? defaultValue, string dataType)
     {
-        return defaultValue switch
+        if (defaultValue == null)
+            return "NULL";
+
+        return dataType.ToUpperInvariant() switch
         {
-            null => "NULL",
-            string s => $"'{s.Replace("'", "''")}'",
-            bool b => b ? "1" : "0",
-            DateTime dt => $"'{dt:yyyy-MM-dd HH:mm:ss}'",
+            "STRING" or "TEXT" => $"'{defaultValue.ToString()?.Replace("'", "''")}'",
+            "BOOLEAN" or "BOOL" => (bool)defaultValue ? "1" : "0",
+            "DATETIME" or "DATE" => $"'{((DateTime)defaultValue):yyyy-MM-dd HH:mm:ss}'",
             _ => defaultValue.ToString() ?? "NULL"
         };
     }
-}
 
+    private string FormatValueForSql(object? value, string dataType)
+    {
+        if (value == null)
+            return "NULL";
+
+        return dataType.ToUpperInvariant() switch
+        {
+            "NVARCHAR" or "VARCHAR" or "CHAR" or "NCHAR" or "TEXT" or "NTEXT" =>
+                $"'{value.ToString()?.Replace("'", "''")}'",
+            "BIT" => (bool)value ? "1" : "0",
+            "DATETIME" or "DATETIME2" => $"'{((DateTime)value):yyyy-MM-dd HH:mm:ss}'",
+            _ => value.ToString() ?? "NULL"
+        };
+    }
+
+    private async Task<EtlStepResult> ExecuteExtractStep(WorkflowNode node, string databaseName)
+    {
+        var stepResult = new EtlStepResult
+        {
+            StepName = node.Data.Label,
+            StepType = node.Type,
+            StartTime = DateTime.UtcNow
+        };
+
+        try
+        {
+            // 获取源文件路径
+            var sourcePath = node.Data.TaskParams?.ContainsKey("sourcePath") == true
+                ? node.Data.TaskParams["sourcePath"]?.ToString()
+                : "data/sample.json";
+
+            // 确保路径是相对于应用程序根目录的
+            if (!Path.IsPathRooted(sourcePath))
+            {
+                sourcePath = Path.Combine(AppContext.BaseDirectory, sourcePath);
+            }
+
+            // 检查文件是否存在
+            if (!File.Exists(sourcePath))
+            {
+                throw new FileNotFoundException($"Source file not found: {sourcePath}");
+            }
+
+            // 读取JSON文件
+            var jsonContent = await File.ReadAllTextAsync(sourcePath);
+            var data = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, object>>>(jsonContent);
+
+            if (data == null || !data.Any())
+            {
+                throw new InvalidOperationException("No data found in source file");
+            }
+
+            // 创建表结构 (基于第一行数据的键)
+            var columns = data.First().Keys.Select(key => new ColumnDefinition
+            {
+                Name = key,
+                DataType = "STRING", // 简化处理，所有字段都设为字符串类型
+                IsNullable = true
+            }).ToList();
+
+            // 创建表
+            var tableName = "extracted_data";
+            await CreateTableAsync(databaseName, tableName, columns);
+
+            // 插入数据
+            var rowsAffected = await InsertDataAsync(databaseName, tableName, data);
+
+            stepResult.Success = true;
+            stepResult.Message = $"Extracted {data.Count} records, inserted {rowsAffected} rows";
+            stepResult.RowsAffected = (int)rowsAffected;
+            stepResult.Details = new Dictionary<string, object?>
+            {
+                ["source_file"] = sourcePath,
+                ["table_name"] = tableName,
+                ["records_count"] = data.Count
+            };
+        }
+        catch (Exception ex)
+        {
+            stepResult.Success = false;
+            stepResult.Message = $"Extract step failed: {ex.Message}";
+            _logger.LogError(ex, "Extract step failed");
+        }
+        finally
+        {
+            stepResult.EndTime = DateTime.UtcNow;
+        }
+
+        return stepResult;
+    }
+
+    private async Task<EtlStepResult> ExecuteValidateStep(WorkflowNode node, string databaseName)
+    {
+        var stepResult = new EtlStepResult
+        {
+            StepName = node.Data.Label,
+            StepType = node.Type,
+            StartTime = DateTime.UtcNow
+        };
+
+        try
+        {
+            // 获取数据进行验证
+            var tableName = "extracted_data";
+            var data = await SelectDataAsync(databaseName, tableName);
+            var dataList = data.ToList();
+
+            var validationErrors = new List<string>();
+            var validRecords = 0;
+
+            // 执行验证规则
+            foreach (var record in dataList)
+            {
+                var isValid = true;
+
+                // 检查必需字段
+                if (record.ContainsKey("id") && (record["id"] == null || string.IsNullOrWhiteSpace(record["id"].ToString())))
+                {
+                    validationErrors.Add($"Record missing required 'id' field");
+                    isValid = false;
+                }
+
+                if (record.ContainsKey("name") && (record["name"] == null || string.IsNullOrWhiteSpace(record["name"].ToString())))
+                {
+                    validationErrors.Add($"Record with id '{record["id"]}' missing required 'name' field");
+                    isValid = false;
+                }
+
+                if (record.ContainsKey("email") && (record["email"] == null || string.IsNullOrWhiteSpace(record["email"].ToString())))
+                {
+                    validationErrors.Add($"Record with id '{record["id"]}' missing required 'email' field");
+                    isValid = false;
+                }
+
+                // 验证邮箱格式 (简单验证)
+                if (record.ContainsKey("email") && record["email"] != null)
+                {
+                    var email = record["email"].ToString();
+                    if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+                    {
+                        validationErrors.Add($"Record with id '{record["id"]}' has invalid email format: {email}");
+                        isValid = false;
+                    }
+                }
+
+                // 验证年龄字段 (如果存在)
+                if (record.ContainsKey("age") && record["age"] != null)
+                {
+                    if (!int.TryParse(record["age"].ToString(), out var age) || age < 0 || age > 150)
+                    {
+                        validationErrors.Add($"Record with id '{record["id"]}' has invalid age: {record["age"]}");
+                        isValid = false;
+                    }
+                }
+
+                if (isValid)
+                {
+                    validRecords++;
+                }
+            }
+
+            stepResult.Success = validationErrors.Count == 0;
+            stepResult.Message = validationErrors.Count == 0
+                ? $"Validation passed: {validRecords} valid records"
+                : $"Validation failed with {validationErrors.Count} errors";
+            stepResult.RowsAffected = validRecords;
+            stepResult.Details = new Dictionary<string, object?>
+            {
+                ["total_records"] = dataList.Count,
+                ["valid_records"] = validRecords,
+                ["invalid_records"] = dataList.Count - validRecords,
+                ["errors"] = validationErrors.Take(10).ToList() // 只显示前10个错误
+            };
+        }
+        catch (Exception ex)
+        {
+            stepResult.Success = false;
+            stepResult.Message = $"Validation step failed: {ex.Message}";
+            _logger.LogError(ex, "Validate step failed");
+        }
+        finally
+        {
+            stepResult.EndTime = DateTime.UtcNow;
+        }
+
+        return stepResult;
+    }
+
+    private async Task<EtlStepResult> ExecuteLoadStep(WorkflowNode node, string databaseName)
+    {
+        var stepResult = new EtlStepResult
+        {
+            StepName = node.Data.Label,
+            StepType = node.Type,
+            StartTime = DateTime.UtcNow
+        };
+
+        try
+        {
+            // 获取目标表名
+            var targetTable = node.Data.TaskParams?.ContainsKey("targetTable") == true
+                ? node.Data.TaskParams["targetTable"]?.ToString()
+                : "users";
+
+            // 从临时表中获取数据
+            var sourceTable = "extracted_data";
+            var data = await SelectDataAsync(databaseName, sourceTable);
+            var dataList = data.ToList();
+
+            if (!dataList.Any())
+            {
+                throw new InvalidOperationException("No data to load");
+            }
+
+            // 创建目标表结构
+            var columns = dataList.First().Keys.Select(key => new ColumnDefinition
+            {
+                Name = key,
+                DataType = "STRING", // 简化处理
+                IsNullable = true
+            }).ToList();
+
+            // 创建目标表
+            await CreateTableAsync(databaseName, targetTable, columns);
+
+            // 加载数据
+            var rowsAffected = await InsertDataAsync(databaseName, targetTable, dataList);
+
+            stepResult.Success = true;
+            stepResult.Message = $"Loaded {rowsAffected} rows into table '{targetTable}'";
+            stepResult.RowsAffected = (int)rowsAffected;
+            stepResult.Details = new Dictionary<string, object?>
+            {
+                ["target_table"] = targetTable,
+                ["records_count"] = dataList.Count,
+                ["rows_affected"] = rowsAffected
+            };
+        }
+        catch (Exception ex)
+        {
+            stepResult.Success = false;
+            stepResult.Message = $"Load step failed: {ex.Message}";
+            _logger.LogError(ex, "Load step failed");
+        }
+        finally
+        {
+            stepResult.EndTime = DateTime.UtcNow;
+        }
+
+        return stepResult;
+    }
+}
 // 用于直接操作数据库文件的上下文
 public class EtlDatabaseContext : DbContext
 {
