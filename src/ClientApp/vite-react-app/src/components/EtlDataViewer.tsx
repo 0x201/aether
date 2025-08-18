@@ -142,21 +142,24 @@ const SelectorItem = styled.li<{ selected?: boolean }>`
   `}
 `;
 
-const TableDataContainer = styled.div`
+const TableContainer = styled.div`
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 4px;
   padding: 15px;
+  grid-column: span 3;
 `;
 
-const DataTableContainer = styled.div`
-  max-height: 400px;
-  overflow-y: auto;
+const TableTitle = styled.h3`
+  margin-top: 0;
 `;
 
-const DataTable = styled.table`
+const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  background-color: white;
+  border-radius: 4px;
+  overflow: hidden;
 `;
 
 const TableHeader = styled.thead`
@@ -164,23 +167,14 @@ const TableHeader = styled.thead`
 `;
 
 const TableHeaderCell = styled.th`
-  padding: 8px;
+  padding: 12px;
   text-align: left;
   border-bottom: 1px solid #dee2e6;
-  position: sticky;
-  top: 0;
 `;
 
 const TableBodyCell = styled.td`
-  padding: 8px;
-  text-align: left;
+  padding: 12px;
   border-bottom: 1px solid #dee2e6;
-`;
-
-const TableRow = styled.tr`
-  &:hover {
-    background-color: #f8f9fa;
-  }
 `;
 
 const EtlDataViewer: React.FC = () => {
@@ -315,6 +309,11 @@ const EtlDataViewer: React.FC = () => {
     }
   }, [selectedDatabase, selectedTable]);
 
+  // 手动刷新
+  const handleRefresh = () => {
+    refreshData();
+  };
+
   // 更改刷新间隔
   const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRefreshInterval(Number(e.target.value));
@@ -326,9 +325,7 @@ const EtlDataViewer: React.FC = () => {
 
     return (
       <ExecutionResult success={executionResult.success}>
-        <ExecutionTitle color={executionResult.success ? 'success' : 'failed'}>
-          ETL Execution Result
-        </ExecutionTitle>
+        <ExecutionTitle>ETL Execution Result</ExecutionTitle>
         <p><strong>Status:</strong> {executionResult.success ? 'Success' : 'Failed'}</p>
         <p><strong>Message:</strong> {executionResult.message}</p>
         <p><strong>Execution Time:</strong> {new Date(executionResult.endTime).getTime() - new Date(executionResult.startTime).getTime()} ms</p>
@@ -340,17 +337,17 @@ const EtlDataViewer: React.FC = () => {
               <p>Status: {step.success ? 'Success' : 'Failed'}</p>
               <p>Message: {step.message}</p>
               <p>Rows Affected: {step.rowsAffected}</p>
-              <p>Execution Time: {new Date(step.endTime).getTime() - new Date(step.startTime).getTime()} ms</p>
-              {step.details && (
-                <StepDetails>
-                  <DetailsTitle>Details:</DetailsTitle>
-                  <DetailsList>
-                    {Object.entries(step.details).map(([key, value]) => (
-                      <DetailItem key={key}><strong>{key}:</strong> {JSON.stringify(value)}</DetailItem>
-                    ))}
-                  </DetailsList>
-                </StepDetails>
-              )}
+              <StepDetails>
+                <DetailsTitle>Details:</DetailsTitle>
+                <DetailsList>
+                  <DetailItem><strong>Start Time:</strong> {new Date(step.startTime).toLocaleString()}</DetailItem>
+                  <DetailItem><strong>End Time:</strong> {new Date(step.endTime).toLocaleString()}</DetailItem>
+                  <DetailItem><strong>Duration:</strong> {new Date(step.endTime).getTime() - new Date(step.startTime).getTime()} ms</DetailItem>
+                  {Object.entries(step.details).map(([key, value]) => (
+                    <DetailItem key={key}><strong>{key}:</strong> {JSON.stringify(value)}</DetailItem>
+                  ))}
+                </DetailsList>
+              </StepDetails>
             </StepResult>
           ))}
         </details>
@@ -358,115 +355,97 @@ const EtlDataViewer: React.FC = () => {
     );
   };
 
+  if (loading) {
+    return <div>Loading ETL data...</div>;
+  }
+
   return (
     <EtlDataViewerContainer>
       <ViewerHeader>
         <h2>ETL Data Viewer</h2>
         <ViewerControls>
-          <ControlButton onClick={refreshData} disabled={loading}>
-            {loading ? 'Refreshing...' : 'Refresh'}
-          </ControlButton>
           <ControlButton onClick={executeEtlWorkflow} disabled={executing}>
-            {executing ? 'Executing...' : 'Run ETL Workflow'}
+            {executing ? 'Executing...' : 'Execute ETL Workflow'}
+          </ControlButton>
+          <ControlButton onClick={handleRefresh} disabled={loading}>
+            Refresh
           </ControlButton>
           <IntervalSelector>
-            <label htmlFor="refresh-interval">Refresh interval: </label>
-            <select 
-              id="refresh-interval"
-              value={refreshInterval} 
-              onChange={handleIntervalChange}
-            >
-              <option value={2000}>2 seconds</option>
+            <label>Refresh Interval:</label>
+            <select value={refreshInterval} onChange={handleIntervalChange}>
               <option value={5000}>5 seconds</option>
               <option value={10000}>10 seconds</option>
               <option value={30000}>30 seconds</option>
+              <option value={60000}>1 minute</option>
             </select>
           </IntervalSelector>
         </ViewerControls>
       </ViewerHeader>
 
-      {error && (
-        <ErrorMessage>
-          Error: {error}
-        </ErrorMessage>
-      )}
-
+      {error && <ErrorMessage>Error: {error}</ErrorMessage>}
+      
       {executionResult && renderExecutionResult()}
 
       <DataViewerContent>
         <SelectorContainer>
           <SelectorTitle>Databases</SelectorTitle>
-          {databases.length > 0 ? (
-            <SelectorList>
-              {databases.map((db, index) => (
-                <SelectorItem 
-                  key={`${db.name}-${index}`} 
-                  selected={selectedDatabase === db.name}
-                  onClick={() => setSelectedDatabase(db.name)}
-                >
-                  {db.name}
-                </SelectorItem>
-              ))}
-            </SelectorList>
-          ) : (
-            <p>No databases found.</p>
-          )}
+          <SelectorList>
+            {databases.map((db) => (
+              <SelectorItem
+                key={db.name}
+                selected={selectedDatabase === db.name}
+                onClick={() => setSelectedDatabase(db.name)}
+              >
+                {db.name}
+              </SelectorItem>
+            ))}
+          </SelectorList>
         </SelectorContainer>
 
         <SelectorContainer>
           <SelectorTitle>Tables</SelectorTitle>
-          {selectedDatabase ? (
-            tables.length > 0 ? (
-              <SelectorList>
-                {tables.map((table, index) => (
-                  <SelectorItem 
-                    key={`${table.name}-${index}`} 
-                    selected={selectedTable === table.name}
-                    onClick={() => setSelectedTable(table.name)}
-                  >
-                    {table.name}
-                  </SelectorItem>
-                ))}
-              </SelectorList>
-            ) : (
-              <p>No tables found in {selectedDatabase}.</p>
-            )
-          ) : (
-            <p>Please select a database first.</p>
-          )}
+          <SelectorList>
+            {tables.map((table) => (
+              <SelectorItem
+                key={table.name}
+                selected={selectedTable === table.name}
+                onClick={() => setSelectedTable(table.name)}
+              >
+                {table.name}
+              </SelectorItem>
+            ))}
+          </SelectorList>
         </SelectorContainer>
 
-        <TableDataContainer>
-          <SelectorTitle>Table Data</SelectorTitle>
-          {selectedTable ? (
-            tableData.length > 0 ? (
-              <DataTableContainer>
-                <DataTable>
-                  <TableHeader>
-                    <tr>
-                      {Object.keys(tableData[0]).map(key => (
-                        <TableHeaderCell key={key}>{key}</TableHeaderCell>
+        {tableData.length > 0 && (
+          <TableContainer>
+            <TableTitle>
+              {selectedDatabase}.{selectedTable} ({tableData.length} rows)
+            </TableTitle>
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <StyledTable>
+                <TableHeader>
+                  <tr>
+                    {Object.keys(tableData[0]).map((column) => (
+                      <TableHeaderCell key={column}>{column}</TableHeaderCell>
+                    ))}
+                  </tr>
+                </TableHeader>
+                <tbody>
+                  {tableData.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {Object.values(row).map((value, colIndex) => (
+                        <TableBodyCell key={colIndex}>
+                          {value === null ? 'NULL' : String(value)}
+                        </TableBodyCell>
                       ))}
                     </tr>
-                  </TableHeader>
-                  <tbody>
-                    {tableData.map((row, index) => (
-                      <TableRow key={index}>
-                        {Object.values(row).map((value, cellIndex) => (
-                          <TableBodyCell key={cellIndex}>{String(value)}</TableBodyCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </tbody>
-                </DataTable>
-              </DataTableContainer>
-            ) : (
-              <p>No data found in table {selectedTable}.</p>
-            )
-          ) : (
-            <p>Please select a table to view data.</p>
-          )}
-        </TableDataContainer>
+                  ))}
+                </tbody>
+              </StyledTable>
+            </div>
+          </TableContainer>
+        )}
       </DataViewerContent>
     </EtlDataViewerContainer>
   );

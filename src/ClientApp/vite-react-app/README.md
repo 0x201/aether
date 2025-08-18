@@ -1,54 +1,157 @@
-# React + TypeScript + Vite
+# ETL Workflow System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a modern ETL (Extract, Transform, Load) workflow system built with .NET and React. The system allows users to create, manage, and execute data processing workflows through a visual interface.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Backend (Workflow.API)
+- Workflow management with visual editor
+- ETL-specific node types (Extract, Validate, Load)
+- Real-time monitoring with SignalR
+- SQL Server database integration
+- RESTful API for workflow operations
+- Sample workflows for demonstration
 
-## Expanding the ESLint configuration
+### Frontend (Vite + React)
+- Visual workflow editor with drag-and-drop interface
+- Dashboard with system overview and status
+- Workflow list and management
+- Real-time monitoring of job executions
+- ETL data viewer with database/table navigation
+- Data visualization with D3.js (bar, pie, and line charts)
+- Responsive design with styled-components
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Architecture
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+The system consists of two main components:
+
+1. **Backend API** - Built with ASP.NET Core, provides RESTful endpoints and SignalR for real-time communication
+2. **Frontend UI** - Built with React, TypeScript, and Vite, provides a rich user interface for workflow management
+
+## ETL Workflow Types
+
+The system includes several predefined workflow templates:
+
+1. **Simple Linear Workflow** - Basic sequential execution
+2. **Decision Workflow** - Conditional execution paths
+3. **Complex Workflow** - Multiple parallel paths with decision nodes
+4. **ETL Workflow** - Specialized for data extraction, validation, and loading
+
+## Node Types
+
+- `start` - Workflow start node
+- `end` - Workflow end node
+- `dummy` - Generic task node
+- `branch` - Decision/conditional node
+- `extract` - Data extraction node (ETL)
+- `validate` - Data validation node (ETL)
+- `load` - Data loading node (ETL)
+
+## Getting Started
+
+### Prerequisites
+
+- .NET 8.0 SDK or later
+- Node.js 16.x or later
+- SQL Server LocalDB
+- PNPM (for frontend package management)
+
+### Backend Setup
+
+1. Navigate to the `Workflow.API` directory
+2. Update the connection strings in `appsettings.json` if needed
+3. Run the application:
+   ```bash
+   dotnet run
+   ```
+
+### Frontend Setup
+
+1. Navigate to the `ClientApp/vite-react-app` directory
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Start the development server:
+   ```bash
+   pnpm dev
+   ```
+
+## API Endpoints
+
+### Workflow Endpoints
+- `GET /api/workflows` - Get all workflows
+- `GET /api/workflows/{id}` - Get a specific workflow
+- `POST /api/workflows` - Create a new workflow
+- `PUT /api/workflows/{id}` - Update a workflow
+- `DELETE /api/workflows/{id}` - Delete a workflow
+- `POST /api/workflows/{id}/execute` - Execute a workflow
+
+### ETL Endpoints
+- `POST /api/etl/execute/{workflowId}` - Execute an ETL workflow
+- `GET /api/etl/databases` - Get list of databases
+- `GET /api/etl/databases/{databaseName}/tables` - Get tables in a database
+- `GET /api/etl/databases/{databaseName}/tables/{tableName}` - Get data from a table
+
+### Monitoring Endpoints
+- `GET /api/workflows/running` - Get running workflows
+- `GET /api/workflows/logs` - Get all execution logs
+- `GET /api/workflows/logs/{workflowInstanceId}` - Get logs for a specific workflow instance
+
+## Real-time Monitoring
+
+The system uses SignalR for real-time updates:
+- `/jobstatus` - Hub for job status updates
+
+## Technologies Used
+
+### Backend
+- ASP.NET Core
+- Entity Framework Core
+- SQL Server
+- SignalR
+- Scalar.AspNetCore (for API documentation)
+
+### Frontend
+- React 18+
+- TypeScript
+- Vite
+- Styled Components
+- React Router
+- D3.js (for data visualization)
+- @microsoft/signalr (for real-time updates)
+
+## Development
+
+### Project Structure
+
+```
+src/
+├── Workflow.API/           # Backend API
+│   ├── Controllers/        # API controllers
+│   ├── Models/             # Data models
+│   ├── Services/           # Business logic
+│   ├── Data/               # Database context and migrations
+│   └── ...
+├── ClientApp/
+│   └── vite-react-app/    # Frontend application
+│       ├── src/
+│       │   ├── components/ # React components
+│       │   ├── services/   # API service clients
+│       │   ├── contexts/   # React contexts
+│       │   └── ...
+│       └── ...
+└── ...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Contributing
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## License
+
+This project is licensed under the MIT License.

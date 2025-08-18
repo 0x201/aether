@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Workflow.API.Services;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,9 @@ builder.Services.AddDbContextFactory<WorkflowDbContext>(options =>
 {
     options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=WorkflowDb;Trusted_Connection=true;MultipleActiveResultSets=true");
 });
+
+// 添加SignalR支持
+builder.Services.AddSignalR();
 
 // 添加工作流服务
 builder.Services.AddScoped<IWorkflowRepository, EfWorkflowRepository>();
@@ -239,6 +243,9 @@ etl.MapGet("/databases/{databaseName}/tables/{tableName}", async (string databas
     }
 });
 
+// Map SignalR hub
+app.MapHub<JobStatusHub>("/jobstatus");
+
 // 初始化示例工作流
 async Task InitializeSampleWorkflows(IWorkflowRepository repository)
 {
@@ -351,7 +358,7 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                     { 
                         Label = "Data Analysis", 
                         OperatorType = "dummy",
-                        Description = "Analyze input data"
+                        Description = "Analyze data for decision making"
                     }
                 },
                 new WorkflowNode
@@ -363,8 +370,8 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                     { 
                         Label = "Check Value", 
                         OperatorType = "branch",
-                        Description = "Check if value is greater than threshold",
-                        TriggerCondition = "{{ data.value > 100 }}"
+                        Description = "Check if value is high or low",
+                        TaskParams = new Dictionary<string, object> { { "condition", "data.value > 100" } }
                     }
                 },
                 new WorkflowNode
@@ -407,8 +414,8 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
             {
                 new WorkflowConnection { Id = "1-2", SourceNodeId = "1", TargetNodeId = "2" },
                 new WorkflowConnection { Id = "2-3", SourceNodeId = "2", TargetNodeId = "3" },
-                new WorkflowConnection { Id = "3-4", SourceNodeId = "3", TargetNodeId = "4" },
-                new WorkflowConnection { Id = "3-5", SourceNodeId = "3", TargetNodeId = "5" },
+                new WorkflowConnection { Id = "3-4", SourceNodeId = "3", TargetNodeId = "4", SourceHandle = "true" },
+                new WorkflowConnection { Id = "3-5", SourceNodeId = "3", TargetNodeId = "5", SourceHandle = "false" },
                 new WorkflowConnection { Id = "4-6", SourceNodeId = "4", TargetNodeId = "6" },
                 new WorkflowConnection { Id = "5-6", SourceNodeId = "5", TargetNodeId = "6" }
             }
@@ -426,7 +433,7 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "1",
                     Type = "start",
-                    Position = new Position { X = 100, Y = 200 },
+                    Position = new Position { X = 100, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Start", 
@@ -437,31 +444,31 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "2",
                     Type = "dummy",
-                    Position = new Position { X = 300, Y = 200 },
+                    Position = new Position { X = 300, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Data Ingestion", 
                         OperatorType = "dummy",
-                        Description = "Ingest data from sources"
+                        Description = "Ingest data from various sources"
                     }
                 },
                 new WorkflowNode
                 {
                     Id = "3",
                     Type = "dummy",
-                    Position = new Position { X = 500, Y = 100 },
+                    Position = new Position { X = 500, Y = 50 },
                     Data = new NodeData 
                     { 
                         Label = "ETL Process", 
                         OperatorType = "dummy",
-                        Description = "Extract, Transform, Load process"
+                        Description = "Extract, Transform, Load data"
                     }
                 },
                 new WorkflowNode
                 {
                     Id = "4",
                     Type = "dummy",
-                    Position = new Position { X = 500, Y = 300 },
+                    Position = new Position { X = 500, Y = 150 },
                     Data = new NodeData 
                     { 
                         Label = "Data Validation", 
@@ -473,20 +480,20 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "5",
                     Type = "branch",
-                    Position = new Position { X = 700, Y = 200 },
+                    Position = new Position { X = 700, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Quality Check", 
                         OperatorType = "branch",
                         Description = "Check data quality",
-                        TriggerCondition = "{{ data.quality == 'high' }}"
+                        TaskParams = new Dictionary<string, object> { { "condition", "data.quality > 0.8" } }
                     }
                 },
                 new WorkflowNode
                 {
                     Id = "6",
                     Type = "dummy",
-                    Position = new Position { X = 900, Y = 100 },
+                    Position = new Position { X = 900, Y = 50 },
                     Data = new NodeData 
                     { 
                         Label = "High Quality Processing", 
@@ -498,7 +505,7 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "7",
                     Type = "dummy",
-                    Position = new Position { X = 900, Y = 300 },
+                    Position = new Position { X = 900, Y = 150 },
                     Data = new NodeData 
                     { 
                         Label = "Error Handling", 
@@ -510,7 +517,7 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "8",
                     Type = "dummy",
-                    Position = new Position { X = 1100, Y = 200 },
+                    Position = new Position { X = 1100, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Data Storage", 
@@ -522,7 +529,7 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "9",
                     Type = "end",
-                    Position = new Position { X = 1300, Y = 200 },
+                    Position = new Position { X = 1300, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "End", 
@@ -537,8 +544,8 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 new WorkflowConnection { Id = "2-4", SourceNodeId = "2", TargetNodeId = "4" },
                 new WorkflowConnection { Id = "3-5", SourceNodeId = "3", TargetNodeId = "5" },
                 new WorkflowConnection { Id = "4-5", SourceNodeId = "4", TargetNodeId = "5" },
-                new WorkflowConnection { Id = "5-6", SourceNodeId = "5", TargetNodeId = "6" },
-                new WorkflowConnection { Id = "5-7", SourceNodeId = "5", TargetNodeId = "7" },
+                new WorkflowConnection { Id = "5-6", SourceNodeId = "5", TargetNodeId = "6", SourceHandle = "true" },
+                new WorkflowConnection { Id = "5-7", SourceNodeId = "5", TargetNodeId = "7", SourceHandle = "false" },
                 new WorkflowConnection { Id = "6-8", SourceNodeId = "6", TargetNodeId = "8" },
                 new WorkflowConnection { Id = "7-8", SourceNodeId = "7", TargetNodeId = "8" },
                 new WorkflowConnection { Id = "8-9", SourceNodeId = "8", TargetNodeId = "9" }
@@ -557,7 +564,7 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "1",
                     Type = "start",
-                    Position = new Position { X = 100, Y = 200 },
+                    Position = new Position { X = 100, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Start", 
@@ -568,45 +575,51 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
                 {
                     Id = "2",
                     Type = "extract",
-                    Position = new Position { X = 300, Y = 200 },
+                    Position = new Position { X = 300, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Extract Data", 
                         OperatorType = "extract",
-                        Description = "Extract data from source",
-                        TaskParams = new Dictionary<string, object> { { "sourcePath", "data/etl_sample.json" } }
+                        Description = "Extract data from JSON file",
+                        TaskParams = new Dictionary<string, object> 
+                        { 
+                            { "filePath", "data/sample.json" }
+                        }
                     }
                 },
                 new WorkflowNode
                 {
                     Id = "3",
                     Type = "validate",
-                    Position = new Position { X = 500, Y = 200 },
+                    Position = new Position { X = 500, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Validate Data", 
                         OperatorType = "validate",
-                        Description = "Validate extracted data"
+                        Description = "Validate extracted data quality"
                     }
                 },
                 new WorkflowNode
                 {
                     Id = "4",
                     Type = "load",
-                    Position = new Position { X = 700, Y = 200 },
+                    Position = new Position { X = 700, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "Load to Database", 
                         OperatorType = "load",
-                        Description = "Load data to database",
-                        TaskParams = new Dictionary<string, object> { { "targetTable", "employees" } }
+                        Description = "Load validated data to in-memory database",
+                        TaskParams = new Dictionary<string, object> 
+                        { 
+                            { "tableName", "etl_data" }
+                        }
                     }
                 },
                 new WorkflowNode
                 {
                     Id = "5",
                     Type = "end",
-                    Position = new Position { X = 900, Y = 200 },
+                    Position = new Position { X = 900, Y = 100 },
                     Data = new NodeData 
                     { 
                         Label = "End", 
@@ -627,3 +640,12 @@ async Task InitializeSampleWorkflows(IWorkflowRepository repository)
 }
 
 app.Run();
+
+// SignalR Hub for job status updates
+public class JobStatusHub : Hub
+{
+    public async Task SubscribeToJob(string jobId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, jobId);
+    }
+}
