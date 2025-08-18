@@ -8,9 +8,7 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/Workflow.API/Workflow.API.csproj" />
-  </Folder>
+  <Project Path="src/Workflow.API/Workflow.API.csproj" />
   <Project Path="src/Catalog.API/Catalog.API.csproj" />
   <Project Path="src/Catalog.Domain/Catalog.Domain.csproj" Id="8270eef7-a0d6-4f4d-8cb7-5306b24d9ca3" />
   <Project Path="src/EventBus/EventBus.csproj">
