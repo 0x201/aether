@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Workflow.API.Models;
+﻿namespace Workflow.API.Models;
 
 public class EtlDatabase
 {

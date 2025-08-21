@@ -1,4 +1,9 @@
-global using System.ComponentModel.DataAnnotations;
-global using Workflow.API.Models;
+﻿global using Workflow.API.Models;
 global using Workflow.API.Services;
 global using Workflow.API.Data;
+global using Microsoft.EntityFrameworkCore;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using Microsoft.AspNetCore.SignalR;
+global using ModernCSharp.ServiceDefaults;
+global using Scalar.AspNetCore;

@@ -1,7 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Workflow.API.Models;
+﻿namespace Workflow.API.Models;
 
 public class EtlTable
 {

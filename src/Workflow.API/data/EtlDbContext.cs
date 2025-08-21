@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Workflow.API.Data;
 
 public class EtlDbContext : DbContext

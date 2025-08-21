@@ -26,10 +26,12 @@ var bookstoreDb = sqlServer.AddDatabase("bookstoredb");
 var identityDb = sqlServer.AddDatabase("identitydb");
 var orderDb = sqlServer.AddDatabase("orderingdb");
 var catalogDb = sqlServer.AddDatabase("catalogdb");
+var workflowDb = sqlServer.AddDatabase("workflowdb");
+var etlDb = sqlServer.AddDatabase("etlDb");
 
-//var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
+var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
-var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", "https")
+var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", launchProfileName)
     .WithExternalHttpEndpoints()
     .WithReference(identityDb).WaitFor(identityDb);
 
@@ -45,6 +47,11 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
     .WithHttpHealthCheck("/health")
     .WithEnvironment("Identity__Url", identityEndpoint);
 
+var workflowApi = builder.AddProject<Projects.Workflow_API>("workflow-api")
+    .WithReference(workflowDb).WaitFor(workflowDb)
+    .WithReference(etlDb).WaitFor(etlDb)
+    .WithHttpHealthCheck("/health");
+
 builder.AddProject<Projects.OrderProcessor>("order-processor")
     .WithReference(redis)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
@@ -59,32 +66,30 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
 var nestjsApp = builder.AddPnpmApp("nestjs-app", @"..\ClientApp\nestjs-demo", "start")
-    .WithHttpEndpoint(env: "PORT")
+    .WithHttpEndpoint(targetPort: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
+
+var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", "start")
+    .WithHttpEndpoint(targetPort: 4200, env: "PORT")
+    .WithExternalHttpEndpoints()
+    .WithReference(orderingApi);
 
 nestjsApp.WithUrl($"{nestjsApp.GetEndpoint("http")}/docs", "NestJs App Swagger Docs");
 
 var viteVueApp = builder.AddViteApp("vite-vue-app", @"..\ClientApp\vite-vue-app", "pnpm")
     .WithPnpmPackageInstallation()
     .WithReference(orderingApi)
-    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
 
 var viteReactApp = builder.AddViteApp("vite-react-app", @"..\ClientApp\vite-react-app", "pnpm")
     .WithPnpmPackageInstallation()
-    .WithHttpEndpoint(env: "PORT")
-    .WithExternalHttpEndpoints()
-    .WithReference(orderingApi);
-
-var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", "start")
-    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\ClientApp\fastapi-demo", "./.venv/Scripts/uvicorn.exe", ["main:app"])
-    .WithHttpEndpoint(env: "PORT")
+    .WithHttpEndpoint(targetPort: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);

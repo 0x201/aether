@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-
 namespace Workflow.API.Models;
 
 public class TaskInstance
