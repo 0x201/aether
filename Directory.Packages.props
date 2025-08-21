@@ -1,8 +1,8 @@
-<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+﻿<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.4.0</AspireVersion>
+    <AspireVersion>9.4.1</AspireVersion>
     <AspnetVersion>9.0.8</AspnetVersion>
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>3.9.3</MSTestVersion>
@@ -10,7 +10,7 @@
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.4</DuendeVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
-    <AspireCommunityVersion>9.7.0-beta.336</AspireCommunityVersion>
+    <AspireCommunityVersion>9.7.0</AspireCommunityVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
@@ -35,11 +35,11 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.12.0-beta.1" />
     <!--AspNetCore-->
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0-preview.6.25358.103" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.6.25358.103" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.0-preview.6.25358.103" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspnetVersion)" />
     <PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
     <!-- Version together with Asp.Versioning -->
@@ -47,20 +47,20 @@
     <PackageVersion Include="Asp.Versioning.Http.Client" Version="$(ApiVersioningVersion)" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="$(ApiVersioningVersion)" />
     <!--Microsoft.Extensions.*-->
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0-preview.6.25358.103" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.0" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.7.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.7.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.8.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.8.0" />
     <!--FluentUI-->
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.12.1" />
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1" />
@@ -69,17 +69,17 @@
     <!--CommunityToolkit-->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <!--EntityFramework & Data-->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0-preview.6.25358.103" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0-preview.6.25358.103" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0-preview.6.25358.103" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />
     <!--Duende.IdentityServer-->
     <PackageVersion Include="Duende.IdentityServer" Version="$(DuendeVersion)" />
-    <PackageVersion Include="Duende.IdentityServer.AspNetIdentity" Version="7.3.0-rc.2" />
-    <PackageVersion Include="Duende.IdentityServer.EntityFramework" Version="7.3.0-rc.2" />
+    <PackageVersion Include="Duende.IdentityServer.AspNetIdentity" Version="7.3.1" />
+    <PackageVersion Include="Duende.IdentityServer.EntityFramework" Version="7.3.1" />
     <PackageVersion Include="Duende.IdentityServer.EntityFramework.Storage" Version="7.1.1" />
     <PackageVersion Include="Duende.IdentityServer.Storage" Version="$(DuendeVersion)" />
     <!--Testing-->
@@ -96,9 +96,9 @@
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
     <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.250702007-experimental4" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
     <PackageVersion Include="WinUIEx" Version="2.6.0" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
@@ -121,6 +121,6 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Polly.Core" Version="8.6.2" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.6.5" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.6.9" />
   </ItemGroup>
 </Project>

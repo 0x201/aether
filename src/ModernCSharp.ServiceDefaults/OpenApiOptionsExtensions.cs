@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 namespace ModernCSharp.ServiceDefaults;
 
@@ -117,24 +118,19 @@ internal static class OpenApiOptionsExtensions
                 return Task.CompletedTask;
             }
 
-            operation.Responses?.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
-            operation.Responses?.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
+            operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
+            operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
 
-            var oAuthScheme = new OpenApiSecuritySchemeReference("oauth2") 
+            var oAuthScheme = new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReferenceWithDescription
-                {
-                    Id = "oauth2",
-                    Type = ReferenceType.SecurityScheme,
-                    Description = "OAuth 2.0 Authorization Code Flow with PKCE"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
             };
 
             operation.Security = new List<OpenApiSecurityRequirement>
             {
                 new()
                 {
-                    [oAuthScheme] = [.. scopes]
+                    [oAuthScheme] = scopes
                 }
             };
 
@@ -159,30 +155,19 @@ internal static class OpenApiOptionsExtensions
         options.AddOperationTransformer((operation, context, cancellationToken) =>
         {
             // Find parameter named "api-version" and add a description to it
-            var apiVersionParameter = operation.Parameters?.FirstOrDefault(p => p.Name == "api-version");
+            var apiVersionParameter = operation.Parameters.FirstOrDefault(p => p.Name == "api-version");
             if (apiVersionParameter is not null)
             {
                 apiVersionParameter.Description = "The API version, in the format 'major.minor'.";
-                var newParameter = new OpenApiParameter
+                switch (context.DocumentName)
                 {
-                    Name = apiVersionParameter.Name,
-                    In = apiVersionParameter.In,
-                    Description = apiVersionParameter.Description,
-                    Required = apiVersionParameter.Required,
-                    Schema = new OpenApiSchema
-                    {
-                        Type = JsonSchemaType.String,
-                        Example = new OpenApiString(context.DocumentName switch
-                        {
-                            "v1" => "1.0",
-                            "v2" => "2.0",
-                            _ => "1.0"
-                        })
-                    }
-                };
-
-                var parameterIndex = operation.Parameters?.IndexOf(apiVersionParameter);
-                operation.Parameters[parameterIndex] = newParameter;
+                    case "v1":
+                        apiVersionParameter.Schema.Example = new OpenApiString("1.0");
+                        break;
+                    case "v2":
+                        apiVersionParameter.Schema.Example = new OpenApiString("2.0");
+                        break;
+                }
             }
             return Task.CompletedTask;
         });
