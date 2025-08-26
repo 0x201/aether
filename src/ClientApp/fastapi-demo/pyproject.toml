@@ -8,11 +8,13 @@ dependencies = [
     "bcrypt",
     "beautifulsoup4",
     "fastapi",
-    "PyJWT",
+    "pyjwt",
     "pymssql",
-    "PyYAML",
+    "pyyaml",
+    "python-dotenv",
     "requests",
-    "uvicorn,
+    "uvicorn",
+    "python-multipart>=0.0.20",
 ]
 
 [dependency-groups]

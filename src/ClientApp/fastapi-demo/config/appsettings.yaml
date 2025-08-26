@@ -1,0 +1,29 @@
+sqlserver:
+  server: "localhost"
+  port: 1433
+  trusted_connection: true
+  integrated_security: "Windows Authentication"
+  user_name: "sa"
+  password: "YourStrongPassword"
+  database: "Database Name"
+
+pwd_salt: "salt"
+
+jwt_config:
+  secret: "secret"
+  access_token_expire_minutes: 120
+
+cors_origins:
+  - "http://localhost:3000"
+  - "http://localhost:5173"
+
+api_version: "v1"
+api_base_url: "/api"
+database: "sqlserver"
+host: "localhost"
+port: 8000
+
+nppa:
+  base_url: "https://www.nppa.gov.cn/bsfw/jggs/yxspjg"
+  data_url: "/index"
+  suffix: ".html"
