@@ -11,14 +11,10 @@ namespace ModernCSharp.WPFApp.ViewModels;
 
 public partial class OrderViewModel : ObservableObject, INavigationAware
 {
-    private readonly IOrderQueries _orderService;
+    private readonly IOrderQueries _orderService = App.GetService<IOrderQueries>();
 
     [ObservableProperty]
-    public ObservableCollection<Order> _orders = [];
-    public OrderViewModel()
-    {
-        _orderService = App.GetService<IOrderQueries>();
-    }
+    private ObservableCollection<Order> _orders = [];
 
     public void OnNavigatedFrom() => throw new NotImplementedException();
     public async void OnNavigatedTo(object parameter)

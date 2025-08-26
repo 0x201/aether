@@ -49,12 +49,12 @@
                 AutoGenerateColumns="False"
                 Margin="0, 0, 10, 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Order Id" Binding="{Binding Id}"/>
-                    <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
-                    <DataGridTextColumn Header="Total" Binding="{Binding Total}"/>
-                    <DataGridTextColumn Header="Order Date" Binding="{Binding OrderDate}"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding OrderStatus}"/>
+                    <DataGridTextColumn Header="Order Id" Binding="{Binding ordernumber}"/>
+                    <DataGridTextColumn Header="Customer Name" Binding="{Binding username}"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding quantity}"/>
+                    <DataGridTextColumn Header="Total" Binding="{Binding total}"/>
+                    <DataGridTextColumn Header="Order Date" Binding="{Binding date}"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding status}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
