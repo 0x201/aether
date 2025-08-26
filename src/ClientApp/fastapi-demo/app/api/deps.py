@@ -9,19 +9,16 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.core import security
-from appsettings import appsettings
-from app.db.session import MysqlSession, SqlServerSession
+from config import config
+from app.db.session import SqlServerSession
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{appsettings.API_BASE_URL}/login/access-token"
+    tokenUrl=f"{config.api_base_url}/{config.api_version}/login/access-token"
 )
 
 
 def get_db() -> Generator:
-    if appsettings.DATABASE.upper() == "MYSQL":
-        db = MysqlSession()
-    else:
-        db = SqlServerSession()
+    db = SqlServerSession()
     try:
         yield db
     finally:
@@ -29,11 +26,11 @@ def get_db() -> Generator:
 
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+        db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> models.User:
     try:
         payload = jwt.decode(
-            token, appsettings.SECRET_KEY, algorithms=[security.ALGORITHM]
+            token, config.jwt_config.secret_key, algorithms=[security.ALGORITHM]
         )
         token_data = schemas.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError):
@@ -50,7 +47,7 @@ def get_current_user(
 
 
 def get_current_active_user(
-    current_user: models.User = Depends(get_current_user),
+        current_user: models.User = Depends(get_current_user),
 ) -> models.User:
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -58,7 +55,7 @@ def get_current_active_user(
 
 
 def get_current_active_superuser(
-    current_user: models.User = Depends(get_current_user),
+        current_user: models.User = Depends(get_current_user),
 ) -> models.User:
     if not crud.user.is_superuser(user=current_user):
         raise HTTPException(

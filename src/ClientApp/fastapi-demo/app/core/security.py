@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from appsettings import appsettings
+from config import config
 ALGORITHM = "HS256"
 
 
@@ -16,15 +16,15 @@ def create_access_token(
         expire = datetime.now() + expires_delta
     else:
         expire = datetime.now() + timedelta(
-            minutes=appsettings.ACCESS_TOKEN_EXPIRE_MINUTES
+            minutes=config.jwt_config.access_token_expire_minutes
         )
     to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, appsettings.SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, config.jwt_config.secret_key, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 def get_password_hash(password: str) -> (bytes, bytes):
-    salt = bcrypt.gensalt(appsettings.PWDSalt)
+    salt = bcrypt.gensalt(config.pwdsalt)
     password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return salt, password
 

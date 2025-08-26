@@ -3,23 +3,23 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from appsettings import appsettings
+from config import config
 
-mysql_engine = create_engine(
-    appsettings.MYSQL_CONNECTION_STRING,
+if config.sqlserver.trusted_connection:
+    conn_str = f'mssql+pymssql://{config.sqlserver.user_name}@{config.sqlserver.server}:{config.sqlserver.port}/{config.sqlserver.database}?charset=ut8&trusted_connection={config.sqlserver.trusted_connection}'
+elif config.sqlserver.integrated_security:
+    conn_str = f'mssql+pymssql://{config.sqlserver.user_name}@{config.sqlserver.server}:{config.sqlserver.port}/{config.sqlserver.database}?charset=ut8&authentication={config.sqlserver.integrated_security}'
+else:
+    conn_str = f'mssql+pymssql://{config.sqlserver.user_name}:{config.sqlserver.password}@{config.sqlserver.server}:{config.sqlserver.port}/{config.sqlserver.database}?charset=utf8'
+
+print(f'Connect to SQL Server: {conn_str}')
+
+sqlserver_engine = create_engine(
+    conn_str,
     future=True
     # echo=True
 )
 
-sqlserver_engine = create_engine(
-    appsettings.SQLSERVER_CONNECTION_STRING,
-    future=True,
-    # echo=True
-)
-
-MysqlSession = sessionmaker(
-    autocommit=False, autoflush=False, bind=mysql_engine, future=True
-)
 SqlServerSession = sessionmaker(
     autocommit=False, autoflush=False, bind=sqlserver_engine, future=True
 )
