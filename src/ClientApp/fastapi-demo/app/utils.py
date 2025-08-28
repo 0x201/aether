@@ -12,7 +12,7 @@ def generate_password_reset_token(email: str) -> str:
     exp = expires.timestamp()
     encoded_jwt = jwt.encode(
         {"exp": exp, "nbf": now, "sub": email},
-        config.jwt_config.secret_key,
+        config.jwt_config.secret,
         algorithm="HS256",
     )
     return encoded_jwt
@@ -20,7 +20,11 @@ def generate_password_reset_token(email: str) -> str:
 
 def verify_password_reset_token(token: str) -> Optional[str]:
     try:
-        decoded_token = jwt.decode(token, config.jwt_config.secret_key, algorithms=["HS256"])
+        decoded_token = jwt.decode(token, config.jwt_config.secret, algorithms=["HS256"])
         return decoded_token["email"]
     except jwt.PyJWTError:
         return None
+
+
+def get_current_timestamp(output_format: str = "%Y%m%d%H%M%S") -> str:
+    return datetime.now().strftime(output_format)
