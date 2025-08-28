@@ -10,19 +10,17 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.core import security
 from config import config
-from app.db.session import SqlServerSession
+from app.db.session_connector import SessionConnector
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{config.api_base_url}/{config.api_version}/login/access-token"
+    tokenUrl=f"{config.api_config.api_prefix}/{config.api_config.api_version}/login/access-token"
 )
 
 
-def get_db() -> Generator:
-    db = SqlServerSession()
-    try:
+def get_db() -> Generator[Session, None, None]:
+    session_connector = SessionConnector()
+    with session_connector.get_session() as db:
         yield db
-    finally:
-        db.close()
 
 
 def get_current_user(
@@ -30,10 +28,10 @@ def get_current_user(
 ) -> models.User:
     try:
         payload = jwt.decode(
-            token, config.jwt_config.secret_key, algorithms=[security.ALGORITHM]
+            token, config.jwt_config.secret, algorithms=[security.ALGORITHM]
         )
         token_data = schemas.TokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
+    except (jwt.PyJWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
