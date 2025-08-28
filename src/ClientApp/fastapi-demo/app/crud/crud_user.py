@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
-from app.models import Role
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
@@ -55,11 +54,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def is_active(self, user: User) -> bool:
         return user.is_active
 
-    def is_superuser(self, db: Session, *, user: User) -> bool:
-        role = db.query(Role).filter(Role.name == 'admin').first()
-        if not role:
-            return False
-        return user.role_id == role.id
+    def is_superuser(self, *, user: User) -> bool:
+        for role in user.roles:
+            if role.name == 'admin':
+                return True
+        return False
 
 
 user = CRUDUser(User)
