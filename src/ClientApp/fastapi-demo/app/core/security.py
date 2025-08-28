@@ -16,10 +16,10 @@ def create_access_token(
         expire = datetime.now() + expires_delta
     else:
         expire = datetime.now() + timedelta(
-            minutes=config.jwt_config.access_token_expire_minutes
+            minutes=config.jwt_config.expire_minutes
         )
     to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, config.jwt_config.secret_key, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, config.jwt_config.secret, algorithm=ALGORITHM)
     return encoded_jwt
 
 
