@@ -25,7 +25,6 @@ class SessionConnector:
                 username=database_config.username,
                 password=database_config.password,
                 trusted_connection=database_config.trusted_connection,
-                authentication=database_config.authentication
             )
         return self.__database_instance
 

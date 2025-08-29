@@ -2,7 +2,6 @@ database:
   server: "localhost"
   port: 1433
   trusted_connection: true
-  authentication: ""
   username: "username"
   password: "YourStrongPassword"
   database: "Database Name"
