@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { apiReference } from '@scalar/nestjs-api-reference'
 
 import './tracing';
 
@@ -39,6 +40,18 @@ function useSwaggerModule(app: INestApplication) {
       docExpansion: 'none'
     }
   });
+
+  app.use(
+    '/scalar',
+    apiReference({
+      spec: {
+        content: document,
+      },
+      authentication: {
+        preferredSecurityScheme: 'bearerAuth',
+      },
+    }),
+  );
 }
 
 bootstrap();
