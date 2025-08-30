@@ -3,6 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from scalar_fastapi import get_scalar_api_reference
 from config import configure as configure_global_config, config
 from config.app_config import AppConfig
 
@@ -29,6 +30,22 @@ app.include_router(api_router, prefix=f"{config.api_config.api_prefix}/{config.a
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "environment": ENVIRONMENT}
+
+
+@app.get("/scalar", include_in_schema=False)
+async def scalar_html():
+    return get_scalar_api_reference(
+        openapi_url=app.openapi_url,
+        title=app.title,
+        authentication={
+            "preferredSecurityScheme": "bearerAuth",
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    )
 
 
 if __name__ == '__main__':
