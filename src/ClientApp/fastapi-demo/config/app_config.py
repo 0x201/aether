@@ -5,7 +5,7 @@ from typing import List, Optional, Any
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from loguru import logger
+from fastapi.logger import logger
 from yaml import safe_load
 
 
@@ -73,12 +73,12 @@ class AppConfig(BaseModel):
         super().__init__(**data)
         self.__config_dic: Any
         self.__project_root = get_project_root()
-        self.__env_name = determine_environment(env)
+        self.__env_name: str = determine_environment(env)
         self.__load_env_file()
         self.__load_config(config_file)
 
     def __load_env_file(self) -> None:
-        env_file_path = self.__project_root / "env" / f".env.{self.__env_name}"
+        env_file_path = self.__project_root / "config" / f".env.{self.__env_name}"
         if env_file_path.exists():
             load_dotenv(dotenv_path=env_file_path)
             logger.info("Loaded environment variables from {}", env_file_path)
@@ -123,8 +123,3 @@ class AppConfig(BaseModel):
     def cors_config(self) -> CorsConfig:
         cors = self.__config_dic.get("cors", {})
         return CorsConfig(**cors)
-
-    @property
-    def logging_config(self) -> LoggingConfig:
-        logging = self.__config_dic.get("logging", {})
-        return LoggingConfig(**logging)
