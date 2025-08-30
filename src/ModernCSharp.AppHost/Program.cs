@@ -52,6 +52,11 @@ var workflowApi = builder.AddProject<Projects.Workflow_API>("workflow-api")
     .WithReference(etlDb).WaitFor(etlDb)
     .WithHttpHealthCheck("/health");
 
+var workflowApp = builder.AddViteApp("workflow-app", @"../workflow-app", "pnpm")
+    .WithPnpmPackageInstallation()
+    .WithExternalHttpEndpoints()
+    .WithReference(orderingApi);
+
 builder.AddProject<Projects.OrderProcessor>("order-processor")
     .WithReference(redis)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
@@ -65,37 +70,31 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
-var nestjsApp = builder.AddPnpmApp("nestjs-app", @"..\ClientApp\nestjs-demo", "start")
+var bookStoreApi = builder.AddPnpmApp("bookstore-api", @"../bookstore-api", "start")
     .WithHttpEndpoint(targetPort: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
+bookStoreApi.WithUrl($"{bookStoreApi.GetEndpoint("https")}/docs", "Book Store API Swagger Docs");
 
-var angularApp = builder.AddPnpmApp("angular-app", @"..\ClientApp\angular-app", "start")
+var bookstoreApp = builder.AddPnpmApp("bookstore-app", @"../bookstore-app", "start")
     .WithHttpEndpoint(targetPort: 4200, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi);
 
-nestjsApp.WithUrl($"{nestjsApp.GetEndpoint("http")}/docs", "NestJs App Swagger Docs");
-
-var viteVueApp = builder.AddViteApp("vite-vue-app", @"..\ClientApp\vite-vue-app", "pnpm")
-    .WithPnpmPackageInstallation()
-    .WithReference(orderingApi)
-    .WithExternalHttpEndpoints();
-
-var viteReactApp = builder.AddViteApp("vite-react-app", @"..\ClientApp\vite-react-app", "pnpm")
-    .WithPnpmPackageInstallation()
-    .WithExternalHttpEndpoints()
-    .WithReference(orderingApi);
-
 #pragma warning disable ASPIREHOSTINGPYTHON001 
-var fastapiApp = builder.AddPythonApp("fastapi-app", @"..\ClientApp\fastapi-demo", "./.venv/Scripts/uvicorn.exe", ["main:app"])
+var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv/Scripts/uvicorn.exe", ["main:app"])
     .WithHttpEndpoint(targetPort: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 #pragma warning restore ASPIREHOSTINGPYTHON001
 
-fastapiApp.WithUrl($"{fastapiApp.GetEndpoint("http")}/docs", "FastApi App Swagger Docs");
+crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("https")}/docs", "Crawler API Swagger Docs");
+
+var crawlerApp = builder.AddViteApp("crawler-app", @"../crawler-app", "pnpm")
+    .WithPnpmPackageInstallation()
+    .WithReference(orderingApi)
+    .WithExternalHttpEndpoints();
 
 
 webApp.WithEnvironment("CallBackUrl", webApp.GetEndpoint("https"));

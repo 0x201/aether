@@ -18,7 +18,7 @@ export class AppController {
   @Get('test-telemetry')
   getTestTelemetry(): string {
     // Create a simple span to test telemetry
-    const tracer = trace.getTracer('nestjs-app');
+    const tracer = trace.getTracer('bookstore-api');
     const span = tracer.startSpan('test-telemetry-operation');
     
     try {

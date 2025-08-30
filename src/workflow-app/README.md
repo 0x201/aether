@@ -51,7 +51,7 @@ The system includes several predefined workflow templates:
 
 ### Prerequisites
 
-- .NET 8.0 SDK or later
+- .NET 9.0 SDK or later
 - Node.js 16.x or later
 - SQL Server LocalDB
 - PNPM (for frontend package management)
@@ -67,7 +67,7 @@ The system includes several predefined workflow templates:
 
 ### Frontend Setup
 
-1. Navigate to the `ClientApp/vite-react-app` directory
+1. Navigate to the `workflow-app` directory
 2. Install dependencies:
    ```bash
    pnpm install
@@ -133,14 +133,13 @@ src/
 │   ├── Services/           # Business logic
 │   ├── Data/               # Database context and migrations
 │   └── ...
-├── ClientApp/
-│   └── vite-react-app/    # Frontend application
-│       ├── src/
-│       │   ├── components/ # React components
-│       │   ├── services/   # API service clients
-│       │   ├── contexts/   # React contexts
-│       │   └── ...
-│       └── ...
+│── workflow-app/    # Frontend application
+│   ├── src/
+│   │   ├── components/ # React components
+│   │   ├── services/   # API service clients
+│   │   ├── contexts/   # React contexts
+│   │   └── ...
+│   └── ...
 └── ...
 ```
 

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-app": {
+    "bookstore-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "outputPath": "dist/angular-app",
+            "outputPath": "dist/bookstore-app",
             "assets": [
               {
                 "glob": "**/*",
@@ -59,10 +59,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angular-app:build:production"
+              "buildTarget": "bookstore-app:build:production"
             },
             "development": {
-              "buildTarget": "angular-app:build:development"
+              "buildTarget": "bookstore-app:build:development"
             }
           },
           "defaultConfiguration": "development"

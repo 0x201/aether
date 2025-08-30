@@ -10,7 +10,7 @@ import { GrpcInstrumentation } from '@opentelemetry/instrumentation-grpc';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
 const otlpServer = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:19109';
-const serviceName = process.env.OTEL_SERVICE_NAME || 'nestjs-app';
+const serviceName = process.env.OTEL_SERVICE_NAME || 'bookstore-api';
 
 console.log(`Initializing OpenTelemetry with OTLP endpoint: ${otlpServer}`);
 console.log(`Service name: ${serviceName}`);
