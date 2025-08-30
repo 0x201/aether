@@ -71,7 +71,7 @@ print(config.sqlserver.server)
 ## Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Run Database Migrations
@@ -82,10 +82,13 @@ alembic upgrade head
 
 ## Start Service
 
-### Windows
+```bash
+uv run main.py
+```
 
-Execute [run.ps1](file:///D:/Code/ModernCSharp/src/ClientApp/fastapi-demo/run.ps1)
 
-### Linux/Mac
+## Testing
 
-Execute [run.sh](file:///D:/Code/ModernCSharp/src/ClientApp/fastapi-demo/run.sh)
+```bash
+uv run coverage_report.py
+```
