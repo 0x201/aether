@@ -27,7 +27,7 @@ var identityDb = sqlServer.AddDatabase("identitydb");
 var orderDb = sqlServer.AddDatabase("orderingdb");
 var catalogDb = sqlServer.AddDatabase("catalogdb");
 var workflowDb = sqlServer.AddDatabase("workflowdb");
-var etlDb = sqlServer.AddDatabase("etlDb");
+var etlDb = sqlServer.AddDatabase("etldb");
 
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
@@ -79,7 +79,7 @@ bookStoreApi.WithUrl($"{bookStoreApi.GetEndpoint("http")}/docs", "Book Store API
 var bookstoreApp = builder.AddPnpmApp("bookstore-app", @"../bookstore-app", "start")
     .WithHttpEndpoint(targetPort: 4200, env: "PORT")
     .WithExternalHttpEndpoints()
-    .WithReference(orderingApi);
+    .WithReference(bookStoreApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv/Scripts/uvicorn.exe", ["main:app"])
@@ -93,7 +93,7 @@ crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/docs", "Crawler API Swagge
 
 var crawlerApp = builder.AddViteApp("crawler-app", @"../crawler-app", "pnpm")
     .WithPnpmPackageInstallation()
-    .WithReference(orderingApi)
+    .WithReference(crawlerApi)
     .WithExternalHttpEndpoints();
 
 
