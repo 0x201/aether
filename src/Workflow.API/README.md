@@ -1,56 +1,56 @@
 # Workflow.API
 
-这是一个基于 ASP.NET Core 的工作流引擎 API，参考了 Apache Airflow 的设计理念，实现了节点、节点执行器和调度器的核心组件。
+This is a workflow engine API based on ASP.NET Core, inspired by Apache Airflow's design concepts, implementing core components including nodes, node executors, and scheduler.
 
-## 功能特性
+## Features
 
-1. **节点管理**：
-   - 支持多种节点类型（起始节点、结束节点、任务节点、决策节点等）
-   - 节点数据持久化（当前使用内存存储）
-   - 节点连接管理
+1. **Node Management**:
+   - Support for multiple node types (start node, end node, task node, decision node, etc.)
+   - Node data persistence (currently using in-memory storage)
+   - Node connection management
 
-2. **节点执行器**：
-   - 不同类型节点的执行逻辑
-   - 节点间数据传递
-   - 决策节点条件评估
+2. **Node Executor**:
+   - Execution logic for different node types
+   - Data passing between nodes
+   - Decision node condition evaluation
 
-3. **工作流调度器**：
-   - 工作流实例管理
-   - 异步工作流执行
-   - 运行状态跟踪
+3. **Workflow Scheduler**:
+   - Workflow instance management
+   - Asynchronous workflow execution
+   - Running status tracking
 
-## 支持的节点类型
+## Supported Node Types
 
-- `start` - 起始节点
-- `end` - 结束节点
-- `dummy` - 任务节点（占位符）
-- `branch` - 决策节点
-- `bash` - Bash命令执行节点
-- `python` - Python脚本执行节点
-- `email` - 邮件发送节点
-- `http` - HTTP请求节点
-- `sql` - SQL执行节点
-- `subdag` - 子工作流节点
-- `sensor` - 传感器节点
-- `custom` - 自定义节点
-- `extract` - 数据提取节点（ETL）
-- `validate` - 数据验证节点（ETL）
-- `load` - 数据加载节点（ETL）
+- `start` - Start node
+- `end` - End node
+- `dummy` - Task node (placeholder)
+- `branch` - Decision node
+- `bash` - Bash command execution node
+- `python` - Python script execution node
+- `email` - Email sending node
+- `http` - HTTP request node
+- `sql` - SQL execution node
+- `subdag` - Sub-workflow node
+- `sensor` - Sensor node
+- `custom` - Custom node
+- `extract` - Data extraction node (ETL)
+- `validate` - Data validation node (ETL)
+- `load` - Data loading node (ETL)
 
-## API 端点
+## API Endpoints
 
-- `GET /api/workflows` - 获取所有工作流
-- `GET /api/workflows/{id}` - 根据ID获取工作流
-- `POST /api/workflows` - 创建新工作流
-- `PUT /api/workflows/{id}` - 更新工作流
-- `DELETE /api/workflows/{id}` - 删除工作流
-- `POST /api/workflows/{id}/execute` - 执行工作流
-- `GET /api/workflows/running` - 获取正在运行的工作流
-- `GET /api/etl/data` - 获取ETL处理后的数据
+- `GET /api/workflows` - Get all workflows
+- `GET /api/workflows/{id}` - Get workflow by ID
+- `POST /api/workflows` - Create new workflow
+- `PUT /api/workflows/{id}` - Update workflow
+- `DELETE /api/workflows/{id}` - Delete workflow
+- `POST /api/workflows/{id}/execute` - Execute workflow
+- `GET /api/workflows/running` - Get running workflows
+- `GET /api/etl/data` - Get ETL processed data
 
-## CORS 配置
+## CORS Configuration
 
-为了支持前端应用的跨域请求，API已配置CORS策略。默认情况下，允许所有来源、方法和标头的请求。
+To support cross-domain requests from frontend applications, CORS policy has been configured for the API. By default, requests from all origins, methods, and headers are allowed.
 
 ```csharp
 builder.Services.AddCors(options =>
@@ -66,7 +66,7 @@ builder.Services.AddCors(options =>
 app.UseCors("AllowAll");
 ```
 
-在生产环境中，建议限制允许的来源以提高安全性：
+In production environments, it is recommended to restrict allowed origins to improve security:
 
 ```csharp
 builder.Services.AddCors(options =>
@@ -80,112 +80,112 @@ builder.Services.AddCors(options =>
 });
 ```
 
-## 架构设计
+## Architecture Design
 
-### 核心组件
+### Core Components
 
-1. **Models** - 数据模型
-   - `WorkflowModel` - 工作流模型
-   - `WorkflowNode` - 工作流节点
-   - `WorkflowConnection` - 节点连接
-   - `NodeData` - 节点数据配置
-   - `Position` - 节点位置信息
+1. **Models** - Data models
+   - `WorkflowModel` - Workflow model
+   - `WorkflowNode` - Workflow node
+   - `WorkflowConnection` - Node connection
+   - `NodeData` - Node data configuration
+   - `Position` - Node position information
 
-2. **Services** - 核心服务
-   - `IWorkflowRepository` - 工作流数据存储接口
-   - `InMemoryWorkflowRepository` - 内存数据存储实现
-   - `INodeExecutor` - 节点执行器接口
-   - `NodeExecutor` - 节点执行器实现
-   - `IWorkflowScheduler` - 工作流调度器接口
-   - `WorkflowScheduler` - 工作流调度器实现
+2. **Services** - Core services
+   - `IWorkflowRepository` - Workflow data storage interface
+   - `InMemoryWorkflowRepository` - In-memory data storage implementation
+   - `INodeExecutor` - Node executor interface
+   - `NodeExecutor` - Node executor implementation
+   - `IWorkflowScheduler` - Workflow scheduler interface
+   - `WorkflowScheduler` - Workflow scheduler implementation
 
-## 示例工作流
+## Sample Workflows
 
-API内置了四个示例工作流，用于演示不同类型的场景：
+The API includes four sample workflows to demonstrate different scenarios:
 
-### 1. 简单线性工作流 (ID: 1)
-包含一个简单的线性执行流程：
+### 1. Simple Linear Workflow (ID: 1)
+Contains a simple linear execution flow:
 Start → Process Data → Validate Results → End
 
-### 2. 决策工作流 (ID: 2)
-包含一个决策节点，根据条件选择不同的执行路径：
+### 2. Decision Workflow (ID: 2)
+Contains a decision node that selects different execution paths based on conditions:
 Start → Data Analysis → Check Value → (High Value Path / Low Value Path) → End
 
-### 3. 复杂工作流 (ID: 3)
-包含多个并行处理路径和决策节点的复杂流程：
+### 3. Complex Workflow (ID: 3)
+A complex flow with multiple parallel processing paths and decision nodes:
 Start → Data Ingestion → (ETL Process & Data Validation) → Quality Check → (High Quality Processing / Error Handling) → Data Storage → End
 
-### 4. ETL工作流 (ID: 4)
-专门用于ETL（提取、转换、加载）的数据处理流程：
+### 4. ETL Workflow (ID: 4)
+A dedicated workflow for ETL (Extract, Transform, Load) data processing:
 Start → Extract Data → Validate Data → Load to Database → End
 
-## ETL功能说明
+## ETL Function Description
 
-ETL工作流包含三个专门的节点类型，用于处理数据提取、验证和加载：
+ETL workflows include three specialized node types for handling data extraction, validation, and loading:
 
-### Extract Node（提取节点）
-- 从文件系统中提取数据
-- 支持JSON格式的文件
-- 可配置文件路径等参数
-- 实际读取并解析指定的JSON文件
+### Extract Node
+- Extracts data from the file system
+- Supports JSON format files
+- Configurable file path and other parameters
+- Actually reads and parses the specified JSON file
 
-### Validate Node（验证节点）
-- 验证提取的数据是否符合预期格式
-- 检查必需字段是否存在
-- 验证数据类型和范围
-- 验证邮箱格式等业务规则
+### Validate Node
+- Validates whether extracted data conforms to expected format
+- Checks if required fields exist
+- Validates data types and ranges
+- Validates email format and other business rules
 
-### Load Node（加载节点）
-- 将验证通过的数据加载到内存数据库中
-- 支持配置目标表名
-- 提供加载行数统计
-- 数据存储在内存中，可通过API访问
+### Load Node
+- Loads validated data into an in-memory database
+- Supports configurable table names
+- Provides load row count statistics
+- Data is stored in memory and can be accessed via API
 
-数据存储在内存数据库中，可通过`GET /api/etl/data`端点访问查询。
+Data is stored in an in-memory database and can be accessed via the `GET /api/etl/data` endpoint.
 
-## 前端集成
+## Frontend Integration
 
-前端应用位于 `src/ClientApp/vite-react-app` 目录中，包含以下功能：
+The frontend application is located in the `src/workflow-app` directory and includes the following features:
 
-1. **可视化工作流编辑器** - 使用React构建的可视化工作流编辑器
-2. **工作流列表** - 显示所有可用的工作流并支持执行
-3. **API服务集成** - 通过 `workflowService.ts` 与后端API交互
+1. **Visual Workflow Editor** - A React-based visual workflow editor
+2. **Workflow List** - Displays all available workflows and supports execution
+3. **API Service Integration** - Interacts with backend API through `workflowService.ts`
 
-### 前端组件
+### Frontend Components
 
-- `WorkflowEditor` - 可视化工作流编辑器
-- `WorkflowList` - 工作流列表和详情查看
-- `WorkflowService` - 与后端API通信的服务
+- `WorkflowEditor` - Visual workflow editor
+- `WorkflowList` - Workflow list and detail view
+- `WorkflowService` - Service for communicating with backend API
 
-## 使用示例
+## Usage Examples
 
 ```bash
-# 获取所有工作流
+# Get all workflows
 curl -X GET http://localhost:5207/api/workflows
 
-# 获取特定工作流
+# Get specific workflow
 curl -X GET http://localhost:5207/api/workflows/4
 
-# 执行ETL工作流
+# Execute ETL workflow
 curl -X POST http://localhost:5207/api/workflows/4/execute
 
-# 获取ETL处理后的数据
+# Get ETL processed data
 curl -X GET http://localhost:5207/api/etl/data
 
-# 获取正在运行的工作流
+# Get running workflows
 curl -X GET http://localhost:5207/api/workflows/running
 ```
 
-## 扩展性
+## Extensibility
 
-该工作流引擎设计具有良好的扩展性：
+This workflow engine is designed with good extensibility:
 
-1. 可以轻松添加新的节点类型
-2. 可以替换数据存储实现（如使用数据库）
-3. 可以增强节点执行器的功能
-4. 可以改进调度器的调度策略
+1. New node types can be easily added
+2. Data storage implementation can be replaced (e.g., using a database)
+3. Node executor functionality can be enhanced
+4. Scheduler's scheduling strategy can be improved
 
-## 参考
+## References
 
-本项目参考了以下开源项目的理念：
-- [Apache Airflow](https://airflow.apache.org/) - 工作流调度和监控平台
+This project draws inspiration from the following open-source projects:
+- [Apache Airflow](https://airflow.apache.org/) - Workflow scheduling and monitoring platform
