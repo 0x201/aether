@@ -17,11 +17,11 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.db.base import Base
-from app.models.user import User
-from app.models.role import Role
-from app.models.user_role import UserRole
-from app.models.book_author import BookAuthor
+from src.db.base import Base
+from src.models.user import User
+from src.models.role import Role
+from src.models.user_role import UserRole
+from src.models.book_author import BookAuthor
 
 target_metadata = Base.metadata
 

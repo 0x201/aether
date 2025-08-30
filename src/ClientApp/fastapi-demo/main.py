@@ -11,7 +11,7 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 app_config = AppConfig()
 configure_global_config(app_config)
 
-from app.api.api_v1.api import api_router
+from src.api.api_v1.api import api_router
 
 app = FastAPI(title="Fastapi Demo",
               openapi_url=f"{config.api_config.api_prefix}/{config.api_config.api_version}/openapi.json")
