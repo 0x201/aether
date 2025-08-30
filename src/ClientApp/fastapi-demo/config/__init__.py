@@ -41,10 +41,6 @@ class GlobalConfigProxy:
     def api_config(self) -> "ApiConfig":
         return self.__ensure_configured().api_config
 
-    @property
-    def logging_config(self) -> "LoggingConfig":
-        return self.__ensure_configured().logging_config
-
     def is_configure(self) -> bool:
         return self.__config is not None
 
