@@ -26,10 +26,10 @@ async function bootstrap() {
 
 function useSwaggerModule(app: INestApplication) {
   const openApi = new DocumentBuilder()
-    .setTitle('Nestjs Demo Api')
-    .setDescription('The nest js demo api swagger ui.')
+    .setTitle('Bookstore Api')
+    .setDescription('The bookstore api swagger ui.')
     .setVersion('1.0')
-    .addTag('Nestjs-demo')
+    .addTag('Bookstore-api')
     .addBearerAuth()
     .build();
 

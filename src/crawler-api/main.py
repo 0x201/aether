@@ -13,7 +13,7 @@ configure_global_config(app_config)
 
 from src.api.api_v1.api import api_router
 
-app = FastAPI(title="Fastapi Demo",
+app = FastAPI(title="Crawler App",
               openapi_url=f"{config.api_config.api_prefix}/{config.api_config.api_version}/openapi.json")
 
 app.add_middleware(
