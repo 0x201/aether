@@ -27,15 +27,18 @@ The Bookstore App is an Angular frontend application designed to work with the B
 ## Features
 
 - Modern Angular application with standalone components
-- Responsive design using SCSS
+- Responsive design using SCSS and Angular Material
 - Routing capabilities
 - Zone.js-free change detection (zoneless)
 - TypeScript for type safety
 - Modular architecture
+- Book browsing and management
+- Admin interface for book management
 
 ## Technology Stack
 
 - [Angular 20](https://angular.io/) - Frontend framework
+- [Angular Material](https://material.angular.io/) - UI Component library
 - [TypeScript](https://www.typescriptlang.org/) - Typed JavaScript
 - [SCSS](https://sass-lang.com/) - CSS preprocessor
 - [RxJS](https://rxjs.dev/) - Reactive programming library
@@ -46,6 +49,12 @@ The Bookstore App is an Angular frontend application designed to work with the B
 ```
 src/
 ├── app/                    # Main application folder
+│   ├── admin/              # Admin components
+│   ├── books/              # Books related components
+│   ├── home/               # Home page component
+│   ├── material/           # Angular Material module
+│   ├── models/             # Data models
+│   ├── services/           # Services for API communication
 │   ├── app.config.ts      # Application configuration
 │   ├── app.html           # Root component template
 │   ├── app.routes.ts      # Application routing
@@ -77,10 +86,11 @@ pnpm install
 ### Running the Application
 
 ```bash
-# Development server
+# Development server with proxy to API
 pnpm start
 
 # The application will be available at http://localhost:4200/
+# Requests to /api will be proxied to http://localhost:3000
 ```
 
 ## Development
@@ -118,11 +128,13 @@ The application uses Angular CLI for project management and follows the standard
 - `tsconfig.json` - TypeScript configuration
 - `tsconfig.app.json` - TypeScript configuration for the application
 - `tsconfig.spec.json` - TypeScript configuration for tests
+- `proxy.conf.json` - Proxy configuration for API requests
 
 The application is configured with:
 - Zoneless change detection for better performance
 - SCSS for styling
 - Standalone components (Angular 19+ approach)
+- Angular Material for UI components
 
 ## Deployment
 

@@ -1,0 +1,45 @@
+<div class="page-header">
+  <h1>Book Catalog</h1>
+  <div class="search-container">
+    <mat-form-field appearance="outline">
+      <mat-label>Search books</mat-label>
+      <input matInput placeholder="Enter book title or author" #searchInput>
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+</div>
+
+@let state = booksService.booksState$ | async;
+
+@if (state?.loading) {
+  <div class="spinner-container">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <div class="book-grid">
+    @for (book of state?.data; track book.id) {
+      <mat-card class="book-card">
+        <mat-card-header>
+          <mat-card-title>{{ book.title }}</mat-card-title>
+          <mat-card-subtitle>{{ book.isbn }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p><strong>Price:</strong> ${{ book.price }}</p>
+          <p><strong>Published:</strong> {{ book.publishDate }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" (click)="viewDetails(book.id)">
+            <mat-icon>visibility</mat-icon>
+            View Details
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <mat-card>
+        <mat-card-content>
+          <p>No books found.</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}

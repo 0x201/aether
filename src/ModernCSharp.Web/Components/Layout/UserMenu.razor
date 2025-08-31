@@ -6,20 +6,12 @@
 
 <AuthorizeView>
     <Authorized>
-        <h3>@context.User.Identity?.Name</h3>
-        <div class="dropdown-menu">
-            <span class="dropdown-button"><img role="presentation" src="icons/user.svg" /></span>
-            <div class="dropdown-content">
-                <a class="dropdown-item" href="user/orders">My orders</a>
-@*                 <form class="dropdown-item" method="post" action="user/logout" @formname="logout" @onsubmit="LogOutAsync">
-                    <AntiforgeryToken />
-                    <button type="submit">Log out</button>
-                </form> *@
-            </div>
+        <div>
+            <h3>@context.User.Identity?.Name</h3><span class="bi bi-person-lock">AAAAAAAA</span>
         </div>
     </Authorized>
     <NotAuthorized>
-        <a aria-label="Sign in" href="@Pages.User.LogIn.Url(Nav)"><img role="presentation" src="icons/user.svg" /></a>
+        <a aria-label="Sign in" href="@Pages.User.LogIn.Url(Nav)"><span class="bi bi-person-lock"></span>Login</a>
     </NotAuthorized>
 </AuthorizeView>
 

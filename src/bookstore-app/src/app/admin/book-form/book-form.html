@@ -1,0 +1,56 @@
+<h2 matDialogTitle>{{ isEditMode ? 'Edit Book' : 'Add Book' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="bookForm" (ngSubmit)="onSubmit()" class="form-container">
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" required>
+      @if (bookForm.get('title')?.hasError('required')) {
+        <mat-error>Title is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>ISBN</mat-label>
+      <input matInput formControlName="isbn" required>
+      @if (bookForm.get('isbn')?.hasError('required')) {
+        <mat-error>ISBN is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" formControlName="price" required>
+      @if (bookForm.get('price')?.hasError('required')) {
+        <mat-error>Price is required</mat-error>
+      }
+      @if (bookForm.get('price')?.hasError('min')) {
+        <mat-error>Price must be greater than 0</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Publish Date</mat-label>
+      <input matInput [matDatepicker]="publishDatePicker" formControlName="publishDate">
+      <mat-datepicker-toggle matSuffix [for]="publishDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #publishDatePicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Author IDs (comma separated)</mat-label>
+      <input matInput formControlName="authorIds" placeholder="e.g., 1, 2, 3">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button matDialogClose>Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="!bookForm.valid" (click)="onSubmit()">
+    {{ isEditMode ? 'Update' : 'Create' }}
+  </button>
+</mat-dialog-actions>

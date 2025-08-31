@@ -1,0 +1,39 @@
+.sidenav-container {
+  flex: 1;
+  min-height: 0; // Allow sidenav container to shrink
+}
+
+.sidenav {
+  width: 250px;
+  padding-top: 0; // Remove default padding that might cause gap
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.bookstore-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.main-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.active-link {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 599px) {
+  .sidenav-container {
+    height: calc(100vh - 56px); // Adjust for mobile toolbar height
+  }
+}
