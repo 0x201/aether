@@ -13,6 +13,7 @@ import { SignUpUserCommand } from '../users/commands/signup-user.command';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AllowAnonymous } from './auth.guard';
+import { RefreshTokenDto } from './refresh-token.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -30,8 +31,8 @@ export class AuthController {
   @AllowAnonymous()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body('refresh_token') refreshToken: string) {
-    return this.authService.refreshAccessToken(refreshToken);
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshAccessToken(refreshTokenDto.refresh_token);
   }
 
   @Get('profile')

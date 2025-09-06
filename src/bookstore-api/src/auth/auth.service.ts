@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class AuthService {
   private readonly jwtConfig: JwtConfig;
+  private readonly usedRefreshTokens: Set<string> = new Set();
 
   constructor(
     private readonly jwtService: JwtService,
@@ -73,8 +74,12 @@ export class AuthService {
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string }> {
+  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string; refresh_token: string }> {
     try {
+      if (this.usedRefreshTokens.has(refreshToken)) {
+        throw new UnauthorizedException('Refresh token has been used');
+      }
+
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.jwtConfig.secret,
       });
@@ -83,6 +88,8 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
+      
+      this.usedRefreshTokens.add(refreshToken);
       
       const roles: string[] =
         user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
@@ -99,7 +106,22 @@ export class AuthService {
         secret: this.jwtConfig.secret,
       });
       
-      return { access_token: newAccessToken };
+      // 生成新的refresh token
+      const newRefreshPayload = {
+        sub: user.id.toString(),
+        username: user.username,
+        tokenId: uuidv4(),
+      };
+      
+      const newRefreshToken = await this.jwtService.signAsync(newRefreshPayload, {
+        expiresIn: this.jwtConfig.refreshTokenExpiresIn,
+        secret: this.jwtConfig.secret,
+      });
+      
+      return { 
+        access_token: newAccessToken,
+        refresh_token: newRefreshToken,
+      };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }

@@ -27,34 +27,34 @@ export class BooksService {
       const authorMap = new Map(authors.map(a => [a.id, a]));
 
       const booksToSave: Book[] = [];
-      const bookAuthorsToSave: BookAuthor[] = [];
 
       for (const command of createBookCommands) {
         const currentAuthorIds = command.authorIds.map(authorId => authorMap.get(authorId));
         if (!currentAuthorIds || currentAuthorIds.length === 0) {
           throw new Error(`Authors with IDs ${command.authorIds} not found.`);
         }
-
+        const publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
+        
         const book = new Book();
         book.title = command.title;
-        book.publishDate = command.publishDate;
+        book.publishDate = publishDate;
         book.price = command.price;
         book.description = command.description;
         book.isbn = command.isbn;
         booksToSave.push(book);
-
-        command.authorIds.forEach((authorId) => {
-          const bookAuthor = new BookAuthor();
-          bookAuthor.bookId = -1; // placeholder, will be replaced
-          bookAuthor.authorId = authorId;
-          bookAuthorsToSave.push(bookAuthor);
-        });
       }
 
       const savedBooks = await queryRunner.manager.save(booksToSave);
 
+      const bookAuthorsToSave: BookAuthor[] = [];
       savedBooks.forEach((book, index) => {
-        bookAuthorsToSave[index].bookId = book.id;
+        const command = createBookCommands[index];
+        command.authorIds.forEach((authorId) => {
+          const bookAuthor = new BookAuthor();
+          bookAuthor.bookId = book.id;
+          bookAuthor.authorId = authorId;
+          bookAuthorsToSave.push(bookAuthor);
+        });
       });
 
       await queryRunner.manager.save(bookAuthorsToSave);
@@ -68,13 +68,11 @@ export class BooksService {
     }
   }
 
-  async create(command: CreateBookCommand) {
+  async create(command: CreateBookCommand): Promise<Book> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    let booksToAdd: Book[] = [];
     try {
-
       const authors = await queryRunner.manager.find(Author, { where: { id: In(command.authorIds) } });
 
       const authorMap = new Map(authors.map(a => [a.id, a]));
@@ -88,34 +86,31 @@ export class BooksService {
 
       const book = new Book();
       book.title = command.title;
-      book.publishDate = command.publishDate;
+      // 转换日期格式为 yyyy-MM-dd
+      book.publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
       book.price = command.price;
       book.description = command.description;
       book.isbn = command.isbn;
 
+      const savedBook = await queryRunner.manager.save(book);
+
       command.authorIds.forEach((authorId) => {
         const bookAuthor = new BookAuthor();
-        bookAuthor.bookId = -1; // placeholder, will be replaced
+        bookAuthor.bookId = savedBook.id;
         bookAuthor.authorId = authorId;
         bookAuthorsToSave.push(bookAuthor);
-      });
-
-      const savedBooks = await queryRunner.manager.save(booksToAdd);
-
-      savedBooks.forEach((book, index) => {
-        bookAuthorsToSave[index].bookId = book.id;
       });
 
       await queryRunner.manager.save(bookAuthorsToSave);
 
       await queryRunner.commitTransaction();
+      return savedBook;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
     }
-
   }
 
   async findAll(query: BookQuery): Promise<[Book[], number]> {
@@ -162,14 +157,15 @@ export class BooksService {
         throw new Error(`Book with id ${id} not found`);
       }
       book.title = command.title;
-      book.publishDate = command.publishDate;
+      // 转换日期格式为 yyyy-MM-dd
+      book.publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
 
       const authors = await queryRunner.manager.find(Author, { where: { id: In(command.authorIds) } });
       if (!authors || authors.length === 0) {
         throw new Error(`Author with IDs ${command.authorIds} not found`);
       }
 
-      await queryRunner.manager.delete(BookAuthor, { where: { bookId: book.id, authorId: In(command.authorIds) } })
+      await queryRunner.manager.delete(BookAuthor, { bookId: book.id })
 
       const newBookAuthors = command.authorIds.map((authorId) =>
         queryRunner.manager.create(BookAuthor, {
