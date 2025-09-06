@@ -1,50 +1,27 @@
 import argparse
 import os
 from pathlib import Path
-from typing import List, Optional, Any
+from typing import Optional, Any
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from fastapi.logger import logger
 from yaml import safe_load
 
-
-class DatabaseConfig(BaseModel):
-    server: str
-    port: Optional[int] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
-    database: Optional[str] = None
-    trusted_connection: bool = False
-    authentication: Optional[str] = None
-
-
-class JwtConfig(BaseModel):
-    secret: str = "secret"
-    expire_minutes: int = 120
-
-
-class CorsConfig(BaseModel):
-    cors_allow_origins: List[str] = []
-    cors_allow_methods: List[str] = []
-
-
-class ApiConfig(BaseModel):
-    api_version: str = "v1"
-    api_prefix: str = ""
-    port: int = 8000
-    host: str = "localhost"
-
-
-class NPPAConfig(BaseModel):
-    base_url: str
-    data_url: str
-    suffix: str
+from .model import (
+    ApiConfig,
+    CorsConfig,
+    DatabaseConfig,
+    JwtConfig,
+    NPPAConfig,
+)
 
 
 def determine_environment(env: Optional[str | Path]) -> str:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env", default=None, help="Environment to use (local, dev, uat, prod)")
+    parser.add_argument(
+        "--env", default=None, help="Environment to use (local, dev, uat, prod)"
+    )
     args, _ = parser.parse_known_args()
     env_value = env or args.env or os.getenv("FASTAPI_ENV", "local")
     env_map = {
@@ -60,16 +37,22 @@ def determine_environment(env: Optional[str | Path]) -> str:
 def get_project_root() -> Path:
     current_path = Path(__file__).resolve()
     while current_path != current_path.root:
-        if (current_path / "main.py").exists() or (
-                current_path / "config"
-        ).is_dir():
+        if (current_path / "main.py").exists() or (current_path / "config").is_dir():
             return current_path
         current_path = current_path.parent
-    raise RuntimeError("Project root directory not found. Ensure 'main.py' or 'config/' exists in the project root")
+    raise RuntimeError(
+        "Project root directory not found. Ensure 'main.py' or 'config/' exists in the project root"
+    )
 
 
 class AppConfig(BaseModel):
-    def __init__(self, /, config_file: Optional[str | Path] = None, env: Optional[str | Path] = None, **data: Any):
+    def __init__(
+        self,
+        /,
+        config_file: Optional[str | Path] = None,
+        env: Optional[str | Path] = None,
+        **data: Any,
+    ):
         super().__init__(**data)
         self.__config_dic: Any
         self.__project_root = get_project_root()
@@ -87,22 +70,29 @@ class AppConfig(BaseModel):
 
             if default_env_file_path.exists():
                 load_dotenv(dotenv_path=default_env_file_path)
-                logger.info("Loaded environment variables from {}", default_env_file_path)
+                logger.info(
+                    "Loaded environment variables from {}", default_env_file_path
+                )
             else:
-                logger.warning("No environment variables file found for {}", self.__env_name)
+                logger.warning(
+                    "No environment variables file found for {}", self.__env_name
+                )
 
     def __load_config(self, config_file: Optional[str | Path]) -> None:
         if config_file:
             config_file_path = config_file
         else:
-            config_file_path = self.__project_root / "config" / f"appsettings.{self.__env_name}.yaml"
+            config_file_path = (
+                self.__project_root / "config" / f"appsettings.{self.__env_name}.yaml"
+            )
 
         try:
             with open(config_file_path, "r", encoding="u8") as file:
                 self.__config_dic = safe_load(file) or {}
         except FileNotFoundError:
             raise FileNotFoundError(
-                f"Config file not found: {config_file_path}. Ensure config file exists for environment '{self.__env_name}'")
+                f"Config file not found: {config_file_path}. Ensure config file exists for environment '{self.__env_name}'"
+            )
 
     @property
     def database_config(self) -> DatabaseConfig:
@@ -123,3 +113,8 @@ class AppConfig(BaseModel):
     def cors_config(self) -> CorsConfig:
         cors = self.__config_dic.get("cors", {})
         return CorsConfig(**cors)
+
+    @property
+    def nppa_config(self) -> NPPAConfig:
+        nppa = self.__config_dic.get("nppa", {})
+        return NPPAConfig(**nppa)

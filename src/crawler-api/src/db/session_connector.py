@@ -10,14 +10,14 @@ class SessionConnector:
         self.__database_config: Optional[DatabaseConfig] = None
         self.__database_instance: Optional[MSSQLSession] = None
 
-    def __get_database_config(self) -> DatabaseConfig:
+    def _get_database_config(self) -> DatabaseConfig:
         if self.__database_config is None:
             self.__database_config = config.database_config
         return self.__database_config
 
-    def __get_database(self) -> MSSQLSession:
+    def _get_database(self) -> MSSQLSession:
         if self.__database_instance is None:
-            database_config = self.__get_database_config()
+            database_config = self._get_database_config()
             self.__database_instance = MSSQLSession(
                 server=database_config.server,
                 database=database_config.database,
@@ -29,5 +29,5 @@ class SessionConnector:
         return self.__database_instance
 
     def get_session(self):
-        db = self.__get_database()
+        db = self._get_database()
         return db.get_session()

@@ -25,9 +25,9 @@ class NPPAGameAuditCrawler:
     National Press and Publication Administration (NPPA) Game Audit Crawler
     """
     def __init__(self):
-        self.base_url = config.nppa.base_url
-        self.data_url = config.nppa.data_url
-        self.suffix = config.nppa.suffix
+        self.base_url = config.nppa_config.base_url
+        self.data_url = config.nppa_config.data_url
+        self.suffix = config.nppa_config.suffix
 
     @staticmethod
     def _convert_to_soup(url: str):
