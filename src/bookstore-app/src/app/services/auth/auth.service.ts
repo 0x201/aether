@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { RefreshTokenDto } from './refresh-token.dto';
 
 export interface LoginRequest {
   username: string;
@@ -55,7 +56,7 @@ export class AuthService {
             localStorage.setItem(this.ACCESS_TOKEN_KEY, response.access_token);
             localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refresh_token);
             this.isAuthenticatedSubject.next(true);
-            this.userRolesSubject.next(this.getUserRoles());
+            this.updateUserRoles();
           }
         })
       );
@@ -93,6 +94,14 @@ export class AuthService {
     return [];
   }
 
+  updateUserRoles(): void {
+    this.userRolesSubject.next(this.getUserRoles());
+  }
+
+  getUserRolesObservable(): Observable<string[]> {
+    return this.userRolesSubject.asObservable();
+  }
+
   hasRole(role: string): boolean {
     const roles = this.getUserRoles();
     return roles.includes(role);
@@ -105,6 +114,38 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  refreshToken(): Observable<LoginResponse> {
+    const refreshToken = this.getRefreshToken();
+    
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    const refreshTokenDto: RefreshTokenDto = { refresh_token: refreshToken };
+    
+    return this.http.post<LoginResponse>('/api/auth/refresh', refreshTokenDto)
+      .pipe(
+        tap(response => {
+          if (response.access_token && response.refresh_token) {
+            localStorage.setItem(this.ACCESS_TOKEN_KEY, response.access_token);
+            localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refresh_token);
+            this.isAuthenticatedSubject.next(true);
+            this.updateUserRoles();
+          }
+        }),
+        catchError(error => {
+          // If refresh token is invalid, logout the user
+          this.logout();
+          return throwError(() => error);
+        })
+      );
   }
 
   private hasToken(): boolean {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -12,6 +12,7 @@ import { BooksService } from '../../services/books.service';
 import { Book } from '../../models/book.model';
 import { BookFormComponent } from '../book-form/book-form';
 import { AsyncPipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-book-management',
@@ -24,17 +25,18 @@ import { AsyncPipe } from '@angular/common';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    AsyncPipe
-  ]
+    AsyncPipe,
+    RouterModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BookManagementComponent implements OnInit, AfterViewInit {
+export class BookManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   books: MatTableDataSource<Book> = new MatTableDataSource<Book>([]);
   booksService = inject(BooksService);
   displayedColumns: string[] = ['title', 'isbn', 'price', 'publishDate', 'actions'];
-  
-  // Pagination
+
   pageSize = 10;
   currentPage = 0;
   totalBooks = 0;
@@ -42,33 +44,37 @@ export class BookManagementComponent implements OnInit, AfterViewInit {
   constructor(
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-  ){}
-
-  ngOnInit(): void {    
-    this.loadBooks();
+  ) {
   }
 
-  ngAfterViewInit(): void {
-    if (this.paginator) {
-      // Set up paginator after view init
-      this.books.paginator = this.paginator;
-      
-      this.paginator.page.subscribe((event: PageEvent) => {
-        this.currentPage = event.pageIndex;
-        this.pageSize = event.pageSize;
-        this.loadBooks();
-      });
-    }
+  ngOnInit(): void {
+    this.loadBooks();
   }
 
   loadBooks(): void {
     this.booksService.booksState$.subscribe(state => {
       if (state?.data) {
         this.books.data = state.data;
+        if (this.paginator) {
+          this.paginator.length = this.totalBooks;
+        }
       }
     });
 
-    this.booksService.refreshBooks()
+    this.booksService.getBooks(this.currentPage, this.pageSize).subscribe({
+      next: (result) => {
+        this.totalBooks = result.totalCount;
+        if (this.paginator) {
+          this.paginator.length = this.totalBooks;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading books:', error);
+        this.snackBar.open('Error loading books', 'Close', {
+          duration: 3000
+        });
+      }
+    });
   }
 
   onPageChange(event: PageEvent): void {
@@ -116,7 +122,7 @@ export class BookManagementComponent implements OnInit, AfterViewInit {
             this.snackBar.open(`Book "${updatedBook.title}" updated successfully`, 'Close', {
               duration: 3000
             });
-            this.loadBooks(); // Refresh the list
+            this.loadBooks();
           },
           error: (error) => {
             console.error('Error updating book:', error);

@@ -5,46 +5,41 @@
     </button>
     <span>Bookstore App</span>
     <span class="spacer"></span>
-    <button mat-button routerLink="/home">
-      <mat-icon>home</mat-icon>
-      Home
+    <button mat-icon-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
     </button>
-    <button mat-button routerLink="/books">
-      <mat-icon>menu_book</mat-icon>
-      Books
-    </button>
-    <button mat-button routerLink="/admin/books">
-      <mat-icon>manage_accounts</mat-icon>
-      Admin
-    </button>
-    <button mat-icon-button (click)="logout()">
-      <mat-icon>exit_to_app</mat-icon>
-    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item routerLink="/users/profile">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
   </mat-toolbar>
 
   <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav #sidenav [mode]="(isHandset$ | async) ? 'over' : 'side'" 
-                 [opened]="!(isHandset$ | async)"
-                 fixedInViewport="false"
-                 class="sidenav">
+    <mat-sidenav #sidenav [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)"
+      fixedInViewport="false" class="sidenav">
       <mat-nav-list>
-        <a mat-list-item routerLink="/home" (click)="sidenav.close()" routerLinkActive="active-link">
+        <a mat-list-item routerLink="/home" routerLinkActive="active-link">
           <mat-icon>home</mat-icon>
           Home
         </a>
-        <a mat-list-item routerLink="/books" (click)="sidenav.close()" routerLinkActive="active-link">
+        <a mat-list-item routerLink="/books" routerLinkActive="active-link">
           <mat-icon>menu_book</mat-icon>
           Browse Books
         </a>
-        <a mat-list-item routerLink="/admin/books" (click)="sidenav.close()" routerLinkActive="active-link">
-          <mat-icon>manage_accounts</mat-icon>
-          Book Management
-        </a>
+        <div>
+          <!-- Adding a wrapper to better see if the element is rendered -->
+          <a mat-list-item routerLink="/books/management" routerLinkActive="active-link" *appRoleAny="['admin']">
+            <mat-icon>library_books</mat-icon>
+            Book Management
+          </a>
+        </div>
         <mat-divider></mat-divider>
-        <a mat-list-item (click)="logout()">
-          <mat-icon>exit_to_app</mat-icon>
-          Logout
-        </a>
       </mat-nav-list>
     </mat-sidenav>
 

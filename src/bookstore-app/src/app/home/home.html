@@ -18,13 +18,17 @@
           <mat-icon>menu_book</mat-icon>
           Browse Books
         </button>
-        <button mat-raised-button color="accent" routerLink="/admin/books" *appRoleAny="['admin']">
+        <button mat-raised-button color="accent" routerLink="/books/management" *appRoleAny="['admin']">
           <mat-icon>manage_accounts</mat-icon>
           Manage Books
         </button>
       </div>
     </mat-card-content>
     <mat-card-actions align="end">
+      <button mat-button routerLink="/admin">
+        <mat-icon>account_circle</mat-icon>
+        My Profile
+      </button>
       <button mat-button (click)="logout()">
         <mat-icon>exit_to_app</mat-icon>
         Logout

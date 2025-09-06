@@ -35,8 +35,8 @@ export class BooksService {
     this.updateBooksState({ loading: true, error: null });
 
     const params = {
-      page: page.toString(),
-      pageSize: pageSize.toString()
+      skipCount: page * pageSize,
+      maxResultCount: pageSize
     };
 
     return this.http.get<PagedResult<Book>>(this.baseUrl, { params }).pipe(

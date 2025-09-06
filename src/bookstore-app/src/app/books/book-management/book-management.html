@@ -1,0 +1,63 @@
+<div class="page-header">
+  <h1>Book Management</h1>
+  <button mat-raised-button color="primary" (click)="openAddBookDialog()">
+    <mat-icon>add</mat-icon>
+    Add Book
+  </button>
+</div>
+
+@let state = booksService.booksState$ | async;
+
+@if (state?.loading) {
+<div class="spinner-container">
+  <mat-spinner></mat-spinner>
+</div>
+} @else if (state) {
+<div class="table-container">
+  <table mat-table [dataSource]="books" matSort>
+    <!-- Title Column -->
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
+      <td mat-cell *matCellDef="let book">{{ book.title }}</td>
+    </ng-container>
+
+    <!-- ISBN Column -->
+    <ng-container matColumnDef="isbn">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>ISBN</th>
+      <td mat-cell *matCellDef="let book">{{ book.isbn }}</td>
+    </ng-container>
+
+    <!-- Price Column -->
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+      <td mat-cell *matCellDef="let book">${{ book.price }}</td>
+    </ng-container>
+
+    <!-- Publish Date Column -->
+    <ng-container matColumnDef="publishDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Publish Date</th>
+      <td mat-cell *matCellDef="let book">{{ book.publishDate }}</td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let book">
+        <button mat-icon-button color="primary" (click)="editBook(book)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteBook(book.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+<mat-paginator [length]="totalBooks" [pageIndex]="currentPage" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+  showFirstLastButtons="true" (page)="onPageChange($event)" aria-label="Select page" #paginator>
+</mat-paginator>
+}

@@ -1,0 +1,32 @@
+.profile-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.profile-info {
+  mat-list-item {
+    height: auto;
+    padding: 16px 0;
+    
+    &:not(:last-child) {
+      border-bottom: 1px solid #e0e0e0;
+    }
+  }
+  
+  mat-icon {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  
+  mat-chip {
+    margin: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    margin: 10px;
+    padding: 10px;
+  }
+}

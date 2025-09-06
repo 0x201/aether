@@ -8,6 +8,12 @@
     mat-card-title {
       font-size: 2rem;
       margin-bottom: 5px;
+      max-height: 6rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
     }
     
     mat-card-subtitle {
@@ -20,6 +26,12 @@
       p {
         margin: 15px 0;
         line-height: 1.6;
+        max-height: 20rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 8;
+        -webkit-box-orient: vertical;
         
         &:first-child {
           margin-top: 0;
