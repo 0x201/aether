@@ -14,6 +14,7 @@ import { compare } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { JwtConfig } from './jwt.config';
 import { RolesService } from '../roles/roles.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +32,7 @@ export class AuthService {
 
   async signIn(
     signInCommand: SignInUserCommand,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.userService.findOne(signInCommand);
     if (!user) {
       return null;
@@ -49,7 +50,59 @@ export class AuthService {
       roles: roles,
       permissions: [],
     };
-    return { access_token: await this.jwtService.signAsync(payload) };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: this.jwtConfig.expiresIn,
+      secret: this.jwtConfig.secret,
+    });
+
+    // Generate refresh token
+    const refreshPayload = {
+      sub: user.id.toString(),
+      username: user.username,
+      tokenId: uuidv4(),
+    };
+    
+    const refreshToken = await this.jwtService.signAsync(refreshPayload, {
+      expiresIn: this.jwtConfig.refreshTokenExpiresIn,
+      secret: this.jwtConfig.secret,
+    });
+
+    return { 
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string }> {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.jwtConfig.secret,
+      });
+      
+      const user = await this.userService.findById(payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      
+      const roles: string[] =
+        user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
+      const newPayload: JwtPayload = {
+        sub: user.id.toString(),
+        username: user.username,
+        nickname: user.nickname,
+        roles: roles,
+        permissions: [],
+      };
+      
+      const newAccessToken = await this.jwtService.signAsync(newPayload, {
+        expiresIn: this.jwtConfig.expiresIn,
+        secret: this.jwtConfig.secret,
+      });
+      
+      return { access_token: newAccessToken };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 
   async signUp(input: SignUpUserCommand): Promise<any> {
@@ -64,7 +117,7 @@ export class AuthService {
     }
     if (input.roles.length > 0) {
       const roles = await this.rolesService.findByNames(input.roles);
-      const rolesExist = !roles && roles.length > 0;
+      const rolesExist = roles && roles.length > 0;
       if (!rolesExist) {
         throw new NotFoundException({
           status: HttpStatus.NOT_FOUND,

@@ -18,7 +18,7 @@
           <mat-icon>menu_book</mat-icon>
           Browse Books
         </button>
-        <button mat-raised-button color="accent" routerLink="/admin/books">
+        <button mat-raised-button color="accent" routerLink="/admin/books" *appRoleAny="['admin']">
           <mat-icon>manage_accounts</mat-icon>
           Manage Books
         </button>

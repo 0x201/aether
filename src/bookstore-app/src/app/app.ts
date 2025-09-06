@@ -25,7 +25,7 @@ import { AuthService } from './services/auth/auth.service';
     MatListModule,
     MatIconModule,
     AsyncPipe,
-    RouterOutlet
+    RouterOutlet,
   ]
 })
 export class App implements OnInit, OnDestroy {

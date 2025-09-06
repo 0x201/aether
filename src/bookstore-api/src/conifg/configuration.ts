@@ -14,7 +14,6 @@ export default () => ({
     password: process.env.DB_PASSWORD,
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT) || 1433,
-    //domain: process.env.DB_DOMAIN,
     database: process.env.DB_DATABASE,
     pool: {
       max: parseInt(process.env.DB_POOL_MAX_SIZE) || 10,
@@ -30,10 +29,10 @@ export default () => ({
     entities: ['src/**/*.entity{.ts,.js}'],
     migrations: ['src/database/migrations/*{.ts,.js}'],
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
-    // driver: "msnodesqlv8" // Required if using windows authentication
   },
   jwtConfig: {
     secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIREIN,
+    expiresIn: process.env.JWT_TOKEN_EXPIREIN,
+    refreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIREIN,
   },
 });

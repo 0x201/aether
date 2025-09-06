@@ -127,10 +127,8 @@ export class BooksService {
       qb = qb.andWhere('book.title like :title', { title: query.filter + '%' });
     }
     if (query.startDate && query.endDate) {
-      qb = qb.andWhere('book.publishDate BETWEEN :start AND :end', {
-        start: query.startDate,
-        end: query.endDate,
-      });
+      qb = qb.andWhere('book.createdTime >= :startDate', { startDate: query.startDate });
+      qb = qb.andWhere('book.createdTime <= :endDate', { endDate: query.endDate });
     }
     if (query.authorId) {
       qb = qb.andWhere('book.authorId=:authorId', {

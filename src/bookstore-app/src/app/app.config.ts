@@ -5,6 +5,19 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './services/auth/auth.interceptor';
+import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
+
+export function tokenGetter() {
+  return localStorage.getItem('access_token');
+}
+
+export function jwtOptionsFactory() {
+  return {
+    tokenGetter: tokenGetter,
+    allowedDomains: ['localhost:3000'],
+    disallowedRoutes: ['localhost:3000/api/auth/signin', 'localhost:3000/api/auth/signup'],
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,6 +25,9 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([authInterceptor]))
-  ]
+    { provide: JWT_OPTIONS, useFactory: jwtOptionsFactory },
+    JwtHelperService,
+    provideHttpClient(withInterceptors([authInterceptor])),
+
+  ],
 };

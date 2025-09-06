@@ -39,16 +39,26 @@
     
     .form-actions {
       display: flex;
-      justify-content: center;
-      margin-top: 10px;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
       
       button {
         width: 100%;
-        max-width: 200px;
         padding: 8px 0;
         
         mat-spinner {
           margin: auto;
+        }
+      }
+      
+      .signup-button {
+        margin-top: 8px;
+        background-color: #e0e0e0;
+        color: #333;
+        
+        &:hover {
+          background-color: #d0d0d0;
         }
       }
     }

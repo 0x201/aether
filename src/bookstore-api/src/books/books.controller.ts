@@ -9,7 +9,7 @@ import {
   Query,
   HttpException,
 } from '@nestjs/common';
-import { PagedResultResponse } from '../common/response/ListResultResponse';
+import { PagedResult } from '../common/response/ListResultResponse';
 import { BooksService } from './books.service';
 import { BookDto } from './dtos/book.dto';
 import { BookQuery } from './queries/book.query';
@@ -17,6 +17,8 @@ import { CreateBookCommand } from './commands/create-book.command';
 import { UpdateBookCommand } from './commands/update-book.command';
 import { plainToClass } from 'class-transformer';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/roles/role.decorator';
+import { RoleEnum } from 'src/roles/role.enum';
 
 @Controller('books')
 @ApiTags('Books')
@@ -25,18 +27,19 @@ export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Post()
+  @Roles(RoleEnum.Admin)
   create(@Body() createBookDto: CreateBookCommand) {
     return this.booksService.create(createBookDto);
   }
 
   @Get()
-  @ApiResponse({ type: PagedResultResponse<BookDto> })
+  @ApiResponse({ type: PagedResult<BookDto> })
   async findAll(
     @Query() query: BookQuery,
-  ): Promise<PagedResultResponse<BookDto>> {
+  ): Promise<PagedResult<BookDto>> {
     const res = await this.booksService.findAll(query);
     const items: BookDto[] = res[0].map((x) => Object.assign(new BookDto(), x));
-    return new PagedResultResponse<BookDto>(items, res[1]);
+    return new PagedResult<BookDto>(items, res[1]);
   }
 
   @Get(':id')

@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { PagedResultResponse } from 'src/common/response/ListResultResponse';
+import { PagedResult } from 'src/common/response/ListResultResponse';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorCommand } from './commands/create-author.command';
 import { UpdateAuthorCommand } from './commands/update-author.command';
@@ -31,9 +31,9 @@ export class AuthorsController {
   @Get()
   async findAll(
     @Query() query: AuthorQuery,
-  ): Promise<PagedResultResponse<Author>> {
+  ): Promise<PagedResult<Author>> {
     const res = await this.authorsService.findAll(query);
-    return new PagedResultResponse<Author>(res[0], res[1]);
+    return new PagedResult<Author>(res[0], res[1]);
   }
 
   @Get(':id')

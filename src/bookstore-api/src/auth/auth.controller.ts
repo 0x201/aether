@@ -27,6 +27,13 @@ export class AuthController {
     return this.authService.signIn(user);
   }
 
+  @AllowAnonymous()
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Body('refresh_token') refreshToken: string) {
+    return this.authService.refreshAccessToken(refreshToken);
+  }
+
   @Get('profile')
   @ApiBearerAuth()
   getProfile(@Request() req) {

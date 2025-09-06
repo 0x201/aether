@@ -1,0 +1,39 @@
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 400px;
+  
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    
+    .form-field {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    
+    .form-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.success-message {
+  text-align: center;
+  padding: 20px;
+  color: green;
+}

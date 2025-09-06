@@ -1,0 +1,78 @@
+<div class="signup-container">
+  <mat-card class="signup-card">
+    <mat-card-header>
+      <mat-card-title>
+        <h1>Create Account</h1>
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      @if (success) {
+        <div class="success-message">
+          <p>Account created successfully! Redirecting to login page...</p>
+        </div>
+      } @else {
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+          <mat-form-field appearance="fill" class="form-field">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" required>
+            @if (signupForm.get('username')?.hasError('required')) {
+              <mat-error>Username is required</mat-error>
+            }
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill" class="form-field">
+            <mat-label>Nickname</mat-label>
+            <input matInput formControlName="nickname" required>
+            @if (signupForm.get('nickname')?.hasError('required')) {
+              <mat-error>Nickname is required</mat-error>
+            }
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill" class="form-field">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" required>
+            @if (signupForm.get('password')?.hasError('required')) {
+              <mat-error>Password is required</mat-error>
+            }
+            @if (signupForm.get('password')?.hasError('minlength')) {
+              <mat-error>Password must be at least 6 characters</mat-error>
+            }
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill" class="form-field">
+            <mat-label>Confirm Password</mat-label>
+            <input matInput type="password" formControlName="confirmPassword" required>
+            @if (signupForm.get('confirmPassword')?.hasError('required')) {
+              <mat-error>Confirm Password is required</mat-error>
+            }
+            @if (signupForm.get('confirmPassword')?.hasError('passwordMismatch')) {
+              <mat-error>Passwords do not match</mat-error>
+            }
+          </mat-form-field>
+          
+          @if (error) {
+            <mat-error class="form-error">
+              {{ error }}
+            </mat-error>
+          }
+          
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" 
+                    [disabled]="!signupForm.valid || loading">
+              @if (loading) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Sign Up
+              }
+            </button>
+            
+            <button mat-stroked-button type="button" (click)="goToLogin()" class="login-button">
+              Back to Login
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

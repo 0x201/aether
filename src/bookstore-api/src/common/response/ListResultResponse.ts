@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IListResult } from '../interface/IPagedResult.interface';
 
-class ListResultResponse<T> implements IListResult<T> {
+class ListResult<T> implements IListResult<T> {
   @ApiProperty()
   readonly items: ReadonlyArray<T>;
 
@@ -10,7 +10,7 @@ class ListResultResponse<T> implements IListResult<T> {
   }
 }
 
-class PagedResultResponse<T> extends ListResultResponse<T> {
+class PagedResult<T> extends ListResult<T> {
   @ApiProperty()
   totalCount: number;
 
@@ -20,4 +20,4 @@ class PagedResultResponse<T> extends ListResultResponse<T> {
   }
 }
 
-export { PagedResultResponse, ListResultResponse };
+export { PagedResult, ListResult };
