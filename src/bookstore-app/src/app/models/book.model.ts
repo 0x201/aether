@@ -6,6 +6,19 @@ export interface Book {
   description: string;
   publishDate: string;
   isActive: boolean;
+  bookAuthors: BookAuthor[];
+}
+
+export interface BookAuthor {
+  bookId: number;
+  authorId: number;
+  author: Author;
+}
+
+export interface Author {
+  id: number;
+  firstName: string;
+  lastName: string;
 }
 
 export interface BookDto {

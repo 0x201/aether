@@ -49,7 +49,7 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>('/api/auth/login', credentials)
+    return this.http.post<LoginResponse>('/api/auth/token', credentials)
       .pipe(
         tap(response => {
           if (response.access_token && response.refresh_token) {
@@ -130,7 +130,7 @@ export class AuthService {
 
     const refreshTokenDto: RefreshTokenDto = { refresh_token: refreshToken };
     
-    return this.http.post<LoginResponse>('/api/auth/refresh', refreshTokenDto)
+    return this.http.post<LoginResponse>('/api/auth/refresh-token', refreshTokenDto)
       .pipe(
         tap(response => {
           if (response.access_token && response.refresh_token) {

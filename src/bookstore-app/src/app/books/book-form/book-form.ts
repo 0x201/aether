@@ -58,7 +58,7 @@ export class BookFormComponent implements OnInit {
         price: book.price,
         publishDate: book.publishDate,
         description: book.description,
-        authorIds: ''
+        authorIds: book.bookAuthors.map(ba => ba.authorId).join(','),
       });
     }
   }

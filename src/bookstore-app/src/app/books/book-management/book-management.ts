@@ -67,6 +67,7 @@ export class BookManagementComponent implements OnInit {
         if (this.paginator) {
           this.paginator.length = this.totalBooks;
         }
+        this.books.data = result.items;
       },
       error: (error) => {
         console.error('Error loading books:', error);
@@ -96,7 +97,11 @@ export class BookManagementComponent implements OnInit {
             this.snackBar.open(`Book "${book.title}" created successfully`, 'Close', {
               duration: 3000
             });
-            this.loadBooks(); // Refresh the list
+            this.currentPage = 0;
+            if (this.paginator) {
+              this.paginator.firstPage();
+            }
+            this.loadBooks();
           },
           error: (error) => {
             console.error('Error creating book:', error);
@@ -118,10 +123,14 @@ export class BookManagementComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.isEditMode) {
         this.booksService.updateBook(result.id, result.book).subscribe({
-          next: (updatedBook) => {
-            this.snackBar.open(`Book "${updatedBook.title}" updated successfully`, 'Close', {
+          next: () => {
+            this.snackBar.open(`Book "${book.title}" updated successfully`, 'Close', {
               duration: 3000
             });
+            this.currentPage = 0;
+            if (this.paginator) {
+              this.paginator.firstPage();
+            }
             this.loadBooks();
           },
           error: (error) => {
@@ -139,10 +148,14 @@ export class BookManagementComponent implements OnInit {
     if (confirm('Are you sure you want to delete this book?')) {
       this.booksService.deleteBook(id).subscribe({
         next: () => {
-          this.snackBar.open('Book deleted successfully', 'Close', {
+          this.snackBar.open(`Book with ID: ${id} deleted successfully`, 'Close', {
             duration: 3000
           });
-          this.loadBooks(); // Refresh the list
+          this.currentPage = 0;
+          if (this.paginator) {
+            this.paginator.firstPage();
+          }
+          this.loadBooks();
         },
         error: (error) => {
           console.error('Error deleting book:', error);
