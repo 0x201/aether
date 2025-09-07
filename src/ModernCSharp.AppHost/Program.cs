@@ -70,11 +70,11 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
-var bookStoreApi = builder.AddPnpmApp("bookstore-api", @"../bookstore-api", "start")
+var bookStoreApi = builder.AddPnpmApp("bookstore-api", @"../bookstore-api", "start:dev")
     .WithHttpEndpoint(targetPort: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
-bookStoreApi.WithUrl($"{bookStoreApi.GetEndpoint("http")}/docs", "Book Store API Swagger Docs");
+bookStoreApi.WithUrl($"{bookStoreApi.GetEndpoint("http")}/scalar", "Book Store API Scalar Reference");
 
 var bookstoreApp = builder.AddPnpmApp("bookstore-app", @"../bookstore-app", "start")
     .WithHttpEndpoint(targetPort: 4200, env: "PORT")
@@ -89,7 +89,7 @@ var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 #pragma warning restore ASPIREHOSTINGPYTHON001
 
-crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/docs", "Crawler API Swagger Docs");
+crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/scalar", "Crawler API Scalar Reference");
 
 var crawlerApp = builder.AddViteApp("crawler-app", @"../crawler-app", "pnpm")
     .WithPnpmPackageInstallation()
