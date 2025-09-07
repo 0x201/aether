@@ -10,10 +10,10 @@ import {
 import { plainToClass } from 'class-transformer';
 import { SignInUserCommand } from '../users/commands/login-user.command';
 import { SignUpUserCommand } from '../users/commands/signup-user.command';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AllowAnonymous } from './auth.guard';
-import { RefreshTokenDto } from './refresh-token.dto';
+import { RefreshTokenDto } from './dtos/refresh-token.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -21,7 +21,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @AllowAnonymous()
-  @Post('login')
+  @Post('token')
   @HttpCode(HttpStatus.OK)
   async signIn(@Body() payload: SignInUserCommand) {
     const user = plainToClass(SignInUserCommand, payload);
@@ -29,7 +29,7 @@ export class AuthController {
   }
 
   @AllowAnonymous()
-  @Post('refresh')
+  @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshAccessToken(refreshTokenDto.refresh_token);

@@ -5,15 +5,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './jwt-payload.interface';
-import { SignInUserCommand } from '../users/commands/login-user.command';
-import { SignUpUserCommand } from '../users/commands/signup-user.command';
+import { JwtPayload } from '../jwt-payload.interface';
+import { SignInUserCommand } from '../../users/commands/login-user.command';
+import { SignUpUserCommand } from '../../users/commands/signup-user.command';
 import { compare } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { JwtConfig } from './jwt.config';
-import { RolesService } from '../roles/roles.service';
+import { JwtConfig } from '../jwt.config';
+import { RolesService } from '../../roles/roles.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()

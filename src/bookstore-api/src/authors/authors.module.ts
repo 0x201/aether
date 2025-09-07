@@ -3,9 +3,10 @@ import { AuthorsService } from './authors.service';
 import { AuthorsController } from './authors.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Author } from './entities/author.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Author])],
+  imports: [TypeOrmModule.forFeature([Author]), AuthModule],
   controllers: [AuthorsController],
   providers: [AuthorsService],
   exports: [AuthorsService],

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { BookQuery } from './queries/book.query';
@@ -7,12 +7,16 @@ import { UpdateBookCommand } from './commands/update-book.command';
 import { Book } from './entities/book.entity';
 import { BookAuthor } from './entities/book-author.entity';
 import { Author } from '../authors/entities/author.entity';
+import { UserContextService } from 'src/auth/services/user-context.service';
 
 @Injectable()
 export class BooksService {
+  private readonly logger = new Logger(BooksService.name);
+
   constructor(
     @InjectRepository(Book) private readonly bookRepository: Repository<Book>,
-    private dataSource: DataSource
+    private dataSource: DataSource,
+    private readonly userContext: UserContextService
   ) { }
 
   async createMany(createBookCommands: CreateBookCommand[]) {
@@ -114,6 +118,9 @@ export class BooksService {
   }
 
   async findAll(query: BookQuery): Promise<[Book[], number]> {
+    const currentUser = this.userContext.getUser();
+    this.logger.log("Current user from book service", currentUser);
+
     let qb = this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.bookAuthors', 'bookAuthor')
@@ -157,8 +164,8 @@ export class BooksService {
         throw new Error(`Book with id ${id} not found`);
       }
       book.title = command.title;
-      // 转换日期格式为 yyyy-MM-dd
       book.publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
+      book.price = command.price;
 
       const authors = await queryRunner.manager.find(Author, { where: { id: In(command.authorIds) } });
       if (!authors || authors.length === 0) {

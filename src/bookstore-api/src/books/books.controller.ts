@@ -24,7 +24,8 @@ import { RoleEnum } from 'src/roles/role.enum';
 @ApiTags('Books')
 @ApiBearerAuth()
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksService: BooksService,
+  ) { }
 
   @Post()
   @Roles(RoleEnum.Admin)
@@ -35,7 +36,7 @@ export class BooksController {
   @Get()
   @ApiResponse({ type: PagedResult<BookDto> })
   async findAll(
-    @Query() query: BookQuery,
+    @Query() query: BookQuery
   ): Promise<PagedResult<BookDto>> {
     const res = await this.booksService.findAll(query);
     const items: BookDto[] = res[0].map((x) => Object.assign(new BookDto(), x));

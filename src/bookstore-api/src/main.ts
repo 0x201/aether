@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { INestApplication } from '@nestjs/common';
+import { ConsoleLogger, INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { apiReference } from '@scalar/nestjs-api-reference'
 
@@ -9,7 +9,11 @@ import './tracing';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log'],
+    logger: new ConsoleLogger({
+      prefix: "Bookstore API",
+      logLevels: ['error', 'warn', 'log'],
+      json: true
+    }),
   });
 
   const configService = app.get(ConfigService);
@@ -26,18 +30,42 @@ async function bootstrap() {
 }
 
 function useSwaggerModule(app: INestApplication) {
+  const port = app.get(ConfigService).get<number>('HTTP_PORT') || 3000;
   const openApi = new DocumentBuilder()
     .setTitle('Bookstore Api')
     .setDescription('The bookstore api swagger ui.')
     .setVersion('1.0')
     .addTag('Bookstore-api')
+    .addOAuth2({
+      type: 'oauth2',
+      flows: {
+        password: {
+          tokenUrl: `http://localhost:${port}/api/auth/token`,
+          authorizationUrl: `http://localhost:${port}/api/auth/token`,
+          refreshUrl: `http://localhost:${port}/api/auth/refresh-token`,
+          scopes: {
+            'openid': 'openid',
+            'profile': 'profile',
+            'email': 'email',
+            'roles': 'roles',
+            'permissions': 'permissions'
+          }
+        }
+      }
+    })
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, openApi);
   SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
-      docExpansion: 'none'
+      docExpansion: 'none',
+      initOAuth: {
+        clientId: 'bookstore-api-client',
+        clientSecret: 'bookstore-api-secret',
+        scopes: ['openid', 'profile', 'email', 'roles', 'permissions'],
+        appName: 'Bookstore Api',
+      },
     }
   });
 
@@ -48,7 +76,7 @@ function useSwaggerModule(app: INestApplication) {
         content: document,
       },
       authentication: {
-        preferredSecurityScheme: 'bearerAuth',
+        preferredSecurityScheme: 'oauth2',
       },
     }),
   );
