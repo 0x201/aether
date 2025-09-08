@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -13,6 +13,7 @@ import { Book } from '../../models/book.model';
 import { BookFormComponent } from '../book-form/book-form';
 import { AsyncPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-book-management',
@@ -31,6 +32,7 @@ import { RouterModule } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookManagementComponent implements OnInit {
+  private destory$ = new Subject<void>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   books: MatTableDataSource<Book> = new MatTableDataSource<Book>([]);
@@ -52,30 +54,33 @@ export class BookManagementComponent implements OnInit {
   }
 
   loadBooks(): void {
-    this.booksService.booksState$.subscribe(state => {
-      if (state?.data) {
-        this.books.data = state.data;
-        if (this.paginator) {
-          this.paginator.length = this.totalBooks;
+    this.booksService.booksState$
+      .pipe(takeUntil(this.destory$))
+      .subscribe(state => {
+        if (state?.data) {
+          this.books.data = state.data;
+          if (this.paginator) {
+            this.paginator.length = this.totalBooks;
+          }
         }
-      }
-    });
+      });
 
-    this.booksService.getBooks(this.currentPage, this.pageSize).subscribe({
-      next: (result) => {
-        this.totalBooks = result.totalCount;
-        if (this.paginator) {
-          this.paginator.length = this.totalBooks;
+    this.booksService
+      .getBooks(this.currentPage, this.pageSize)
+      .subscribe({
+        next: (result) => {
+          this.totalBooks = result.totalCount;
+          if (this.paginator) {
+            this.paginator.length = this.totalBooks;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading books:', error);
+          this.snackBar.open('Error loading books', 'Close', {
+            duration: 3000
+          });
         }
-        this.books.data = result.items;
-      },
-      error: (error) => {
-        console.error('Error loading books:', error);
-        this.snackBar.open('Error loading books', 'Close', {
-          duration: 3000
-        });
-      }
-    });
+      });
   }
 
   onPageChange(event: PageEvent): void {

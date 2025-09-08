@@ -122,9 +122,6 @@ export class BooksService {
   }
 
   async findAll(query: BookQuery): Promise<[Book[], number]> {
-    const currentUser = this.currentUser.getUser();
-    this.logger.log("Current user from book service", currentUser);
-
     let qb = this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.bookAuthors', 'bookAuthor')

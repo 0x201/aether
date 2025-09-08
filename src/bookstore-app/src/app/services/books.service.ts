@@ -20,7 +20,7 @@ export class BooksService {
 
   public booksState$ = this.booksState.asObservable();
 
-    private bookDetailState = new BehaviorSubject<ApiState<Book>>({
+  private bookDetailState = new BehaviorSubject<ApiState<Book>>({
     data: null,
     loading: false,
     error: null,
@@ -41,10 +41,10 @@ export class BooksService {
 
     return this.http.get<PagedResult<Book>>(this.baseUrl, { params }).pipe(
       tap(books => {
-        this.updateBooksState({ 
-          data: books.items, 
-          loading: false, 
-          timestamp: Date.now() 
+        this.updateBooksState({
+          data: books.items,
+          loading: false,
+          timestamp: Date.now()
         });
       }),
       catchError(error => {
@@ -57,7 +57,7 @@ export class BooksService {
   }
 
   getBook(id: number): Observable<Book> {
-    this.updateBookDetailState({loading: true, error: null});
+    this.updateBookDetailState({ loading: true, error: null });
 
     return this.http.get<Book>(`${this.baseUrl}/${id}`).pipe(
       tap(book => {
@@ -78,24 +78,35 @@ export class BooksService {
 
   createBook(book: BookDto): Observable<Book> {
     return this.http.post<Book>(this.baseUrl, book).pipe(
+      tap(() => {
+        this.refreshBooks();
+      }),
       catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
     );
   }
 
   updateBook(id: number, book: BookDto): Observable<Book> {
     return this.http.put<Book>(`${this.baseUrl}/${id}`, book).pipe(
+      tap(() => {
+        this.refreshBooks();
+      }),
       catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
     );
   }
 
   deleteBook(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => {
+        this.refreshBooks();
+      }),
       catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
     );
   }
 
   refreshBooks(): void {
-    this.getBooks().subscribe();
+    if (!this.booksState.value.loading) {
+      this.getBooks().subscribe();
+    }
   }
 
   private updateBooksState(updates: Partial<ApiState<Book[]>>) {
