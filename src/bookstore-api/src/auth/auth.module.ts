@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
 import { AuthService } from './services/auth.service';
@@ -9,11 +9,12 @@ import { AuthGuard } from './auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtConfig } from './jwt.config';
 import { RolesModule } from '../roles/roles.module';
-import { AuthMiddleware } from './middlewares/auth.middleware';
-import { UserContextService } from './services/user-context.service';
+import { CurrentUser } from '../shared/current-user.service';
+import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
   imports: [
+    SharedModule,
     UsersModule,
     RolesModule,
     PassportModule,
@@ -32,17 +33,13 @@ import { UserContextService } from './services/user-context.service';
   ],
   providers: [
     AuthService,
-    UserContextService,
+    CurrentUser,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
   ],
   controllers: [AuthController],
-  exports: [AuthService, UserContextService],
+  exports: [AuthService],
 })
-export class AuthModule { 
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('*');
-  }
-}
+export class AuthModule { }

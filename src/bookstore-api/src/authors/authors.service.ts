@@ -5,16 +5,22 @@ import { CreateAuthorCommand } from './commands/create-author.command';
 import { UpdateAuthorCommand } from './commands/update-author.command';
 import { Author } from './entities/author.entity';
 import { AuthorQuery } from './queries/author.query';
+import { CurrentUser } from 'src/shared/current-user.service';
 
 @Injectable()
 export class AuthorsService {
+
   constructor(
-    @InjectRepository(Author) private authorRepository: Repository<Author>
-  ) { }
+    @InjectRepository(Author) private authorRepository: Repository<Author>,
+    private readonly currentUser: CurrentUser
+  ) {}
 
   async create(createAuthorCommand: CreateAuthorCommand) {
     let author = new Author();
     author = Object.assign(author, createAuthorCommand);
+    const user = this.currentUser.getUser();
+    author.createdBy = user.username;
+    author.lastModifiedBy = user.username;
     await this.authorRepository.save(author);
   }
 
@@ -48,6 +54,10 @@ export class AuthorsService {
       where: { id: id },
     });
     const updatedAuthor = Object.assign(originalAuthor, updateAuthorDto);
+
+    const user = this.currentUser.getUser();
+
+    updatedAuthor.lastModifiedBy = user.username;
     await this.authorRepository.save(updatedAuthor);
   }
 

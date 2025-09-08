@@ -7,7 +7,7 @@ import { UpdateBookCommand } from './commands/update-book.command';
 import { Book } from './entities/book.entity';
 import { BookAuthor } from './entities/book-author.entity';
 import { Author } from '../authors/entities/author.entity';
-import { UserContextService } from 'src/auth/services/user-context.service';
+import { CurrentUser } from 'src/shared/current-user.service';
 
 @Injectable()
 export class BooksService {
@@ -16,7 +16,7 @@ export class BooksService {
   constructor(
     @InjectRepository(Book) private readonly bookRepository: Repository<Book>,
     private dataSource: DataSource,
-    private readonly userContext: UserContextService
+    private readonly currentUser: CurrentUser
   ) { }
 
   async createMany(createBookCommands: CreateBookCommand[]) {
@@ -38,7 +38,7 @@ export class BooksService {
           throw new Error(`Authors with IDs ${command.authorIds} not found.`);
         }
         const publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
-        
+
         const book = new Book();
         book.title = command.title;
         book.publishDate = publishDate;
@@ -90,11 +90,15 @@ export class BooksService {
 
       const book = new Book();
       book.title = command.title;
-      // 转换日期格式为 yyyy-MM-dd
       book.publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
       book.price = command.price;
       book.description = command.description;
       book.isbn = command.isbn;
+
+      const username = this.currentUser.getUsername();
+
+      book.createdBy = username;
+      book.lastModifiedBy = username;
 
       const savedBook = await queryRunner.manager.save(book);
 
@@ -118,7 +122,7 @@ export class BooksService {
   }
 
   async findAll(query: BookQuery): Promise<[Book[], number]> {
-    const currentUser = this.userContext.getUser();
+    const currentUser = this.currentUser.getUser();
     this.logger.log("Current user from book service", currentUser);
 
     let qb = this.bookRepository
@@ -154,7 +158,6 @@ export class BooksService {
   }
 
   async update(id: number, command: UpdateBookCommand) {
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -180,17 +183,21 @@ export class BooksService {
           authorId: authorId,
         })
       );
-      await this.bookRepository.save(book);
+
+      book.lastModifiedBy = this.currentUser.getUsername();
+
+      await queryRunner.manager.save(book);
       await queryRunner.manager.save(newBookAuthors);
+
+      await queryRunner.commitTransaction();
 
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      this.logger.error("An error occurred while updating book.", error);
       throw error;
     } finally {
       await queryRunner.release();
     }
-
-
   }
 
   async remove(id: number) {

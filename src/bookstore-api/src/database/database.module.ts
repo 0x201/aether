@@ -7,11 +7,13 @@ import { BookAuthor } from '../books/entities/book-author.entity';
 import { Role } from '../roles/entities/role.entity';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../users/entities/user-role.entity';
+import { SharedModule } from 'src/shared/shared.module';
 
 
 @Global()
 @Module({
     imports: [
+        SharedModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],

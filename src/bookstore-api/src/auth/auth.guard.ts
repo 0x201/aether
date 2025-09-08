@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { JwtConfig } from './jwt.config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
   private readonly jwtConfig: JwtConfig;
   constructor(
     private jwtService: JwtService,
@@ -35,6 +37,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
+      this.logger.error('No token found in the request headers.');
       throw new UnauthorizedException();
     }
     try {
@@ -42,7 +45,8 @@ export class AuthGuard implements CanActivate {
         secret: this.jwtConfig.secret,
       });
       request['user'] = payload;
-    } catch {
+    } catch (error) {
+      this.logger.error("An error occurred while verifying the JWT token.", error);
       throw new UnauthorizedException();
     }
     return true;
