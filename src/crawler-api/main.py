@@ -38,11 +38,21 @@ async def scalar_html():
         openapi_url=app.openapi_url,
         title=app.title,
         authentication={
-            "preferredSecurityScheme": "bearerAuth",
+            "preferredSecurityScheme": "oauth2",
             "bearerAuth": {
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT"
+            },
+            "oauth2": {
+                "type": "oauth2",
+                "credentials": {
+                    "password": {
+                        "tokenUrl": f"{app_config.api_config.api_prefix}/{app_config.api_config.api_version}/access-token",
+                        "scopes": {},
+                    }
+                }
+
             }
         }
     )

@@ -29,10 +29,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
         return db.query(self.model).order_by(self.model.id).offset(skip).limit(limit).all()
 
-    def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self, db: Session, *, obj_in: CreateSchemaType, current_user: Optional[str] = None) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)  # type: ignore
+        
+        if hasattr(self.model, 'created_by') and current_user:
+            setattr(db_obj, 'created_by', current_user)
+        if hasattr(self.model, 'last_modified_by') and current_user:
+            setattr(db_obj, 'last_modified_by', current_user)
+            
         db.add(db_obj)
+        db.commit()
         db.refresh(db_obj)
         return db_obj
 
@@ -41,7 +48,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db: Session,
             *,
             db_obj: ModelType,
-            obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+            obj_in: Union[UpdateSchemaType, Dict[str, Any]],
+            current_user: Optional[str] = None
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
@@ -51,11 +59,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
+                
+        if hasattr(self.model, 'last_modified_by') and current_user:
+            setattr(db_obj, 'last_modified_by', current_user)
+            
         db.add(db_obj)
+        db.commit()
         db.refresh(db_obj)
         return db_obj
 
     def remove(self, db: Session, *, id: int) -> None:
         obj = db.query(self.model).get(id)
         db.delete(obj)
+        db.commit()
         return

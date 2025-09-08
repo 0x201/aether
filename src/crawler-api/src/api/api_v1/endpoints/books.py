@@ -26,37 +26,59 @@ async def get_book(*, db: Session = Depends(deps.get_db), book_id: int):
     return crud.book.get(db, book_id)
  
 @router.post("/", response_model=schemas.Book)
-async def create_book(*, db: Session = Depends(deps.get_db), book_to_add: schemas.BookCreate):
-    return crud.book.create(db, obj_in=book_to_add)
+async def create_book(
+    *, 
+    db: Session = Depends(deps.get_db), 
+    book_to_add: schemas.BookCreate,
+    current_user = Depends(deps.get_current_active_user)
+):
+    current_username = current_user.username if current_user else "system"
+    return crud.book.create(db, obj_in=book_to_add, current_user=current_username)
 
 @router.put("/{book_id}", response_model=schemas.Book)
 async def update_book(
-    *, db: Session = Depends(deps.get_db), book_id: int, book_in: schemas.BookUpdate
+    *, 
+    db: Session = Depends(deps.get_db), 
+    book_id: int, 
+    book_in: schemas.BookUpdate,
+    current_user = Depends(deps.get_current_active_user)
 ) -> Any:
-    book = crud.book.get(book_id)
+    book = crud.book.get(db, id=book_id)
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="The book with this id does not exist in the system.",
         )
-    book = crud.book.update(db, db_obj=book, obj_in=book_in)
+    current_username = current_user.username if current_user else "system"
+    book = crud.book.update(db, db_obj=book, obj_in=book_in, current_user=current_username)
     return book
 
 
 @router.patch("/{book_id}", response_model=schemas.Book)
 async def patch_book(
-    *, db: Session = Depends(deps.get_db), book_id: int, book_in: Dict[str, Any]
+    *, 
+    db: Session = Depends(deps.get_db), 
+    book_id: int, 
+    book_in: Dict[str, Any],
+    current_user = Depends(deps.get_current_active_user)
 ) -> Any:
-    book = crud.book.get(book_id)
+    book = crud.book.get(db, id=book_id)
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="The book with this id does not exist in the system.",
         )
-    book = crud.book.update(db, db_obj=book, obj_in=book_in)
+    current_username = current_user.username if current_user else "system"
+    book = crud.book.update(db, db_obj=book, obj_in=book_in, current_user=current_username)
     return book
 
 
 @router.delete("/{book_id}")
-async def delete_book(*, db: Session = Depends(deps.get_db), book_id: int):
-    return crud.book.remove(db, book_id)
+async def delete_book(
+    *, 
+    db: Session = Depends(deps.get_db), 
+    book_id: int,
+    current_user = Depends(deps.get_current_active_user)
+):
+    current_username = current_user.username if current_user else "system"
+    return crud.book.remove(db, id=book_id)

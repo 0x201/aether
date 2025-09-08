@@ -15,14 +15,11 @@ internal static class Extensions
             });
         });
 
-        // 添加 SignalR 支持
         builder.Services.AddSignalR();
 
-        // 配置数据库服务
         AddWorkflowDbContext(builder);
         AddEtlDbContext(builder);
 
-        // 添加工作流服务
         builder.Services.AddScoped<IWorkflowRepository, EfWorkflowRepository>();
         builder.Services.AddSingleton<INodeExecutor, NodeExecutor>();
         builder.Services.AddSingleton<IWorkflowScheduler, WorkflowScheduler>();

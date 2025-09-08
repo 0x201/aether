@@ -8,12 +8,10 @@ class BookBase(BaseModel):
     title: Optional[str] = None
     price: float = 0.0
     isbn: Optional[str] = None
-    cover_img: Optional[str] = None
     description: Optional[str] = None
-    language: Optional[str] = None
-    paperback: int = 0
     publish_date: Optional[str] = None
     is_active: Optional[bool] = False
+    author_ids: Optional[List[int]] = []
 
 
 class BookCreate(BookBase):
