@@ -8,7 +8,7 @@ import { Role } from '../roles/entities/role.entity';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../users/entities/user-role.entity';
 import { SharedModule } from 'src/shared/shared.module';
-
+import { Menu } from '../menus/entities/menu.entity';
 
 @Global()
 @Module({
@@ -25,12 +25,12 @@ import { SharedModule } from 'src/shared/shared.module';
                     port: configService.get('database.port'),
                     password: configService.get('database.password'),
                     database: configService.get('database.database'),
-                    entities: [Author, Book, BookAuthor, Role, User, UserRole],
+                    entities: [Author, Book, BookAuthor, Role, User, UserRole, Menu],
                     pool: configService.get('database.pool'),
                     options: configService.get('database.options'),
                     synchronize: configService.get('database.synchronize'),
                     logging: configService.get('database.logging'),
-                    autoLoadEntities: configService.get('database.autoLoadEntities')
+                    autoLoadEntities: configService.get('database.autoLoadEntities'),
                 }
                 return config;
             },

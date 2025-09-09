@@ -1,36 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ConsoleLogger, INestApplication } from '@nestjs/common';
+import { ConsoleLogger, INestApplication, NestApplicationOptions } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { apiReference } from '@scalar/nestjs-api-reference'
 
-import './tracing';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: new ConsoleLogger({
-      prefix: "Bookstore API",
-      logLevels: ['error', 'warn', 'log'],
-      json: true
-    }),
-  });
-
-  const configService = app.get(ConfigService);
-
-  app.enableCors({
-    origin: configService.get('CORS_ALLOW_ORIGINS'),
-    credentials: true,
-  });
-  app.setGlobalPrefix('/api', { exclude: ['/health'] });
-
-  useSwaggerModule(app);
-
-  await app.listen(configService.get<number>('HTTP_PORT') || 3000);
-}
-
-function useSwaggerModule(app: INestApplication) {
-  const port = app.get(ConfigService).get<number>('HTTP_PORT') || 3000;
+function useSwaggerModule(app: INestApplication, port: number) {
   const openApi = new DocumentBuilder()
     .setTitle('Bookstore Api')
     .setDescription('The bookstore api swagger ui.')
@@ -80,6 +55,35 @@ function useSwaggerModule(app: INestApplication) {
       },
     }),
   );
+}
+
+function useCors(app: INestApplication) {
+  const configService = app.get(ConfigService);
+
+  app.enableCors({
+    origin: configService.get('CORS_ALLOW_ORIGINS'),
+    credentials: true,
+  });
+}
+
+async function bootstrap() {
+  const appOptions: NestApplicationOptions = {
+    logger: new ConsoleLogger({
+      logLevels: ['error', 'warn', 'log', 'debug', 'verbose'],
+      json: true,
+      colors: true,
+    }),
+  };
+  const app = await NestFactory.create(AppModule, appOptions);
+
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('HTTP_PORT') || 3000;
+
+  app.setGlobalPrefix('/api', { exclude: ['/health'] });
+  useCors(app);
+  useSwaggerModule(app, port);
+
+  await app.listen(port);
 }
 
 bootstrap();

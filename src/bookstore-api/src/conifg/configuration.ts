@@ -35,4 +35,8 @@ export default () => ({
     expiresIn: process.env.JWT_TOKEN_EXPIREIN,
     refreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIREIN,
   },
+  otelConfig: {
+    otelServer: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    serviceName: process.env.OTEL_SERVICE_NAME,
+  },
 });

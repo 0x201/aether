@@ -16,17 +16,25 @@ export class Initial1748872197887 implements MigrationInterface {
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_BOOK_TITLE" ON "books" ("title") `);
         await queryRunner.query(`CREATE TABLE "authors" ("id" int NOT NULL IDENTITY(1,1), "firstName" varchar(50) NOT NULL, "lastName" varchar(50) NOT NULL, "isActive" bit NOT NULL CONSTRAINT "DF_ee8b278cccd572d91d1b45a51ca" DEFAULT 1, "createdTime" datetime2 NOT NULL CONSTRAINT "DF_2a7b77cd15d440b3f76d410640e" DEFAULT getdate(), "createdBy" nvarchar(200) NOT NULL CONSTRAINT "DF_1dbf6cb22948d1cb67fee06d9bc" DEFAULT '', "lastModifiedTime" datetime2 CONSTRAINT "DF_8deea9583cb3cbbfe7a2ca58944" DEFAULT getdate(), "lastModifiedBy" nvarchar(200), CONSTRAINT "PK_d2ed02fabd9b52847ccb85e6b88" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "book_author" ("book_id" int NOT NULL, "author_id" int NOT NULL, CONSTRAINT "PK_a34e1d3551a22a871f8f0d32347" PRIMARY KEY ("book_id", "author_id"))`);
+        await queryRunner.query(`CREATE TABLE "menus" ("id" int NOT NULL IDENTITY(1,1), "name" varchar(100) NOT NULL, "title" varchar(100) NOT NULL, "icon" varchar(200), "route" varchar(200), "order" int NOT NULL, "parentId" int, "isActive" bit NOT NULL CONSTRAINT "DF_eca40fc97be5046210ec1c07fe0" DEFAULT 1, "createdTime" datetime2 NOT NULL CONSTRAINT "DF_532d0d9cca55a1a88037c57556a" DEFAULT getdate(), "createdBy" nvarchar(200) NOT NULL CONSTRAINT "DF_61e3248522c02038026978215bc" DEFAULT '', "lastModifiedTime" datetime2 CONSTRAINT "DF_758e1200f73303e14070d57c1d7" DEFAULT getdate(), "lastModifiedBy" nvarchar(200), CONSTRAINT "PK_642aa99e00d262c0c16acce60e4" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "menu_role" ("menu_id" int NOT NULL, "role_id" int NOT NULL, CONSTRAINT "PK_9331175757924005ece622a047d" PRIMARY KEY ("menu_id", "role_id"))`);
         await queryRunner.query(`ALTER TABLE "user_role" ADD CONSTRAINT "FK_USER_ROLE_USER_ID" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "user_role" ADD CONSTRAINT "FK_USER_ROLE_ROLE_ID" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "book_author" ADD CONSTRAINT "FK_BOOK_AUTHOR_BOOK_ID" FOREIGN KEY ("book_id") REFERENCES "books"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "book_author" ADD CONSTRAINT "FK_BOOK_AUTHOR_AUTHOR_ID" FOREIGN KEY ("author_id") REFERENCES "authors"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "menu_role" ADD CONSTRAINT "FK_MENU_ROLE_MENU_ID" FOREIGN KEY ("menu_id") REFERENCES "menus"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "menu_role" ADD CONSTRAINT "FK_MENU_ROLE_ROLE_ID" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "menu_role" DROP CONSTRAINT "FK_MENU_ROLE_ROLE_ID"`);
+        await queryRunner.query(`ALTER TABLE "menu_role" DROP CONSTRAINT "FK_MENU_ROLE_MENU_ID"`);
         await queryRunner.query(`ALTER TABLE "book_author" DROP CONSTRAINT "FK_BOOK_AUTHOR_AUTHOR_ID"`);
         await queryRunner.query(`ALTER TABLE "book_author" DROP CONSTRAINT "FK_BOOK_AUTHOR_BOOK_ID"`);
         await queryRunner.query(`ALTER TABLE "user_role" DROP CONSTRAINT "FK_USER_ROLE_ROLE_ID"`);
         await queryRunner.query(`ALTER TABLE "user_role" DROP CONSTRAINT "FK_USER_ROLE_USER_ID"`);
+        await queryRunner.query(`DROP TABLE "menu_role"`);
+        await queryRunner.query(`DROP TABLE "menus"`);
         await queryRunner.query(`DROP TABLE "book_author"`);
         await queryRunner.query(`DROP TABLE "authors"`);
         await queryRunner.query(`DROP INDEX "IDX_BOOK_TITLE" ON "books"`);

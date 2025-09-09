@@ -5,6 +5,7 @@ import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { RefreshTokenDto } from './refresh-token.dto';
+import { Menu } from '../../models/menu.model';
 
 export interface LoginRequest {
   username: string;
@@ -28,6 +29,7 @@ export interface JwtPayload {
   nickname: string;
   roles: string[];
   permissions: string[];
+  menus: Menu[];
 }
 
 @Injectable({

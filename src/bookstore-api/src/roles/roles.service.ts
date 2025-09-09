@@ -82,4 +82,8 @@ export class RolesService {
   async count(): Promise<number> {
     return await this.roleRepository.count();
   }
+
+  async findAllRoles(): Promise<Role[]> {
+    return await this.roleRepository.find();
+  }
 }

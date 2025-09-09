@@ -11,6 +11,7 @@ import { JwtConfig } from './jwt.config';
 import { RolesModule } from '../roles/roles.module';
 import { CurrentUser } from '../shared/current-user.service';
 import { SharedModule } from 'src/shared/shared.module';
+import { MenusModule } from 'src/menus/menus.module';
 
 @Module({
   imports: [
@@ -23,13 +24,13 @@ import { SharedModule } from 'src/shared/shared.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        global: true,
         secret: configService.get<JwtConfig>('jwtConfig').secret,
         signOptions: {
           expiresIn: configService.get<JwtConfig>('jwtConfig').expiresIn,
         },
       }),
     }),
+    MenusModule,
   ],
   providers: [
     AuthService,
@@ -40,6 +41,6 @@ import { SharedModule } from 'src/shared/shared.module';
     },
   ],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule { }

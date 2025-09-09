@@ -24,21 +24,14 @@
     <mat-sidenav #sidenav [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)"
       fixedInViewport="false" class="sidenav">
       <mat-nav-list>
-        <a mat-list-item routerLink="/home" routerLinkActive="active-link">
-          <mat-icon>home</mat-icon>
-          Home
-        </a>
-        <a mat-list-item routerLink="/books" routerLinkActive="active-link">
-          <mat-icon>menu_book</mat-icon>
-          Browse Books
-        </a>
-        <div>
-          <!-- Adding a wrapper to better see if the element is rendered -->
-          <a mat-list-item routerLink="/books/management" routerLinkActive="active-link" *appRoleAny="['admin']">
-            <mat-icon>library_books</mat-icon>
-            Book Management
+        <ng-container>
+          @for (menu of menus; track $index) {
+          <a mat-list-item [routerLink]="menu.route" routerLinkActive="active-link" *appRoleAny="menu.roles">
+            <mat-icon>{{menu.icon}}</mat-icon>
+            {{menu.title}}
           </a>
-        </div>
+          }
+        </ng-container>
         <mat-divider></mat-divider>
       </mat-nav-list>
     </mat-sidenav>

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpStatus,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -15,9 +16,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtConfig } from '../jwt.config';
 import { RolesService } from '../../roles/roles.service';
 import { v4 as uuidv4 } from 'uuid';
+import { MenusService } from '../../menus/menus.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private readonly jwtConfig: JwtConfig;
   private readonly usedRefreshTokens: Set<string> = new Set();
 
@@ -26,14 +29,16 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly rolesService: RolesService,
     private readonly configService: ConfigService,
+    private readonly menusService: MenusService,
   ) {
     this.jwtConfig = this.configService.get<JwtConfig>('jwtConfig');
   }
 
 
-  async signIn(
+  async signin(
     signInCommand: SignInUserCommand,
   ): Promise<{ access_token: string; refresh_token: string }> {
+    this.logger.log(`Signing in user ${signInCommand.username}`);
     const user = await this.userService.findOne(signInCommand);
     if (!user) {
       return null;
@@ -44,12 +49,28 @@ export class AuthService {
     }
     const roles: string[] =
       user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
+      
+    const userMenus = await this.menusService.getUserMenus(user.id);
+    const menus = userMenus.map(menu => {
+      return {
+        id: menu.id,
+        name: menu.name,
+        title: menu.title,
+        icon: menu.icon,
+        route: menu.route,
+        order: menu.order,
+        parentId: menu.parentId,
+        roles: menu.roles
+      };
+    });
+    
     const payload: JwtPayload = {
       sub: user.id.toString(),
       username: user.username,
       nickname: user.nickname,
       roles: roles,
       permissions: [],
+      menus: menus
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.jwtConfig.expiresIn,
@@ -93,12 +114,28 @@ export class AuthService {
       
       const roles: string[] =
         user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
+      
+      const userMenus = await this.menusService.getUserMenus(user.id);
+      const menus = userMenus.map(menu => {
+        return {
+          id: menu.id,
+          name: menu.name,
+          title: menu.title,
+          icon: menu.icon,
+          route: menu.route,
+          order: menu.order,
+          parentId: menu.parentId,
+          roles: menu.roles
+        };
+      });
+      
       const newPayload: JwtPayload = {
         sub: user.id.toString(),
         username: user.username,
         nickname: user.nickname,
         roles: roles,
         permissions: [],
+        menus: menus
       };
       
       const newAccessToken = await this.jwtService.signAsync(newPayload, {
@@ -106,7 +143,6 @@ export class AuthService {
         secret: this.jwtConfig.secret,
       });
       
-      // 生成新的refresh token
       const newRefreshPayload = {
         sub: user.id.toString(),
         username: user.username,
@@ -127,7 +163,7 @@ export class AuthService {
     }
   }
 
-  async signUp(input: SignUpUserCommand): Promise<any> {
+  async signup(input: SignUpUserCommand): Promise<any> {
     const user = await this.userService.findOne(input);
     const userExists = user !== null;
 

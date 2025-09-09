@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
@@ -9,9 +9,11 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { AsyncPipe } from '@angular/common';
-import { AuthService } from './services/auth/auth.service';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { AuthService, JwtPayload } from './services/auth/auth.service';
 import { RoleDirective } from './services/auth/role.directive';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { Menu } from './models/menu.model';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +21,7 @@ import { RoleDirective } from './services/auth/role.directive';
   styleUrl: './app.scss',
   standalone: true,
   imports: [
+    CommonModule,
     RouterModule,
     MatToolbarModule,
     MatButtonModule,
@@ -31,16 +34,19 @@ import { RoleDirective } from './services/auth/role.directive';
     RoleDirective,
   ]
 })
-export class App implements OnInit, OnDestroy {
+export class App implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sidenav') sidenav!: MatSidenav;
   
   private destroy$ = new Subject<void>();
   isHandset$!: Observable<boolean>;
+  menus: Menu[] = [];
   
   constructor(
     private breakpointObserver: BreakpointObserver,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private jwtHelper: JwtHelperService,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +55,12 @@ export class App implements OnInit, OnDestroy {
         map(result => result.matches),
         shareReplay()
       );
+      
+    this.loadMenusFromToken();
+  }
+  
+  ngAfterViewInit(): void {
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -62,5 +74,16 @@ export class App implements OnInit, OnDestroy {
 
   toggleSidenav(): void {
     this.sidenav.toggle();
+  }
+  
+  private loadMenusFromToken(): void {
+    const token = this.authService.getToken();
+    if (token && !this.jwtHelper.isTokenExpired(token)) {
+      const decoded: JwtPayload | null = this.jwtHelper.decodeToken(token);
+      if (decoded && decoded.menus) {
+        this.menus = decoded.menus;
+        this.cdRef.detectChanges();
+      }
+    }
   }
 }

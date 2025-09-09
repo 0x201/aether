@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,6 +38,7 @@ export class BookManagementComponent implements OnInit {
   books: MatTableDataSource<Book> = new MatTableDataSource<Book>([]);
   booksService = inject(BooksService);
   displayedColumns: string[] = ['title', 'isbn', 'price', 'publishDate', 'actions'];
+  snackBarConfig: MatSnackBarConfig = { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' };
 
   pageSize = 10;
   currentPage = 0;
@@ -99,9 +100,7 @@ export class BookManagementComponent implements OnInit {
       if (result) {
         this.booksService.createBook(result.book).subscribe({
           next: (book) => {
-            this.snackBar.open(`Book "${book.title}" created successfully`, 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open(`Book "${book.title}" created successfully`, 'Close', this.snackBarConfig);
             this.currentPage = 0;
             if (this.paginator) {
               this.paginator.firstPage();
@@ -110,9 +109,7 @@ export class BookManagementComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error creating book:', error);
-            this.snackBar.open('Error creating book', 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open('Error creating book', 'Close', this.snackBarConfig);
           }
         });
       }
@@ -129,9 +126,7 @@ export class BookManagementComponent implements OnInit {
       if (result && result.isEditMode) {
         this.booksService.updateBook(result.id, result.book).subscribe({
           next: () => {
-            this.snackBar.open(`Book "${book.title}" updated successfully`, 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open(`Book "${book.title}" updated successfully`, 'Close', this.snackBarConfig);
             this.currentPage = 0;
             if (this.paginator) {
               this.paginator.firstPage();
@@ -140,9 +135,7 @@ export class BookManagementComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error updating book:', error);
-            this.snackBar.open('Error updating book', 'Close', {
-              duration: 3000
-            });
+            this.snackBar.open('Error updating book', 'Close', this.snackBarConfig);
           }
         });
       }
@@ -153,9 +146,7 @@ export class BookManagementComponent implements OnInit {
     if (confirm('Are you sure you want to delete this book?')) {
       this.booksService.deleteBook(id).subscribe({
         next: () => {
-          this.snackBar.open(`Book with ID: ${id} deleted successfully`, 'Close', {
-            duration: 3000
-          });
+          this.snackBar.open(`Book with ID: ${id} deleted successfully`, 'Close', this.snackBarConfig);
           this.currentPage = 0;
           if (this.paginator) {
             this.paginator.firstPage();
@@ -164,9 +155,7 @@ export class BookManagementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error deleting book:', error);
-          this.snackBar.open('Error deleting book', 'Close', {
-            duration: 3000
-          });
+          this.snackBar.open('Error deleting book', 'Close', this.snackBarConfig);
         }
       });
     }

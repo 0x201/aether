@@ -12,6 +12,7 @@ import { SharedModule } from './shared/shared.module';
 import { RolesModule } from './roles/roles.module';
 import { DatabaseModule } from './database/database.module';
 import configuration from './conifg/configuration';
+import { MenusModule } from './menus/menus.module';
 
 @Module({
   imports: [
@@ -22,13 +23,14 @@ import configuration from './conifg/configuration';
     }),
     CacheModule.register(),
     DatabaseModule,
+    RolesModule,
+    MenusModule,
     BooksModule,
     AuthorsModule,
     AuthModule,
     UsersModule,
     DataSeedModule,
     SharedModule,
-    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

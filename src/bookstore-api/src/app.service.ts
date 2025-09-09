@@ -1,11 +1,7 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { DataSeedService } from './data-seed/data-seed.service';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class AppService implements OnApplicationBootstrap {
-  constructor(private dataSeedService: DataSeedService) {}
+export class AppService {
+  constructor() { }
 
-  onApplicationBootstrap() {
-    this.dataSeedService.seedAsync();
-  }
 }

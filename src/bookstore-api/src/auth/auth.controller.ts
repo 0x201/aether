@@ -25,7 +25,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async signIn(@Body() payload: SignInUserCommand) {
     const user = plainToClass(SignInUserCommand, payload);
-    return this.authService.signIn(user);
+    return this.authService.signin(user);
   }
 
   @AllowAnonymous()
@@ -44,6 +44,6 @@ export class AuthController {
   @AllowAnonymous()
   @Post('signup')
   async signUp(@Body() input: SignUpUserCommand) {
-    return await this.authService.signUp(input);
+    return await this.authService.signup(input);
   }
 }
