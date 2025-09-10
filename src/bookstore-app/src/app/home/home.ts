@@ -8,7 +8,6 @@ import { AuthService } from '../services/auth/auth.service';
 import { BooksService } from '../services/books.service';
 import {  MatSnackBarModule } from '@angular/material/snack-bar';
 import { AsyncPipe } from '@angular/common';
-import { RoleDirective } from '../services/auth/role.directive';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +22,6 @@ import { RoleDirective } from '../services/auth/role.directive';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     AsyncPipe,
-    RoleDirective
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

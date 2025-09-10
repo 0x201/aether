@@ -32,23 +32,20 @@ import { Subject, takeUntil } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookManagementComponent implements OnInit {
-  private destory$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   books: MatTableDataSource<Book> = new MatTableDataSource<Book>([]);
   booksService = inject(BooksService);
   displayedColumns: string[] = ['title', 'isbn', 'price', 'publishDate', 'actions'];
   snackBarConfig: MatSnackBarConfig = { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' };
-
+  dialog: MatDialog = inject(MatDialog);
+  snackBar: MatSnackBar = inject(MatSnackBar);
   pageSize = 10;
   currentPage = 0;
   totalBooks = 0;
 
-  constructor(
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar,
-  ) {
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.loadBooks();
@@ -56,7 +53,7 @@ export class BookManagementComponent implements OnInit {
 
   loadBooks(): void {
     this.booksService.booksState$
-      .pipe(takeUntil(this.destory$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         if (state?.data) {
           this.books.data = state.data;

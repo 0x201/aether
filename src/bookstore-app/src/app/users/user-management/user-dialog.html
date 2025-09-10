@@ -1,0 +1,36 @@
+<h1 matDialogTitle>{{ data.user ? 'Edit User' : 'Add User' }}</h1>
+<mat-dialog-content>
+  <form [formGroup]="userForm" class="user-form">
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" required>
+      @if (userForm.get('username')?.hasError('required')) {
+      <mat-error>Username is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Nickname</mat-label>
+      <input matInput formControlName="nickname" required>
+      @if (userForm.get('nickname')?.hasError('required')) {
+        <mat-error>Nickname is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="form-field">
+      <mat-label>Roles</mat-label>
+      <mat-select formControlName="roles" multiple>
+        @if (data.roles) {
+          @for (role of data.roles; track role) {
+            <mat-option [value]="role">{{ role }}</mat-option>
+          }
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="userForm.invalid">{{ data.user ? 'Update' :
+    'Create' }}</button>
+</mat-dialog-actions>

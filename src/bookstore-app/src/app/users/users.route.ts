@@ -7,4 +7,10 @@ export const UsersRoutes: Route[] = [
         loadComponent: () => import('./user-profile/user-profile').then(mod => mod.UserProfileComponent),
         canActivate: [authGuard]
     },
+    {
+        path: 'users/manage',
+        loadComponent: () => import('./user-management/user-management').then(mod => mod.UserManagementComponent),
+        canActivate: [authGuard],
+        data: { roles: ['admin'] }
+    },
 ];
