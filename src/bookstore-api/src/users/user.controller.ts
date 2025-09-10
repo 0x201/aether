@@ -1,30 +1,28 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, HttpStatus, Query, HttpException } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { SignUpUserCommand } from './commands/signup-user.command';
+import { SignUpUserCommand as SignupUserCommand } from './commands/signup-user.command';
 import { UpdateUserCommand } from './commands/update-user.command';
 import { UserDto } from './dtos/user.dto';
 import { UserQuery } from './queries/user.query';
 import { PagedResult } from 'src/common/response/ListResultResponse';
 import { Roles } from 'src/roles/role.decorator';
 import { RoleEnum } from 'src/roles/role.enum';
+import { User } from './entities/user.entity';
 
 @Roles(RoleEnum.Admin)
 @ApiTags('Users')
 @Controller('users')
 @ApiBearerAuth()
 export class UserController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Return all users', type: PagedResult<UserDto> })
-  async getAllUsers(@Query() query: UserQuery): Promise<PagedResult<UserDto>> {
+  @ApiOperation({ summary: 'Get users with paged list' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Return users with paged list', type: PagedResult<UserDto> })
+  async findAll(@Query() query: UserQuery): Promise<PagedResult<UserDto>> {
     const [users, totalCount] = await this.usersService.findAll(query);
-    const items: UserDto[] = users.map(user => {
-      return Object.assign(new UserDto(), user);
-    });
-    return new PagedResult<UserDto>(items, totalCount);
+    return new PagedResult<UserDto>(users.map(user => this.mapToDto(user)), totalCount);
   }
 
   @Get(':id')
@@ -32,16 +30,21 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'User id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Return user by id', type: UserDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
-    return this.usersService.findById(id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      throw new HttpException(`Cannot find the user with id ${id}`, 404);
+    }
+    return this.mapToDto(user);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiBody({ type: SignUpUserCommand })
+  @ApiBody({ type: SignupUserCommand })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'User created successfully', type: UserDto })
-  async createUser(@Body() signUpUserCommand: SignUpUserCommand): Promise<UserDto> {
-    return this.usersService.insert(signUpUserCommand);
+  async createUser(@Body() signUpUserCommand: SignupUserCommand): Promise<UserDto> {
+    const user = await this.usersService.insert(signUpUserCommand);
+    return this.mapToDto(user);
   }
 
   @Put(':id')
@@ -50,11 +53,11 @@ export class UserController {
   @ApiBody({ type: UpdateUserCommand })
   @ApiResponse({ status: HttpStatus.OK, description: 'User updated successfully', type: UserDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
-  async updateUser(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserCommand: UpdateUserCommand
-  ): Promise<UserDto> {
-    return this.usersService.update(id, updateUserCommand);
+  ): Promise<void> {
+    await this.usersService.update(id, updateUserCommand);
   }
 
   @Delete(':id')
@@ -63,6 +66,19 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, description: 'User deleted successfully' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.usersService.remove(id);
+    return await this.usersService.remove(id);
+  }
+
+
+  private mapToDto(user: User): UserDto {
+    const dto = new UserDto();
+    dto.id = user.id;
+    dto.username = user.username;
+    dto.nickname = user.nickname;
+    dto.isActive = user.isActive;
+    dto.createdTime = user.createdTime;
+    dto.lastModifiedTime = user.lastModifiedTime;
+    dto.roles = user.userRoles.map(userRole => userRole.role.name);
+    return dto;
   }
 }

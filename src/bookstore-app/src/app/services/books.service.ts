@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
 import { PagedResult } from '../models/book.model';
@@ -29,7 +29,9 @@ export class BooksService {
 
   public bookDetailState$ = this.bookDetailState.asObservable();
 
-  constructor(private http: HttpClient) { }
+  private http: HttpClient = inject(HttpClient);
+
+  constructor() { }
 
   getBooks(page: number = 0, pageSize: number = 10): Observable<PagedResult<Book>> {
     this.updateBooksState({ loading: true, error: null });
@@ -39,63 +41,68 @@ export class BooksService {
       maxResultCount: pageSize
     };
 
-    return this.http.get<PagedResult<Book>>(this.baseUrl, { params }).pipe(
-      tap(books => {
-        this.updateBooksState({
-          data: books.items,
-          loading: false,
-          timestamp: Date.now()
-        });
-      }),
-      catchError(error => {
-        const errMsg = this.getErrorMessage(error);
-        this.updateBooksState({ loading: false, error: errMsg });
-        return throwError(() => new Error(errMsg));
-      }),
-      retry(2)
-    );
+    return this.http.get<PagedResult<Book>>(this.baseUrl, { params })
+      .pipe(
+        tap(res => {
+          this.updateBooksState({
+            data: res.items,
+            loading: false,
+            timestamp: Date.now()
+          });
+        }),
+        catchError(error => {
+          const errMsg = this.getErrorMessage(error);
+          this.updateBooksState({ loading: false, error: errMsg });
+          return throwError(() => new Error(errMsg));
+        }),
+        retry(2)
+      );
   }
 
   getBook(id: number): Observable<Book> {
     this.updateBookDetailState({ loading: true, error: null });
 
-    return this.http.get<Book>(`${this.baseUrl}/${id}`).pipe(
-      tap(book => {
-        this.updateBookDetailState({
-          data: book,
-          loading: false,
-          timestamp: Date.now()
-        });
-      }),
-      catchError(error => {
-        const errMsg = this.getErrorMessage(error);
-        this.updateBookDetailState({ loading: false, error: errMsg });
-        return throwError(() => new Error(errMsg));
-      }),
-      retry(2)
-    );
+    return this.http.get<Book>(`${this.baseUrl}/${id}`)
+      .pipe(
+        tap(book => {
+          this.updateBookDetailState({
+            data: book,
+            loading: false,
+            timestamp: Date.now()
+          });
+        }),
+        catchError(error => {
+          const errMsg = this.getErrorMessage(error);
+          this.updateBookDetailState({ loading: false, error: errMsg });
+          return throwError(() => new Error(errMsg));
+        }),
+        retry(2)
+      );
   }
 
   createBook(book: BookDto): Observable<Book> {
-    return this.http.post<Book>(this.baseUrl, book).pipe(
-      tap(() => {
-        this.refreshBooks();
-      }),
-      catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
-    );
+    return this.http.post<Book>(this.baseUrl, book)
+      .pipe(
+        tap(() => {
+          this.refreshBooks();
+        }),
+        catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
+      );
   }
 
   updateBook(id: number, book: BookDto): Observable<Book> {
-    return this.http.put<Book>(`${this.baseUrl}/${id}`, book).pipe(
-      tap(() => {
-        this.refreshBooks();
-      }),
-      catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
-    );
+    return this.http.put<Book>(`${this.baseUrl}/${id}`, book)
+      .pipe(
+        tap(() => {
+          this.refreshBooks();
+        }),
+        catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
+      );
   }
 
   deleteBook(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+    return this.http.delete<void>(`${this.baseUrl}/${id}`)
+    .pipe(
       tap(() => {
         this.refreshBooks();
       }),

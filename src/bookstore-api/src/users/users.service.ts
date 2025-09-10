@@ -2,16 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository, In, DataSource, } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { SignInUserCommand } from './commands/login-user.command';
 import { SignUpUserCommand } from './commands/signup-user.command';
 import { UpdateUserCommand } from './commands/update-user.command';
-import { UserDto } from './dtos/user.dto';
-import { plainToClass } from 'class-transformer';
 import { UtilsService } from '../shared/utils';
 import { UserRole } from './entities/user-role.entity';
 import { Role } from '../roles/entities/role.entity';
 import { UserQuery } from './queries/user.query';
-import { PagedResult } from 'src/common/response/ListResultResponse';
+import { UserDto } from './dtos/user.dto';
+import { CurrentUser } from 'src/shared/current-user.service';
 
 
 @Injectable()
@@ -19,27 +17,33 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly dataSource: DataSource,
-    private readonly utilsService: UtilsService
+    private readonly utilsService: UtilsService,
+    private readonly currentUser: CurrentUser
   ) { }
 
-  async findOne(input: SignInUserCommand): Promise<User> {
-    return await this.userRepository.findOne({
-      where: {
-        username: input.username,
-      },
-      relations: ['userRoles', 'userRoles.role'],
-    });
-  }
-
-  async findById(id: number): Promise<User> {
-    return await this.userRepository.findOne({
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
       where: { id: id },
       relations: ['userRoles', 'userRoles.role'],
     });
+
+    return user;
   }
 
-  async findAll(query: UserQuery): Promise<[UserDto[], number]> {
-    let qb = this.userRepository.createQueryBuilder('user');
+  async findByUsername(username: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { username: username },
+      relations: ['userRoles', 'userRoles.role'],
+    });
+
+    return user;
+  }
+
+  async findAll(query: UserQuery): Promise<[User[], number]> {
+    let qb = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userRoles', 'userRoles')
+      .leftJoinAndSelect('userRoles.role', 'role');
     if (query.filter) {
       qb = qb.where('user.username like :username', { username: query.filter + '%' });
     }
@@ -47,15 +51,17 @@ export class UsersService {
       qb = qb.andWhere('user.createdTime >= :startDate', { startDate: query.startDate });
       qb = qb.andWhere('user.createdTime <= :endDate', { endDate: query.endDate });
     }
-    
-    return await qb
+
+    const [users, count] = await qb
       .orderBy(query.sorting, query.order === 'asc' ? 'ASC' : 'DESC')
       .skip(query.skipCount)
       .take(query.maxResultCount)
       .getManyAndCount();
+
+    return [users, count];
   }
 
-  async insert(input: SignUpUserCommand): Promise<UserDto> {
+  async insert(input: SignUpUserCommand): Promise<User> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -81,7 +87,7 @@ export class UsersService {
 
       await queryRunner.commitTransaction();
 
-      return this.mapToDto(user);
+      return user
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -90,7 +96,7 @@ export class UsersService {
     }
   }
 
-  async update(id: number, input: UpdateUserCommand): Promise<UserDto> {
+  async update(id: number, input: UpdateUserCommand): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -99,10 +105,11 @@ export class UsersService {
     user.username = input.username ?? user.username;
     user.nickname = input.nickname ?? user.nickname;
     user.isActive = input.isActive ?? user.isActive;
+
     user.lastModifiedTime = this.utilsService.getNowString();
-    
-    const updatedUser = await this.userRepository.save(user);
-    return this.mapToDto(updatedUser);
+    user.lastModifiedBy = this.currentUser.getUsername();
+
+    await this.userRepository.save(user);
   }
 
   async remove(id: number): Promise<void> {

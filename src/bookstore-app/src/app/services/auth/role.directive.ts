@@ -76,7 +76,6 @@ export class RoleDirective implements OnInit, OnDestroy {
       this.isVisible = true;
     }
     
-    // Mark for check to prevent ExpressionChangedAfterItHasBeenCheckedError
     this.changeDetectorRef.markForCheck();
   }
 }

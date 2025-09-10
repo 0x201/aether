@@ -154,7 +154,7 @@ export class BooksService {
     return book;
   }
 
-  async update(id: number, command: UpdateBookCommand) {
+  async update(id: number, command: UpdateBookCommand): Promise<Book> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -187,7 +187,7 @@ export class BooksService {
       await queryRunner.manager.save(newBookAuthors);
 
       await queryRunner.commitTransaction();
-
+      return book;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error("An error occurred while updating book.", error);

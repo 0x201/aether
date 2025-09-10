@@ -18,12 +18,20 @@ export class RolesController {
     constructor(private readonly rolesService: RolesService) { }
 
     @Get()
-    @ApiOperation({ summary: 'Get all roles' })
+    @ApiOperation({ summary: 'Get roles with paged list' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Return all roles', type: PagedResult<RoleDto> })
-    async getAllRoles(@Query() query: RoleQuery): Promise<PagedResult<RoleDto>> {
+    async findAll(@Query() query: RoleQuery): Promise<PagedResult<RoleDto>> {
         const [roles, totalCount] = await this.rolesService.findAll(query);
         const items: RoleDto[] = roles.map((x) => Object.assign(new RoleDto(), x));
         return new PagedResult<RoleDto>(items, totalCount);
+    }
+
+    @Get("/all")
+    @ApiOperation({ summary: 'Get all roles' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Return all roles', type: PagedResult<RoleDto> })
+    async getAllRoles(): Promise<RoleDto[]> {
+        const roles = await this.rolesService.findAllRoles();
+        return roles.map((x) => this.mapToDto(x));
     }
 
     @Get(':id')
@@ -63,5 +71,12 @@ export class RolesController {
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Role not found' })
     async deleteRole(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.rolesService.remove(id);
+    }
+
+    private mapToDto(role: Role): RoleDto {
+        return {
+            id: role.id,
+            name: role.name
+        };
     }
 }

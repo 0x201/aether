@@ -5,4 +5,5 @@ export class UserDto {
   isActive: boolean;
   createdTime: string;
   lastModifiedTime: string;
+  roles: string[];
 }
