@@ -9,4 +9,4 @@ import { ConfigModule } from '@nestjs/config';
   providers: [UtilsService, CurrentUser, TracingService],
   exports: [UtilsService, CurrentUser, TracingService],
 })
-export class SharedModule { }
+export class SharedModule {}

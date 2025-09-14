@@ -22,7 +22,7 @@ import { MenusModule } from './menus/menus.module';
       envFilePath: [`env/.env.${process.env.NODE_ENV || 'development.local'}`],
     }),
     CacheModule.register(),
-    DatabaseModule, 
+    DatabaseModule,
     AuthModule,
     RolesModule,
     MenusModule,
@@ -36,5 +36,5 @@ import { MenusModule } from './menus/menus.module';
   providers: [AppService],
 })
 export class AppModule implements NestModule {
-  configure() { }
+  configure() {}
 }

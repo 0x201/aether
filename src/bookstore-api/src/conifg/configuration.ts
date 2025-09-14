@@ -3,8 +3,10 @@ import * as path from 'path';
 
 dotenv.config({
   path: path.resolve(
-    process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
-  )
+    process.env.NODE_ENV === 'production'
+      ? '.env.production'
+      : '.env.development',
+  ),
 });
 
 export default () => ({
@@ -22,7 +24,8 @@ export default () => ({
     },
     options: {
       encrypt: process.env.DB_ENCRYPT === 'true',
-      trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true',
+      trustServerCertificate:
+        process.env.DB_TRUST_SERVER_CERTIFICATE === 'true',
     },
     logging: process.env.DB_LOGGING === 'true',
     autoLoadEntities: process.env.DB_AUTOLOADENTITIES === 'true' || false,

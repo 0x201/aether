@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export interface IAuditable {
   createdTime: string;
@@ -8,16 +8,19 @@ export interface IAuditable {
 }
 
 export class BaseAuditableEntity implements IAuditable {
-  
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'CreatedTime', type: 'datetime' })
   createdTime: string;
 
-  @Column({ default: '', length: 200 })
+  @Column({ name: 'CreatedBy', default: '', length: 200 })
   createdBy: string;
 
-  @UpdateDateColumn({ name: 'lastModifiedTime', nullable: true })
+  @UpdateDateColumn({
+    name: 'LastModifiedTime',
+    nullable: true,
+    type: 'datetime',
+  })
   lastModifiedTime: string;
 
-  @Column({ nullable: true, length: 200 })
+  @Column({ name: 'LastModifiedBy', nullable: true, length: 200 })
   lastModifiedBy: string;
 }

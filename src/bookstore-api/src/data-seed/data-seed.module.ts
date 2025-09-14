@@ -7,14 +7,8 @@ import { AuthorsModule } from 'src/authors/authors.module';
 import { MenusModule } from 'src/menus/menus.module';
 
 @Module({
-  imports: [
-    UsersModule,
-    RolesModule,
-    BooksModule,
-    AuthorsModule,
-    MenusModule
-  ],
+  imports: [UsersModule, RolesModule, BooksModule, AuthorsModule, MenusModule],
   providers: [DataSeedService],
-  exports: [DataSeedService]
+  exports: [DataSeedService],
 })
 export class DataSeedModule {}

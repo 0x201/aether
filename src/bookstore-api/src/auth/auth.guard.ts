@@ -46,7 +46,10 @@ export class AuthGuard implements CanActivate {
       });
       request['user'] = payload;
     } catch (error) {
-      this.logger.error("An error occurred while verifying the JWT token.", error);
+      this.logger.error(
+        'An error occurred while verifying the JWT token.',
+        error,
+      );
       throw new UnauthorizedException();
     }
     return true;

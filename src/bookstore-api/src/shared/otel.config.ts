@@ -1,4 +1,4 @@
 export interface OtelConfig {
-    otelServer: string;
-    serviceName: string;
+  otelServer: string;
+  serviceName: string;
 }

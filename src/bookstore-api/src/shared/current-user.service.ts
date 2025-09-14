@@ -1,6 +1,5 @@
-import { Inject, Injectable, Scope } from "@nestjs/common";
-import { REQUEST } from "@nestjs/core";
-
+import { Inject, Injectable, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 
 export interface UserPayload {
   sub: string;
@@ -12,7 +11,7 @@ export interface UserPayload {
 
 @Injectable({ scope: Scope.REQUEST })
 export class CurrentUser {
-  constructor(@Inject(REQUEST) private readonly request: Request) { }
+  constructor(@Inject(REQUEST) private readonly request: Request) {}
 
   getUser(): UserPayload | null {
     return (this.request as any).user;
