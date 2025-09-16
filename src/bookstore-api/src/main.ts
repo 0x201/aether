@@ -1,11 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ConsoleLogger, INestApplication, NestApplicationOptions } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  INestApplication,
+  NestApplicationOptions,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { apiReference } from '@scalar/nestjs-api-reference'
+import { apiReference } from '@scalar/nestjs-api-reference';
 
-function useSwaggerModule(app: INestApplication, port: number) {
+function useSwaggerModule(app: INestApplication, endpoint: string) {
   const openApi = new DocumentBuilder()
     .setTitle('Bookstore Api')
     .setDescription('The bookstore api swagger ui.')
@@ -15,18 +19,18 @@ function useSwaggerModule(app: INestApplication, port: number) {
       type: 'oauth2',
       flows: {
         password: {
-          tokenUrl: `http://localhost:${port}/api/auth/token`,
-          authorizationUrl: `http://localhost:${port}/api/auth/token`,
-          refreshUrl: `http://localhost:${port}/api/auth/refresh-token`,
+          tokenUrl: `${endpoint}/api/auth/token`,
+          authorizationUrl: `${endpoint}/api/auth/token`,
+          refreshUrl: `${endpoint}/api/auth/refresh-token`,
           scopes: {
-            'openid': 'openid',
-            'profile': 'profile',
-            'email': 'email',
-            'roles': 'roles',
-            'permissions': 'permissions'
-          }
-        }
-      }
+            openid: 'openid',
+            profile: 'profile',
+            email: 'email',
+            roles: 'roles',
+            permissions: 'permissions',
+          },
+        },
+      },
     })
     .addBearerAuth()
     .build();
@@ -41,7 +45,7 @@ function useSwaggerModule(app: INestApplication, port: number) {
         scopes: ['openid', 'profile', 'email', 'roles', 'permissions'],
         appName: 'Bookstore Api',
       },
-    }
+    },
   });
 
   app.use(
@@ -77,11 +81,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, appOptions);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('HTTP_PORT') || 3000;
+  const endpoint = configService.get<string>('HTTP_ENDPOINT');
+  const port = configService.get<number>('PORT') || 3000;
 
   app.setGlobalPrefix('/api', { exclude: ['/health'] });
   useCors(app);
-  useSwaggerModule(app, port);
+  useSwaggerModule(app, endpoint);
 
   await app.listen(port);
 }
