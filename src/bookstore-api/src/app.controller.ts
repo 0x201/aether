@@ -5,7 +5,7 @@ import { DataSeedService } from './data-seed/data-seed.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly dataSeedService: DataSeedService) {}
+  constructor(private readonly dataSeedService: DataSeedService) { }
 
   @AllowAnonymous()
   @Get('/health')
@@ -15,8 +15,9 @@ export class AppController {
 
   @AllowAnonymous()
   @Get('/seed-data')
-  seedAsync(): void {
-    this.dataSeedService.seedAsync();
+  async seedAsync(): Promise<{}> {
+    await this.dataSeedService.seedAsync();
+    return { statusCode: 200, message: 'Data seeded successfully' };
   }
 
   @AllowAnonymous()
