@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateBookCommand {
   @ApiProperty()
@@ -13,4 +13,6 @@ export class CreateBookCommand {
   price: number;
   @ApiProperty()
   authorIds: number[];
+  @ApiPropertyOptional()
+  isActive?: boolean;
 }

@@ -1,210 +1,131 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository, SelectQueryBuilder } from 'typeorm';
 import { BookQuery } from './queries/book.query';
 import { CreateBookCommand } from './commands/create-book.command';
 import { UpdateBookCommand } from './commands/update-book.command';
 import { Book } from './entities/book.entity';
 import { BookAuthor } from './entities/book-author.entity';
 import { Author } from '../authors/entities/author.entity';
-import { CurrentUser } from 'src/shared/current-user.service';
+import { UserContextService } from 'src/shared/services/user-context.service';
+import { GenericCrudAuditableService } from 'src/common/services/generic-crud-auditable.service';
+import { DateTimeService } from 'src/shared/services/datetime.service';
 
 @Injectable()
-export class BooksService {
-  private readonly logger = new Logger(BooksService.name);
+export class BooksService extends GenericCrudAuditableService<Book, CreateBookCommand, UpdateBookCommand> {
+  protected readonly logger = new Logger(BooksService.name);
 
   constructor(
     @InjectRepository(Book) private readonly bookRepository: Repository<Book>,
-    private dataSource: DataSource,
-    private readonly currentUser: CurrentUser
-  ) { }
-
-  async createMany(createBookCommands: CreateBookCommand[]) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const authorIds = [...new Set(createBookCommands.flatMap(x => x.authorIds))];
-
-      const authors = await queryRunner.manager.find(Author, { where: { id: In(authorIds) } });
-
-      const authorMap = new Map(authors.map(a => [a.id, a]));
-
-      const booksToSave: Book[] = [];
-
-      for (const command of createBookCommands) {
-        const currentAuthorIds = command.authorIds.map(authorId => authorMap.get(authorId));
-        if (!currentAuthorIds || currentAuthorIds.length === 0) {
-          throw new Error(`Authors with IDs ${command.authorIds} not found.`);
-        }
-        const publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
-
-        const book = new Book();
-        book.title = command.title;
-        book.publishDate = publishDate;
-        book.price = command.price;
-        book.description = command.description;
-        book.isbn = command.isbn;
-        booksToSave.push(book);
-      }
-
-      const savedBooks = await queryRunner.manager.save(booksToSave);
-
-      const bookAuthorsToSave: BookAuthor[] = [];
-      savedBooks.forEach((book, index) => {
-        const command = createBookCommands[index];
-        command.authorIds.forEach((authorId) => {
-          const bookAuthor = new BookAuthor();
-          bookAuthor.bookId = book.id;
-          bookAuthor.authorId = authorId;
-          bookAuthorsToSave.push(bookAuthor);
-        });
-      });
-
-      await queryRunner.manager.save(bookAuthorsToSave);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    protected readonly dataSource: DataSource,
+    protected readonly currentUser: UserContextService,
+    protected readonly dateTimeService: DateTimeService,
+  ) {
+    super(bookRepository, dataSource, currentUser, dateTimeService);
   }
 
-  async create(command: CreateBookCommand): Promise<Book> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const authors = await queryRunner.manager.find(Author, { where: { id: In(command.authorIds) } });
+  protected mapCreateDtoToEntity(command: CreateBookCommand, entity: Book): void {
+    entity.title = command.title;
+    entity.publishDate = command.publishDate
+      ? new Date(command.publishDate).toISOString().split('T')[0]
+      : null;
+    entity.price = command.price;
+    entity.description = command.description;
+    entity.isbn = command.isbn;
+  }
 
-      const authorMap = new Map(authors.map(a => [a.id, a]));
+  protected mapUpdateDtoToEntity(command: UpdateBookCommand, entity: Book): void {
+    const publishDate = command.publishDate
+      ? new Date(command.publishDate).toISOString().split('T')[0]
+      : null;
 
-      const bookAuthorsToSave: BookAuthor[] = [];
+    Object.assign(entity, {
+      title: command.title ?? entity.title,
+      publishDate: publishDate ?? entity.publishDate,
+      price: command.price ?? entity.price,
+      description: command.description ?? entity.description,
+      isbn: command.isbn ?? entity.isbn,
+      isActive: command.isActive ?? entity.isActive,
+    });
+  }
 
-      const currentAuthorIds = command.authorIds.map(authorId => authorMap.get(authorId));
-      if (!currentAuthorIds || currentAuthorIds.length === 0) {
-        throw new Error(`Authors with IDs ${command.authorIds} not found.`);
-      }
+  protected async afterCreate(queryRunner: QueryRunner, command: CreateBookCommand, entity: Book): Promise<void> {
+    if (command.authorIds && command.authorIds.length > 0) {
+      const authors: Author[] = await queryRunner.manager
+        .createQueryBuilder(Author, "author")
+        .where("author.id IN (:...authorIds)", { authorIds: command.authorIds })
+        .getMany();
 
-      const book = new Book();
-      book.title = command.title;
-      book.publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
-      book.price = command.price;
-      book.description = command.description;
-      book.isbn = command.isbn;
-
-      const username = this.currentUser.getUsername();
-
-      book.createdBy = username;
-      book.lastModifiedBy = username;
-
-      const savedBook = await queryRunner.manager.save(book);
-
-      command.authorIds.forEach((authorId) => {
+      const bookAuthorsToSave: BookAuthor[] = authors.map((author) => {
         const bookAuthor = new BookAuthor();
-        bookAuthor.bookId = savedBook.id;
-        bookAuthor.authorId = authorId;
-        bookAuthorsToSave.push(bookAuthor);
+        bookAuthor.bookId = entity.id;
+        bookAuthor.authorId = author.id;
+        return bookAuthor;
       });
 
-      await queryRunner.manager.save(bookAuthorsToSave);
-
-      await queryRunner.commitTransaction();
-      return savedBook;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
+      await queryRunner.manager.save<BookAuthor>(bookAuthorsToSave);
     }
+    await super.afterCreate(queryRunner, command, entity);
   }
 
-  async findAll(query: BookQuery): Promise<[Book[], number]> {
-    let qb = this.bookRepository
-      .createQueryBuilder('book')
-      .leftJoinAndSelect('book.bookAuthors', 'bookAuthor')
-      .leftJoinAndSelect('bookAuthor.author', 'author');
-    if (query.filter) {
-      qb = qb.andWhere('book.title like :title', { title: query.filter + '%' });
-    }
-    if (query.startDate && query.endDate) {
-      qb = qb.andWhere('book.createdTime >= :startDate', { startDate: query.startDate });
-      qb = qb.andWhere('book.createdTime <= :endDate', { endDate: query.endDate });
-    }
-    if (query.authorId) {
-      qb = qb.andWhere('book.authorId=:authorId', {
-        authorId: query.authorId
-      })
-    }
+  protected async afterUpdate(queryRunner: QueryRunner, command: UpdateBookCommand, entity: Book): Promise<void> {
+    if (command.authorIds) {
+      await queryRunner.manager
+        .createQueryBuilder(BookAuthor, "bookAuthor")
+        .where('bookId = :bookId', { bookId: entity.id })
+        .delete()
+        .execute();
 
-    return await qb
-      .orderBy(query.sorting, query.order === 'asc' ? 'ASC' : 'DESC')
-      .skip(query.skipCount)
-      .take(query.maxResultCount)
-      .getManyAndCount();
+      if (command.authorIds.length > 0) {
+        const bookAuthorsToAdd = command.authorIds.map((authorId) => {
+          const bookAuthor = new BookAuthor();
+          bookAuthor.bookId = entity.id;
+          bookAuthor.authorId = authorId;
+          return bookAuthor;
+        });
+
+        await queryRunner.manager.save<BookAuthor>(bookAuthorsToAdd);
+      }
+    }
+    await super.afterUpdate(queryRunner, command, entity);
+  }
+
+  async findBooks(query: BookQuery): Promise<[Book[], number]> {
+    return this.findPaginated(query, (qb: SelectQueryBuilder<Book>) => {
+      qb = qb.leftJoinAndSelect("book.bookAuthors", 'bookAuthor')
+        .leftJoinAndSelect("bookAuthor.author", 'author');
+
+      if (query.filter) {
+        qb = qb.andWhere('book.title like :title', { title: `%${query.filter}%` });
+      }
+
+      if (query.startDate && query.endDate) {
+        qb = qb.andWhere('book.createdTime >= :startDate', {
+          startDate: query.startDate,
+        });
+        qb = qb.andWhere('book.createdTime <= :endDate', {
+          endDate: query.endDate,
+        });
+      }
+
+      if (query.authorId) {
+         qb = qb.where("author.id = :authorId", { authorId: query.authorId })
+      }
+
+      return qb;
+    });
   }
 
   async findOne(id: number): Promise<Book> {
     const book = await this.bookRepository.findOne({
       relations: ['bookAuthors', 'bookAuthors.author'],
-      where: { id: id }
+      where: { id: id },
     });
     return book;
   }
 
   async update(id: number, command: UpdateBookCommand): Promise<Book> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      let book = await queryRunner.manager.findOne(Book, { where: { id: id } });
-      if (!book) {
-        throw new Error(`Book with id ${id} not found`);
-      }
-      book.title = command.title;
-      book.publishDate = command.publishDate ? new Date(command.publishDate).toISOString().split('T')[0] : null;
-      book.price = command.price;
-
-      const authors = await queryRunner.manager.find(Author, { where: { id: In(command.authorIds) } });
-      if (!authors || authors.length === 0) {
-        throw new Error(`Author with IDs ${command.authorIds} not found`);
-      }
-
-      await queryRunner.manager.delete(BookAuthor, { bookId: book.id })
-
-      const newBookAuthors = command.authorIds.map((authorId) =>
-        queryRunner.manager.create(BookAuthor, {
-          bookId: book.id,
-          authorId: authorId,
-        })
-      );
-
-      book.lastModifiedBy = this.currentUser.getUsername();
-
-      await queryRunner.manager.save(book);
-      await queryRunner.manager.save(newBookAuthors);
-
-      await queryRunner.commitTransaction();
-      return book;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      this.logger.error("An error occurred while updating book.", error);
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    return super.update(id, command);
   }
 
-  async remove(id: number) {
-    const bookToDelete = await this.bookRepository.findOne({
-      where: { id: id },
-    });
-    await this.bookRepository.remove(bookToDelete);
-  }
-
-  async count(): Promise<number> {
-    return await this.bookRepository.count();
-  }
 }
