@@ -21,6 +21,9 @@ export default () => ({
       max: parseInt(process.env.DB_POOL_MAX_SIZE) || 10,
       min: parseInt(process.env.DB_POOL_MIN_SIZE) || 0,
       idleTimeoutMillis: parseInt(process.env.DB_TIMEOUT) || 30000,
+      createTimeoutMillis: parseInt(process.env.DB_CREATE_TIMEOUT) || 30000,
+      destroyTimeoutMillis: parseInt(process.env.DB_DESTROY_TIMEOUT) || 5000,
+      acquireTimeoutMillis: parseInt(process.env.DB_ACQUIRE_TIMEOUT) || 30000,
     },
     options: {
       encrypt: process.env.DB_ENCRYPT === 'true',
