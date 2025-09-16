@@ -10,10 +10,10 @@ export interface UserPayload {
 }
 
 @Injectable({ scope: Scope.REQUEST })
-export class CurrentUser {
+export class UserContextService {
   constructor(@Inject(REQUEST) private readonly request: Request) {}
 
-  getUser(): UserPayload | null {
+  getCurrentUser(): UserPayload | null {
     return (this.request as any).user;
   }
 
