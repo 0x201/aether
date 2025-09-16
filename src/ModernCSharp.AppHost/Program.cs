@@ -74,16 +74,18 @@ var bookStoreApi = builder.AddPnpmApp("bookstore-api", @"../bookstore-api", "sta
     .WithHttpEndpoint(targetPort: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
-bookStoreApi.WithUrl($"{bookStoreApi.GetEndpoint("http")}/scalar", "Book Store API Scalar Reference");
+var bookstoreApiHttpEndpoint = bookStoreApi.GetEndpoint("http");
+bookStoreApi.WithUrl($"{bookstoreApiHttpEndpoint}/scalar", "Book Store API Scalar Reference");
+bookStoreApi.WithEnvironment("HTTP_ENDPOINT", bookstoreApiHttpEndpoint);
 
 var bookstoreApp = builder.AddPnpmApp("bookstore-app", @"../bookstore-app", "start")
-    .WithHttpEndpoint(targetPort: 4200, env: "PORT")
+    .WithHttpEndpoint(targetPort: 4200, env: "HTTP_PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookStoreApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv/Scripts/uvicorn.exe", ["main:app"])
-    .WithHttpEndpoint(targetPort: 8000, env: "PORT")
+    .WithHttpEndpoint(targetPort: 8000, env: "HTTP_PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
