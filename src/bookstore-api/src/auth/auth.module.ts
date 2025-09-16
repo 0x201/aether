@@ -9,7 +9,7 @@ import { AuthGuard } from './auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtConfig } from './jwt.config';
 import { RolesModule } from '../roles/roles.module';
-import { CurrentUser } from '../shared/current-user.service';
+import { UserContextService } from '../shared/services/user-context.service';
 import { SharedModule } from 'src/shared/shared.module';
 import { MenusModule } from 'src/menus/menus.module';
 
@@ -34,7 +34,7 @@ import { MenusModule } from 'src/menus/menus.module';
   ],
   providers: [
     AuthService,
-    CurrentUser,
+    UserContextService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

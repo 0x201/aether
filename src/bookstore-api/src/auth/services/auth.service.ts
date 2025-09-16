@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -17,6 +18,10 @@ import { JwtConfig } from '../jwt.config';
 import { RolesService } from '../../roles/roles.service';
 import { v4 as uuidv4 } from 'uuid';
 import { MenusService } from '../../menus/menus.service';
+import { Role } from 'src/roles/entities/role.entity';
+import { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
+import { CryptoService } from 'src/shared/services/crypto.service';
 
 @Injectable()
 export class AuthService {
@@ -30,47 +35,50 @@ export class AuthService {
     private readonly rolesService: RolesService,
     private readonly configService: ConfigService,
     private readonly menusService: MenusService,
+    private readonly cryptoService: CryptoService,
+    @Inject(REQUEST) private readonly request: Request
   ) {
     this.jwtConfig = this.configService.get<JwtConfig>('jwtConfig');
   }
 
-
   async signin(
     signInCommand: SignInUserCommand,
   ): Promise<{ access_token: string; refresh_token: string }> {
-    this.logger.log(`Signing in user ${signInCommand.username}`);
-    const user = await this.userService.findOne(signInCommand);
+    const user = await this.userService.findByUsername(signInCommand.username);
     if (!user) {
       return null;
     }
-    const isMatched = await compare(signInCommand.password, user.password);
+    const isMatched = await this.cryptoService.compare(signInCommand.password, user.password);
     if (!isMatched) {
+      this.logger.error('Invalid credentials. Request from ', { 
+        ip: this.request.ip,
+        ips: this.request.ips,
+        remoteAddress: this.request.socket.remoteAddress,
+        remoteFamily: this.request.socket.remoteFamily,
+        remotePort: this.request.socket.remotePort,
+      });
       throw new UnauthorizedException();
     }
-    const roles: string[] =
-      user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
-      
-    const userMenus = await this.menusService.getUserMenus(user.id);
-    const menus = userMenus.map(menu => {
-      return {
-        id: menu.id,
-        name: menu.name,
-        title: menu.title,
-        icon: menu.icon,
-        route: menu.route,
-        order: menu.order,
-        parentId: menu.parentId,
-        roles: menu.roles
-      };
-    });
-    
+
+    const roles: Role[] = await this.rolesService.findByUserId(user.id);
+    const menus = await this.menusService.getUserMenus(user.id);
+
     const payload: JwtPayload = {
       sub: user.id.toString(),
       username: user.username,
       nickname: user.nickname,
-      roles: roles,
+      roles: roles.map(role => ({ id: role.id, name: role.name })),
       permissions: [],
-      menus: menus
+      menus: menus.map(menu => ({
+        id: menu.id,
+        name: menu.name,
+        route: menu.route,
+        icon: menu.icon,
+        title: menu.title,
+        parentId: menu.parentId,
+        isActive: menu.isActive,
+        order: menu.order,
+      })),
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.jwtConfig.expiresIn,
@@ -83,19 +91,21 @@ export class AuthService {
       username: user.username,
       tokenId: uuidv4(),
     };
-    
+
     const refreshToken = await this.jwtService.signAsync(refreshPayload, {
       expiresIn: this.jwtConfig.refreshTokenExpiresIn,
       secret: this.jwtConfig.secret,
     });
 
-    return { 
+    return {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string; refresh_token: string }> {
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     try {
       if (this.usedRefreshTokens.has(refreshToken)) {
         throw new UnauthorizedException('Refresh token has been used');
@@ -104,57 +114,45 @@ export class AuthService {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.jwtConfig.secret,
       });
-      
-      const user = await this.userService.findById(payload.sub);
+
+      const user = await this.userService.findOneWithRoles(payload.sub);
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
-      
+
       this.usedRefreshTokens.add(refreshToken);
-      
-      const roles: string[] =
-        user.userRoles.length == 0 ? [] : user.userRoles.map((x) => x.role.name);
-      
-      const userMenus = await this.menusService.getUserMenus(user.id);
-      const menus = userMenus.map(menu => {
-        return {
-          id: menu.id,
-          name: menu.name,
-          title: menu.title,
-          icon: menu.icon,
-          route: menu.route,
-          order: menu.order,
-          parentId: menu.parentId,
-          roles: menu.roles
-        };
-      });
-      
+
+      const menus = await this.menusService.getUserMenus(user.id);
+
       const newPayload: JwtPayload = {
         sub: user.id.toString(),
         username: user.username,
         nickname: user.nickname,
-        roles: roles,
+        roles: user.roles,
         permissions: [],
-        menus: menus
+        menus: menus,
       };
-      
+
       const newAccessToken = await this.jwtService.signAsync(newPayload, {
         expiresIn: this.jwtConfig.expiresIn,
         secret: this.jwtConfig.secret,
       });
-      
+
       const newRefreshPayload = {
         sub: user.id.toString(),
         username: user.username,
         tokenId: uuidv4(),
       };
-      
-      const newRefreshToken = await this.jwtService.signAsync(newRefreshPayload, {
-        expiresIn: this.jwtConfig.refreshTokenExpiresIn,
-        secret: this.jwtConfig.secret,
-      });
-      
-      return { 
+
+      const newRefreshToken = await this.jwtService.signAsync(
+        newRefreshPayload,
+        {
+          expiresIn: this.jwtConfig.refreshTokenExpiresIn,
+          secret: this.jwtConfig.secret,
+        },
+      );
+
+      return {
         access_token: newAccessToken,
         refresh_token: newRefreshToken,
       };
@@ -164,7 +162,7 @@ export class AuthService {
   }
 
   async signup(input: SignUpUserCommand): Promise<any> {
-    const user = await this.userService.findOne(input);
+    const user = await this.userService.findByUsername(input.username);
     const userExists = user !== null;
 
     if (userExists) {
@@ -173,8 +171,8 @@ export class AuthService {
         message: 'User has already exists!',
       });
     }
-    if (input.roles.length > 0) {
-      const roles = await this.rolesService.findByNames(input.roles);
+    if (input.roleIds.length > 0) {
+      const roles = await this.rolesService.findByIds(input.roleIds);
       const rolesExist = roles && roles.length > 0;
       if (!rolesExist) {
         throw new NotFoundException({
