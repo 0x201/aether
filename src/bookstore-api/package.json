@@ -19,10 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npx typeorm -- migration:generate -n",
-    "migration:run": "npx typeorm migration:run -- -d ./src/database/typeorm-migration.config.ts",
-    "migration:revert": "npx typeorm migration:revert -- -d ./src/database/typeorm-migration.config.ts"
+    "migration:generate": "npx typeorm-ts-node-commonjs migration:generate ./src/database/migrations -d ./src/database/typeorm-migration.config.ts",
+    "migration:run": "npx typeorm-ts-node-commonjs migration:run -d ./src/database/typeorm-migration.config.ts",
+    "migration:revert": "npx typeorm-ts-node-commonjs migration:revert ./src/database/migrations -d ./src/database/typeorm-migration.config.ts"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
