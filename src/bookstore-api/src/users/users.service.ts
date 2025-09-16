@@ -1,115 +1,154 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository, In, DataSource, } from 'typeorm';
+import { Repository, DataSource, QueryRunner, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { SignUpUserCommand } from './commands/signup-user.command';
 import { UpdateUserCommand } from './commands/update-user.command';
-import { UtilsService } from '../shared/utils';
-import { UserRole } from './entities/user-role.entity';
 import { Role } from '../roles/entities/role.entity';
 import { UserQuery } from './queries/user.query';
 import { UserDto } from './dtos/user.dto';
-import { CurrentUser } from 'src/shared/current-user.service';
-
+import { UserContextService } from '../shared/services/user-context.service';
+import { GenericCrudAuditableService } from '../common/services/generic-crud-auditable.service';
+import { CryptoService } from 'src/shared/services/crypto.service';
+import { DateTimeService } from 'src/shared/services/datetime.service';
+import { UserRole } from './entities/user-role.entity';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends GenericCrudAuditableService<User, SignUpUserCommand, UpdateUserCommand> {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly dataSource: DataSource,
-    private readonly utilsService: UtilsService,
-    private readonly currentUser: CurrentUser
-  ) { }
+    protected readonly dataSource: DataSource,
+    private readonly cryptoService: CryptoService,
+    protected readonly userContext: UserContextService,
+    protected readonly dateTimeService: DateTimeService,
+  ) {
+    super(userRepository, dataSource, userContext, dateTimeService);
+  }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: id },
-      relations: ['userRoles', 'userRoles.role'],
-    });
+  protected mapCreateDtoToEntity(command: SignUpUserCommand, entity: User): void {
+    entity.username = command.username;
+    entity.nickname = command.nickname;
+    entity.isActive = true;
+  }
 
-    return user;
+  protected mapUpdateDtoToEntity(command: UpdateUserCommand, entity: User): void {
+    entity.username ??= command.username;
+    entity.nickname ??= command.nickname;
+    entity.isActive ??= command.isActive;
+  }
+
+  protected async beforeCreate(queryRunner: QueryRunner, command: SignUpUserCommand, entity: User): Promise<void> {
+    if (command.password) {
+      const password = await this.cryptoService.hash(command.password);
+      entity.password = password;
+    }
+    await super.beforeCreate(queryRunner, command, entity);
+  }
+
+  protected async afterCreate(queryRunner: QueryRunner, command: SignUpUserCommand, entity: User): Promise<void> {
+    if (command.roleIds && command.roleIds.length > 0) {
+      const roles: Role[] = await queryRunner.manager
+        .createQueryBuilder(Role, 'role')
+        .where('role.id IN (:...roleIds)', { roleIds: command.roleIds })
+        .getMany();
+
+      const userRolesToAdd = roles.map((role) => {
+        const userRole = new UserRole();
+        userRole.role = role;
+        userRole.user = entity;
+        userRole.assignedAt = this.dateTimeService.getNowString();
+        userRole.assignedBy = this.userContext.getUsername();
+        return userRole;
+      });
+
+      const savedUserRoles =await queryRunner.manager.save<UserRole>(userRolesToAdd);
+      entity.userRoles = savedUserRoles;
+    }
+
+    await super.afterCreate(queryRunner, command, entity);
+  }
+
+  protected async afterUpdate(queryRunner: QueryRunner, command: UpdateUserCommand, entity: User): Promise<void> {
+    if (command.roleIds) {
+      await queryRunner.manager
+        .createQueryBuilder(UserRole, 'userRole')
+        .where('userId = :userId', { userId: entity.id })
+        .delete()
+        .execute();
+
+      if (command.roleIds.length > 0) {
+        const userRolesToAdd = command.roleIds.map((roleId) => {
+          const userRole = new UserRole();
+          userRole.user.id = entity.id;
+          userRole.role.id = roleId;
+          return userRole;
+        });
+
+        await this.dataSource.manager.save<UserRole>(userRolesToAdd);
+      }
+    }
+
+    await super.afterUpdate(queryRunner, command, entity);
+  }
+
+  async findOneWithRoles(id: number): Promise<UserDto> {
+    const user = await super.findOne(id);
+
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+
+    const roles = await this.dataSource
+      .createQueryBuilder('UserRole', 'userRole')
+      .innerJoinAndSelect('Roles', 'role', 'userRole.RoleId = role.Id')
+      .where('userRole.UserId = :id', { id: user.id })
+      .getMany();
+
+    const userDto: UserDto = {
+      id: user.id,
+      username: user.username,
+      nickname: user.nickname,
+      isActive: user.isActive,
+      createdTime: user.createdTime,
+      lastModifiedTime: user.lastModifiedTime,
+      roles: (roles as Role[]).map(role => ({
+        id: role.id,
+        name: role.name
+      }))
+    };
+
+    return userDto;
   }
 
   async findByUsername(username: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { username: username },
-      relations: ['userRoles', 'userRoles.role'],
+    return this.userRepository.findOneBy({ username })
+  }
+
+  async findByUsernameWithRoles(username: string): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { username },
+      relations: ['roles'],
     });
-
-    return user;
   }
 
-  async findAll(query: UserQuery): Promise<[User[], number]> {
-    let qb = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userRoles', 'userRoles')
-      .leftJoinAndSelect('userRoles.role', 'role');
-    if (query.filter) {
-      qb = qb.where('user.username like :username', { username: query.filter + '%' });
-    }
-    if (query.startDate && query.endDate) {
-      qb = qb.andWhere('user.createdTime >= :startDate', { startDate: query.startDate });
-      qb = qb.andWhere('user.createdTime <= :endDate', { endDate: query.endDate });
-    }
+  async findPaginatedUsers(query: UserQuery): Promise<[User[], number]> {
+    return this.findPaginated(query, (qb: SelectQueryBuilder<User>) => {
+      qb = qb.leftJoinAndSelect("user.userRoles", "userRole")
+        .leftJoinAndSelect("userRole.role", "role")
 
-    const [users, count] = await qb
-      .orderBy(query.sorting, query.order === 'asc' ? 'ASC' : 'DESC')
-      .skip(query.skipCount)
-      .take(query.maxResultCount)
-      .getManyAndCount();
+      if (query.filter) {
+        qb = qb.andWhere('user.username like :username', { username: `%${query.filter}%` });
+      }
 
-    return [users, count];
-  }
-
-  async insert(input: SignUpUserCommand): Promise<User> {
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    let user = new User();
-    try {
-      const roles: Role[] = await queryRunner.manager.find(Role, { where: { name: In([...input.roles]) } });
-      user.username = input.username;
-      const [pwd, salt] = await this.utilsService.getPwdHash(input.password)
-      user.password = pwd;
-      user.salt = salt;
-      user.nickname = input.nickname;
-      user.createdTime = this.utilsService.getNowString();
-      user = await queryRunner.manager.save(user);
-
-      const userRolesToAdd = roles.map(role => {
-        const userRole = new UserRole();
-        userRole.userId = user.id;
-        userRole.roleId = role.id;
-        return userRole;
-      });
-      await queryRunner.manager.save(userRolesToAdd);
-
-      await queryRunner.commitTransaction();
-
-      return user
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
-  async update(id: number, input: UpdateUserCommand): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id: id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    user.username = input.username ?? user.username;
-    user.nickname = input.nickname ?? user.nickname;
-    user.isActive = input.isActive ?? user.isActive;
-
-    user.lastModifiedTime = this.utilsService.getNowString();
-    user.lastModifiedBy = this.currentUser.getUsername();
-
-    await this.userRepository.save(user);
+      if (query.startDate && query.endDate) {
+        qb = qb.andWhere('user.createdTime >= :startDate', { 
+          startDate: query.startDate 
+        }).andWhere('user.createdTime <= :endDate', { 
+          endDate: query.endDate 
+        });
+      }
+      return qb;
+    });
   }
 
   async remove(id: number): Promise<void> {
@@ -119,20 +158,5 @@ export class UsersService {
     }
 
     await this.userRepository.remove(user);
-  }
-
-  async count(): Promise<number> {
-    return await this.userRepository.count();
-  }
-
-  private mapToDto(user: User): UserDto {
-    const dto = new UserDto();
-    dto.id = user.id;
-    dto.username = user.username;
-    dto.nickname = user.nickname;
-    dto.isActive = user.isActive;
-    dto.createdTime = user.createdTime;
-    dto.lastModifiedTime = user.lastModifiedTime;
-    return dto;
   }
 }

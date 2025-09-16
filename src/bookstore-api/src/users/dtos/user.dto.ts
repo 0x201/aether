@@ -1,3 +1,5 @@
+import { RoleDto } from "src/roles/dtos/role.dto";
+
 export class UserDto {
   id: number;
   username: string;
@@ -5,5 +7,5 @@ export class UserDto {
   isActive: boolean;
   createdTime: string;
   lastModifiedTime: string;
-  roles: string[];
+  roles: RoleDto[];
 }

@@ -1,26 +1,28 @@
-import {
-  Column,
-  Entity,
-  Index,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 import { UserRole } from '../../users/entities/user-role.entity';
+import { RoleMenu } from '../../menus/entities/role-menu.entity';
 
-
-@Entity('roles')
+@Entity('Roles')
 @Index('IDX_ROLE_NAME', ['name'], { unique: true })
 export class Role extends BaseAuditableEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'Id' })
   id: number;
 
-  @Column({ type: 'varchar', length: 200 })
+  @Column({ name: 'Name', type: 'varchar', length: 200 })
   name: string;
 
-  @Column({ default: true })
+  @Column({ name: 'IsActive', default: true })
   isActive: boolean;
 
-  @OneToMany(() => UserRole, ur => ur.role)
+
+  @OneToMany(() => UserRole, userRole => userRole.role, {
+    createForeignKeyConstraints: false
+  })
   userRoles: UserRole[];
+
+  @OneToMany(() => RoleMenu, roleMenu => roleMenu.role, {
+    createForeignKeyConstraints: false
+  })
+  roleMenus: RoleMenu[];
 }

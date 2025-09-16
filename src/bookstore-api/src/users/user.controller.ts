@@ -9,6 +9,7 @@ import { PagedResult } from 'src/common/response/ListResultResponse';
 import { Roles } from 'src/roles/role.decorator';
 import { RoleEnum } from 'src/roles/role.enum';
 import { User } from './entities/user.entity';
+import { RoleDto } from 'src/roles/dtos/role.dto';
 
 @Roles(RoleEnum.Admin)
 @ApiTags('Users')
@@ -21,8 +22,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get users with paged list' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Return users with paged list', type: PagedResult<UserDto> })
   async findAll(@Query() query: UserQuery): Promise<PagedResult<UserDto>> {
-    const [users, totalCount] = await this.usersService.findAll(query);
-    return new PagedResult<UserDto>(users.map(user => this.mapToDto(user)), totalCount);
+    const [users, totalCount] = await this.usersService.findPaginatedUsers(query);
+    const items = users.map((user) => this.mapUserToUserDto(user));
+    return new PagedResult<UserDto>(items, totalCount);
   }
 
   @Get(':id')
@@ -31,11 +33,11 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Return user by id', type: UserDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
-    const user = await this.usersService.findOne(id);
+    const user = await this.usersService.findOneWithRoles(id);
     if (!user) {
       throw new HttpException(`Cannot find the user with id ${id}`, 404);
     }
-    return this.mapToDto(user);
+    return user;
   }
 
   @Post()
@@ -44,7 +46,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.CREATED, description: 'User created successfully', type: UserDto })
   async createUser(@Body() signUpUserCommand: SignupUserCommand): Promise<UserDto> {
     const user = await this.usersService.insert(signUpUserCommand);
-    return this.mapToDto(user);
+    return this.mapUserToUserDto(user);
   }
 
   @Put(':id')
@@ -70,7 +72,7 @@ export class UserController {
   }
 
 
-  private mapToDto(user: User): UserDto {
+  private mapUserToUserDto(user: User): UserDto {
     const dto = new UserDto();
     dto.id = user.id;
     dto.username = user.username;
@@ -78,7 +80,12 @@ export class UserController {
     dto.isActive = user.isActive;
     dto.createdTime = user.createdTime;
     dto.lastModifiedTime = user.lastModifiedTime;
-    dto.roles = user.userRoles.map(userRole => userRole.role.name);
+    dto.roles = user.userRoles.map((userRole) => {
+      const roleDto = new RoleDto();
+      roleDto.name = userRole.role.name;
+      roleDto.id = userRole.role.id;
+      return roleDto;     
+    });
     return dto;
   }
 }

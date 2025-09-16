@@ -1,23 +1,48 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository, In, } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { Repository, In, DataSource, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateRoleCommand } from './commands/create-role.command';
 import { UpdateRoleCommand } from './commands/update-role.command';
 import { Role } from './entities/role.entity';
 import { RoleQuery } from './queries/role.query';
-
+import { UserContextService } from '../shared/services/user-context.service';
+import { GenericCrudAuditableService } from 'src/common/services/generic-crud-auditable.service';
+import { DateTimeService } from 'src/shared/services/datetime.service';
 
 @Injectable()
-export class RolesService {
+export class RolesService extends GenericCrudAuditableService<Role, CreateRoleCommand, UpdateRoleCommand> {
   constructor(
-    @InjectRepository(Role) private readonly roleRepository: Repository<Role>
-  ) { }
+    @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
+    protected readonly dataSource: DataSource,
+    protected readonly currentUser: UserContextService,
+    protected readonly dateTimeService: DateTimeService,
+  ) {
+    super(roleRepository, dataSource, currentUser, dateTimeService);
+  }
 
-  async findOne(name: string): Promise<Role> {
+  protected mapCreateDtoToEntity(command: CreateRoleCommand, entity: Role): void {
+    entity.name = command.name;
+  }
+
+  protected mapUpdateDtoToEntity(command: UpdateRoleCommand, entity: Role): void {
+    Object.assign(entity, {
+      name: command.name ?? entity.name,
+      isActive: command.isActive ?? entity.isActive,
+    });
+  }
+
+  async findByUserId(userId: number): Promise<Role[]> {
+    return await this.roleRepository.createQueryBuilder('role')
+      .innerJoin('UserRole', 'userRole', 'role.id = userRole.RoleId')
+      .where('userRole.UserId = :userId', { userId })
+      .getMany();
+  }
+
+  async findOneByName(name: string): Promise<Role> {
     return this.roleRepository.findOne({ where: { name: name } });
   }
 
-  async findById(id: number): Promise<Role> {
+  async findOne(id: number): Promise<Role> {
     return this.roleRepository.findOne({ where: { id: id } });
   }
 
@@ -25,65 +50,30 @@ export class RolesService {
     return this.roleRepository.find({ where: { name: In(names) } });
   }
 
-  async findAll(query: RoleQuery): Promise<[Role[], number]> {
-    let qb = this.roleRepository
-      .createQueryBuilder('role');
-    if (query.filter) {
-      qb = qb.andWhere('role.name like :name', { name: query.filter + '%' });
-    }
+  async findRoles(query: RoleQuery): Promise<[Role[], number]> {
+    return this.findPaginated(query, (qb: SelectQueryBuilder<Role>) => {
+      if (query.filter) {
+        qb = qb.andWhere('role.name like :name', { name: query.filter + '%' });
+      }
 
-    if (query.startDate && query.endDate) {
-      qb = qb.andWhere('role.createdTime >= :startDate', { startDate: query.startDate });
-      qb = qb.andWhere('role.createdTime <= :endDate', { endDate: query.endDate });
-    }
+      if (query.startDate && query.endDate) {
+        qb = qb.andWhere('role.createdTime >= :startDate', {
+          startDate: query.startDate,
+        });
+        qb = qb.andWhere('role.createdTime <= :endDate', {
+          endDate: query.endDate,
+        });
+      }
 
-    return await qb
-      .orderBy(query.sorting, query.order === 'asc' ? 'ASC' : 'DESC')
-      .skip(query.skipCount)
-      .take(query.maxResultCount)
-      .getManyAndCount();
-  }
-
-  async insert(command: CreateRoleCommand): Promise<Role> {
-    const roleToSave = new Role();
-    roleToSave.name = command.name;
-    return this.roleRepository.save(roleToSave);
-  }
-
-  async insertMany(commands: CreateRoleCommand[]): Promise<void> {
-    const rolesToSave = commands.map((command) => {
-      const roleToSave = new Role();
-      roleToSave.name = command.name;
-      return roleToSave;
+      return qb;
     });
-    await this.roleRepository.save(rolesToSave);
-  }
-
-  async update(id: number, command: UpdateRoleCommand): Promise<Role> {
-    const role = await this.roleRepository.findOne({ where: { id: id } });
-    if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
-    }
-
-    role.name = command.name ?? role.name;
-    role.isActive = command.isActive ?? role.isActive;
-    return this.roleRepository.save(role);
-  }
-
-  async remove(id: number): Promise<void> {
-    const role = await this.roleRepository.findOne({ where: { id: id } });
-    if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
-    }
-
-    await this.roleRepository.remove(role);
-  }
-
-  async count(): Promise<number> {
-    return await this.roleRepository.count();
   }
 
   async findAllRoles(): Promise<Role[]> {
     return await this.roleRepository.find();
+  }
+
+  async findByIds(ids: number[]): Promise<Role[]> {
+    return await this.roleRepository.findBy({ id: In(ids) });
   }
 }

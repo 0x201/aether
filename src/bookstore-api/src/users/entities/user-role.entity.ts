@@ -1,22 +1,34 @@
-import { Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { Role } from "../../roles/entities/role.entity";
 
-@Entity('user_role')
-@Index('IDX_USER_ROLE_USER_ID', ['userId'], { unique: true })
-@Index('IDX_USER_ROLE_ROLE_ID', ['roleId'], { unique: true })
+@Entity('UserRole')
+@Index('IDX_UserRole_UserId_RoleId', ['userId', 'roleId'], { unique: true })
 export class UserRole {
-    @PrimaryColumn({ name: 'user_id' })
+    @PrimaryGeneratedColumn({ name: "Id" })
+    id: number;
+
+    @Column({ name: "UserId" })
     userId: number;
 
-    @PrimaryColumn({ name: 'role_id' })
+    @Column({ name: "RoleId" })
     roleId: number;
 
-    @ManyToOne(() => User, (user) => user.userRoles)
-    @JoinColumn({ name: 'user_id', foreignKeyConstraintName: 'FK_USER_ROLE_USER_ID' })
+    @Column({ name: "AssignedAt", type: 'datetime', default: () => 'GETDATE()' })
+    assignedAt: string;
+
+    @Column({ name: "AssignedBy", nullable: true })
+    assignedBy: string;
+
+    @ManyToOne(() => User, (user) => user.userRoles, {
+        createForeignKeyConstraints: false,
+    })
+    @JoinColumn({ name: "UserId" })
     user: User;
 
-    @ManyToOne(() => Role, (role) => role.userRoles)
-    @JoinColumn({ name: 'role_id', foreignKeyConstraintName: 'FK_USER_ROLE_ROLE_ID' })
+    @ManyToOne(() => Role, (role) => role.userRoles, {
+        createForeignKeyConstraints: false
+    })
+    @JoinColumn({ name: "RoleId" })
     role: Role;
 }

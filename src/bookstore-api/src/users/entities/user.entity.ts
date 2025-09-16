@@ -1,34 +1,27 @@
-import {
-  Column,
-  Entity,
-  Index,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 import { UserRole } from './user-role.entity';
 
-@Entity('users')
+@Entity('Users')
 @Index('IDX_USER_USERNAME', ['username'], { unique: true })
 export class User extends BaseAuditableEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'Id' })
   id: number;
 
-  @Column({ type: 'varchar', length: 200 })
+  @Column({ name: 'Username', type: 'varchar', length: 200 })
   username: string;
 
-  @Column({ type: 'varchar', length: 200 })
+  @Column({ name: 'Password', type: 'varchar', length: 200 })
   password: string;
 
-  @Column({ type: 'varchar', length: 128 })
-  salt: string;
-
-  @Column({ type: 'varchar', length: 200, nullable: true })
+  @Column({ name: 'Nickname', type: 'varchar', length: 200, nullable: true })
   nickname: string;
 
-  @Column({ default: true })
+  @Column({ name: 'IsActive', default: true })
   isActive: boolean;
 
-  @OneToMany(() => UserRole, (ur) => ur.user)
+  @OneToMany(() => UserRole, userRole => userRole.user, {
+    createForeignKeyConstraints: false
+  })
   userRoles: UserRole[];
 }

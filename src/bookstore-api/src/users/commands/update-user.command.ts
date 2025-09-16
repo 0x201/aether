@@ -1,12 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserCommand {
   @ApiProperty()
   username: string;
-  
+
   @ApiProperty()
-  nickname: string;
-  
+  nickname?: string;
+
+  @ApiPropertyOptional()
+  roleIds?: number[];
+
+  @ApiPropertyOptional()
+  password?: string;
+
   @ApiProperty()
   isActive: boolean;
 }

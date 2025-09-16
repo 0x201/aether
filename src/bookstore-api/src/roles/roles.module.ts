@@ -8,15 +8,15 @@ import { RoleGuard } from './role.guard';
 import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Role]), SharedModule],
-    providers: [
-        RolesService,
-        {
-            provide: APP_GUARD,
-            useClass: RoleGuard
-        }
-    ],
-    exports: [RolesService],
-    controllers: [RolesController],
+  imports: [TypeOrmModule.forFeature([Role]), SharedModule],
+  providers: [
+    RolesService,
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
+  exports: [RolesService],
+  controllers: [RolesController],
 })
-export class RolesModule { }
+export class RolesModule {}
