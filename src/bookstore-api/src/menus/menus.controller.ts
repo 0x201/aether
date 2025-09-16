@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,7 +21,11 @@ import { Menu } from './entities/menu.entity';
 import { MenuDto } from './dtos/menu.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { UserPayload } from '../shared/current-user.service';
+import { UserPayload } from '../shared/services/user-context.service';
+import { MenuQuery } from './queries/menu.query';
+import { PagedResult } from 'src/common/response/ListResultResponse';
+import { CreateMenuCommand } from './commands/create-menu.command';
+import { UpdateMenuCommand } from './commands/update-menu.command';
 
 @Controller('menus')
 @ApiTags('Menus')
@@ -37,7 +42,8 @@ export class MenusController {
     type: [MenuDto],
   })
   async getUserMenus(@CurrentUser() user: UserPayload): Promise<MenuDto[]> {
-    return await this.menusService.getUserMenus(Number(user.sub));
+    const menus = await this.menusService.getUserMenus(Number(user.sub));
+    return menus.map((menu) => this.mapToDto(menu));
   }
 
   @Get()
@@ -47,8 +53,13 @@ export class MenusController {
     description: 'Return all menus',
     type: [Menu],
   })
-  async getAllMenus(): Promise<Menu[]> {
-    return await this.menusService.getAllMenus();
+  async getAllMenus(@Query() query: MenuQuery): Promise<PagedResult<MenuDto>> {
+    const [menus, totalCount] = await this.menusService.findMenus(query);
+
+    return new PagedResult<MenuDto>(
+      menus.map((menu) => this.mapToDto(menu)),
+      totalCount,
+    );
   }
 
   @Post()
@@ -58,8 +69,8 @@ export class MenusController {
     description: 'Menu created successfully',
     type: Menu,
   })
-  async createMenu(@Body() menu: Partial<Menu>): Promise<Menu> {
-    return await this.menusService.createMenu(menu);
+  async createMenu(@Body() menu: CreateMenuCommand): Promise<Menu> {
+    return await this.menusService.insert(menu);
   }
 
   @Put(':id')
@@ -71,9 +82,10 @@ export class MenusController {
   })
   async updateMenu(
     @Param('id', ParseIntPipe) id: number,
-    @Body() menu: Partial<Menu>,
-  ): Promise<Menu> {
-    return await this.menusService.updateMenu(id, menu);
+    @Body() menuToUpdate: UpdateMenuCommand,
+  ): Promise<MenuDto> {
+    const menu = await this.menusService.update(id, menuToUpdate);
+    return this.mapToDto(menu);
   }
 
   @Delete(':id')
@@ -83,6 +95,19 @@ export class MenusController {
     description: 'Menu deleted successfully',
   })
   async deleteMenu(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return await this.menusService.deleteMenu(id);
+    return await this.menusService.delete(id);
+  }
+
+  private mapToDto(menu: Menu): MenuDto {
+    return {
+      id: menu.id,
+      name: menu.name,
+      title: menu.title,
+      icon: menu.icon,
+      route: menu.route,
+      order: menu.order,
+      parentId: menu.parentId,
+      isActive: menu.isActive,
+    };
   }
 }

@@ -24,7 +24,4 @@ export class MenuDto {
 
   @ApiProperty()
   isActive: boolean;
-
-  @ApiProperty({ type: [String] })
-  roles: string[];
 }

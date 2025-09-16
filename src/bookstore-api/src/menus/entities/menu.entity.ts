@@ -1,44 +1,35 @@
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
-import { Role } from '../../roles/entities/role.entity';
+import { RoleMenu } from './role-menu.entity';
 
-@Entity('menus')
+@Entity('Menus')
 export class Menu extends BaseAuditableEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'Id' })
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ name: 'Name', type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ name: 'Title', type: 'varchar', length: 100 })
   title: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
+  @Column({ name: 'Icon', type: 'varchar', length: 200, nullable: true })
   icon: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
+  @Column({ name: 'Route', type: 'varchar', length: 200, nullable: true })
   route: string;
 
-  @Column({ type: 'int' })
+  @Column({ name: 'Order', type: 'int' })
   order: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ name: 'ParentId', type: 'int', nullable: true })
   parentId: number;
 
-  @Column({ default: true })
+  @Column({ name: 'IsActive', default: true })
   isActive: boolean;
 
-  @ManyToMany(() => Role, { cascade: true })
-  @JoinTable({
-    name: 'menu_role',
-    joinColumn: { name: 'menu_id' },
-    inverseJoinColumn: { name: 'role_id' },
+  @OneToMany(() => RoleMenu, roleMenu => roleMenu.menu, {
+    createForeignKeyConstraints: false
   })
-  roles: Role[];
+  roleMenus: RoleMenu[];
 }
