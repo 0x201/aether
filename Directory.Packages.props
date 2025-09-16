@@ -10,7 +10,7 @@
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.4</DuendeVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
-    <AspireCommunityVersion>9.7.0</AspireCommunityVersion>
+    <AspireCommunityVersion>9.7.2</AspireCommunityVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
