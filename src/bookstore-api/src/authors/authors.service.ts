@@ -1,74 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateAuthorCommand } from './commands/create-author.command';
 import { UpdateAuthorCommand } from './commands/update-author.command';
 import { Author } from './entities/author.entity';
 import { AuthorQuery } from './queries/author.query';
-import { CurrentUser } from 'src/shared/current-user.service';
+import { UserContextService } from 'src/shared/services/user-context.service';
+import { GenericCrudAuditableService } from 'src/common/services/generic-crud-auditable.service';
+import { DateTimeService } from 'src/shared/services/datetime.service';
 
 @Injectable()
-export class AuthorsService {
+export class AuthorsService extends GenericCrudAuditableService<Author, CreateAuthorCommand, UpdateAuthorCommand> {
+  protected readonly logger = new Logger(AuthorsService.name);
 
   constructor(
     @InjectRepository(Author) private authorRepository: Repository<Author>,
-    private readonly currentUser: CurrentUser
-  ) {}
-
-  async create(createAuthorCommand: CreateAuthorCommand) {
-    let author = new Author();
-    author = Object.assign(author, createAuthorCommand);
-    const user = this.currentUser.getUser();
-    author.createdBy = user.username;
-    author.lastModifiedBy = user.username;
-    await this.authorRepository.save(author);
+    protected readonly dataSource: DataSource,
+    protected readonly dateTimeService: DateTimeService,
+    protected readonly currentUser: UserContextService,
+  ) {
+    super(authorRepository, dataSource, currentUser, dateTimeService);
   }
 
-  async createMany(createAuthorsCommand: CreateAuthorCommand[]) {
-    let authorsToAdd: Author[] = [];
-    createAuthorsCommand.forEach((command) => {
-      let author = new Author();
-      author = Object.assign(author, command);
-      authorsToAdd.push(author);
-    })
-
-    await this.authorRepository.save(authorsToAdd);
+  protected mapCreateDtoToEntity(command: CreateAuthorCommand, entity: Author): void {
+    entity.firstName = command.firstName;
+    entity.lastName = command.lastName;
   }
 
-  async findAll(query: AuthorQuery): Promise<[Author[], number]> {
-    let qb = this.authorRepository.createQueryBuilder('author');
-    if (query.filter) {
-      qb = qb.where('author.name like :name', { name: query.filter + '%' });
-    }
-    return await qb
-      .orderBy(query.sorting, query.order === 'asc' ? 'ASC' : 'DESC')
-      .getManyAndCount();
+  protected mapUpdateDtoToEntity(command: UpdateAuthorCommand, entity: Author): void {
+    Object.assign(entity, {
+      firstName: command.firstName ?? entity.firstName,
+      lastName: command.lastName ?? entity.lastName,
+      isActive: command.isActive ?? entity.isActive,
+    });
+  }
+  async findAuthors(query: AuthorQuery): Promise<[Author[], number]> {
+    return this.findPaginated(query, (qb: SelectQueryBuilder<Author>) => {
+      if (query.filter) {
+        qb = qb.where('author.firstName like :name OR author.lastName like :name', { name: `%${query.filter}%` });
+      }
+      return qb;
+    });
   }
 
   async findOne(id: number): Promise<Author> {
     return await this.authorRepository.findOne({ where: { id: id } });
-  }
-
-  async update(id: number, updateAuthorDto: UpdateAuthorCommand) {
-    const originalAuthor = await this.authorRepository.findOne({
-      where: { id: id },
-    });
-    const updatedAuthor = Object.assign(originalAuthor, updateAuthorDto);
-
-    const user = this.currentUser.getUser();
-
-    updatedAuthor.lastModifiedBy = user.username;
-    await this.authorRepository.save(updatedAuthor);
-  }
-
-  async remove(id: number): Promise<void> {
-    const authorToDelete = await this.authorRepository.findOne({
-      where: { id: id },
-    });
-    await this.authorRepository.remove(authorToDelete);
-  }
-
-  async count(): Promise<number> {
-    return this.authorRepository.count();
   }
 }
