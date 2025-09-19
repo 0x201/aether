@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { RoleDto } from "src/roles/dtos/role.dto";
 
 export class CreateMenuCommand {
   @ApiProperty()
@@ -14,5 +15,5 @@ export class CreateMenuCommand {
   @ApiProperty()
   parentId: number;
   @ApiProperty()
-  roleIds: number[];
+  roles: RoleDto[];
 }

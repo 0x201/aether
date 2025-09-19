@@ -9,7 +9,10 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -43,7 +46,7 @@ export class MenusController {
   })
   async getUserMenus(@CurrentUser() user: UserPayload): Promise<MenuDto[]> {
     const menus = await this.menusService.getUserMenus(Number(user.sub));
-    return menus.map((menu) => this.mapToDto(menu));
+    return menus.map((menu) => Menu.mapToDto(menu));
   }
 
   @Get()
@@ -57,7 +60,7 @@ export class MenusController {
     const [menus, totalCount] = await this.menusService.findMenus(query);
 
     return new PagedResult<MenuDto>(
-      menus.map((menu) => this.mapToDto(menu)),
+      menus.map((menu) => Menu.mapToDto(menu)),
       totalCount,
     );
   }
@@ -69,8 +72,9 @@ export class MenusController {
     description: 'Menu created successfully',
     type: Menu,
   })
-  async createMenu(@Body() menu: CreateMenuCommand): Promise<Menu> {
-    return await this.menusService.insert(menu);
+  async createMenu(@Body() menuToAdd: CreateMenuCommand, @Res() res: Response): Promise<void> {
+    const menu = await this.menusService.insert(menuToAdd);
+    res.status(HttpStatus.CREATED).location(`/api/menus/${menu.id}`).send();
   }
 
   @Put(':id')
@@ -83,31 +87,24 @@ export class MenusController {
   async updateMenu(
     @Param('id', ParseIntPipe) id: number,
     @Body() menuToUpdate: UpdateMenuCommand,
-  ): Promise<MenuDto> {
+    @Res() res: Response,
+  ): Promise<void> {
     const menu = await this.menusService.update(id, menuToUpdate);
-    return this.mapToDto(menu);
+    const menuDto = Menu.mapToDto(menu);
+    res.status(200).json(menuDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a menu' })
   @ApiResponse({
-    status: 200,
+    status: 204,
     description: 'Menu deleted successfully',
   })
-  async deleteMenu(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return await this.menusService.delete(id);
-  }
-
-  private mapToDto(menu: Menu): MenuDto {
-    return {
-      id: menu.id,
-      name: menu.name,
-      title: menu.title,
-      icon: menu.icon,
-      route: menu.route,
-      order: menu.order,
-      parentId: menu.parentId,
-      isActive: menu.isActive,
-    };
+  async deleteMenu(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.menusService.delete(id);
+    res.status(204).send();
   }
 }

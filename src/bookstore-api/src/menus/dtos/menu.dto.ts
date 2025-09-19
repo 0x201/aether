@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { RoleDto } from 'src/roles/dtos/role.dto';
 
 export class MenuDto {
   @ApiProperty()
@@ -24,4 +25,7 @@ export class MenuDto {
 
   @ApiProperty()
   isActive: boolean;
+
+  @ApiProperty()
+  roles: RoleDto[];
 }
