@@ -14,6 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
+    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="9.4.2-preview.1.25428.12" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.NodeJS" Version="$(AspireVersion)" />

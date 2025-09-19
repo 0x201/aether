@@ -22,6 +22,11 @@ var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
                        .WithDataVolume()
                        .WithContainerName("sql-server");
 
+var keyclock = builder.AddKeycloak("keyclock", port: 8080)
+                      .WithLifetime(ContainerLifetime.Persistent)
+                      .WithDataVolume()
+                      .WithContainerName("keyclock");
+
 var bookstoreDb = sqlServer.AddDatabase("bookstoredb");
 var identityDb = sqlServer.AddDatabase("identitydb");
 var orderDb = sqlServer.AddDatabase("orderingdb");
