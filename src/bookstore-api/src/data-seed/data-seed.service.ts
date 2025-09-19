@@ -26,7 +26,7 @@ export class DataSeedService {
         'A landmark volume in science writing by one of the great minds of our time, Stephen Hawking\'s book explores such profound questions as: How did the universe begin—and what made its start possible? Does time always flow forward? Is the universe unending—or are there boundaries? Are there other dimensions in space? What will happen when it all ends?\\nTold in language we all can understand, A Brief History of Time plunges into the exotic realms of black holes and quarks, of antimatter and "arrows of time," of the big bang and a bigger God—where the possibilities are wondrous and unexpected. With exciting images and profound imagination, Stephen Hawking brings us closer to the ultimate secrets at the very heart of creation.',
       publishDate: '1998-09-01',
       price: 9.99,
-      authorIds: [1],
+      authors: [{ id: 1, firstName: 'Eric', lastName: 'Matthes', isActive: true }],
     },
     {
       title:
@@ -36,7 +36,7 @@ export class DataSeedService {
         "Python Crash Course is the world's bestselling programming book, with over 1,500,000 copies sold to date!\\nPython Crash Course is the world's best-selling guide to the Python programming language. This fast-paced, thorough introduction will have you writing programs, solving problems, and developing functioning applications in no time.\\nYou'll start by learning basic programming concepts, such as variables, lists, classes, and loops, and practice writing clean code with exercises for each topic. You'll also learn how to make your programs interactive and test your code safely before adding it to a project. You'll put your new knowledge into practice by creating a Space Invaders-inspired arcade game, building a set of data visualizations with Python's handy libraries, and deploying a simple application online.",
       publishDate: '2023-01-10',
       price: 31.99,
-      authorIds: [2],
+      authors: [{ id: 2, firstName: 'Jay', lastName: 'Wengler', isActive: true }],
     },
     {
       title: "System Design Interview - An insider's guide",
@@ -45,7 +45,7 @@ export class DataSeedService {
         "System Design Interview - An Insider's Guide (Volume 1)\\nSystem design interviews are the most difficult to tackle of all technical interview questions. This book is Volume 1 of the System Design Interview - An insider's guide series that provides a reliable strategy and knowledge base for approaching a broad range of system design questions. This book provides a step-by-step framework for how to tackle a system design question. It includes many real-world examples to illustrate the systematic approach, with detailed steps that you can follow.",
       publishDate: '2024-03-05',
       price: 37.99,
-      authorIds: [3],
+      authors: [{ id: 3, firstName: 'Jane', lastName: 'Doe', isActive: true }],
     },
     {
       title:
@@ -55,7 +55,7 @@ export class DataSeedService {
         'A fast-paced, thorough programming introduction that will have you writing your own software and web applications in no time.\\nLike Python Crash Course, this hands-on guide is a must-have for anyone who wants to learn how to code from the ground up—this time using the popular JavaScript programming language.\\nLearn JavaScript—Fast!',
       publishDate: '2024-03-05',
       price: 39.58,
-      authorIds: [4],
+      authors: [{ id: 4, firstName: 'Ari', lastName: 'Elsas', isActive: true }],
     },
     {
       title: 'Grokking Algorithms, Second Edition',
@@ -64,7 +64,7 @@ export class DataSeedService {
         "A friendly, fully-illustrated introduction to the most important computer programming algorithms.\\nMaster the most widely used algorithms and be fully prepared when you're asked about them at your next job interview. With beautifully simple explanations, over 400 fun illustrations, and dozens of relevant examples, you'll actually enjoy learning about algorithms with this fun and friendly guide!",
       publishDate: '2024-03-26',
       price: 47.49,
-      authorIds: [5],
+      authors: [{ id: 5, firstName: 'J.K.', lastName: 'Rowling', isActive: true }],
     },
   ];
 
@@ -130,7 +130,7 @@ export class DataSeedService {
         username: 'admin',
         password: '1q2w3E!',
         nickname: 'admin',
-        roleIds: [1],
+        roles: [{ id: 1, name: "admin" }],
       });
       this.logger.log('Seeding user data - End');
     }
@@ -157,7 +157,7 @@ export class DataSeedService {
         route: '/home',
         order: 1,
         parentId: 0,
-        roleIds: (adminRole && userRole) ? [userRole.id, adminRole.id] : [],
+        roles: (adminRole && userRole) ? [userRole, adminRole] : [],
       },
       {
         name: 'browse_books',
@@ -166,7 +166,7 @@ export class DataSeedService {
         route: '/books',
         order: 2,
         parentId: 0,
-        roleIds: (adminRole && userRole) ? [userRole.id, adminRole.id] : [],
+        roles: (adminRole && userRole) ? [userRole, adminRole] : [],
       },
       {
         name: 'book_management',
@@ -175,7 +175,25 @@ export class DataSeedService {
         route: '/books/management',
         order: 3,
         parentId: 0,
-        roleIds: adminRole ? [adminRole.id] : [],
+        roles: adminRole ? [adminRole] : [],
+      },
+      {
+        name: 'menu_management',
+        title: 'Menu Management',
+        icon: 'menu_book',
+        route: '/menus/management',
+        order: 4,
+        parentId: 0,
+        roles: adminRole ? [adminRole] : [],
+      },
+      {
+        name: 'user_management',
+        title: 'User Management',
+        icon: 'manage_accounts',
+        route: '/users/management',
+        order: 5,
+        parentId: 0,
+        roles: adminRole ? [adminRole] : [],
       },
     ];
 
