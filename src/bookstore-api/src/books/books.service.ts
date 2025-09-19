@@ -50,10 +50,10 @@ export class BooksService extends GenericCrudAuditableService<Book, CreateBookCo
   }
 
   protected async afterCreate(queryRunner: QueryRunner, command: CreateBookCommand, entity: Book): Promise<void> {
-    if (command.authorIds && command.authorIds.length > 0) {
+    if (command.authors && command.authors.length > 0) {
       const authors: Author[] = await queryRunner.manager
         .createQueryBuilder(Author, "author")
-        .where("author.id IN (:...authorIds)", { authorIds: command.authorIds })
+        .where("author.id IN (:...authorIds)", { authorIds: command.authors.map(author => author.id) })
         .getMany();
 
       const bookAuthorsToSave: BookAuthor[] = authors.map((author) => {
@@ -69,18 +69,18 @@ export class BooksService extends GenericCrudAuditableService<Book, CreateBookCo
   }
 
   protected async afterUpdate(queryRunner: QueryRunner, command: UpdateBookCommand, entity: Book): Promise<void> {
-    if (command.authorIds) {
+    if (command.authors) {
       await queryRunner.manager
         .createQueryBuilder(BookAuthor, "bookAuthor")
         .where('bookId = :bookId', { bookId: entity.id })
         .delete()
         .execute();
 
-      if (command.authorIds.length > 0) {
-        const bookAuthorsToAdd = command.authorIds.map((authorId) => {
+      if (command.authors.length > 0) {
+        const bookAuthorsToAdd = command.authors.map((author) => {
           const bookAuthor = new BookAuthor();
           bookAuthor.bookId = entity.id;
-          bookAuthor.authorId = authorId;
+          bookAuthor.authorId = author.id;
           return bookAuthor;
         });
 
@@ -123,9 +123,4 @@ export class BooksService extends GenericCrudAuditableService<Book, CreateBookCo
     });
     return book;
   }
-
-  async update(id: number, command: UpdateBookCommand): Promise<Book> {
-    return super.update(id, command);
-  }
-
 }

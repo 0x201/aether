@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AuthorDto } from 'src/authors/dtos/author.dto';
 
 export class CreateBookCommand {
   @ApiProperty()
@@ -12,7 +13,7 @@ export class CreateBookCommand {
   @ApiProperty()
   price: number;
   @ApiProperty()
-  authorIds: number[];
+  authors: AuthorDto[];
   @ApiPropertyOptional()
   isActive?: boolean;
 }

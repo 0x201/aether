@@ -9,6 +9,7 @@ import {
   Query,
   HttpException,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { PagedResult } from '../common/response/ListResultResponse';
 import { BooksService } from './books.service';
@@ -28,12 +29,13 @@ import { Roles } from 'src/roles/role.decorator';
 import { RoleEnum } from 'src/roles/role.enum';
 import { Book } from './entities/book.entity';
 import { AuthorDto } from 'src/authors/dtos/author.dto';
+import { Response } from 'express';
 
 @Controller('books')
 @ApiTags('Books')
 @ApiBearerAuth()
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(private readonly booksService: BooksService) { }
 
   @Post()
   @Roles(RoleEnum.Admin)
@@ -42,11 +44,10 @@ export class BooksController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Book created successfully',
-    type: BookDto,
   })
-  async create(@Body() createBookDto: CreateBookCommand): Promise<BookDto> {
+  async create(@Body() createBookDto: CreateBookCommand, @Res() res: Response): Promise<void> {
     const book = await this.booksService.insert(createBookDto);
-    return this.mapBookToBookDto(book);
+    res.status(HttpStatus.CREATED).location(`/api/books/${book.id}`).send();
   }
 
   @Get()
@@ -93,9 +94,8 @@ export class BooksController {
   async update(
     @Param('id') id: number,
     @Body() updateBookDto: UpdateBookCommand,
-  ): Promise<BookDto> {
-    const book = await this.booksService.update(id, updateBookDto);
-    return this.mapBookToBookDto(book);
+  ): Promise<void> {
+    await this.booksService.update(id, updateBookDto);
   }
 
   @Roles(RoleEnum.Admin)
@@ -125,6 +125,7 @@ export class BooksController {
       authorDto.id = bookAuthor.author.id;
       authorDto.firstName = bookAuthor.author.firstName;
       authorDto.lastName = bookAuthor.author.lastName;
+      authorDto.isActive = bookAuthor.author.isActive;
       return authorDto;
     });
     return dto;
