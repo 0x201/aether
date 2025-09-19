@@ -1,59 +1,48 @@
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.book-management-container {
+  padding: 20px;
   
-  h1 {
-    margin: 0;
-  }
-}
-
-.table-container {
-  overflow-x: auto;
-  margin-bottom: 20px;
-  
-  table {
-    width: 100%;
-    background: white;
-  }
-}
-
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-}
-
-.book-card {
-  mat-card-header {
-    mat-card-title {
-      max-height: 3rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+  .toolbar {
+    margin-bottom: 20px;
+    
+    button {
+      mat-icon {
+        margin-right: 5px;
+      }
     }
   }
   
-  mat-card-content {
-    p {
-      max-height: 6rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .books-table {
+    width: 100%;
+    
+    .mat-column-title {
+      width: 25%;
+    }
+    
+    .mat-column-isbn {
+      width: 20%;
+    }
+    
+    .mat-column-price {
+      width: 10%;
+    }
+    
+    .mat-column-publishDate {
+      width: 15%;
+    }
+    
+    .mat-column-actions {
+      width: 15%;
+      text-align: right;
     }
   }
 }
 
 @media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
+  .book-management-container {
+    padding: 10px;
   }
 }

@@ -1,3 +1,13 @@
+.book-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  .form-field {
+    width: 100%;
+  }
+}
+
 .form-container {
   min-width: 400px;
   padding: 20px 0;
