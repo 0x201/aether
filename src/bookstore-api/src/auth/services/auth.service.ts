@@ -12,7 +12,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../jwt-payload.interface';
 import { SignInUserCommand } from '../../users/commands/login-user.command';
 import { SignUpUserCommand } from '../../users/commands/signup-user.command';
-import { compare } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { JwtConfig } from '../jwt.config';
 import { RolesService } from '../../roles/roles.service';
@@ -22,6 +21,7 @@ import { Role } from 'src/roles/entities/role.entity';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
 import { CryptoService } from 'src/shared/services/crypto.service';
+import { Menu } from 'src/menus/entities/menu.entity';
 
 @Injectable()
 export class AuthService {
@@ -69,16 +69,7 @@ export class AuthService {
       nickname: user.nickname,
       roles: roles.map(role => ({ id: role.id, name: role.name })),
       permissions: [],
-      menus: menus.map(menu => ({
-        id: menu.id,
-        name: menu.name,
-        route: menu.route,
-        icon: menu.icon,
-        title: menu.title,
-        parentId: menu.parentId,
-        isActive: menu.isActive,
-        order: menu.order,
-      })),
+      menus: menus.map(menu => Menu.mapToDto(menu)),
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.jwtConfig.expiresIn,
@@ -130,7 +121,7 @@ export class AuthService {
         nickname: user.nickname,
         roles: user.roles,
         permissions: [],
-        menus: menus,
+        menus: menus.map(menu => Menu.mapToDto(menu)),
       };
 
       const newAccessToken = await this.jwtService.signAsync(newPayload, {
@@ -171,8 +162,8 @@ export class AuthService {
         message: 'User has already exists!',
       });
     }
-    if (input.roleIds.length > 0) {
-      const roles = await this.rolesService.findByIds(input.roleIds);
+    if (input.roles.length > 0) {
+      const roles = await this.rolesService.findByIds(input.roles.map(role => role.id));
       const rolesExist = roles && roles.length > 0;
       if (!rolesExist) {
         throw new NotFoundException({
