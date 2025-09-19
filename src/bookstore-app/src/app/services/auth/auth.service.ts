@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { RefreshTokenDto } from './refresh-token.dto';
 import { Menu } from '../../models/menu.model';
+import { Role } from '../../models/role.model';
 
 export interface LoginRequest {
   username: string;
@@ -27,7 +28,7 @@ export interface JwtPayload {
   sub: string;
   username: string;
   nickname: string;
-  roles: string[];
+  roles: Role[];
   permissions: string[];
   menus: Menu[];
 }
@@ -39,7 +40,7 @@ export class AuthService {
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private isAuthenticatedSubject!: BehaviorSubject<boolean>;
-  private userRolesSubject!: BehaviorSubject<string[]>;
+  private userRolesSubject!: BehaviorSubject<Role[]>;
   
   private http = inject(HttpClient);
   private router = inject(Router);
@@ -47,7 +48,7 @@ export class AuthService {
 
   constructor() {
     this.isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
-    this.userRolesSubject = new BehaviorSubject<string[]>(this.getUserRoles());
+    this.userRolesSubject = new BehaviorSubject<Role[]>(this.getUserRoles());
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -64,7 +65,7 @@ export class AuthService {
       );
   }
 
-  signUp(userData: SignUpRequest): Observable<any> {
+  signup(userData: SignUpRequest): Observable<any> {
     const signUpData = {
       ...userData,
       roles: ['user'] // assign 'user' role to all users registred from auth api
@@ -85,7 +86,7 @@ export class AuthService {
     return this.isAuthenticatedSubject.asObservable();
   }
 
-  getUserRoles(): string[] {
+  getUserRoles(): Role[] {
     const token = this.getToken();
     if (token && this.jwtHelper && !this.jwtHelper.isTokenExpired(token)) {
       const decoded: JwtPayload | null = this.jwtHelper.decodeToken(token);
@@ -100,18 +101,19 @@ export class AuthService {
     this.userRolesSubject.next(this.getUserRoles());
   }
 
-  getUserRolesObservable(): Observable<string[]> {
+  getUserRolesObservable(): Observable<Role[]> {
     return this.userRolesSubject.asObservable();
   }
 
   hasRole(role: string): boolean {
     const roles = this.getUserRoles();
-    return roles.includes(role);
+    return roles.some(r => r.name.includes(role));
   }
 
   hasAnyRole(roles: string[]): boolean {
     const userRoles = this.getUserRoles();
-    return roles.some(role => userRoles.includes(role));
+    console.log('userRoles', userRoles);
+    return userRoles.some(role => roles.includes(role.name));
   }
 
   getToken(): string | null {

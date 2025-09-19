@@ -78,7 +78,7 @@ export class SignupComponent implements OnInit {
         password: formData.password,
       };
       
-      this.authService.signUp(signupData).subscribe({
+      this.authService.signup(signupData).subscribe({
         next: () => {
           this.loading = false;
           this.success = true;

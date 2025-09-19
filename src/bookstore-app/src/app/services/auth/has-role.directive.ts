@@ -16,7 +16,7 @@ export class HasRoleDirective implements OnInit {
 
   ngOnInit(): void {
     const userRoles = this.authService.getUserRoles();
-    const hasRole = this.roles.some(role => userRoles.includes(role));
+    const hasRole = userRoles.some(role => this.roles.includes(role.name));
     
     if (hasRole) {
       this.viewContainer.createEmbeddedView(this.templateRef);
