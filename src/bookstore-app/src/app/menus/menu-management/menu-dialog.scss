@@ -1,0 +1,13 @@
+.menu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  .form-field {
+    width: 100%;
+  }
+  
+  mat-checkbox {
+    margin-top: 10px;
+  }
+}
