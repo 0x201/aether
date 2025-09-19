@@ -1,10 +1,12 @@
-<div class="main-container">
-  <mat-toolbar color="primary" class="bookstore-toolbar">
-    <button mat-icon-button (click)="toggleSidenav()">
+<mat-toolbar color="primary">
+  <div class="toolbar-left">
+    <button mat-icon-button (click)="isSidenavOpened = !isSidenavOpened">
       <mat-icon>menu</mat-icon>
     </button>
     <span>Bookstore App</span>
-    <span class="spacer"></span>
+  </div>
+
+  <div class="toolbar-right">
     <button mat-icon-button [matMenuTriggerFor]="userMenu">
       <mat-icon>account_circle</mat-icon>
     </button>
@@ -18,28 +20,26 @@
         <span>Logout</span>
       </button>
     </mat-menu>
-  </mat-toolbar>
+  </div>
+</mat-toolbar>
 
-  <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav #sidenav [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)"
-      fixedInViewport="false" class="sidenav">
-      <mat-nav-list>
-        <ng-container>
-          @for (menu of menus; track $index) {
-          <a mat-list-item [routerLink]="menu.route" routerLinkActive="active-link" *appRoleAny="menu.roles">
-            <mat-icon>{{menu.icon}}</mat-icon>
-            {{menu.title}}
-          </a>
-          }
-        </ng-container>
-        <mat-divider></mat-divider>
-      </mat-nav-list>
-    </mat-sidenav>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav [(opened)]="isSidenavOpened" mode="side" fixedInViewport="false" class="app-sidenav"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'">
+    <div class="sidenav-scroll-wrapper">
+      <cdk-virtual-scroll-viewport itemSize="50" minBufferPx="200" maxBufferPx="400" class="viewport">
+        <mat-nav-list>
+          <recursive-menu *cdkVirtualFor="let menu of menus" [menu]="menu" [level]="0">
+          </recursive-menu>
+        </mat-nav-list>
+      </cdk-virtual-scroll-viewport>
+    </div>
 
-    <mat-sidenav-content class="sidenav-content">
-      <div class="bookstore-container">
-        <router-outlet></router-outlet>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-</div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content">
+    <div class="content-container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

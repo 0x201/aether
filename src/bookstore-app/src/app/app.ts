@@ -2,18 +2,35 @@ import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ChangeDetectorR
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { RouterOutlet, Router, RouterModule } from '@angular/router';
+import { RouterOutlet, RouterModule } from '@angular/router';
 import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { AuthService, JwtPayload } from './services/auth/auth.service';
 import { RoleDirective } from './services/auth/role.directive';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Menu } from './models/menu.model';
+import { MatTreeModule } from '@angular/material/tree';
+import { FormsModule } from '@angular/forms';
+import { Role } from './models/role.model';
+import { RecursiveMenu } from './menus/menu-item/recursive-menu';
+import { ScrollingModule } from "@angular/cdk/scrolling";
+
+interface MenuNode {
+  id: number;
+  name: string;
+  title: string;
+  icon: string;
+  route: string;
+  order: number;
+  roles: Role[];
+  children?: MenuNode[];
+}
 
 @Component({
   selector: 'app-root',
@@ -29,22 +46,31 @@ import { Menu } from './models/menu.model';
     MatListModule,
     MatIconModule,
     MatMenuModule,
+    MatSelectModule,
     AsyncPipe,
     RouterOutlet,
-    RoleDirective,
-  ]
+    MatTreeModule,
+    FormsModule,
+    ScrollingModule,
+    RecursiveMenu,
+]
 })
-export class App implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('sidenav') sidenav!: MatSidenav;
-  
+export class App implements OnInit, AfterViewInit, OnDestroy {  
   private destroy$ = new Subject<void>();
   isHandset$!: Observable<boolean>;
   menus: Menu[] = [];
+  isSidenavOpened = true;
   
+  childrenMenuAccessor = (node: MenuNode) => node.children ?? [];
+
+  hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0
+  
+  menuTreeData: MenuNode[] = [];
+
+
   constructor(
     private breakpointObserver: BreakpointObserver,
     private authService: AuthService,
-    private router: Router,
     private jwtHelper: JwtHelperService,
     private cdRef: ChangeDetectorRef
   ) {}
@@ -71,10 +97,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   logout(): void {
     this.authService.logout();
   }
-
-  toggleSidenav(): void {
-    this.sidenav.toggle();
-  }
+  
   
   private loadMenusFromToken(): void {
     const token = this.authService.getToken();
@@ -82,8 +105,58 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       const decoded: JwtPayload | null = this.jwtHelper.decodeToken(token);
       if (decoded && decoded.menus) {
         this.menus = decoded.menus;
+        this.menuTreeData = this.buildTreeMenuData(decoded.menus, decoded.roles);
         this.cdRef.detectChanges();
       }
     }
+  }
+  
+  private buildTreeMenuData(menus: Menu[], roles: Role[]): MenuNode[] {
+    const menuMap = new Map<number, MenuNode>();
+    menus.forEach(menu => {
+      menuMap.set(menu.id, { 
+        id: menu.id,
+        name: menu.name,
+        title: menu.title,
+        icon: menu.icon,
+        route: menu.route,
+        order: menu.order,
+        roles: roles,
+        children: []
+      });
+    });
+
+    const tree: MenuNode[] = [];
+
+    menus.forEach(menu => {
+      const menuNode = menuMap.get(menu.id)!;
+      if (menu.parentId === 0) {
+        // Root level menu
+        tree.push(menuNode);
+      } else {
+        const parent = menuMap.get(menu.parentId);
+        if (parent) {
+          parent.children = parent.children || [];
+          parent.children.push(menuNode);
+        }
+      }
+    });
+
+    const sortMenus = (menuNodes: MenuNode[]) => {
+      menuNodes.sort((a, b) => a.order - b.order);
+      menuNodes.forEach(node => {
+        if (node.children && node.children.length > 0) {
+          sortMenus(node.children);
+        }
+      });
+    };
+
+    sortMenus(tree);
+    return tree;
+  }
+  
+  menuRoleNames(menu: MenuNode): string[] {
+    if (!menu.roles) return [];
+    return menu.roles.map(r => r.name);
   }
 }
