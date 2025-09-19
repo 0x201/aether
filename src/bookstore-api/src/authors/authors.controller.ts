@@ -40,6 +40,19 @@ export class AuthorsController {
     return this.mapAuthorToAuthorDto(author);
   }
 
+    @Get("/all")
+    @ApiOperation({ summary: 'Get all authors' })
+    @ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Return books list',
+      type: Array<AuthorDto>,
+    })
+    async findAllBooks(): Promise<AuthorDto[]> {
+      const authors = await this.authorsService.findAll();
+      const dtos: AuthorDto[] = authors.map((author) => this.mapAuthorToAuthorDto(author));
+      return dtos;
+    }
+
   @Get()
   @ApiOperation({ summary: 'Get authors with paged list' })
   @ApiResponse({

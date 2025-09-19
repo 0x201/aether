@@ -212,8 +212,12 @@ export abstract class GenericCrudBaseService<T extends BaseAuditableEntity, Crea
    * @param options Find options
    * @returns Array of entities and count
    */
-  async findAll(options?: FindManyOptions<T>): Promise<[T[], number]> {
+  async findAllWithPagination(options?: FindManyOptions<T>): Promise<[T[], number]> {
     return await this.repository.findAndCount(options);
+  }
+
+  async findAll(): Promise<T[]> {
+    return await this.repository.find();
   }
 
   /**
