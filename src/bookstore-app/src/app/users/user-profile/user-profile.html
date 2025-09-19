@@ -23,7 +23,7 @@
             <div matListItemTitle>Roles</div>
             <div matListItemLine>
               @for (role of userProfile?.roles; track role) {
-                <mat-chip>{{ role }}</mat-chip>
+                <mat-chip>{{ role.name }}</mat-chip>
               }
             </div>
           </mat-list-item>

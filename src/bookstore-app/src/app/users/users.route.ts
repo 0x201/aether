@@ -8,7 +8,7 @@ export const UsersRoutes: Route[] = [
         canActivate: [authGuard]
     },
     {
-        path: 'users/manage',
+        path: 'users/management',
         loadComponent: () => import('./user-management/user-management').then(mod => mod.UserManagementComponent),
         canActivate: [authGuard],
         data: { roles: ['admin'] }

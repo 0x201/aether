@@ -19,10 +19,10 @@
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Roles</mat-label>
-      <mat-select formControlName="roles" multiple>
+      <mat-select formControlName="roles" multiple [compareWith]="compareRoles">
         @if (data.roles) {
           @for (role of data.roles; track role) {
-            <mat-option [value]="role">{{ role }}</mat-option>
+            <mat-option [value]="role">{{ role.name }}</mat-option>
           }
         }
       </mat-select>

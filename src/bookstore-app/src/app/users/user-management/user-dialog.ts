@@ -34,6 +34,7 @@ export interface UserDialogData {
 })
 export class UserDialogComponent implements OnInit {
   userForm: FormGroup;
+  allRoles: Role[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -53,12 +54,22 @@ export class UserDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const generalRoles = this.data.roles || [];
+    if (this.data.user?.roles) {
+      const roleMap = new Map<number, Role>();
+      generalRoles.forEach(role => roleMap.set(role.id, role));
+      this.data.user.roles.forEach(role => roleMap.set(role.id, role));
+      
+      this.allRoles = Array.from(roleMap.values());
+    } else {
+      this.allRoles = generalRoles;
+    }
     if (this.data.user) {
       this.userForm.patchValue({
         username: this.data.user.username || '',
         nickname: this.data.user.nickname || '',
         isActive: this.data.user.isActive !== undefined ? this.data.user.isActive : true,
-        roles: this.data.user.roles || []
+        roles: this.data.user.roles
       });
     }
   }
@@ -68,5 +79,9 @@ export class UserDialogComponent implements OnInit {
       const formData = this.userForm.value;
       this.dialogRef.close(formData);
     }
+  }
+
+  compareRoles(role1: Role, role2: Role): boolean {
+    return role1.id === role2.id;
   }
 }

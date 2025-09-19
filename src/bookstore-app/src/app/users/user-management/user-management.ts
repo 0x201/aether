@@ -55,7 +55,7 @@ export class UserManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
-    //this.loadRoles();
+    this.loadRoles();
   }
 
   loadUsers(): void {
@@ -100,6 +100,9 @@ export class UserManagementComponent implements OnInit {
   }
 
   openAddUserDialog(): void {
+    if (this.roles.length === 0) {
+      this.loadRoles();
+    }
     const dialogRef = this.dialog.open(UserDialogComponent, {
       width: '500px',
       data: { user: null, roles: this.roles }
@@ -113,10 +116,12 @@ export class UserManagementComponent implements OnInit {
   }
 
   openEditUserDialog(user: User): void {
-    console.log('Opening edit user dialog for user:', user);
+    if (this.roles.length === 0) {
+      this.loadRoles();
+    }
     const dialogRef = this.dialog.open(UserDialogComponent, {
       width: '500px',
-      data: { user: { ...user }, roles: user.roles }
+      data: { user: { ...user }, roles: this.roles }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -128,7 +133,7 @@ export class UserManagementComponent implements OnInit {
 
   createUser(user: Partial<User>): void {
     this.usersService.createUser(user).subscribe({
-      next: (newUser) => {
+      next: () => {
         this.snackBar.open('User created successfully', 'Close', this.snackBarConfig);
         this.loadUsers();
       },
@@ -141,7 +146,7 @@ export class UserManagementComponent implements OnInit {
 
   updateUser(id: number, user: Partial<User>): void {
     this.usersService.updateUser(id, user).subscribe({
-      next: (updatedUser) => {
+      next: () => {
         this.snackBar.open('User updated successfully', 'Close', this.snackBarConfig);
         this.loadUsers();
       },
@@ -154,7 +159,7 @@ export class UserManagementComponent implements OnInit {
 
   toggleUser(id: number, active: boolean) {
     this.usersService.updateUser(id, { isActive: active }).subscribe({
-      next: (updatedUser) => {
+      next: () => {
         this.snackBar.open('User updated successfully', 'Close', this.snackBarConfig);
         this.loadUsers();
       },

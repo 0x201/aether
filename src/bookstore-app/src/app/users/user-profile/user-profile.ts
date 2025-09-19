@@ -7,11 +7,12 @@ import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 import { AuthService, JwtPayload } from '../../services/auth/auth.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { Role } from '../../models/role.model';
 
 interface UserProfile {
   username: string;
   nickname: string;
-  roles: string[];
+  roles: Role[];
 }
 
 @Component({
