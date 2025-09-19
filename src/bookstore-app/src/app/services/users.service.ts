@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
 import { User } from '../models/user.model';
-import { PagedResult } from '../models/book.model';
+import { PagedResult } from '../models/paged-result.model';
 import { ApiState } from '../models/api-state';
 
 @Injectable({

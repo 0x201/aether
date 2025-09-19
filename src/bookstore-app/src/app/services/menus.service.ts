@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
-import { Menu } from '../models/menu.model';
-import { PagedResult } from '../models/book.model';
+import { CreateOrUpdateMenuCommand, Menu } from '../models/menu.model';
+import { PagedResult } from '../models/paged-result.model';
 import { ApiState } from '../models/api-state';
 
 @Injectable({
@@ -82,7 +82,7 @@ export class MenusService {
       );
   }
 
-  createMenu(menu: Partial<Menu>): Observable<Menu> {
+  createMenu(menu: CreateOrUpdateMenuCommand): Observable<Menu> {
     return this.http.post<Menu>(this.baseUrl, menu)
       .pipe(
         tap(() => {

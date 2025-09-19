@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
-import { PagedResult } from '../models/book.model';
-import { Book, BookDto } from '../models/book.model';
+import { Book } from '../models/book.model';
 import { ApiState } from '../models/api-state'
+import { PagedResult } from '../models/paged-result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -80,7 +80,7 @@ export class BooksService {
       );
   }
 
-  createBook(book: BookDto): Observable<Book> {
+  createBook(book: Book): Observable<Book> {
     return this.http.post<Book>(this.baseUrl, book)
       .pipe(
         tap(() => {
@@ -90,7 +90,7 @@ export class BooksService {
       );
   }
 
-  updateBook(id: number, book: BookDto): Observable<Book> {
+  updateBook(id: number, book: Book): Observable<Book> {
     return this.http.put<Book>(`${this.baseUrl}/${id}`, book)
       .pipe(
         tap(() => {
