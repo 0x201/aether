@@ -32,9 +32,9 @@ export class UsersService extends GenericCrudAuditableService<User, SignUpUserCo
   }
 
   protected mapUpdateDtoToEntity(command: UpdateUserCommand, entity: User): void {
-    entity.username ??= command.username;
-    entity.nickname ??= command.nickname;
-    entity.isActive ??= command.isActive;
+    entity.username = command.username ?? entity.username;
+    entity.nickname = command.nickname ?? entity.nickname;
+    entity.isActive = command.isActive ?? entity.isActive;
   }
 
   protected async beforeCreate(queryRunner: QueryRunner, command: SignUpUserCommand, entity: User): Promise<void> {
@@ -46,22 +46,22 @@ export class UsersService extends GenericCrudAuditableService<User, SignUpUserCo
   }
 
   protected async afterCreate(queryRunner: QueryRunner, command: SignUpUserCommand, entity: User): Promise<void> {
-    if (command.roleIds && command.roleIds.length > 0) {
+    if (command.roles && command.roles.length > 0) {
       const roles: Role[] = await queryRunner.manager
         .createQueryBuilder(Role, 'role')
-        .where('role.id IN (:...roleIds)', { roleIds: command.roleIds })
+        .where('role.id IN (:...roleIds)', { roleIds: command.roles.map(role => role.id) })
         .getMany();
 
       const userRolesToAdd = roles.map((role) => {
         const userRole = new UserRole();
-        userRole.role = role;
-        userRole.user = entity;
+        userRole.roleId = role.id;
+        userRole.userId = entity.id;
         userRole.assignedAt = this.dateTimeService.getNowString();
         userRole.assignedBy = this.userContext.getUsername();
         return userRole;
       });
 
-      const savedUserRoles =await queryRunner.manager.save<UserRole>(userRolesToAdd);
+      const savedUserRoles = await queryRunner.manager.save<UserRole>(userRolesToAdd);
       entity.userRoles = savedUserRoles;
     }
 
@@ -69,22 +69,24 @@ export class UsersService extends GenericCrudAuditableService<User, SignUpUserCo
   }
 
   protected async afterUpdate(queryRunner: QueryRunner, command: UpdateUserCommand, entity: User): Promise<void> {
-    if (command.roleIds) {
+    if (command.roles) {
       await queryRunner.manager
         .createQueryBuilder(UserRole, 'userRole')
         .where('userId = :userId', { userId: entity.id })
         .delete()
         .execute();
 
-      if (command.roleIds.length > 0) {
-        const userRolesToAdd = command.roleIds.map((roleId) => {
+      if (command.roles.length > 0) {
+        const userRolesToAdd = command.roles.map((role) => {
           const userRole = new UserRole();
-          userRole.user.id = entity.id;
-          userRole.role.id = roleId;
+          userRole.userId = entity.id;
+          userRole.roleId = role.id;
+          userRole.assignedAt = this.dateTimeService.getNowString();
+          userRole.assignedBy = this.userContext.getUsername();
           return userRole;
         });
 
-        await this.dataSource.manager.save<UserRole>(userRolesToAdd);
+        await queryRunner.manager.save(userRolesToAdd);
       }
     }
 
@@ -141,10 +143,10 @@ export class UsersService extends GenericCrudAuditableService<User, SignUpUserCo
       }
 
       if (query.startDate && query.endDate) {
-        qb = qb.andWhere('user.createdTime >= :startDate', { 
-          startDate: query.startDate 
-        }).andWhere('user.createdTime <= :endDate', { 
-          endDate: query.endDate 
+        qb = qb.andWhere('user.createdTime >= :startDate', {
+          startDate: query.startDate
+        }).andWhere('user.createdTime <= :endDate', {
+          endDate: query.endDate
         });
       }
       return qb;

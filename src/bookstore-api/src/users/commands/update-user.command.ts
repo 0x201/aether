@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { RoleDto } from 'src/roles/dtos/role.dto';
 
 export class UpdateUserCommand {
   @ApiProperty()
@@ -8,7 +9,7 @@ export class UpdateUserCommand {
   nickname?: string;
 
   @ApiPropertyOptional()
-  roleIds?: number[];
+  roles?: RoleDto[];
 
   @ApiPropertyOptional()
   password?: string;
