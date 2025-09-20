@@ -1,4 +1,4 @@
-import { Injectable, Renderer2, RendererFactory2, Inject } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2, Inject, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { OverlayContainer } from '@angular/cdk/overlay';
@@ -13,12 +13,12 @@ export class ThemeService {
   private currentThemeSubject = new BehaviorSubject<Theme>('indigo-pink');
   public currentTheme$ = this.currentThemeSubject.asObservable();
   private renderer: Renderer2;
+  private document: Document = inject(DOCUMENT);
 
-  constructor(
-    private rendererFactory: RendererFactory2,
-    @Inject(DOCUMENT) private document: Document,
-    private overlayContainer: OverlayContainer
-  ) {
+  private overlayContainer: OverlayContainer = inject(OverlayContainer);
+  private rendererFactory: RendererFactory2 = inject(RendererFactory2);
+
+  constructor() {
     this.renderer = this.rendererFactory.createRenderer(null, null);
     this.loadThemeFromStorage();
   }
@@ -38,13 +38,11 @@ export class ThemeService {
   }
 
   private applyTheme(theme: Theme): void {
-    // 移除当前主题样式
     const existingLink = this.document.getElementById('theme-css');
     if (existingLink) {
       this.renderer.removeChild(this.document.head, existingLink);
     }
 
-    // 添加新主题样式（除了默认主题）
     if (theme !== 'indigo-pink') {
       const linkEl = this.renderer.createElement('link');
       this.renderer.setAttribute(linkEl, 'id', 'theme-css');
@@ -53,7 +51,6 @@ export class ThemeService {
       this.renderer.appendChild(this.document.head, linkEl);
     }
 
-    // 应用主题到覆盖层容器
     this.applyThemeToOverlay(theme);
   }
 
@@ -67,7 +64,6 @@ export class ThemeService {
       overlayContainerElement.classList.remove(...themeClasses);
     }
     
-    // 为覆盖层添加主题类
     overlayContainerElement.classList.add(`${theme}-theme`);
   }
 

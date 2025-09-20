@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Menu } from '../../models/menu.model';
@@ -37,12 +37,10 @@ export interface MenuDialogData {
 export class MenuDialogComponent implements OnInit {
   menuForm: FormGroup;
   allRoles: Role[] = [];
-
-  constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<MenuDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: MenuDialogData
-  ) {
+  public data: MenuDialogData = inject(MAT_DIALOG_DATA);
+  private fb: FormBuilder = inject(FormBuilder);
+  public dialogRef: MatDialogRef<MenuDialogComponent> = inject(MatDialogRef<MenuDialogComponent>);
+  constructor() {
     if (!this.data.roles) {
       this.data.roles = [];
     }

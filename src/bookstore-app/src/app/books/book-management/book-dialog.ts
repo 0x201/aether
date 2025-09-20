@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,12 +37,10 @@ export interface BookFormDialogData {
 export class BookDialogComponent implements OnInit {
   bookForm: FormGroup;
   allAuthors: Author[] = [];
+  private fb: FormBuilder = inject(FormBuilder);
+  public data: BookFormDialogData = inject(MAT_DIALOG_DATA);
 
-  constructor(
-    public dialogRef: MatDialogRef<BookDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: BookFormDialogData,
-    private fb: FormBuilder,
-  ) {
+  constructor(public dialogRef: MatDialogRef<BookDialogComponent>) {
     if (!this.data.authors) {
       this.data.authors = [];
     }
