@@ -17,6 +17,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthorsService } from '../../services/authors.service';
 import { Author } from '../../models/author.model';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-book-management',
@@ -26,6 +27,7 @@ import { Author } from '../../models/author.model';
   imports: [
     MatButtonModule,
     MatCardModule,
+    MatChipsModule,
     MatIconModule,
     MatTableModule,
     MatPaginatorModule,
@@ -38,7 +40,7 @@ export class BookManagementComponent implements OnInit, OnDestroy {
   
   books: MatTableDataSource<Book> = new MatTableDataSource<Book>([]);
   authors: Author[] = [];
-  displayedColumns: string[] = ['title', 'isbn', 'price', 'publishDate', 'actions'];
+  displayedColumns: string[] = ['title', 'isbn', 'price', 'publishDate', 'authors', 'actions'];
   
   pageSize = 10;
   currentPage = 0;

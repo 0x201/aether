@@ -39,6 +39,18 @@
             <td mat-cell *matCellDef="let book">{{ book.publishDate }}</td>
           </ng-container>
 
+          <!-- Authors Column -->
+          <ng-container matColumnDef="authors">
+            <th mat-header-cell *matHeaderCellDef>Authors</th>
+            <td mat-cell *matCellDef="let book">
+              <mat-chip-listbox>
+                @for (author of book.authors; track author) {
+                <mat-chip-option disabled>{{ `${author.firstName} ${author.lastName}` }}</mat-chip-option>
+                }
+              </mat-chip-listbox>
+            </td>
+          </ng-container>
+
           <!-- Actions Column -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
