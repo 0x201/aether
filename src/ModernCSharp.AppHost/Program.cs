@@ -57,7 +57,8 @@ var workflowApi = builder.AddProject<Projects.Workflow_API>("workflow-api")
     .WithReference(etlDb).WaitFor(etlDb)
     .WithHttpHealthCheck("/health");
 
-var workflowApp = builder.AddViteApp("workflow-app", @"../workflow-app", "pnpm")
+var workflowApp = builder.AddPnpmApp("workflow-app", @"../workflow-app", "dev")
+    .WithHttpEndpoint(port: 3010, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(workflowApi);
@@ -76,7 +77,8 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
 var bookStoreApi = builder.AddPnpmApp("bookstore-api", @"../bookstore-api", "start:dev")
-    .WithHttpEndpoint(targetPort: 3000, env: "PORT")
+    .WithHttpEndpoint(port: 3011, env: "PORT")
+    .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 var bookstoreApiHttpEndpoint = bookStoreApi.GetEndpoint("http");
@@ -84,21 +86,22 @@ bookStoreApi.WithUrl($"{bookstoreApiHttpEndpoint}/scalar", "Book Store API Scala
 bookStoreApi.WithEnvironment("HTTP_ENDPOINT", bookstoreApiHttpEndpoint);
 
 var bookstoreApp = builder.AddPnpmApp("bookstore-app", @"../bookstore-app", "start")
-    .WithHttpEndpoint(targetPort: 4200, env: "HTTP_PORT")
+    .WithHttpEndpoint(port: 3012, env: "PORT")
+    .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(bookStoreApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
 var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv/Scripts/uvicorn.exe", ["main:app"])
-    .WithHttpEndpoint(targetPort: 8000, env: "HTTP_PORT")
+    .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
     .WithReference(bookstoreDb).WaitFor(bookstoreDb);
 #pragma warning restore ASPIREHOSTINGPYTHON001
-
 crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/scalar", "Crawler API Scalar Reference");
 
-var crawlerApp = builder.AddViteApp("crawler-app", @"../crawler-app", "pnpm")
+var crawlerApp = builder.AddPnpmApp("crawler-app", @"../crawler-app", "dev")
+    .WithHttpEndpoint(port: 3014, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithReference(crawlerApi)
     .WithExternalHttpEndpoints();
