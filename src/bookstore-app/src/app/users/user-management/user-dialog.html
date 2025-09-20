@@ -19,13 +19,22 @@
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Roles</mat-label>
-      <mat-select formControlName="roles" multiple [compareWith]="compareRoles">
-        @if (data.roles) {
-          @for (role of data.roles; track role) {
-            <mat-option [value]="role">{{ role.name }}</mat-option>
-          }
+      <mat-select formControlName="roles" multiple [compareWith]="compareRoles" placeholder="Select roles">
+        <mat-option>
+          <input 
+            placeholder="Search roles" 
+            (keyup)="onRoleSearchKeyUp($event)"
+            matInput
+            style="width: 100%; padding: 8px; border: none; outline: none;">
+        </mat-option>
+        @for (role of filteredRoles | async; track role) {
+          <mat-option [value]="role">{{ role.name }}</mat-option>
+        }
+        @if ((filteredRoles | async)?.length === 0) {
+          <mat-option disabled>No roles found</mat-option>
         }
       </mat-select>
+      <mat-hint>Start typing to search for roles</mat-hint>
     </mat-form-field>
   </form>
 </mat-dialog-content>

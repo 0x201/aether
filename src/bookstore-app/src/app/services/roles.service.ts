@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
 import { Role } from '../models/role.model';
-import { PagedResult } from '../models/paged-result.model';
+import { PagedQuery, PagedResult } from '../models/paged-result.model';
 import { ApiState } from '../models/api-state';
 
 @Injectable({
@@ -36,13 +36,18 @@ export class RolesService {
     return this.http.get<Role[]>(`${this.apiUrl}/all`);
   }
 
-  getRoles(page: number = 0, pageSize: number = 10): Observable<PagedResult<Role>> {
+  getRoles(query: PagedQuery): Observable<PagedResult<Role>> {
     this.updateRolesState({ loading: true, error: null });
-    const params = {
-      skipCount: (page * pageSize),
-      maxResultCount: pageSize
+    const params = new HttpParams()
+      .set('skipCount', query.page * query.pageSize)
+      .set('maxResultCount', query.pageSize);
+    if (query.filter) {
+      params.set('filter', query.filter);
     }
-    return this.http.get<PagedResult<Role>>(this.apiUrl)
+    if (query.sorting) {
+      params.set('sorting', query.sorting);
+    }
+    return this.http.get<PagedResult<Role>>(this.apiUrl, { params })
       .pipe(
         tap(res => {
           this.updateRolesState({
@@ -118,7 +123,11 @@ export class RolesService {
 
   refreshRoles(): void {
     if (!this.rolesState.value.loading) {
-      this.getRoles().subscribe();
+      const query = {
+        page: 0,
+        pageSize: 10
+      };
+      this.getRoles(query).subscribe();
     }
   }
 

@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from '../../models/user.model';
 import { Role } from '../../models/role.model';
@@ -10,7 +10,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-
+import { RolesService } from '../../services/roles.service';
+import { debounceTime, distinctUntilChanged, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 export interface UserDialogData {
   user: User | null;
   roles: Role[];
@@ -29,22 +31,28 @@ export interface UserDialogData {
     MatIconModule,
     MatInputModule,
     MatSelectModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AsyncPipe,
   ]
 })
 export class UserDialogComponent implements OnInit {
   userForm: FormGroup;
   allRoles: Role[] = [];
+  filteredRoles: Observable<Role[]> = of([]);
+  roleSearchControl: FormControl<string | null>;
 
-  constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<UserDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UserDialogData
-  ) {
+  rolesService = inject(RolesService);
+  private fb: FormBuilder = inject(FormBuilder);
+  public dialogRef: MatDialogRef<UserDialogComponent> = inject(MatDialogRef<UserDialogComponent>);
+  public data: UserDialogData = inject(MAT_DIALOG_DATA);
+
+  constructor() {
     if (!this.data.roles) {
       this.data.roles = [];
     }
-    
+
+    this.roleSearchControl = this.fb.control('')
+
     this.userForm = this.fb.group({
       username: ['', Validators.required],
       nickname: ['', Validators.required],
@@ -59,7 +67,7 @@ export class UserDialogComponent implements OnInit {
       const roleMap = new Map<number, Role>();
       generalRoles.forEach(role => roleMap.set(role.id, role));
       this.data.user.roles.forEach(role => roleMap.set(role.id, role));
-      
+
       this.allRoles = Array.from(roleMap.values());
     } else {
       this.allRoles = generalRoles;
@@ -72,6 +80,34 @@ export class UserDialogComponent implements OnInit {
         roles: this.data.user.roles
       });
     }
+
+    this.setupRoleSearch();
+  }
+
+  setupRoleSearch(): void {
+    this.filteredRoles = this.roleSearchControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(value => {
+        const filter = value || "";
+        if (filter.length < 1) {
+          return of(this.allRoles);
+        }
+        const query = {
+          filter: filter,
+          page: 0,
+          pageSize: 10
+        }
+        return this.rolesService.getRoles(query).pipe(
+          map(result => result.items)
+        );
+      }),
+    );
+  }
+
+  onRoleSearchKeyUp(event: any): void {
+    this.roleSearchControl.setValue(event.target.value);
   }
 
   onSave(): void {
