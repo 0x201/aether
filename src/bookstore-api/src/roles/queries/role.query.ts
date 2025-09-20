@@ -10,5 +10,4 @@ export class RoleQuery
   startDate: string;
   @ApiPropertyOptional()
   endDate: string;
-  name: string | null;
 }

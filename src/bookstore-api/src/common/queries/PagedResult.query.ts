@@ -28,6 +28,8 @@ class PagedAndSortedResultQuery extends OmitType(PagedResultQuery, []) {
 }
 
 class PagedSortedAndFilteredResultQuery {
+  @ApiPropertyOptional()
+  filter: string | null;
   @ApiProperty({
     description: 'The count of data per page',
     minimum: 1,
@@ -37,8 +39,6 @@ class PagedSortedAndFilteredResultQuery {
   maxResultCount: number = 10;
   @ApiPropertyOptional()
   order: string | null = 'asc';
-  @ApiPropertyOptional()
-  sorting: string | null = 'id';
   @ApiProperty({
     description: 'The page index',
     minimum: 0,
@@ -47,7 +47,7 @@ class PagedSortedAndFilteredResultQuery {
   })
   skipCount: number = 0;
   @ApiPropertyOptional()
-  filter: string | null;
+  sorting: string | null = 'id';
 }
 
 export {

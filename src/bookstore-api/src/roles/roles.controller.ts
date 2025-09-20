@@ -43,8 +43,8 @@ export class RolesController {
     type: PagedResult<RoleDto>,
   })
   async findPaginatedList(@Query() query: RoleQuery): Promise<PagedResult<RoleDto>> {
-    const [roles, totalCount] = await this.rolesService.findPaginated(query);
-    const items: RoleDto[] = roles.map((x) => Object.assign(new RoleDto(), x));
+    const [roles, totalCount] = await this.rolesService.findRoles(query);
+    const items: RoleDto[] = roles.map((role) => Role.mapRoleToRoleDto(role));
     return new PagedResult<RoleDto>(items, totalCount);
   }
 
@@ -57,7 +57,7 @@ export class RolesController {
   })
   async getAllRoles(): Promise<RoleDto[]> {
     const roles = await this.rolesService.findAllRoles();
-    return roles.map((x) => this.mapRoleToRoleDto(x));
+    return roles.map((x) => Role.mapRoleToRoleDto(x));
   }
 
   @Get(':id')
@@ -114,12 +114,5 @@ export class RolesController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Role not found' })
   async deleteRole(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.rolesService.delete(id);
-  }
-
-  private mapRoleToRoleDto(role: Role): RoleDto {
-    return {
-      id: role.id,
-      name: role.name,
-    };
   }
 }

@@ -4,10 +4,12 @@ import { AppModule } from './app.module';
 import {
   ConsoleLogger,
   INestApplication,
+  Logger,
   NestApplicationOptions,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { log } from 'console';
 
 function useSwaggerModule(app: INestApplication, endpoint: string) {
   const openApi = new DocumentBuilder()
@@ -79,16 +81,18 @@ async function bootstrap() {
     }),
   };
   const app = await NestFactory.create(AppModule, appOptions);
+  const logger = new Logger(app.constructor.name)
 
   const configService = app.get(ConfigService);
   const endpoint = configService.get<string>('HTTP_ENDPOINT');
-  const port = configService.get<number>('PORT') || 3000;
+  const port = configService.get<string>('PORT') || 3000;
 
   app.setGlobalPrefix('/api', { exclude: ['/health'] });
   useCors(app);
   useSwaggerModule(app, endpoint);
 
   await app.listen(port);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 bootstrap();

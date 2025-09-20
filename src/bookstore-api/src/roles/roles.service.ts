@@ -22,6 +22,7 @@ export class RolesService extends GenericCrudAuditableService<Role, CreateRoleCo
 
   protected mapCreateDtoToEntity(command: CreateRoleCommand, entity: Role): void {
     entity.name = command.name;
+    entity.isActive = true;
   }
 
   protected mapUpdateDtoToEntity(command: UpdateRoleCommand, entity: Role): void {
@@ -53,7 +54,7 @@ export class RolesService extends GenericCrudAuditableService<Role, CreateRoleCo
   async findRoles(query: RoleQuery): Promise<[Role[], number]> {
     return this.findPaginated(query, (qb: SelectQueryBuilder<Role>) => {
       if (query.filter) {
-        qb = qb.andWhere('role.name like :name', { name: query.filter + '%' });
+        qb = qb.andWhere('role.name like :name', { name: `%${query.filter}%` });
       }
 
       if (query.startDate && query.endDate) {
