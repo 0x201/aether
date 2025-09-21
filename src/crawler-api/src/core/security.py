@@ -23,10 +23,9 @@ def create_access_token(
     return encoded_jwt
 
 
-def get_password_hash(password: str) -> (bytes, bytes):
-    salt = bcrypt.gensalt(config.pwdsalt)
-    password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return salt, password
+def get_password_hash(password: str) -> bytes:
+    password = bcrypt.hashpw(password.encode())
+    return password
 
 
 def verify_password(plain_password: bytes, hashed_password: bytes) -> bool:

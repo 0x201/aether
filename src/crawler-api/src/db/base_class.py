@@ -1,6 +1,5 @@
-from sqlalchemy import Column, String, DateTime, func
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import String, DateTime, func
+from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -9,17 +8,17 @@ class Base(DeclarativeBase):
 
 class Auditable(DeclarativeBase):
     @declared_attr
-    def created_by(cls):
-        return Column(String(200), name="createdBy", nullable=False)
+    def created_time(cls) -> Mapped[str]:
+        return mapped_column(DateTime, name="CreatedTime", nullable=False)
 
     @declared_attr
-    def created_time(cls):
-        return Column(DateTime, name="createdTime", nullable=False, server_default=func.now())
+    def created_by(cls) -> Mapped[str]:
+        return mapped_column(String(200), name="CreatedBy", default="", nullable=False)
 
     @declared_attr
-    def last_modified_by(cls):
-        return Column(String(200), name="lastModifiedBy", nullable=True)
+    def last_modified_time(cls) -> Mapped[str]:
+        return mapped_column(DateTime, name="LastModifiedTime", nullable=True)
 
     @declared_attr
-    def last_modified_time(cls):
-        return Column(DateTime, name="lastModifiedTime", nullable=True, server_default=func.now(), onupdate=func.now())
+    def last_modified_by(cls) -> Mapped[str]:
+        return mapped_column(String(200), name="LastModifiedBy", nullable=True)

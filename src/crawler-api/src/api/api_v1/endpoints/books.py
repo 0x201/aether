@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -11,74 +11,89 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[schemas.Book])
-async def read_books(
+def read_books(
     *,
     db: Session = Depends(deps.get_db),
     title: Optional[str] = None,
     skip: int = 0,
-    limit: int = 10
+    limit: int = 100,
 ) -> Any:
-    return crud.book.get_books(db, title=title, skip=skip, limit=limit)
+    """
+    Retrieve books.
+    """
+    books = crud.book.get_books(db, title=title, skip=skip, limit=limit)
+    return books
+
+
+@router.post("", response_model=schemas.Book)
+def create_book(
+    *,
+    db: Session = Depends(deps.get_db),
+    book_in: schemas.BookCreate,
+    current_user = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Create new book.
+    """
+    current_username = current_user.username if current_user else "system"
+    book = crud.book.create(db, obj_in=book_in, current_user=current_username)
+    return book
 
 
 @router.get("/{book_id}", response_model=schemas.Book)
-async def get_book(*, db: Session = Depends(deps.get_db), book_id: int):
-    return crud.book.get(db, book_id)
- 
-@router.post("/", response_model=schemas.Book)
-async def create_book(
+def get_book(
     *, 
     db: Session = Depends(deps.get_db), 
-    book_to_add: schemas.BookCreate,
-    current_user = Depends(deps.get_current_active_user)
-):
-    current_username = current_user.username if current_user else "system"
-    return crud.book.create(db, obj_in=book_to_add, current_user=current_username)
+    book_id: int,
+) -> Any:
+    """
+    Get book by ID.
+    """
+    book = crud.book.get(db, book_id)
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The book with this id does not exist in the system.",
+        )
+    return book
+
 
 @router.put("/{book_id}", response_model=schemas.Book)
-async def update_book(
+def update_book(
     *, 
     db: Session = Depends(deps.get_db), 
     book_id: int, 
     book_in: schemas.BookUpdate,
-    current_user = Depends(deps.get_current_active_user)
+    current_user = Depends(deps.get_current_active_user),
 ) -> Any:
+    """
+    Update a book.
+    """
     book = crud.book.get(db, id=book_id)
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="The book with this id does not exist in the system.",
         )
-    current_username = current_user.username if current_user else "system"
-    book = crud.book.update(db, db_obj=book, obj_in=book_in, current_user=current_username)
+    book = crud.book.update(db, db_obj=book, obj_in=book_in)
     return book
 
 
-@router.patch("/{book_id}", response_model=schemas.Book)
-async def patch_book(
-    *, 
-    db: Session = Depends(deps.get_db), 
-    book_id: int, 
-    book_in: Dict[str, Any],
-    current_user = Depends(deps.get_current_active_user)
-) -> Any:
-    book = crud.book.get(db, id=book_id)
-    if not book:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The book with this id does not exist in the system.",
-        )
-    current_username = current_user.username if current_user else "system"
-    book = crud.book.update(db, db_obj=book, obj_in=book_in, current_user=current_username)
-    return book
-
-
-@router.delete("/{book_id}")
-async def delete_book(
-    *, 
-    db: Session = Depends(deps.get_db), 
+@router.delete("/{book_id}", response_model=schemas.Book)
+def delete_book(
+    *,
+    db: Session = Depends(deps.get_db),
     book_id: int,
-    current_user = Depends(deps.get_current_active_user)
-):
-    current_username = current_user.username if current_user else "system"
-    return crud.book.remove(db, id=book_id)
+    current_user = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Delete a book.
+    """
+    book = crud.book.get(db, id=book_id)
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The book with this id does not exist in the system.",
+        )
+    book = crud.book.remove(db, id=book_id)
+    return book

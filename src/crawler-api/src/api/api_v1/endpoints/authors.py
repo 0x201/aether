@@ -9,7 +9,7 @@ from src.api import deps
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.Author)
+@router.post("", response_model=schemas.Author)
 async def create_author(
     *, db: Session = Depends(deps.get_db), author_in: schemas.AuthorCreate,
     current_user = Depends(deps.get_current_active_user)

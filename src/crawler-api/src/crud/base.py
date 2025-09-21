@@ -3,6 +3,7 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import select
 
 from src.db.base_class import Base
 
@@ -22,12 +23,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def get(self, db: Session, id: Any) -> Optional[ModelType]:
-        return db.query(self.model).filter(self.model.id == id).first()
+        stmt = select(self.model).filter(self.model.id == id)
+        result = db.execute(stmt)
+        return result.scalars().first()
 
     def get_multi(
             self, db: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
-        return db.query(self.model).order_by(self.model.id).offset(skip).limit(limit).all()
+        stmt = select(self.model).order_by(self.model.id).offset(skip).limit(limit)
+        result = db.execute(stmt)
+        return result.scalars().all()
 
     def create(self, db: Session, *, obj_in: CreateSchemaType, current_user: Optional[str] = None) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
@@ -69,7 +74,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def remove(self, db: Session, *, id: int) -> None:
-        obj = db.query(self.model).get(id)
-        db.delete(obj)
-        db.commit()
+        stmt = select(self.model).filter(self.model.id == id)
+        result = db.execute(stmt)
+        obj = result.scalars().first()
+        if obj:
+            db.delete(obj)
+            db.commit()
         return

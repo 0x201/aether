@@ -1,3 +1,8 @@
+"""
+Dependencies for the API.
+These dependencies are used to inject database sessions and user authentication into endpoints.
+"""
+
 from typing import Generator
 
 import jwt
@@ -12,20 +17,30 @@ from src.core import security
 from config import config
 from src.db.session_connector import SessionConnector
 
-reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{config.api_config.api_prefix}/{config.api_config.api_version}/login/access-token"
-)
 
+def get_oauth2() -> OAuth2PasswordBearer:
+    """
+    Dependency that provides an OAuth2 password bearer.
+    """
+    return OAuth2PasswordBearer(
+        tokenUrl=f"{config.api_config.api_prefix}/{config.api_config.api_version}/login/access-token"
+    )
 
 def get_db() -> Generator[Session, None, None]:
+    """
+    Dependency that provides a SQLAlchemy database session.
+    """
     session_connector = SessionConnector()
     with session_connector.get_session() as db:
         yield db
 
 
 def get_current_user(
-        db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+    db: Session = Depends(get_db), token: str = Depends(get_oauth2)
 ) -> models.User:
+    """
+    Dependency that verifies and returns the current authenticated user.
+    """
     try:
         payload = jwt.decode(
             token, config.jwt_config.secret, algorithms=[security.ALGORITHM]
@@ -36,26 +51,30 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = db.query(models.User).options(joinedload(models.User.roles)).filter(models.User.id == token_data.sub).first()
+    user = crud.user.get(db, id=token_data.sub)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
 def get_current_active_user(
-        current_user: models.User = Depends(get_current_user),
+    current_user: models.User = Depends(get_current_user),
 ) -> models.User:
+    """
+    Dependency that verifies and returns the current authenticated user if active.
+    """
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
 def get_current_active_superuser(
-        current_user: models.User = Depends(get_current_user),
+    current_user: models.User = Depends(get_current_user),
 ) -> models.User:
-    if not crud.user.is_superuser(user=current_user):
+    """
+    Dependency that verifies and returns the current authenticated user if superuser.
+    """
+    if not crud.user.is_superuser(current_user):
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"
         )
