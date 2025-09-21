@@ -36,34 +36,34 @@ var etlDb = sqlServer.AddDatabase("etldb");
 
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
-var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", launchProfileName)
+var identityApi = builder.AddProject<Projects.Identity_API>("identityapi", launchProfileName)
     .WithExternalHttpEndpoints()
     .WithReference(identityDb).WaitFor(identityDb);
 
 var identityEndpoint = identityApi.GetEndpoint("https");
 
-var catalogApi = builder.AddProject<Projects.Catalog_API>("catalog-api")
+var catalogApi = builder.AddProject<Projects.Catalog_API>("catalogapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(catalogDb);
 
-var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
+var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderDb).WaitFor(orderDb)
     .WithHttpHealthCheck("/health")
     .WithEnvironment("Identity__Url", identityEndpoint);
 
-var workflowApi = builder.AddProject<Projects.Workflow_API>("workflow-api")
+var workflowApi = builder.AddProject<Projects.Workflow_API>("workflowapi")
     .WithReference(workflowDb).WaitFor(workflowDb)
     .WithReference(etlDb).WaitFor(etlDb)
     .WithHttpHealthCheck("/health");
 
-var workflowApp = builder.AddPnpmApp("workflow-app", @"../workflow-app", "dev")
-    .WithHttpEndpoint(port: 3010, env: "PORT")
+var workflowApp = builder.AddPnpmApp("workflowapp", @"../workflow-app", "dev")
+    .WithReference(workflowApi)
+    .WithHttpEndpoint(port: 3010, env: "VITE_PORT")
     .WithPnpmPackageInstallation()
-    .WithExternalHttpEndpoints()
-    .WithReference(workflowApi);
+    .WithExternalHttpEndpoints();
 
-builder.AddProject<Projects.OrderProcessor>("order-processor")
+builder.AddProject<Projects.OrderProcessor>("orderprocessor")
     .WithReference(redis)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderDb)
@@ -91,7 +91,7 @@ var bookstoreApp = builder.AddPnpmApp("bookstoreapp", @"../bookstore-app", "star
     .WithExternalHttpEndpoints()
     .WithReference(bookStoreApi);
 
-#pragma warning disable ASPIREHOSTINGPYTHON001 
+#pragma warning disable ASPIREHOSTINGPYTHON001
 var crawlerApi = builder.AddPythonApp("crawlerapi", @"../crawler-api", "main.py")
     .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints()
