@@ -107,8 +107,12 @@ class AppConfig(BaseModel):
 
     @property
     def api_config(self) -> ApiConfig:
-        api = self.__config_dic.get("api", {})
-        return ApiConfig(**api)
+        api = self._config_dic.get("api", {})
+        api_config = ApiConfig(**api)
+        aspire_port = os.getenv("PORT")
+        if aspire_port:
+            api_config.port = int(aspire_port)
+        return api_config
 
     @property
     def cors_config(self) -> CorsConfig:
