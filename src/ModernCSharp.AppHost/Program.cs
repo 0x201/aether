@@ -76,7 +76,7 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
-var bookStoreApi = builder.AddPnpmApp("bookstore-api", @"../bookstore-api", "start:dev")
+var bookStoreApi = builder.AddPnpmApp("bookstoreapi", @"../bookstore-api", "start:dev")
     .WithHttpEndpoint(port: 3011, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
@@ -85,7 +85,7 @@ var bookstoreApiHttpEndpoint = bookStoreApi.GetEndpoint("http");
 bookStoreApi.WithUrl($"{bookstoreApiHttpEndpoint}/scalar", "Book Store API Scalar Reference");
 bookStoreApi.WithEnvironment("HTTP_ENDPOINT", bookstoreApiHttpEndpoint);
 
-var bookstoreApp = builder.AddPnpmApp("bookstore-app", @"../bookstore-app", "start")
+var bookstoreApp = builder.AddPnpmApp("bookstoreapp", @"../bookstore-app", "start")
     .WithHttpEndpoint(port: 3012, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()

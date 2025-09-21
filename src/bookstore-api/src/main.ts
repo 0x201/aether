@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { apiReference } from '@scalar/nestjs-api-reference';
-import { log } from 'console';
 
 function useSwaggerModule(app: INestApplication, endpoint: string) {
   const openApi = new DocumentBuilder()
