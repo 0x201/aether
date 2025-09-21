@@ -92,7 +92,7 @@ var bookstoreApp = builder.AddPnpmApp("bookstoreapp", @"../bookstore-app", "star
     .WithReference(bookStoreApi);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001 
-var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv/Scripts/uvicorn.exe", ["main:app"])
+var crawlerApi = builder.AddPythonApp("crawlerapi", @"../crawler-api", "main.py")
     .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
@@ -100,7 +100,7 @@ var crawlerApi = builder.AddPythonApp("crawler-api", @"../crawler-api", "./.venv
 #pragma warning restore ASPIREHOSTINGPYTHON001
 crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/scalar", "Crawler API Scalar Reference");
 
-var crawlerApp = builder.AddPnpmApp("crawler-app", @"../crawler-app", "dev")
+var crawlerApp = builder.AddPnpmApp("crawlerapp", @"../crawler-app", "dev")
     .WithHttpEndpoint(port: 3014, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithReference(crawlerApi)
