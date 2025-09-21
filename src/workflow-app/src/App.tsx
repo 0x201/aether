@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import WorkflowEditor from './components/WorkflowEditor';
 import WorkflowList from './components/WorkflowList';
@@ -8,7 +8,7 @@ import Dashboard from './components/Dashboard';
 import DataVisualization from './components/DataVisualization';
 import { type Workflow } from './services/workflowService';
 import styled from 'styled-components';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 
 // Styled Components
 const AppContainer = styled.div`
@@ -56,7 +56,6 @@ const MainContent = styled.main`
 
 function App() {
   const [editingWorkflow, setEditingWorkflow] = useState<Workflow | null>(null);
-
   const handleEditWorkflow = (workflow: Workflow) => {
     setEditingWorkflow(workflow);
   };
@@ -67,22 +66,22 @@ function App() {
         <Header>
           <h1>ETL Workflow System</h1>
           <Nav>
-            <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/" >
               Dashboard
             </NavLink>
-            <NavLink to="/workflows" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/workflows">
               Workflows
             </NavLink>
-            <NavLink to="/editor" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/editor">
               Editor
             </NavLink>
-            <NavLink to="/monitor" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/monitor">
               Monitor
             </NavLink>
-            <NavLink to="/etl-data" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/etl-data">
               ETL Data
             </NavLink>
-            <NavLink to="/visualization" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/visualization">
               Visualization
             </NavLink>
           </Nav>

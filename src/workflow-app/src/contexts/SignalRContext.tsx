@@ -17,8 +17,10 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) =>
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    // Create SignalR connection without API versioning
+    // SignalR hubs typically don't use the same versioning approach as regular API endpoints
     const newConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5205/jobstatus')
+      .withUrl('/api/jobstatus')
       .configureLogging(LogLevel.Information)
       .build();
 

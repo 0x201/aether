@@ -1,5 +1,6 @@
-// 工作流API服务，用于与后端API交互
-const API_BASE_URL = 'http://localhost:5205/api';
+//const API_BASE_URL = 'http://localhost:5205/api';
+const API_BASE_URL = '/api';
+const API_VERSION = '1.0';
 
 export interface Workflow {
   id: string;
@@ -51,7 +52,6 @@ export interface Position {
   y: number;
 }
 
-// 添加执行日志接口
 export interface ExecutionLog {
   id: string;
   workflowId: string;
@@ -65,7 +65,6 @@ export interface ExecutionLog {
   details?: Record<string, any>;
 }
 
-// 添加工作流状态接口
 export interface WorkflowStatus {
   workflowId: string;
   workflowName: string;
@@ -74,7 +73,6 @@ export interface WorkflowStatus {
   message: string;
 }
 
-// 添加ETL执行结果接口
 export interface EtlExecutionResult {
   workflowId: string;
   executionId: string;
@@ -97,7 +95,6 @@ export interface EtlStepResult {
   details: Record<string, any>;
 }
 
-// 添加数据库和表信息接口
 export interface EtlDatabaseInfo {
   name: string;
 }
@@ -111,10 +108,14 @@ export interface EtlTableData {
 }
 
 class WorkflowService {
-  // 获取所有工作流
+  private addApiVersion(url: string): string {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}api-version=${API_VERSION}`;
+  }
+
   async getAllWorkflows(): Promise<Workflow[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch workflows: ${response.status} ${response.statusText} - ${errorText}`);
@@ -126,10 +127,9 @@ class WorkflowService {
     }
   }
 
-  // 根据ID获取工作流
   async getWorkflowById(id: string): Promise<Workflow> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/${id}`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/${id}`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch workflow: ${response.status} ${response.statusText} - ${errorText}`);
@@ -141,10 +141,9 @@ class WorkflowService {
     }
   }
 
-  // 创建新工作流
   async createWorkflow(workflow: Omit<Workflow, 'id' | 'createdAt' | 'updatedAt'>): Promise<Workflow> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows`, {
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,10 +163,9 @@ class WorkflowService {
     }
   }
 
-  // 更新工作流
   async updateWorkflow(id: string, workflow: Partial<Workflow>): Promise<Workflow> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/${id}`, {
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/${id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -187,10 +185,9 @@ class WorkflowService {
     }
   }
 
-  // 删除工作流
   async deleteWorkflow(id: string): Promise<void> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/${id}`, {
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/${id}`), {
         method: 'DELETE',
       });
       
@@ -204,10 +201,9 @@ class WorkflowService {
     }
   }
 
-  // 执行工作流
   async executeWorkflow(id: string): Promise<{ workflowInstanceId: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/${id}/execute`, {
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/${id}/execute`), {
         method: 'POST',
       });
       
@@ -223,10 +219,9 @@ class WorkflowService {
     }
   }
 
-  // 获取正在运行的工作流
   async getRunningWorkflows(): Promise<string[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/running`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/running`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch running workflows: ${response.status} ${response.statusText} - ${errorText}`);
@@ -238,10 +233,9 @@ class WorkflowService {
     }
   }
 
-  // 获取工作流执行日志
   async getExecutionLogs(): Promise<ExecutionLog[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/logs`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/logs`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch execution logs: ${response.status} ${response.statusText} - ${errorText}`);
@@ -253,10 +247,9 @@ class WorkflowService {
     }
   }
 
-  // 获取特定工作流实例的日志
   async getWorkflowExecutionLogs(workflowInstanceId: string): Promise<ExecutionLog[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/logs/${workflowInstanceId}`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/logs/${workflowInstanceId}`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch execution logs for workflow instance ${workflowInstanceId}: ${response.status} ${response.statusText} - ${errorText}`);
@@ -268,10 +261,9 @@ class WorkflowService {
     }
   }
 
-  // 获取工作流状态
   async getWorkflowStatus(id: string): Promise<WorkflowStatus> {
     try {
-      const response = await fetch(`${API_BASE_URL}/workflows/${id}/status`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/workflows/${id}/status`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch workflow status: ${response.status} ${response.statusText} - ${errorText}`);
@@ -283,10 +275,9 @@ class WorkflowService {
     }
   }
 
-  // 获取ETL数据
   async getEtlData(): Promise<Record<string, any[]>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/etl/data`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/etl/data`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch ETL data: ${response.status} ${response.statusText} - ${errorText}`);
@@ -298,10 +289,9 @@ class WorkflowService {
     }
   }
 
-  // 获取特定表的ETL数据
   async getEtlTableData(tableName: string): Promise<any[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/etl/table/${tableName}`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/etl/table/${tableName}`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch ETL data for table ${tableName}: ${response.status} ${response.statusText} - ${errorText}`);
@@ -313,10 +303,9 @@ class WorkflowService {
     }
   }
 
-  // 执行ETL工作流
   async executeEtlWorkflow(workflowId: string): Promise<EtlExecutionResult> {
     try {
-      const response = await fetch(`${API_BASE_URL}/etl/execute/${workflowId}`, {
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/etl/execute/${workflowId}`), {
         method: 'POST',
       });
       
@@ -332,10 +321,9 @@ class WorkflowService {
     }
   }
 
-  // 获取ETL数据库列表
   async getEtlDatabases(): Promise<EtlDatabaseInfo[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/etl/databases`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/etl/databases`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch ETL databases: ${response.status} ${response.statusText} - ${errorText}`);
@@ -347,10 +335,9 @@ class WorkflowService {
     }
   }
 
-  // 获取特定数据库中的表列表
   async getEtlTables(databaseName: string): Promise<EtlTableInfo[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/etl/databases/${databaseName}/tables`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/etl/databases/${databaseName}/tables`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch ETL tables: ${response.status} ${response.statusText} - ${errorText}`);
@@ -362,10 +349,9 @@ class WorkflowService {
     }
   }
 
-  // 获取特定表的数据
   async getEtlTableDataNew(databaseName: string, tableName: string): Promise<EtlTableData[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/etl/databases/${databaseName}/tables/${tableName}`);
+      const response = await fetch(this.addApiVersion(`${API_BASE_URL}/etl/databases/${databaseName}/tables/${tableName}`));
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to fetch ETL table data: ${response.status} ${response.statusText} - ${errorText}`);
