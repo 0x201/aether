@@ -1,19 +1,8 @@
 using Microsoft.Data.SqlClient;
+using Workflow.API.Abstractions;
+using Workflow.API.Models;
 
 namespace Workflow.API.Services;
-
-public interface IEtlService
-{
-    Task<string> CreateDatabaseAsync(string databaseName);
-    Task<bool> DropDatabaseAsync(string databaseName);
-    IEnumerable<string> ListDatabases();
-    Task<bool> CreateTableAsync(string databaseName, string tableName, IEnumerable<ColumnDefinition> columns);
-    Task<bool> DropTableAsync(string databaseName, string tableName);
-    Task<IEnumerable<string>> ListTablesAsync(string databaseName);
-    Task<long> InsertDataAsync(string databaseName, string tableName, IEnumerable<Dictionary<string, object?>> data);
-    Task<IEnumerable<Dictionary<string, object?>>> SelectDataAsync(string databaseName, string tableName, int limit = 1000);
-    Task<EtlExecutionResult> ExecuteEtlWorkflowAsync(WorkflowModel workflow);
-}
 
 public class ColumnDefinition
 {
@@ -58,12 +47,12 @@ public class EtlService : IEtlService
 {
     private readonly string _connectionString;
     private readonly ILogger<EtlService> _logger;
-    private readonly IDbContextFactory<EtlDbContext> _contextFactory;
+    private readonly IEtlRepository _etlRepository;
 
-    public EtlService(ILogger<EtlService> logger, IDbContextFactory<EtlDbContext> contextFactory)
+    public EtlService(ILogger<EtlService> logger, IEtlRepository etlRepository)
     {
         _logger = logger;
-        _contextFactory = contextFactory;
+        _etlRepository = etlRepository;
         _connectionString = "Server=(localdb)\\mssqllocaldb;Trusted_Connection=true;MultipleActiveResultSets=true";
     }
 
@@ -79,19 +68,16 @@ public class EtlService : IEtlService
 
         try
         {
-            // 验证数据库名称
             if (string.IsNullOrWhiteSpace(databaseName))
             {
                 throw new ArgumentException("Database name cannot be null or empty", nameof(databaseName));
             }
 
-            // 清理数据库名称，防止SQL注入
             var safeDatabaseName = SanitizeDatabaseName(databaseName);
 
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // 检查数据库是否已存在
             var checkDbCommand = new SqlCommand(
                 "SELECT database_id FROM sys.databases WHERE name = @dbName", connection);
             checkDbCommand.Parameters.AddWithValue("@dbName", safeDatabaseName);
@@ -103,7 +89,6 @@ public class EtlService : IEtlService
                 return safeDatabaseName;
             }
 
-            // 创建数据库
             var createDbCommand = new SqlCommand(
                 $"CREATE DATABASE [{safeDatabaseName}]", connection);
             await createDbCommand.ExecuteNonQueryAsync();
@@ -135,7 +120,6 @@ public class EtlService : IEtlService
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // 检查数据库是否存在
             var checkDbCommand = new SqlCommand(
                 "SELECT database_id FROM sys.databases WHERE name = @dbName", connection);
             checkDbCommand.Parameters.AddWithValue("@dbName", safeDatabaseName);
@@ -147,7 +131,6 @@ public class EtlService : IEtlService
                 return false;
             }
 
-            // 设置数据库为单用户模式并删除
             var dropDbCommand = new SqlCommand($@"
                 ALTER DATABASE [{safeDatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
                 DROP DATABASE [{safeDatabaseName}];", connection);
@@ -216,11 +199,8 @@ public class EtlService : IEtlService
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // 切换到指定数据库
             var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
             await useDbCommand.ExecuteNonQueryAsync();
-
-            // 检查表是否已存在
             var checkTableCommand = new SqlCommand(
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @tableName", connection);
             checkTableCommand.Parameters.AddWithValue("@tableName", safeTableName);
@@ -233,7 +213,6 @@ public class EtlService : IEtlService
                 return false;
             }
 
-            // 构建CREATE TABLE语句
             var columnDefinitions = columnList.Select(c =>
                 $"[{c.Name}] {MapToSqlType(c.DataType)}" +
                 (c.IsPrimaryKey ? " PRIMARY KEY" : "") +
@@ -275,11 +254,9 @@ public class EtlService : IEtlService
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // 切换到指定数据库
             var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
             await useDbCommand.ExecuteNonQueryAsync();
 
-            // 检查表是否存在
             var checkTableCommand = new SqlCommand(
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @tableName", connection);
             checkTableCommand.Parameters.AddWithValue("@tableName", safeTableName);
@@ -292,7 +269,6 @@ public class EtlService : IEtlService
                 return false;
             }
 
-            // 删除表
             var dropTableCommand = new SqlCommand($"DROP TABLE [{safeTableName}]", connection);
             await dropTableCommand.ExecuteNonQueryAsync();
 
@@ -322,7 +298,6 @@ public class EtlService : IEtlService
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // 切换到指定数据库
             var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
             await useDbCommand.ExecuteNonQueryAsync();
 
@@ -369,11 +344,9 @@ public class EtlService : IEtlService
             using var connection = CreateConnection();
             await connection.OpenAsync();
 
-            // 切换到指定数据库
             var useDbCommand = new SqlCommand($"USE [{safeDatabaseName}]", connection);
             await useDbCommand.ExecuteNonQueryAsync();
 
-            // 获取表的列信息
             var columnsCommand = new SqlCommand(
                 @"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE 
                   FROM INFORMATION_SCHEMA.COLUMNS 
@@ -397,14 +370,12 @@ public class EtlService : IEtlService
                 throw new EtlExecutionException($"Table {safeTableName} not found or has no columns");
             }
 
-            // 构建INSERT语句
             var firstRow = dataList.First();
             var columns = firstRow.Keys.Where(k => columnInfo.ContainsKey(k)).ToList();
             var insertSql = $"INSERT INTO [{safeTableName}] ([{string.Join("], [", columns)}]) VALUES ";
 
             var rowsAffected = 0L;
 
-            // 批量插入数据
             foreach (var row in dataList)
             {
                 var values = columns.Select(column =>
@@ -583,6 +554,55 @@ public class EtlService : IEtlService
         return executionResult;
     }
 
+    public async Task SyncDatabaseStructureAsync(string databaseName)
+    {
+        try
+        {
+            _logger.LogInformation("Synchronizing database structure for {DatabaseName}", databaseName);
+
+            // Check if database exists in our metadata
+            var existingDatabase = await _etlRepository.GetDatabaseByNameAsync(databaseName);
+            if (existingDatabase == null)
+            {
+                // Create database entry
+                var database = new EtlDatabase
+                {
+                    Name = databaseName
+                };
+                await _etlRepository.CreateDatabaseAsync(database);
+                existingDatabase = database;
+            }
+
+            // Get tables from the actual database
+            var tables = ListTablesAsync(databaseName).Result.ToList(); // Using Result for simplicity in this sync method
+
+            foreach (var tableName in tables)
+            {
+                // Check if table exists in our metadata
+                var existingTable = await _etlRepository.GetTableByNameAsync(existingDatabase.Id, tableName);
+                if (existingTable == null)
+                {
+                    // Create table entry
+                    var table = new EtlTable
+                    {
+                        Name = tableName,
+                        DatabaseId = existingDatabase.Id
+                    };
+                    await _etlRepository.CreateTableAsync(table);
+                    existingTable = table;
+                }
+
+                // TODO: Sync columns as well
+            }
+
+            _logger.LogInformation("Database structure synchronized for {DatabaseName}", databaseName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to synchronize database structure for {DatabaseName}", databaseName);
+        }
+    }
+
     // Helper methods
     private string SanitizeDatabaseName(string databaseName)
     {
@@ -732,7 +752,6 @@ public class EtlService : IEtlService
 
         try
         {
-            // 获取数据进行验证
             var tableName = "extracted_data";
             var data = await SelectDataAsync(databaseName, tableName);
             var dataList = data.ToList();
@@ -740,12 +759,10 @@ public class EtlService : IEtlService
             var validationErrors = new List<string>();
             var validRecords = 0;
 
-            // 执行验证规则
             foreach (var record in dataList)
             {
                 var isValid = true;
 
-                // 检查必需字段
                 if (record.ContainsKey("id") && (record["id"] == null || string.IsNullOrWhiteSpace(record["id"].ToString())))
                 {
                     validationErrors.Add($"Record missing required 'id' field");
@@ -764,7 +781,6 @@ public class EtlService : IEtlService
                     isValid = false;
                 }
 
-                // 验证邮箱格式 (简单验证)
                 if (record.ContainsKey("email") && record["email"] != null)
                 {
                     var email = record["email"].ToString();
@@ -775,7 +791,6 @@ public class EtlService : IEtlService
                     }
                 }
 
-                // 验证年龄字段 (如果存在)
                 if (record.ContainsKey("age") && record["age"] != null)
                 {
                     if (!int.TryParse(record["age"].ToString(), out var age) || age < 0 || age > 150)
@@ -829,12 +844,9 @@ public class EtlService : IEtlService
 
         try
         {
-            // 获取目标表名
             var targetTable = node.Data.TaskParams?.ContainsKey("targetTable") == true
                 ? node.Data.TaskParams["targetTable"]?.ToString()
                 : "users";
-
-            // 从临时表中获取数据
             var sourceTable = "extracted_data";
             var data = await SelectDataAsync(databaseName, sourceTable);
             var dataList = data.ToList();
@@ -844,18 +856,14 @@ public class EtlService : IEtlService
                 throw new InvalidOperationException("No data to load");
             }
 
-            // 创建目标表结构
             var columns = dataList.First().Keys.Select(key => new ColumnDefinition
             {
                 Name = key,
-                DataType = "STRING", // 简化处理
+                DataType = "STRING",
                 IsNullable = true
             }).ToList();
 
-            // 创建目标表
             await CreateTableAsync(databaseName, targetTable, columns);
-
-            // 加载数据
             var rowsAffected = await InsertDataAsync(databaseName, targetTable, dataList);
 
             stepResult.Success = true;
@@ -882,7 +890,7 @@ public class EtlService : IEtlService
         return stepResult;
     }
 }
-// 用于直接操作数据库文件的上下文
+
 public class EtlDatabaseContext : DbContext
 {
     public EtlDatabaseContext(DbContextOptions<EtlDatabaseContext> options) : base(options)

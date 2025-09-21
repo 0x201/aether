@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 public static class EtlApi
 {
@@ -29,12 +29,19 @@ public static class EtlApi
             }
         });
 
-        etl.MapGet("/databases", ([FromServices] IEtlService etlService) =>
+        etl.MapGet("/databases", async ([FromServices] IEtlService etlService, [FromServices] IEtlRepository etlRepository) =>
         {
             try
             {
-                var databases = etlService.ListDatabases();
-                return Results.Ok(databases);
+                // Sync with actual database structure
+                var databases = etlRepository.GetAllDatabasesAsync().Result.ToList(); // Simplified for example
+                foreach (var db in databases)
+                {
+                    await etlService.SyncDatabaseStructureAsync(db.Name);
+                }
+                
+                var databaseList = etlService.ListDatabases();
+                return Results.Ok(databaseList);
             }
             catch (EtlExecutionException ex)
             {
@@ -46,10 +53,13 @@ public static class EtlApi
             }
         });
 
-        etl.MapGet("/tables/{databaseName}", async (string databaseName, [FromServices] IEtlService etlService) =>
+        etl.MapGet("/tables/{databaseName}", async (string databaseName, [FromServices] IEtlService etlService, [FromServices] IEtlRepository etlRepository) =>
         {
             try
             {
+                // Sync database structure
+                await etlService.SyncDatabaseStructureAsync(databaseName);
+                
                 var tables = await etlService.ListTablesAsync(databaseName);
                 return Results.Ok(tables);
             }
@@ -79,6 +89,20 @@ public static class EtlApi
                 return Results.Problem($"Internal server error: {ex.Message}", statusCode: 500);
             }
         });
+        
+        etl.MapPost("/sync/{databaseName}", async (string databaseName, [FromServices] IEtlService etlService) =>
+        {
+            try
+            {
+                await etlService.SyncDatabaseStructureAsync(databaseName);
+                return Results.Ok(new { message = $"Database {databaseName} synchronized successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Failed to synchronize database: {ex.Message}", statusCode: 500);
+            }
+        });
+        
         return etl;
     }
 }

@@ -1,60 +1,54 @@
-namespace Workflow.API;
+using Workflow.API.DataSeed;
+using TaskSchedulerService = Workflow.API.Services.TaskScheduler;
 
-internal static class Extensions
+public static class Extensions
 {
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
-        // 添加 CORS 支持
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", policy =>
-            {
-                policy.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
-            });
-        });
-
+        var services = builder.Services;
         builder.Services.AddSignalR();
-
         AddWorkflowDbContext(builder);
         AddEtlDbContext(builder);
 
-        builder.Services.AddScoped<IWorkflowRepository, EfWorkflowRepository>();
-        builder.Services.AddSingleton<INodeExecutor, NodeExecutor>();
-        builder.Services.AddSingleton<IWorkflowScheduler, WorkflowScheduler>();
-        builder.Services.AddSingleton<IEtlService, EtlService>();
+        services.AddScoped<IWorkflowRepository, EfWorkflowRepository>();
+        services.AddScoped<IEtlRepository, EtlRepository>();
+        services.AddSingleton<INodeExecutor, NodeExecutor>();
+        services.AddScoped<IWorkflowScheduler, WorkflowScheduler>();
+        services.AddScoped<IEtlService, EtlService>();
+        services.AddSingleton<ITaskScheduler, TaskSchedulerService>();
+        services.AddHostedService(provider => 
+            (TaskSchedulerService)provider.GetRequiredService<ITaskScheduler>());
     }
 
     private static void AddWorkflowDbContext(IHostApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("WorkflowDb") 
-            ?? "Server=(localdb)\\mssqllocaldb;Database=WorkflowDb;Trusted_Connection=true;MultipleActiveResultSets=true";
-
+        var connectionString = builder.Configuration.GetConnectionString("workflowdb");
         builder.Services.AddDbContext<WorkflowDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString, sqlOptions => 
             {
                 sqlOptions.EnableRetryOnFailure(5);
             });
-        });
-
+        }, ServiceLifetime.Singleton, ServiceLifetime.Singleton);
+        
+        builder.Services.AddDbContextFactory<WorkflowDbContext>();
+        builder.EnrichSqlServerDbContext<WorkflowDbContext>();
         builder.Services.AddMigration<WorkflowDbContext, WorkflowDbContextSeed>();
     }
 
     private static void AddEtlDbContext(IHostApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("EtlDb") 
-            ?? "Server=(localdb)\\mssqllocaldb;Database=WorkflowEtlDb;Trusted_Connection=true;MultipleActiveResultSets=true";
-
+        var connectionString = builder.Configuration.GetConnectionString("etldb");
         builder.Services.AddDbContext<EtlDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString, sqlOptions => 
             {
                 sqlOptions.EnableRetryOnFailure(5);
             });
-        });
-
-        builder.Services.AddMigration<EtlDbContext, EtlDbContextSeed>();
+        }, ServiceLifetime.Singleton, ServiceLifetime.Singleton);
+        
+        builder.Services.AddDbContextFactory<EtlDbContext>();
+        builder.EnrichSqlServerDbContext<EtlDbContext>();
+        builder.Services.AddMigration<EtlDbContext, EtlDbSeed>();
     }
 }

@@ -1,4 +1,4 @@
-namespace Workflow.API.Services;
+namespace Workflow.API.Abstractions;
 
 public interface IWorkflowRepository
 {

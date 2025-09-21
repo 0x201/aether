@@ -1,4 +1,4 @@
-namespace Workflow.API.Services;
+namespace Workflow.API.Abstractions;
 
 public class InMemoryWorkflowRepository : IWorkflowRepository
 {
@@ -11,7 +11,6 @@ public class InMemoryWorkflowRepository : IWorkflowRepository
 
     private void InitializeSampleWorkflows()
     {
-        // 简单线性工作流
         _workflows["1"] = new WorkflowModel
         {
             Id = "1",
@@ -74,7 +73,6 @@ public class InMemoryWorkflowRepository : IWorkflowRepository
             CreatedAt = DateTime.UtcNow
         };
 
-        // 决策工作流
         _workflows["2"] = new WorkflowModel
         {
             Id = "2",
@@ -165,7 +163,6 @@ public class InMemoryWorkflowRepository : IWorkflowRepository
             CreatedAt = DateTime.UtcNow
         };
 
-        // 复杂工作流
         _workflows["3"] = new WorkflowModel
         {
             Id = "3",
@@ -296,7 +293,6 @@ public class InMemoryWorkflowRepository : IWorkflowRepository
             CreatedAt = DateTime.UtcNow
         };
 
-        // ETL工作流
         _workflows["4"] = new WorkflowModel
         {
             Id = "4",

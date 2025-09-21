@@ -1,24 +1,17 @@
-namespace Workflow.API.Data;
+namespace Workflow.API.DataSeed;
 
-public class EtlDbContextSeed : IDbSeeder<EtlDbContext>
+public class EtlDbSeed(ILogger<EtlDbSeed> logger) : IDbSeeder<EtlDbContext>
 {
-    private readonly ILogger<EtlDbContextSeed> _logger;
-
-    public EtlDbContextSeed(ILogger<EtlDbContextSeed> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<EtlDbSeed> _logger = logger;
 
     public async Task SeedAsync(EtlDbContext context)
     {
         _logger.LogInformation("Starting EtlDbContext seed");
 
-        // 检查是否已有数据
         if (!context.Databases.Any())
         {
             _logger.LogInformation("Seeding initial ETL data");
 
-            // 创建示例数据库结构
             var sampleDatabase = new EtlDatabase
             {
                 Name = "SampleDB",

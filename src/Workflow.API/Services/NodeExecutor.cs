@@ -1,11 +1,10 @@
 using System.Text.Json;
+using Workflow.API.Abstractions;
 
 namespace Workflow.API.Services;
 
 public class NodeExecutor : INodeExecutor
-{
-    // 内存数据库存储提取的数据
-    private static readonly Dictionary<string, List<Dictionary<string, object>>> _inMemoryDb = new();
+{    private static readonly Dictionary<string, List<Dictionary<string, object>>> _inMemoryDb = new();
     
     public async Task<object?> ExecuteNodeAsync(string nodeType, object? inputData)
     {
@@ -33,7 +32,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteStartNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var startData = new
@@ -51,7 +49,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteTaskNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var taskData = new
@@ -70,10 +67,8 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteDecisionNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
-        // 简单的决策逻辑 - 检查输入数据中的某个值
         bool decisionResult = false;
         
         if (inputData != null)
@@ -115,7 +110,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteEndNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var endData = new
@@ -133,7 +127,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteBashNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var bashData = new
@@ -152,7 +145,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecutePythonNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var pythonData = new
@@ -171,7 +163,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteEmailNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var emailData = new
@@ -190,7 +181,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteHttpNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var httpData = new
@@ -209,7 +199,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteSqlNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var sqlData = new
@@ -228,7 +217,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteSubDagNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var subDagData = new
@@ -246,7 +234,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteSensorNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var sensorData = new
@@ -264,7 +251,6 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteCustomNodeAsync(object? inputData)
     {
-        // 模拟异步操作
         await Task.Delay(100);
         
         var customData = new
@@ -282,10 +268,8 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteExtractNodeAsync(object? inputData)
     {
-        // 模拟文件提取操作
-        await Task.Delay(500); // 模拟IO操作延迟
+        await Task.Delay(500);
         
-        // 从输入数据中获取文件路径
         string filePath = "sample_data.json";
         if (inputData is JsonElement jsonElement && jsonElement.TryGetProperty("filePath", out JsonElement filePathElement))
         {
@@ -296,7 +280,6 @@ public class NodeExecutor : INodeExecutor
 
         try
         {
-            // 尝试读取并解析JSON文件
             string jsonData;
             if (File.Exists(filePath))
             {
@@ -304,7 +287,6 @@ public class NodeExecutor : INodeExecutor
             }
             else
             {
-                // 如果文件不存在，使用示例数据
                 jsonData = @"[
                     { ""id"": 1, ""name"": ""John Doe"", ""email"": ""john@example.com"", ""age"": 30 },
                     { ""id"": 2, ""name"": ""Jane Smith"", ""email"": ""jane@example.com"", ""age"": 25 },
@@ -312,7 +294,6 @@ public class NodeExecutor : INodeExecutor
                 ]";
             }
 
-            // 解析JSON数据
             using var doc = JsonDocument.Parse(jsonData);
             extractedData = new List<Dictionary<string, object>>();
 
@@ -398,15 +379,13 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteValidateNodeAsync(object? inputData)
     {
-        // 模拟数据验证操作
-        await Task.Delay(300); // 模拟验证延迟
+        await Task.Delay(300);
         
         int validRows = 0;
         int invalidRows = 0;
         var validationErrors = new List<string>();
         List<Dictionary<string, object>> validatedData = new();
         
-        // 如果输入数据包含提取的数据，则进行验证
         if (inputData is JsonElement jsonElement && jsonElement.TryGetProperty("data", out JsonElement dataArray))
         {
             foreach (var item in dataArray.EnumerateArray())
@@ -491,13 +470,11 @@ public class NodeExecutor : INodeExecutor
 
     private async Task<object> ExecuteLoadNodeAsync(object? inputData)
     {
-        // 模拟数据加载到内存数据库操作
-        await Task.Delay(400); // 模拟数据库操作延迟
+        await Task.Delay(400);
         
         string tableName = "etl_data";
         int loadedRows = 0;
         
-        // 如果输入数据包含验证通过的数据，则加载到内存数据库
         if (inputData is JsonElement jsonElement && jsonElement.TryGetProperty("data", out JsonElement dataArray))
         {
             var dataList = new List<Dictionary<string, object>>();
@@ -558,7 +535,6 @@ public class NodeExecutor : INodeExecutor
         return loadResult;
     }
     
-    // 简单的邮箱验证方法
     private bool IsValidEmail(string email)
     {
         try

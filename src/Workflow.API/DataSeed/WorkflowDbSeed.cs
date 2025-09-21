@@ -1,24 +1,16 @@
-namespace Workflow.API.Data;
+namespace Workflow.API.DataSeed;
 
-public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
+public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbSeeder<WorkflowDbContext>
 {
-    private readonly ILogger<WorkflowDbContextSeed> _logger;
-
-    public WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<WorkflowDbContextSeed> _logger = logger;
 
     public async Task SeedAsync(WorkflowDbContext context)
     {
         _logger.LogInformation("Starting WorkflowDbContext seed");
 
-        // 检查是否已有数据
         if (!context.Workflows.Any())
         {
             _logger.LogInformation("Seeding initial workflows data");
-
-            // 添加示例工作流数据
             var workflows = GetSampleWorkflows();
             context.Workflows.AddRange(workflows);
             await context.SaveChangesAsync();
@@ -31,9 +23,8 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
         }
     }
 
-    private List<WorkflowModel> GetSampleWorkflows()
+    private static List<WorkflowModel> GetSampleWorkflows()
     {
-        // 简单线性工作流
         var workflow1 = new WorkflowModel
         {
             Id = "1",
@@ -45,10 +36,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "1",
                     Type = "start",
                     Position = new Position { X = 100, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Start", 
-                        OperatorType = "start" 
+                    Data = new NodeData
+                    {
+                        Label = "Start",
+                        OperatorType = "start"
                     }
                 },
                 new WorkflowNode
@@ -56,9 +47,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "2",
                     Type = "dummy",
                     Position = new Position { X = 300, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Process Data", 
+                    Data = new NodeData
+                    {
+                        Label = "Process Data",
                         OperatorType = "dummy",
                         Description = "Process the extracted data"
                     }
@@ -68,9 +59,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "3",
                     Type = "dummy",
                     Position = new Position { X = 500, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Validate Results", 
+                    Data = new NodeData
+                    {
+                        Label = "Validate Results",
                         OperatorType = "dummy",
                         Description = "Validate processed results"
                     }
@@ -80,10 +71,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "4",
                     Type = "end",
                     Position = new Position { X = 700, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "End", 
-                        OperatorType = "end" 
+                    Data = new NodeData
+                    {
+                        Label = "End",
+                        OperatorType = "end"
                     }
                 }
             },
@@ -96,7 +87,6 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
             CreatedAt = DateTime.UtcNow
         };
 
-        // 决策工作流
         var workflow2 = new WorkflowModel
         {
             Id = "2",
@@ -108,10 +98,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "1",
                     Type = "start",
                     Position = new Position { X = 100, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Start", 
-                        OperatorType = "start" 
+                    Data = new NodeData
+                    {
+                        Label = "Start",
+                        OperatorType = "start"
                     }
                 },
                 new WorkflowNode
@@ -119,9 +109,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "2",
                     Type = "dummy",
                     Position = new Position { X = 300, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Data Analysis", 
+                    Data = new NodeData
+                    {
+                        Label = "Data Analysis",
                         OperatorType = "dummy",
                         Description = "Analyze input data"
                     }
@@ -131,13 +121,13 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "3",
                     Type = "branch",
                     Position = new Position { X = 500, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Check Value", 
+                    Data = new NodeData
+                    {
+                        Label = "Check Value",
                         OperatorType = "branch",
                         Description = "Check if value is greater than threshold",
-                        TaskParams = new Dictionary<string, object> 
-                        { 
+                        TaskParams = new Dictionary<string, object>
+                        {
                             { "condition", "value > 100" }
                         }
                     }
@@ -147,9 +137,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "4",
                     Type = "dummy",
                     Position = new Position { X = 700, Y = 50 },
-                    Data = new NodeData 
-                    { 
-                        Label = "High Value Path", 
+                    Data = new NodeData
+                    {
+                        Label = "High Value Path",
                         OperatorType = "dummy",
                         Description = "Process high value data"
                     }
@@ -159,9 +149,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "5",
                     Type = "dummy",
                     Position = new Position { X = 700, Y = 150 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Low Value Path", 
+                    Data = new NodeData
+                    {
+                        Label = "Low Value Path",
                         OperatorType = "dummy",
                         Description = "Process low value data"
                     }
@@ -171,10 +161,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "6",
                     Type = "end",
                     Position = new Position { X = 900, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "End", 
-                        OperatorType = "end" 
+                    Data = new NodeData
+                    {
+                        Label = "End",
+                        OperatorType = "end"
                     }
                 }
             },
@@ -190,7 +180,6 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
             CreatedAt = DateTime.UtcNow
         };
 
-        // 复杂工作流
         var workflow3 = new WorkflowModel
         {
             Id = "3",
@@ -202,10 +191,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "1",
                     Type = "start",
                     Position = new Position { X = 100, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Start", 
-                        OperatorType = "start" 
+                    Data = new NodeData
+                    {
+                        Label = "Start",
+                        OperatorType = "start"
                     }
                 },
                 new WorkflowNode
@@ -213,9 +202,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "2",
                     Type = "dummy",
                     Position = new Position { X = 300, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Data Ingestion", 
+                    Data = new NodeData
+                    {
+                        Label = "Data Ingestion",
                         OperatorType = "dummy",
                         Description = "Ingest data from various sources"
                     }
@@ -225,9 +214,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "3",
                     Type = "dummy",
                     Position = new Position { X = 500, Y = 50 },
-                    Data = new NodeData 
-                    { 
-                        Label = "ETL Process", 
+                    Data = new NodeData
+                    {
+                        Label = "ETL Process",
                         OperatorType = "dummy",
                         Description = "Extract, Transform, Load data"
                     }
@@ -237,9 +226,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "4",
                     Type = "dummy",
                     Position = new Position { X = 500, Y = 150 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Data Validation", 
+                    Data = new NodeData
+                    {
+                        Label = "Data Validation",
                         OperatorType = "dummy",
                         Description = "Validate ingested data"
                     }
@@ -249,13 +238,13 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "5",
                     Type = "branch",
                     Position = new Position { X = 700, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Quality Check", 
+                    Data = new NodeData
+                    {
+                        Label = "Quality Check",
                         OperatorType = "branch",
                         Description = "Check data quality",
-                        TaskParams = new Dictionary<string, object> 
-                        { 
+                        TaskParams = new Dictionary<string, object>
+                        {
                             { "condition", "quality > 0.8" }
                         }
                     }
@@ -265,9 +254,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "6",
                     Type = "dummy",
                     Position = new Position { X = 900, Y = 50 },
-                    Data = new NodeData 
-                    { 
-                        Label = "High Quality Processing", 
+                    Data = new NodeData
+                    {
+                        Label = "High Quality Processing",
                         OperatorType = "dummy",
                         Description = "Process high quality data"
                     }
@@ -277,9 +266,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "7",
                     Type = "dummy",
                     Position = new Position { X = 900, Y = 150 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Error Handling", 
+                    Data = new NodeData
+                    {
+                        Label = "Error Handling",
                         OperatorType = "dummy",
                         Description = "Handle low quality data"
                     }
@@ -289,9 +278,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "8",
                     Type = "dummy",
                     Position = new Position { X = 1100, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Data Storage", 
+                    Data = new NodeData
+                    {
+                        Label = "Data Storage",
                         OperatorType = "dummy",
                         Description = "Store processed data"
                     }
@@ -301,10 +290,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "9",
                     Type = "end",
                     Position = new Position { X = 1300, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "End", 
-                        OperatorType = "end" 
+                    Data = new NodeData
+                    {
+                        Label = "End",
+                        OperatorType = "end"
                     }
                 }
             },
@@ -324,7 +313,6 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
             CreatedAt = DateTime.UtcNow
         };
 
-        // ETL工作流
         var workflow4 = new WorkflowModel
         {
             Id = "4",
@@ -336,10 +324,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "1",
                     Type = "start",
                     Position = new Position { X = 100, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Start", 
-                        OperatorType = "start" 
+                    Data = new NodeData
+                    {
+                        Label = "Start",
+                        OperatorType = "start"
                     }
                 },
                 new WorkflowNode
@@ -347,13 +335,13 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "2",
                     Type = "extract",
                     Position = new Position { X = 300, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Extract Data", 
+                    Data = new NodeData
+                    {
+                        Label = "Extract Data",
                         OperatorType = "extract",
                         Description = "Extract data from JSON file",
-                        TaskParams = new Dictionary<string, object> 
-                        { 
+                        TaskParams = new Dictionary<string, object>
+                        {
                             { "filePath", "data/sample.json" }
                         }
                     }
@@ -363,9 +351,9 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "3",
                     Type = "validate",
                     Position = new Position { X = 500, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Validate Data", 
+                    Data = new NodeData
+                    {
+                        Label = "Validate Data",
                         OperatorType = "validate",
                         Description = "Validate extracted data quality"
                     }
@@ -375,13 +363,13 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "4",
                     Type = "load",
                     Position = new Position { X = 700, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "Load to Database", 
+                    Data = new NodeData
+                    {
+                        Label = "Load to Database",
                         OperatorType = "load",
                         Description = "Load validated data to in-memory database",
-                        TaskParams = new Dictionary<string, object> 
-                        { 
+                        TaskParams = new Dictionary<string, object>
+                        {
                             { "tableName", "etl_data" }
                         }
                     }
@@ -391,10 +379,10 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
                     Id = "5",
                     Type = "end",
                     Position = new Position { X = 900, Y = 100 },
-                    Data = new NodeData 
-                    { 
-                        Label = "End", 
-                        OperatorType = "end" 
+                    Data = new NodeData
+                    {
+                        Label = "End",
+                        OperatorType = "end"
                     }
                 }
             },
@@ -408,6 +396,6 @@ public class WorkflowDbContextSeed : IDbSeeder<WorkflowDbContext>
             CreatedAt = DateTime.UtcNow
         };
 
-        return new List<WorkflowModel> { workflow1, workflow2, workflow3, workflow4 };
+        return [workflow1, workflow2, workflow3, workflow4];
     }
 }

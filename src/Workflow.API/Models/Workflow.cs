@@ -73,7 +73,6 @@ public class WorkflowConnection
     public string? TargetHandle { get; set; }
 }
 
-// 添加执行日志模型
 public class ExecutionLog
 {
     public string Id { get; set; } = string.Empty;

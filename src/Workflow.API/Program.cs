@@ -1,46 +1,27 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Workflow.API.Hubs;
 
-builder.Services.AddOpenApi();
-builder.Services.AddSignalR();
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddApplicationServices();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
-});
+builder.Services.AddProblemDetails();
+
+var withApiVersioning = builder.Services.AddApiVersioning();
+builder.AddDefaultOpenApi(withApiVersioning);
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+var workflow = app.NewVersionedApi("Workflow");
+workflow.MapWorkflowsApiV1();
 
-app.UseCors("AllowAll");
+var etl = app.NewVersionedApi("Etl");
+etl.MapEtlApiV1();
 
+app.MapHub<JobStatusHub>("/api/jobstatus");
 app.UseDefaultOpenApi();
-
-app.MapWorkflowsApiV1();
-app.MapEtlApiV1();
-
-app.MapHub<JobStatusHub>("/jobstatus");
-
 app.Run();
-
-// SignalR Hub for job status updates
-public class JobStatusHub : Hub
-{
-    public async Task SubscribeToJob(string jobId)
-    {
-        await Groups.AddToGroupAsync(Context.ConnectionId, jobId);
-    }
-}
