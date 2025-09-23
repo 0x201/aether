@@ -1,4 +1,4 @@
-import { Injectable, Renderer2, RendererFactory2, Inject, inject } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { OverlayContainer } from '@angular/cdk/overlay';

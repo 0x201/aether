@@ -4,7 +4,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../services/auth/auth.service';
 import { BooksService } from '../services/books.service';
 import {  MatSnackBarModule } from '@angular/material/snack-bar';
 import { AsyncPipe } from '@angular/common';
@@ -28,7 +27,6 @@ import { AsyncPipe } from '@angular/common';
 export class HomeComponent implements OnInit {
   booksService = inject(BooksService);
   constructor(
-    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -38,10 +36,6 @@ export class HomeComponent implements OnInit {
 
   loadRandomBooks(): void {
     this.booksService.refreshBooks();
-  }
-
-  logout(): void {
-    this.authService.logout();
   }
 
   viewBookDetails(bookId: number): void {

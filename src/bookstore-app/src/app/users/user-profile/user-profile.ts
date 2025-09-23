@@ -5,7 +5,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
-import { AuthService, JwtPayload } from '../../services/auth/auth.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Role } from '../../models/role.model';
 
@@ -34,7 +33,6 @@ export class UserProfileComponent implements OnInit {
   userProfile: UserProfile | null = null;
 
   constructor(
-    private authService: AuthService,
     private jwtHelper: JwtHelperService
   ) { }
 
@@ -43,20 +41,20 @@ export class UserProfileComponent implements OnInit {
   }
 
   loadUserProfile(): void {
-    const token = this.authService.getToken();
-    if (token) {
-      const decoded: JwtPayload | null = this.jwtHelper.decodeToken(token);
-      if (decoded) {
-        this.userProfile = {
-          username: decoded.username,
-          nickname: decoded.nickname,
-          roles: decoded.roles || []
-        };
-      }
-    }
+    // const token = this.authService.getToken();
+    // if (token) {
+    //   const decoded: JwtPayload | null = this.jwtHelper.decodeToken(token);
+    //   if (decoded) {
+    //     this.userProfile = {
+    //       username: decoded.username,
+    //       nickname: decoded.nickname,
+    //       roles: decoded.roles || []
+    //     };
+    //   }
+    // }
   }
 
   logout(): void {
-    this.authService.logout();
+    //this.authService.logout();
   }
 }

@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { RouterOutlet, RouterModule } from '@angular/router';
-import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,15 +11,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { AuthService, JwtPayload } from './services/auth/auth.service';
-import { RoleDirective } from './services/auth/role.directive';
-import { JwtHelperService } from '@auth0/angular-jwt';
 import { Menu } from './models/menu.model';
 import { MatTreeModule } from '@angular/material/tree';
 import { FormsModule } from '@angular/forms';
 import { Role } from './models/role.model';
 import { RecursiveMenu } from './menus/menu-item/recursive-menu';
 import { ScrollingModule } from "@angular/cdk/scrolling";
+import { UsersService } from './services/users.service';
+import keycloak from 'keycloak-js';
 
 interface MenuNode {
   id: number;
@@ -59,7 +58,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject<void>();
   isHandset$!: Observable<boolean>;
   menus: Menu[] = [];
-  isSidenavOpened = true;
+  isSidenavOpened = false;
   
   childrenMenuAccessor = (node: MenuNode) => node.children ?? [];
 
@@ -67,11 +66,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   
   menuTreeData: MenuNode[] = [];
 
+  private keycloakService = inject(keycloak);
+  private userService = inject(UsersService);
 
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private authService: AuthService,
-    private jwtHelper: JwtHelperService,
     private cdRef: ChangeDetectorRef
   ) {}
 
@@ -95,20 +94,19 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   logout(): void {
-    this.authService.logout();
+    this.keycloakService.logout();
   }
   
   
   private loadMenusFromToken(): void {
-    const token = this.authService.getToken();
-    if (token && !this.jwtHelper.isTokenExpired(token)) {
-      const decoded: JwtPayload | null = this.jwtHelper.decodeToken(token);
-      if (decoded && decoded.menus) {
-        this.menus = decoded.menus;
-        this.menuTreeData = this.buildTreeMenuData(decoded.menus, decoded.roles);
-        this.cdRef.detectChanges();
-      }
-    }
+    this.userService.loadUserMenus().subscribe(menus => {
+      this.menus = menus;
+      const userRoles = this.userService.getCurrentUserRoles();
+      // Convert roles to Role[] format
+      const roles: Role[] = userRoles.map(roleName => ({ id: 0, name: roleName } as Role));
+      this.menuTreeData = this.buildTreeMenuData(this.menus, roles);
+      this.cdRef.detectChanges();
+    });
   }
   
   private buildTreeMenuData(menus: Menu[], roles: Role[]): MenuNode[] {
@@ -121,7 +119,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
         icon: menu.icon,
         route: menu.route,
         order: menu.order,
-        roles: roles,
+        roles: menu.roles,
         children: []
       });
     });

@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -15,13 +16,13 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "es2022",
+    "module": "es2022",
     "useDefineForClassFields": false,
     "lib": [
-      "ES2022",
+      "es2022",
       "DOM"
     ]
   },
