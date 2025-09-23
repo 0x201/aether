@@ -14,6 +14,7 @@ ModernCSharp is a comprehensive solution showcasing modern C# development practi
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
+- [Service Port Allocations](#service-port-allocations)
 - [License](#license)
 
 ## Overview
@@ -216,6 +217,31 @@ ModernCSharp/
 ├── Directory.Build.props         # Common build properties
 └── Directory.Packages.props      # Central package management
 ```
+
+## Service Port Allocations
+
+The following table shows the port allocations for services managed by the AppHost:
+
+| Service | Https Port | Http Port | Type |
+|---------|------|------|------|
+| Redis | N.A | 6379 | Database |
+| Redis Insight | N.A | 6378 | Management UI |
+| RabbitMQ | N.A | 5672 | Message Broker |
+| RabbitMQ Management | N.A  | 15672 | Management UI |
+| SQL Server | N.A  | 14330 | Database |
+| Keycloak | N.A  | 8080 | Identity Provider |
+| Catalog API | 5003  | 5002 | Backend API |
+| Ordering API | 5005 | 5004 | Backend API |
+| Workflow API | 5007 | 5006 | Backend API |
+| Web App | 5009 | 5008 | Frontend |
+| Order Processor | 5011 | 5010 | Frontend |
+| Workflow App (Vue) | 3010 | Frontend |
+| Bookstore API (Node.js) | 3011 | Backend API |
+| Bookstore App (Angular) | 3012 | Frontend |
+| Crawler API (Python) | 3013 | Backend API |
+| Crawler App (Vite) | 3014 | Frontend |
+
+All backend APIs now have corresponding clients configured in Keycloak with the naming pattern `{service-name}-api` (e.g., `catalog-api`, `ordering-api`, etc.). Frontend applications use the naming pattern `{service-name}-app` (e.g., `bookstore-app`, `crawler-app`, etc.).
 
 ## License
 

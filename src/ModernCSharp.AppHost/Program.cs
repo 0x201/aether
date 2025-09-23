@@ -25,6 +25,7 @@ var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
 var keycloak = builder.AddKeycloak("keycloak", port: 8080)
                       .WithLifetime(ContainerLifetime.Persistent)
                       .WithDataVolume()
+                      .WithRealmImport("./realm.json")
                       .WithContainerName("keycloak");
 
 var bookstoreDb = sqlServer.AddDatabase("bookstoredb");
@@ -44,24 +45,28 @@ var identityEndpoint = identityApi.GetEndpoint("https");
 
 var catalogApi = builder.AddProject<Projects.Catalog_API>("catalogapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
-    .WithReference(catalogDb);
+    .WithReference(catalogDb)
+    .WithReference(keycloak).WaitFor(keycloak);
 
 var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderDb).WaitFor(orderDb)
     .WithHttpHealthCheck("/health")
-    .WithEnvironment("Identity__Url", identityEndpoint);
+    .WithEnvironment("Identity__Url", identityEndpoint)
+    .WithReference(keycloak).WaitFor(keycloak);
 
 var workflowApi = builder.AddProject<Projects.Workflow_API>("workflowapi")
     .WithReference(workflowDb).WaitFor(workflowDb)
     .WithReference(etlDb).WaitFor(etlDb)
-    .WithHttpHealthCheck("/health");
+    .WithHttpHealthCheck("/health")
+    .WithReference(keycloak).WaitFor(keycloak);
 
 var workflowApp = builder.AddPnpmApp("workflowapp", @"../workflow-app", "dev")
     .WithReference(workflowApi)
     .WithHttpEndpoint(port: 3010, env: "VITE_PORT")
     .WithPnpmPackageInstallation()
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .WithReference(keycloak).WaitFor(keycloak);
 
 builder.AddProject<Projects.OrderProcessor>("orderprocessor")
     .WithReference(redis)
@@ -89,14 +94,16 @@ var bookstoreApp = builder.AddPnpmApp("bookstoreapp", @"../bookstore-app", "star
     .WithHttpEndpoint(port: 3012, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
-    .WithReference(bookStoreApi);
+    .WithReference(bookStoreApi)
+    .WithReference(keycloak).WaitFor(keycloak);
 
 #pragma warning disable ASPIREHOSTINGPYTHON001
 var crawlerApi = builder.AddPythonApp("crawlerapi", @"../crawler-api", "main.py")
     .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
-    .WithReference(bookstoreDb).WaitFor(bookstoreDb);
+    .WithReference(bookstoreDb).WaitFor(bookstoreDb)
+    .WithReference(keycloak).WaitFor(keycloak);
 #pragma warning restore ASPIREHOSTINGPYTHON001
 crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/scalar", "Crawler API Scalar Reference");
 
@@ -104,7 +111,8 @@ var crawlerApp = builder.AddPnpmApp("crawlerapp", @"../crawler-app", "dev")
     .WithHttpEndpoint(port: 3014, env: "PORT")
     .WithPnpmPackageInstallation()
     .WithReference(crawlerApi)
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .WithReference(keycloak).WaitFor(keycloak);
 
 
 webApp.WithEnvironment("CallBackUrl", webApp.GetEndpoint("https"));
