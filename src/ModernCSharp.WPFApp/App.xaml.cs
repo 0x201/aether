@@ -24,11 +24,6 @@ using ModernCSharp.WPFApp.Views;
 
 namespace ModernCSharp.WPFApp;
 
-// For more information about application lifecycle events see https://docs.microsoft.com/dotnet/framework/wpf/app-development/application-management-overview
-
-// WPF UI elements use language en-US by default.
-// If you need to support other cultures make sure you add converters and review dates and numbers in your UI to ensure everything adapts correctly.
-// Tracking issue for improving this is https://github.com/dotnet/wpf/issues/1946
 public partial class App : System.Windows.Application
 {
     private static IHost _host;
@@ -47,7 +42,7 @@ public partial class App : System.Windows.Application
 
         builder.AddServiceDefaults();
 
-        builder.AddApplicationServices();
+        builder.AddOrderingApplicationServices();
 
         ConfigureServices(builder);
 

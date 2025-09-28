@@ -1,29 +1,10 @@
 ﻿namespace ModernCSharp.Shared.FileServices.Export;
 
-public abstract class FileExportStrategyBase<T> : IFileExportStrategy<T>
+public abstract class FileExportStrategyBase<T>(params FileType[] fileTypes) : IFileExportStrategy<T>
 {
-    protected FileExportContext<T> _context;
+    public IReadOnlyCollection<FileType> FileTypes { get; } = [.. fileTypes];
 
-    public IReadOnlyCollection<FileType> FileTypes { get; }
-
-    protected FileExportStrategyBase(params FileType[] fileTypes)
-    {
-        FileTypes = [.. fileTypes];
-    }
-
-    public abstract Task<Result> ExportAsync(CancellationToken cancellationToken = default);
-
-    public void Initialize(IFileExportContext<T> context)
-    {
-        if (context is not FileExportContext<T> exportContext)
-        {
-            throw new ArgumentException($"Invalid file export context. Expected {typeof(FileExportContext<T>)}, but got {context.GetType()}.");
-        }
-
-        OnInitialize(exportContext);
-    }
-
-    protected virtual void OnInitialize(FileExportContext<T> context) => _context = context;
+    public abstract Task<Result> ExportAsync(IFileExportContext<T> context, CancellationToken cancellationToken = default);
 
     public bool CanExport(FileType fileType) => FileTypes.Contains(fileType);
 }

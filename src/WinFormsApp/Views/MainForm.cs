@@ -1,5 +1,3 @@
-using ModernCSharp.WinFormsApp.Models;
-
 namespace ModernCSharp.WinFormsApp.Views;
 
 public partial class MainForm : BaseView, IMainView

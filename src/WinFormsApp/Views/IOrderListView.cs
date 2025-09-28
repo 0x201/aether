@@ -1,10 +1,5 @@
 ﻿using System.ComponentModel;
 
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.WinFormsApp.Common;
-using ModernCSharp.WinFormsApp.Enums;
-using ModernCSharp.WinFormsApp.Models;
-
 namespace ModernCSharp.WinFormsApp.Views;
 
 public interface IOrderListView : IView

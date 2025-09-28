@@ -16,14 +16,12 @@
   "roles": {
     "realm": [
       {
-        "id": "user-role",
         "name": "user",
         "description": "User privileges",
         "composite": false,
         "clientRole": false
       },
       {
-        "id": "admin-role",
         "name": "admin",
         "description": "Administrator privileges",
         "composite": false,
@@ -41,7 +39,6 @@
   },
   "groups": [
     {
-      "id": "users-group",
       "name": "users",
       "path": "/users",
       "attributes": {},
@@ -52,7 +49,6 @@
       "subGroups": []
     },
     {
-      "id": "admins-group",
       "name": "admins",
       "path": "/admins",
       "attributes": {},
@@ -66,8 +62,8 @@
   ],
   "users": [
     {
-      "id": "test-user-1",
-      "createdTimestamp": 1609459200000,
+      "id": "cebe1650-f70b-42e3-b685-45da0b6d63ee",
+      "createdTimestamp": 1758820511000,
       "username": "testuser",
       "enabled": true,
       "totp": false,
@@ -86,8 +82,8 @@
       ]
     },
     {
-      "id": "admin-user-1",
-      "createdTimestamp": 1609459200000,
+      "id": "dd7d71e6-3749-4f54-a02a-a9cc62d5d231",
+      "createdTimestamp": 1758820511000,
       "username": "admin",
       "enabled": true,
       "totp": false,
@@ -117,7 +113,6 @@
   ],
   "clientScopes": [
     {
-      "id": "openid-scope",
       "name": "openid",
       "description": "OpenID Connect scope",
       "protocol": "openid-connect",
@@ -127,7 +122,6 @@
       }
     },
     {
-      "id": "profile-scope",
       "name": "profile",
       "description": "User profile scope",
       "protocol": "openid-connect",
@@ -137,7 +131,6 @@
       },
       "protocolMappers": [
         {
-          "id": "username-mapper",
           "name": "username",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-property-mapper",
@@ -202,7 +195,6 @@
       },
       "protocolMappers": [
         {
-          "id": "realm-roles-mapper",
           "name": "realm roles",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
@@ -243,7 +235,6 @@
       },
       "protocolMappers": [
         {
-          "id": "allowed-web-origins-mapper",
           "name": "allowed web origins",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-allowed-origins-mapper",
@@ -264,7 +255,6 @@
       },
       "protocolMappers": [
         {
-          "id": "email-address-mapper",
           "name": "email",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-property-mapper",
@@ -307,7 +297,6 @@
       },
       "protocolMappers": [
         {
-          "id": "address-mapper",
           "name": "address",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-address-mapper",
@@ -338,7 +327,6 @@
       },
       "protocolMappers": [
         {
-          "id": "phone-number-mapper",
           "name": "phone number",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-attribute-mapper",
@@ -380,7 +368,6 @@
       },
       "protocolMappers": [
         {
-          "id": "upn-mapper",
           "name": "upn",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-property-mapper",
@@ -395,7 +382,6 @@
           }
         },
         {
-          "id": "groups-mapper",
           "name": "groups",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
@@ -494,7 +480,6 @@
   ],
   "clients": [
     {
-      "id": "webapp-client",
       "clientId": "webapp",
       "name": "WebApp Client",
       "enabled": true,
@@ -537,7 +522,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "webapp-audience-mapper",
           "name": "webapp-audience-mapper",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
@@ -568,7 +552,6 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "ordering-scalar-ui-client",
       "clientId": "orderingscalarui",
       "name": "Ordering Scalar UI",
       "enabled": true,
@@ -619,7 +602,6 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "catalog-scalar-ui-client",
       "clientId": "catalogscalarui",
       "name": "Catalog Scalar UI",
       "enabled": true,
@@ -670,7 +652,6 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "workflow-scalar-ui-client",
       "clientId": "workflowscalarui",
       "name": "Workflow Scalar UI",
       "enabled": true,
@@ -721,12 +702,10 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "bookstore-app-client",
-      "clientId": "bookstore-app",
+      "clientId": "bookstoreapp",
       "name": "Bookstore App",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "http://localhost:3012/*"
       ],
@@ -760,12 +739,10 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "crawler-app-client",
-      "clientId": "crawler-app",
+      "clientId": "crawlerapp",
       "name": "Crawler App",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "http://localhost:3014/*"
       ],
@@ -799,12 +776,10 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "bookstore-api-client",
-      "clientId": "bookstore-api",
+      "clientId": "bookstoreapi",
       "name": "Bookstore API",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "http://localhost:3011/*"
       ],
@@ -839,7 +814,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "bookstore-api-audience-mapper",
           "name": "bookstore-api-audience-mapper",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
@@ -863,12 +837,71 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "crawler-api-client",
+      "clientId": "bookstoreapiscalar",
+      "name": "Bookstore API Scalar Reference",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "http://localhost:3011/scalar"
+      ],
+      "webOrigins": [
+        "http://localhost:3011"
+      ],
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.multivalued.roles": "false",
+        "saml.force.post.binding": "false",
+        "saml.encrypt": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+      },
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "name": "bookstore-api-audience-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "bookstore-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "roles",
+        "bookstore-api"
+      ],
+      "optionalClientScopes": [
+        "offline_access"
+      ],
+      "authorizationServicesEnabled": false
+    },
+    {
       "clientId": "crawler-api",
       "name": "Crawler API",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "http://localhost:3013/*"
       ],
@@ -903,7 +936,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "crawler-api-audience-mapper",
           "name": "crawler-api-audience-mapper",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
@@ -927,12 +959,10 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "catalog-api-client",
       "clientId": "catalog-api",
       "name": "Catalog API",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "https://catalogapi.local/*",
         "http://localhost:5002/*",
@@ -971,7 +1001,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "catalog-api-audience-mapper",
           "name": "catalog-api-audience-mapper",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
@@ -995,12 +1024,10 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "ordering-api-client",
       "clientId": "ordering-api",
       "name": "Ordering API",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "https://orderingapi.local/*",
         "http://localhost:5004/*",
@@ -1039,7 +1066,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "ordering-api-audience-mapper",
           "name": "ordering-api-audience-mapper",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
@@ -1063,12 +1089,10 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "workflow-api-client",
       "clientId": "workflow-api",
       "name": "Workflow API",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "https://workflowapi.local/*",
         "http://localhost:5006/*",
@@ -1107,7 +1131,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "workflow-api-audience-mapper",
           "name": "workflow-api-audience-mapper",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
@@ -1131,7 +1154,6 @@
       "authorizationServicesEnabled": false
     },
     {
-      "id": "account-client",
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
@@ -1139,7 +1161,6 @@
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [
         "/realms/moderncsharp/account/*"
       ],
@@ -1172,7 +1193,6 @@
       ]
     },
     {
-      "id": "account-console-client",
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
@@ -1202,7 +1222,6 @@
       "nodeReRegistrationTimeout": 0,
       "protocolMappers": [
         {
-          "id": "branch_code-mapper",
           "name": "branch_code",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-attribute-mapper",
@@ -1231,7 +1250,6 @@
       ]
     },
     {
-      "id": "admin-cli-client",
       "clientId": "admin-cli",
       "name": "${client_admin-cli}",
       "surrogateAuthRequired": false,
@@ -1267,7 +1285,6 @@
       ]
     },
     {
-      "id": "broker-client",
       "clientId": "broker",
       "name": "${client_broker}",
       "surrogateAuthRequired": false,
@@ -1303,13 +1320,11 @@
       ]
     },
     {
-      "id": "realm-management-client",
       "clientId": "realm-management",
       "name": "${client_realm-management}",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "secret",
       "redirectUris": [],
       "webOrigins": [],
       "notBefore": 0,
@@ -1340,7 +1355,6 @@
       ]
     },
     {
-      "id": "security-admin-console-client",
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
@@ -1372,7 +1386,6 @@
       "nodeReRegistrationTimeout": 0,
       "protocolMappers": [
         {
-          "id": "locale-mapper",
           "name": "locale",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-attribute-mapper",

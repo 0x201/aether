@@ -1,6 +1,6 @@
 ﻿namespace ModernCSharp.Shared.FileServices.Export;
 
-public class FileExportContext<T>(FileType fileType, string outputPath, IEnumerable<T> dataToExport) : IFileExportContext<T>
+public class FileExportContext<T>(FileType fileType, string outputPath, IReadOnlyCollection<T> dataToExport) : IFileExportContext<T>
 {
     public string OutputPath
     {
@@ -13,7 +13,7 @@ public class FileExportContext<T>(FileType fileType, string outputPath, IEnumera
         set;
     } = fileType;
 
-    public IEnumerable<T> DataToExport
+    public IReadOnlyCollection<T> DataToExport
     {
         get;
     } = dataToExport;

@@ -1,7 +1,5 @@
-﻿using ModernCSharp.WinFormsApp.Common;
-using ModernCSharp.WinFormsApp.Views;
+﻿namespace ModernCSharp.WinFormsApp.Presenters;
 
-namespace ModernCSharp.WinFormsApp.Presenters;
 public class MainPresenter(
     IMainView view,
     IPresenter<IOrderListView> orderPresenter) : AbstractPresenter<IMainView>(view)

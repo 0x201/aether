@@ -2,11 +2,7 @@
 
 public interface IFileExportStrategy<T>
 {
-    IReadOnlyCollection<FileType> FileTypes
-    {
-        get;
-    }
-    void Initialize(IFileExportContext<T> context);
-    Task<Result> ExportAsync(CancellationToken cancellationToken = default);
+    IReadOnlyCollection<FileType> FileTypes { get; }
+    Task<Result> ExportAsync(IFileExportContext<T> context, CancellationToken cancellationToken = default);
     bool CanExport(FileType fileType) => FileTypes.Contains(fileType);
 }

@@ -2,29 +2,30 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.4.2</AspireVersion>
-    <AspnetVersion>9.0.9</AspnetVersion>
+    <AspireVersion>9.5.0</AspireVersion>
+    <AspnetVersion>10.0.0-rc.1.25451.107</AspnetVersion>
+    <!--<AspnetVersion>9.0.9</AspnetVersion>-->
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>3.9.3</MSTestVersion>
     <FluentUIVersion>4.12.1</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.4</DuendeVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
-    <AspireCommunityVersion>9.7.2</AspireCommunityVersion>
+    <AspireCommunityVersion>9.8.0</AspireCommunityVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
-    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="9.4.2-preview.1.25428.12" />
+    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="9.5.0-preview.1.25474.7" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.NodeJS" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Hosting.MySql" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />
+    <!--<PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />-->
+    <PackageVersion Include="Aspire.RabbitMQ.Client" Version="9.4.2" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="$(AspireCommunityVersion)" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Python.Extensions" Version="$(AspireCommunityVersion)" />
     <!--OpenTelemetry-->
@@ -38,6 +39,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.3.2" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspnetVersion)" />
@@ -59,7 +61,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.2" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.5.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.9.0" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
     <!--FluentUI-->
@@ -97,9 +99,9 @@
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
     <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
     <PackageVersion Include="WinUIEx" Version="2.8.0" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
@@ -120,8 +122,8 @@
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="MediatR" Version="13.0.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Polly.Core" Version="8.6.3" />
+    <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.5" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.7" />
   </ItemGroup>
 </Project>

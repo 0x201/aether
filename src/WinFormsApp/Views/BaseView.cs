@@ -1,6 +1,4 @@
-﻿using ModernCSharp.WinFormsApp.Common;
-
-namespace ModernCSharp.WinFormsApp.Views;
+﻿namespace ModernCSharp.WinFormsApp.Views;
 
 public class BaseView : Form, IView
 {

@@ -8,9 +8,8 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="src/Workflow.API/Workflow.API.csproj" />
   <Project Path="src/Catalog.API/Catalog.API.csproj" />
-  <Project Path="src/Catalog.Domain/Catalog.Domain.csproj" Id="8270eef7-a0d6-4f4d-8cb7-5306b24d9ca3" />
+  <Project Path="src/Catalog.Domain/Catalog.Domain.csproj" />
   <Project Path="src/EventBus/EventBus.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
@@ -20,13 +19,14 @@
     <Platform Solution="*|x86" Project="x86" />
   </Project>
   <Project Path="src/Identity.API/Identity.API.csproj" />
-  <Project Path="src/IntegrationEventLogEF/IntegrationEventLogEF.csproj" Id="752ffec7-857e-4c0e-b930-7cb590c85371" />
-  <Project Path="src/Inventory.Domain/Inventory.Domain.csproj" Id="57ca883b-48e9-4f32-9e9c-51919ecf8b9c" />
+  <Project Path="src/IntegrationEventLogEF/IntegrationEventLogEF.csproj" />
+  <Project Path="src/Inventory.Domain/Inventory.Domain.csproj" />
+  <Project Path="src/ModernCSharp.AppDefaults/ModernCSharp.AppDefaults.csproj" />
   <Project Path="src/ModernCSharp.AppHost/ModernCSharp.AppHost.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="src/ModernCSharp.DDD/ModernCSharp.DDD.csproj" Id="cf2247b3-6fc4-4a93-9bf3-4f906072f079" />
+  <Project Path="src/ModernCSharp.DDD/ModernCSharp.DDD.csproj" />
   <Project Path="src/ModernCSharp.ServiceDefaults/ModernCSharp.ServiceDefaults.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
@@ -80,6 +80,7 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
+  <Project Path="src/Workflow.API/Workflow.API.csproj" />
   <Project Path="test/ModernCSharp.Tests/ModernCSharp.Tests.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />

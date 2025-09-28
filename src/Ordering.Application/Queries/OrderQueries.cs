@@ -1,5 +1,4 @@
-﻿
-namespace ModernCSharp.Ordering.Application.Queries;
+﻿namespace ModernCSharp.Ordering.Application.Queries;
 
 public class OrderQueries(IOrderRepository orderRepository) : IOrderQueries
 {

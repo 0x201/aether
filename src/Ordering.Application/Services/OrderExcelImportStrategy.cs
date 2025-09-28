@@ -1,34 +1,15 @@
-﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
+﻿using ModernCSharp.Shared.FileServices.Abstraction;
+using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.Ordering.Application.Services;
 
 public class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger)
-    : FileImportStrategyBase<Order>(FileType.OrderExcel)
+    : BaseOrderFileImportStrategy(logger, FileType.OrderExcel)
 {
-    public override async Task<ImportResult<Order>> ImportAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var orders = await PerformImportAsync(cancellationToken);
-            return ImportResult<Order>.Success(orders);
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogError("Import {FileType} operation  was cancelled.", _context!.FileType);
-            return ImportResult<Order>.Failure([$"Import {_context.FileType} operation  was cancelled."]);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while importing orders from {@InputPath}.", _context!.InputPath);
-            return ImportResult<Order>.Failure([$"An error occurred while importing orders from {_context.InputPath}."]);
-        }
-    }
-
-    private Task<List<Order>> PerformImportAsync(CancellationToken cancellationToken = default)
+    protected override Task<List<Order>> PerformImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        using var stream = new FileStream(_context!.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var stream = new FileStream(context.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var wb = new XLWorkbook(stream);
         var ws = wb.Worksheet(1);
 

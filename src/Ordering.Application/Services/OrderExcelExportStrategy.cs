@@ -1,37 +1,14 @@
-﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
+﻿using ModernCSharp.Shared.FileServices.Abstraction;
+using Order = ModernCSharp.Ordering.Application.Queries.Order;
 
 namespace ModernCSharp.Ordering.Application.Services;
 
-public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) : FileExportStrategyBase<Order>(FileType.OrderExcel)
+public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) 
+    : BaseOrderFileExportStrategy<Order>(logger, FileType.OrderExcel)
 {
-    public override async Task<Result> ExportAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            await PerformExportAsync(cancellationToken);
-            return Result.Success();
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogError("Export {FileType} operation  was cancelled.", _context!.FileType);
-            return Result.Failure([$"Export {_context.FileType} operation  was cancelled."]);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while exporting orders to {@OutputPath}.", _context!.OutputPath);
-            return Result.Failure([$"An error occurred while exporting orders to {_context.OutputPath}."]);
-        }
-    }
-
-    private Task PerformExportAsync(CancellationToken cancellationToken = default)
+    protected override Task PerformExportAsync(IFileExportContext<Order> context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!_context!.DataToExport.Any())
-        {
-            logger.LogInformation("No order to export.");
-            return Task.CompletedTask;
-        }
 
         using var wb = new XLWorkbook();
         var ws = wb.AddWorksheet("Worksheet 1");
@@ -47,7 +24,7 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) 
         }
 
         var contentRowIndex = 2;
-        foreach (var order in _context.DataToExport)
+        foreach (var order in context.DataToExport)
         {
             var currentRow = ws.Row(contentRowIndex);
             currentRow.Cell("A").SetValue(order.ordernumber);
@@ -60,7 +37,7 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) 
             contentRowIndex++;
         }
 
-        wb.SaveAs(_context.OutputPath);
+        wb.SaveAs(context.OutputPath);
 
         return Task.CompletedTask;
     }

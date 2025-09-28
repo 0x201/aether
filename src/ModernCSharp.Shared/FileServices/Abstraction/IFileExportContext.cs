@@ -11,7 +11,7 @@ public interface IFileExportContext<T>
         get; set;
     }
 
-    IEnumerable<T> DataToExport
+    IReadOnlyCollection<T> DataToExport
     {
         get;
     }

@@ -8,7 +8,7 @@ public class ExportOrderCommandHandler(IFileExportStrategyFactory<Order> fileExp
 {
     public Task<Result> Handle(ExportOrderCommand request, CancellationToken cancellationToken)
     {
-        var strategy = fileExportStrategyFactory.GetStrategy(request.ExportContext);
-        return strategy.ExportAsync(cancellationToken);
+        var strategy = fileExportStrategyFactory.GetStrategy(request.ExportContext.FileType);
+        return strategy.ExportAsync(request.ExportContext, cancellationToken);
     }
 }

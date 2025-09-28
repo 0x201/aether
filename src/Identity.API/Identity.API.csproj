@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>ModernCSharp.Identity.API</RootNamespace>
     <UserSecretsId>354e4c73-3f84-497e-89b2-cd7d484afa27</UserSecretsId>
   </PropertyGroup>

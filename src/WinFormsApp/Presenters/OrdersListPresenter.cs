@@ -1,17 +1,4 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.DependencyInjection;
-
-using ModernCSharp.Ordering.Application.Commands;
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.Shared.FileServices;
-using ModernCSharp.Shared.FileServices.Export;
-using ModernCSharp.WinFormsApp.Common;
-using ModernCSharp.WinFormsApp.Enums;
-using ModernCSharp.WinFormsApp.Models;
-using ModernCSharp.WinFormsApp.Views;
-
-namespace ModernCSharp.WinFormsApp.Presenters;
+﻿namespace ModernCSharp.WinFormsApp.Presenters;
 
 public class OrdersListPresenter(
     IOrderListView view,

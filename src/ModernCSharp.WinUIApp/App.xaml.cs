@@ -33,7 +33,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         var builder = Microsoft.Extensions.Hosting.Host
             .CreateApplicationBuilder();
 
-        builder.AddApplicationServices();
+        builder.AddOrderingApplicationServices();
 
         ConfigureServices(builder);
 

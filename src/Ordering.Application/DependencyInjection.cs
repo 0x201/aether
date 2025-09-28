@@ -9,7 +9,7 @@ namespace ModernCSharp.Ordering.Application;
 
 public static class DependencyInjection
 {
-    public static void AddApplicationServices(this IHostApplicationBuilder builder)
+    public static void AddOrderingApplicationServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddAutoMapper(config => 
         {

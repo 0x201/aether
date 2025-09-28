@@ -8,7 +8,7 @@ public class ImportOrderCommandHandler(IFileImportStrategyFactory<Order> fileImp
 {
     public Task<ImportResult<Order>> Handle(ImportOrderCommand request, CancellationToken cancellationToken)
     {
-        var strategy = fileImportStrategyFactory.GetStrategy(request.ImportContext);
-        return strategy.ImportAsync(cancellationToken);
+        var strategy = fileImportStrategyFactory.GetStrategy(request.ImportContext.FileType);
+        return strategy.ImportAsync(request.ImportContext, cancellationToken);
     }
 }

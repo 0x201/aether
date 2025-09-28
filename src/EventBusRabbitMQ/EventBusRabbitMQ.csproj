@@ -1,25 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <IsAotCompatible>true</IsAotCompatible>
-        <RootNamespace>ModernCSharp.EventBusRabbitMQ</RootNamespace>
-        <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
-        <Platforms>AnyCPU;x64;x86</Platforms>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>ModernCSharp.EventBusRabbitMQ</RootNamespace>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <Compile Include="..\Shared\ActivityExtensions.cs" Link="ActivityExtensions.cs" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\ActivityExtensions.cs" Link="ActivityExtensions.cs" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Aspire.RabbitMQ.Client" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
-        <PackageReference Include="Polly.Core" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.RabbitMQ.Client" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\EventBus\EventBus.csproj" />
-    </ItemGroup>
-    
+  <ItemGroup>
+    <ProjectReference Include="..\EventBus\EventBus.csproj" />
+  </ItemGroup>
+
 </Project>

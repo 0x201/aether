@@ -1,16 +1,14 @@
 ﻿namespace ModernCSharp.Shared.FileServices.Export;
 
-public class FileExportStrategyFactory<T>(IEnumerable<IFileExportStrategy<T>> strategies)
-    : FileStrategyFactoryBase<IFileExportStrategy<T>, IFileExportContext<T>>(strategies),
-      IFileExportStrategyFactory<T>
+public class FileExportStrategyFactory<T>(IEnumerable<IFileExportStrategy<T>> strategies) : IFileExportStrategyFactory<T>
 {
-    protected override bool CanHandle(IFileExportStrategy<T> strategy, IFileExportContext<T> context) =>
-        strategy.CanExport(context.FileType);
+    private readonly IEnumerable<IFileExportStrategy<T>> _strategies = strategies ?? throw new ArgumentNullException(nameof(strategies));
 
-    public override IFileExportStrategy<T> GetStrategy(IFileExportContext<T> context)
+    public IFileExportStrategy<T> GetStrategy(FileType fileType)
     {
-        var strategy = base.GetStrategy(context);
-        strategy.Initialize(context);
+        var strategy = _strategies.FirstOrDefault(s => s.CanExport(fileType))
+            ?? throw new NotSupportedException($"No export strategy found for file type: {fileType}");
+
         return strategy;
     }
 }

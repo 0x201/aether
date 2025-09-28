@@ -1,9 +1,5 @@
 ﻿using System.ComponentModel;
 
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.WinFormsApp.Enums;
-using ModernCSharp.WinFormsApp.Models;
-
 namespace ModernCSharp.WinFormsApp.Views;
 
 public partial class OrderListView : BaseView, IOrderListView
@@ -185,7 +181,6 @@ public partial class OrderListView : BaseView, IOrderListView
         {
             var filterText = FilterTextBox.Text.ToLower();
 
-            // 对 BindingList 进行过滤
             var filteredData = new BindingList<Order>(
             [
                 .. Orders.Where(o =>

@@ -1,7 +1,4 @@
-﻿using ModernCSharp.WinFormsApp.Enums;
-using ModernCSharp.WinFormsApp.Models;
-
-namespace ModernCSharp.WinFormsApp.Views;
+﻿namespace ModernCSharp.WinFormsApp.Views;
 
 public partial class ImportOrdersView : BaseView, IImportView
 {

@@ -2,5 +2,5 @@
 
 public interface IFileExportStrategyFactory<T>
 {
-    IFileExportStrategy<T> GetStrategy(IFileExportContext<T> context);
+    IFileExportStrategy<T> GetStrategy(FileType fileType);
 }
