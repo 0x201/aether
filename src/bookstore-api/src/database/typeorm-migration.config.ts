@@ -1,40 +1,35 @@
-import { config } from 'dotenv';
-import { resolve } from 'path';
+import { load } from 'js-yaml'; 
 import { DataSource } from 'typeorm';
+import { AppConfig } from '../config/configuration';
+import { resolve } from 'path';
+import { readFileSync } from 'fs';
 
-const envPath = {
+const configPath = {
   path: resolve(
     __dirname,
-    process.env.NODE_ENV === 'Production'
-      ? '../../env/.env.production'
-      : '../../env/.env.development',
+    process.env.NODE_ENV !== 'Production'
+      ? '../../config/development.yaml'
+      : '../../config/production.yaml',
   ),
 };
 
-config(envPath);
+const configFile = readFileSync(configPath.path, "utf8");
+const config = load(configFile) as AppConfig;
+
+
 
 const dataSource = new DataSource({
   type: 'mssql',
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT) ?? 1433,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  logging: process.env.DB_LOGGING === 'true',
+  host: config.database.host,
+  port: config.database.port ?? 1433,
+  username: config.database.username,
+  password: config.database.password,
+  database: config.database.database,
+  logging: config.database.logging,
   entities: ['src/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*{.ts,.js}'],
-  synchronize: process.env.DB_SYNCHRONIZE === 'true',
-  options: {
-    encrypt: process.env.DB_ENCRYPT === 'true',
-    trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true', // Use this for development purposes
-  },
-  pool: {
-    max: parseInt(process.env.DB_POOL_MAX_SIZE) || 10,
-    min: parseInt(process.env.DB_POOL_MIN_SIZE) || 0,
-    idleTimeoutMillis: parseInt(process.env.DB_TIMEOUT) || 30000,
-  },
+  synchronize:config.database.synchronize,
+  options: config.database.options,
+  pool: config.database.pool,
 });
-
-console.log(dataSource.options);
-
 export default dataSource;

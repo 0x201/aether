@@ -92,13 +92,16 @@ export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCo
     await super.afterUpdate(queryRunner, command, entity);
   }
 
-  async getUserMenus(userId: number): Promise<Menu[]> {
+  async getUserMenus(userRoles: string[]): Promise<Menu[]> {
+    if (!userRoles || userRoles.length === 0) {
+      return [];
+    }
+
     const menus = await this.dataSource
       .createQueryBuilder(Menu, 'menu')
       .innerJoinAndSelect('menu.roleMenus', 'roleMenu')
       .innerJoinAndSelect('roleMenu.role', 'role')
-      .innerJoinAndSelect('role.userRoles', 'userRole')
-      .where('userRole.UserId = :userId', { userId })
+      .where('role.Name IN (:...roleNames)', { roleNames: userRoles })
       .andWhere('menu.IsActive = :isActive', { isActive: true })
       .orderBy('menu.Order', 'ASC')
       .getMany();

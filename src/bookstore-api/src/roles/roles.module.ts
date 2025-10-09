@@ -6,6 +6,7 @@ import { RolesService } from './roles.service';
 import { RolesController } from './roles.controller';
 import { RoleGuard } from './role.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Role]), SharedModule],

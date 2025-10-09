@@ -10,26 +10,19 @@ import { PagedResult } from '../models/paged-result.model';
 import { HttpClient } from '@angular/common/http';
 
 interface JwtPayload {
-  exp: number;
-  iat: number;
-  jti: string;
-  iss: string;
-  sub: string;
-  typ: string;
+  userId: string;
+  username: string;
+  email: string;
+  // Keycloak specific claims
   azp: string;
-  sid: string;
-  realm_access: {
+  realm_access?: {
     roles: string[];
   };
-  resource_access: {
-    [key: string]: {
+  resource_access?: {
+    [clientId: string]: {
       roles: string[];
     }
   };
-  scope: string;
-  name: string;
-  preferred_username: string;
-  email: string;
 }
 
 @Injectable({
@@ -70,6 +63,7 @@ export class UsersService {
 
   parseAccessToken(): JwtPayload | null {
     const token = this.keycloakService.token;
+    console.log('Token:', token);
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       return this.jwtHelper.decodeToken(token);
     }
@@ -78,21 +72,21 @@ export class UsersService {
 
   getCurrentUserId(): string | null {
     const token = this.parseAccessToken();
-    return token ? (token.sub || null) : null;
+    return token ? (token.userId || null) : null;
   }
 
   getCurrentUsername(): string | null {
     const token = this.parseAccessToken();
-    return token ? (token.preferred_username || null) : null;
+    return token ? (token.username || null) : null;
   }
 
   loadUserMenus(): Observable<Menu[]> {
     const userId = this.getCurrentUserId() || this.getCurrentUsername();
-
+    console.log('User ID:', userId);
     if (userId) {
-      this.menusService.getMenus(0, 100).subscribe({
+      this.menusService.getUserMenus().subscribe({
         next: (result) => {
-          this.userMenusSubject.next(result.items);
+          this.userMenusSubject.next(result);
         },
         error: (error) => {
           console.error('Error loading user menus:', error);
@@ -120,10 +114,22 @@ export class UsersService {
 
   getCurrentUserRoles(): string[] {
     const token = this.parseAccessToken();
-    if (token && token.realm_access && token.realm_access.roles) {
-      return token.realm_access.roles;
+    if (!token) {
+      return [];
     }
-    return [];
+
+    // Extract roles from resource_access using the azp (authorized party) claim as client ID
+    let roles: string[] = [];
+    const clientId = token.azp;
+
+    if (clientId && token.resource_access && token.resource_access[clientId]) {
+      roles = token.resource_access[clientId].roles || [];
+    } else if (token.realm_access) {
+      // Fallback to realm_access if resource_access is not available
+      roles = token.realm_access.roles || [];
+    }
+
+    return roles;
   }
 
   getUsers(page: number = 0, pageSize: number = 10): Observable<PagedResult<User>> {

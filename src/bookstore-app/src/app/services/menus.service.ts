@@ -92,6 +92,10 @@ export class MenusService {
       );
   }
 
+  getUserMenus(): Observable<Menu[]> {
+    return this.http.get<Menu[]>(`${this.baseUrl}/user`);
+  }
+
   updateMenu(id: number, menu: Partial<Menu>): Observable<Menu> {
     return this.http.put<Menu>(`${this.baseUrl}/${id}`, menu)
       .pipe(

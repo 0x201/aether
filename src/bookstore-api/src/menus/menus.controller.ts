@@ -45,7 +45,7 @@ export class MenusController {
     type: [MenuDto],
   })
   async getUserMenus(@CurrentUser() user: UserPayload): Promise<MenuDto[]> {
-    const menus = await this.menusService.getUserMenus(Number(user.sub));
+    const menus = await this.menusService.getUserMenus(user.roles);
     return menus.map((menu) => Menu.mapToDto(menu));
   }
 

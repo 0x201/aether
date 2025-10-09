@@ -6,9 +6,10 @@ import { Menu } from './entities/menu.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { SharedModule } from 'src/shared/shared.module';
 import { RolesModule } from 'src/roles/roles.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Menu]), JwtModule, RolesModule, SharedModule],
+  imports: [TypeOrmModule.forFeature([Menu]), AuthModule, JwtModule, RolesModule, SharedModule],
   providers: [MenusService],
   controllers: [MenusController],
   exports: [MenusService],

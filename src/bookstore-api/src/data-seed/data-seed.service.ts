@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateBookCommand } from '../books/commands/create-book.command';
 import { BooksService } from '../books/books.service';
 import { AuthorsService } from '../authors/authors.service';
-import { UsersService } from '../users/users.service';
 import { RolesService } from '../roles/roles.service';
 import { MenusService } from '../menus/menus.service';
 import { CreateMenuCommand } from 'src/menus/commands/create-menu.command';
@@ -69,14 +68,13 @@ export class DataSeedService {
   ];
 
   constructor(
-    private readonly usersServie: UsersService,
     private readonly rolesService: RolesService,
     private readonly booksService: BooksService,
     private readonly authorsService: AuthorsService,
     private readonly menusService: MenusService,
   ) { }
 
-  private async setupBooksAndAuthors(): Promise<void> {
+  private async seedBooksAndAuthors(): Promise<void> {
     try {
       const [authorCount, bookCount] = await Promise.all([
         this.authorsService.count(),
@@ -104,11 +102,8 @@ export class DataSeedService {
     }
   }
 
-  private async setupUsersAndRoles() {
-    const [roleCount, userCount] = await Promise.all([
-      this.rolesService.count(),
-      this.usersServie.count(),
-    ]);
+  private async seedRoles() {
+    const roleCount = await this.rolesService.count();
     if (roleCount > 0) {
       this.logger.log('Role is already setup, Skip seeding');
     } else {
@@ -120,23 +115,9 @@ export class DataSeedService {
       ]);
       this.logger.log('Seeding role data - End');
     }
-
-    if (userCount > 0) {
-      this.logger.log('User is already setup, Skip seeding');
-      return;
-    } else {
-      this.logger.log('Seeding user data - Start');
-      await this.usersServie.insert({
-        username: 'admin',
-        password: '1q2w3E!',
-        nickname: 'admin',
-        roles: [{ id: 1, name: "admin" }],
-      });
-      this.logger.log('Seeding user data - End');
-    }
   }
 
-  private async setupMenus() {
+  private async seedMenus() {
     const menuCount = await this.menusService.count();
     if (menuCount > 0) {
       this.logger.log('Menus are already setup, Skip seeding');
@@ -186,15 +167,6 @@ export class DataSeedService {
         parentId: 0,
         roles: adminRole ? [adminRole] : [],
       },
-      {
-        name: 'user_management',
-        title: 'User Management',
-        icon: 'manage_accounts',
-        route: '/users/management',
-        order: 5,
-        parentId: 0,
-        roles: adminRole ? [adminRole] : [],
-      },
     ];
 
     await this.menusService.insertMany(menus);
@@ -205,9 +177,9 @@ export class DataSeedService {
   async seedAsync() {
     this.logger.log('Starting data seeding...');
     try {
-      await this.setupBooksAndAuthors();
-      await this.setupUsersAndRoles();
-      await this.setupMenus();
+      await this.seedBooksAndAuthors();
+      await this.seedRoles();
+      await this.seedMenus();
       this.logger.log('Data seeding completed successfully.');
     } catch (error) {
       this.logger.error('Error during data seeding:', error);

@@ -32,13 +32,6 @@ export class RolesService extends GenericCrudAuditableService<Role, CreateRoleCo
     });
   }
 
-  async findByUserId(userId: number): Promise<Role[]> {
-    return await this.roleRepository.createQueryBuilder('role')
-      .innerJoin('UserRole', 'userRole', 'role.id = userRole.RoleId')
-      .where('userRole.UserId = :userId', { userId })
-      .getMany();
-  }
-
   async findOneByName(name: string): Promise<Role> {
     return this.roleRepository.findOne({ where: { name: name } });
   }

@@ -34,3 +34,5 @@ pnpm-debug.log*
 
 # local env files
 *.local
+
+local.yaml

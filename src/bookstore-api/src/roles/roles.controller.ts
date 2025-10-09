@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -27,7 +28,9 @@ import { PagedResult } from 'src/common/response/ListResultResponse';
 import { RoleQuery } from './queries/role.query';
 import { Roles } from './role.decorator';
 import { RoleEnum } from './role.enum';
+import { RoleGuard } from './role.guard';
 
+@UseGuards(RoleGuard)
 @Roles(RoleEnum.Admin)
 @ApiTags('Roles')
 @Controller('roles')

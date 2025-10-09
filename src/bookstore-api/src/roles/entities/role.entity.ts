@@ -1,6 +1,5 @@
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
-import { UserRole } from '../../users/entities/user-role.entity';
 import { RoleMenu } from '../../menus/entities/role-menu.entity';
 import { RoleDto } from '../dtos/role.dto';
 
@@ -15,12 +14,6 @@ export class Role extends BaseAuditableEntity {
 
   @Column({ name: 'IsActive', default: true })
   isActive: boolean;
-
-
-  @OneToMany(() => UserRole, userRole => userRole.role, {
-    createForeignKeyConstraints: false
-  })
-  userRoles: UserRole[];
 
   @OneToMany(() => RoleMenu, roleMenu => roleMenu.role, {
     createForeignKeyConstraints: false

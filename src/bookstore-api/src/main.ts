@@ -10,65 +10,38 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { apiReference } from '@scalar/nestjs-api-reference';
 
-function useSwaggerModule(app: INestApplication, endpoint: string) {
+function useSwaggerModule(app: INestApplication, configService: ConfigService) {
   const openApi = new DocumentBuilder()
     .setTitle('Bookstore Api')
-    .setDescription('The bookstore api swagger ui.')
+    .setDescription('The bookstore api Scalar UI')
     .setVersion('1.0')
     .addTag('Bookstore-api')
-    .addOAuth2({
-      type: 'oauth2',
-      flows: {
-        password: {
-          tokenUrl: `${endpoint}/api/auth/token`,
-          authorizationUrl: `${endpoint}/api/auth/token`,
-          refreshUrl: `${endpoint}/api/auth/refresh-token`,
-          scopes: {
-            openid: 'openid',
-            profile: 'profile',
-            email: 'email',
-            roles: 'roles',
-            permissions: 'permissions',
-          },
-        },
-      },
-    })
-    .addBearerAuth()
+    .addOAuth2()
     .build();
 
   const document = SwaggerModule.createDocument(app, openApi);
-  SwaggerModule.setup('docs', app, document, {
-    swaggerOptions: {
-      docExpansion: 'none',
-      initOAuth: {
-        clientId: 'bookstore-api-client',
-        clientSecret: 'bookstore-api-secret',
-        scopes: ['openid', 'profile', 'email', 'roles', 'permissions'],
-        appName: 'Bookstore Api',
-      },
-    },
-  });
 
   app.use(
     '/scalar',
     apiReference({
-      spec: {
-        content: document,
-      },
+      content: document,
       authentication: {
         preferredSecurityScheme: 'oauth2',
-      },
+        securitySchemes: {
+          oauth2: {
+            flows: {
+              authorizationCode: {
+                'x-scalar-client-id': `${configService.get<string>('keycloak.clientId')}`,
+                clientSecret: `${configService.get<string>('keycloak.clientSecret')}`,
+                authorizationUrl: `${configService.get<string>('keycloak.authServerUrl')}/realms/${configService.get<string>('keycloak.realm')}/protocol/openid-connect/auth`,
+                tokenUrl: `${configService.get<string>('keycloak.authServerUrl')}/realms/${configService.get<string>('keycloak.realm')}/protocol/openid-connect/token`,
+              },
+            },
+          }
+        }
+      }
     }),
   );
-}
-
-function useCors(app: INestApplication) {
-  const configService = app.get(ConfigService);
-
-  app.enableCors({
-    origin: configService.get('CORS_ALLOW_ORIGINS'),
-    credentials: true,
-  });
 }
 
 async function bootstrap() {
@@ -83,12 +56,10 @@ async function bootstrap() {
   const logger = new Logger(app.constructor.name)
 
   const configService = app.get(ConfigService);
-  const endpoint = configService.get<string>('HTTP_ENDPOINT');
-  const port = configService.get<string>('PORT') || 3000;
+  const port = configService.get<number>('PORT') || 3000;
 
   app.setGlobalPrefix('/api', { exclude: ['/health'] });
-  useCors(app);
-  useSwaggerModule(app, endpoint);
+  useSwaggerModule(app, configService);
 
   await app.listen(port);
   logger.log(`Application is running on: ${await app.getUrl()}`);

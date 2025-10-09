@@ -1,8 +1,7 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RoleEnum } from './role.enum';
 import { ROLES_KEY } from './role.decorator';
-import { RoleDto } from './dtos/role.dto';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -13,13 +12,26 @@ export class RoleGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-
-    if (!requiredRoles) {
+    if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    if (!user) {
+      return false;
+    }
 
-    return requiredRoles.some((role) => user.roles?.some((r: RoleDto) => r.name === role));
+    const userRoles = user.roles || [];
+    const hasRole = requiredRoles.some((role) => 
+      userRoles.includes(role) || 
+      userRoles.includes(Object.values(RoleEnum).find(enumRole => enumRole === role))
+    );
+
+    if (!hasRole) {
+      throw new ForbiddenException('Insufficient permissions');
+    }
+
+    return true;
   }
 }

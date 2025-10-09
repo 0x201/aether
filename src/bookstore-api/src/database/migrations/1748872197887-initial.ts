@@ -16,30 +16,6 @@ export class Initial1748872197887 implements MigrationInterface {
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_ROLE_NAME" ON "Roles" ("Name") `,
     );
-    await queryRunner.query(`CREATE TABLE "UserRole" (
-            "Id" int NOT NULL IDENTITY(1,1),
-            "UserId" int NOT NULL,
-            "RoleId" int NOT NULL,
-            "AssignedAt" datetime CONSTRAINT "DF_UserRole_AssignedAt_Default" DEFAULT GETDATE(),
-            "AssignedBy" nvarchar(200),
-            CONSTRAINT "PK_UserRole_Id" PRIMARY KEY ("Id"))`);
-    await queryRunner.query(
-      `CREATE UNIQUE INDEX "IDX_UserRole_UserId_RoleId" ON "UserRole" ("RoleId", "UserId") `,
-    );
-    await queryRunner.query(`CREATE TABLE "Users" (
-            "Id" int NOT NULL IDENTITY(1,1),
-            "Username" varchar(200) NOT NULL,
-            "Password" varchar(200) NOT NULL,
-            "Nickname" varchar(200),
-            "IsActive" bit NOT NULL CONSTRAINT "DF_Users_IsActive_Default" DEFAULT 1,
-            "CreatedTime" datetime NOT NULL CONSTRAINT "DF_Users_CreatedTime_Default" DEFAULT GETDATE(),
-            "CreatedBy" nvarchar(200) NOT NULL CONSTRAINT "DF_Users_CreatedBy_Default" DEFAULT '',
-            "LastModifiedTime" datetime CONSTRAINT "DF_Users_LastModifiedTime_Default" DEFAULT GETDATE(),
-            "LastModifiedBy" nvarchar(200), 
-            CONSTRAINT "PK_Users_Id" PRIMARY KEY ("Id"))`);
-    await queryRunner.query(
-      `CREATE UNIQUE INDEX "IDX_USER_USERNAME" ON "Users" ("Username") `,
-    );
     await queryRunner.query(`CREATE TABLE "Books" (
             "Id" int NOT NULL IDENTITY(1,1),
             "Title" varchar(512) NOT NULL,
@@ -117,12 +93,6 @@ export class Initial1748872197887 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "IDX_BOOK_TITLE" ON "Books"`);
     await queryRunner.query(`DROP INDEX "IDX_BOOK_ISBN" ON "Books"`);
     await queryRunner.query(`DROP TABLE "Books"`);
-
-    await queryRunner.query(`DROP INDEX "IDX_USER_USERNAME" ON "Users"`);
-    await queryRunner.query(`DROP TABLE "Users"`);
-
-    await queryRunner.query(`DROP INDEX "IDX_UserRole_UserId_RoleId" ON "UserRole"`);
-    await queryRunner.query(`DROP TABLE "UserRole"`);
 
     await queryRunner.query(`DROP INDEX "IDX_ROLE_NAME" ON "Roles"`);
     await queryRunner.query(`DROP TABLE "Roles"`);

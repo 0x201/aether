@@ -5,8 +5,6 @@ import { Author } from '../authors/entities/author.entity';
 import { Book } from '../books/entities/book.entity';
 import { BookAuthor } from '../books/entities/book-author.entity';
 import { Role } from '../roles/entities/role.entity';
-import { User } from '../users/entities/user.entity';
-import { UserRole } from '../users/entities/user-role.entity';
 import { SharedModule } from 'src/shared/shared.module';
 import { Menu } from '../menus/entities/menu.entity';
 import { RoleMenu } from 'src/menus/entities/role-menu.entity';
@@ -26,7 +24,7 @@ import { RoleMenu } from 'src/menus/entities/role-menu.entity';
           port: configService.get('database.port'),
           password: configService.get('database.password'),
           database: configService.get('database.database'),
-          entities: [Author, Book, BookAuthor, Role, User, UserRole, Menu, RoleMenu],
+          entities: [Author, Book, BookAuthor, Role, Menu, RoleMenu],
           pool: configService.get('database.pool'),
           options: configService.get('database.options'),
           synchronize: configService.get('database.synchronize'),

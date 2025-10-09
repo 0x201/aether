@@ -17,7 +17,7 @@ import {
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { GrpcInstrumentation } from '@opentelemetry/instrumentation-grpc';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { OtelConfig } from '../otel.config';
+import { OtelConfig } from '../../config/otel.config';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class TracingService implements OnModuleInit, OnApplicationShutdown {
   private readonly otelConfig: OtelConfig;
 
   constructor(private configService: ConfigService) {
-    this.otelConfig = this.configService.get<OtelConfig>('otelConfig');
+    this.otelConfig = this.configService.get<OtelConfig>('otel');
 
     this.logger.log(
       `Initializing OpenTelemetry with OTLP endpoint: ${this.otelConfig.otelServer}`,

@@ -32,10 +32,13 @@ export function jwtOptionsFactory(configService: ConfigService) {
   };
 }
 
-const urlCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
-  urlPattern: /^(http:\/\/localhost:3011)(\/.*)?$/i,
-  bearerPrefix: 'Bearer',
-});
+function getUrlCondition(configService: ConfigService): IncludeBearerTokenCondition {
+  const apiEndpoint = configService.getApiEndpoint();
+  return createInterceptorCondition<IncludeBearerTokenCondition>({
+    urlPattern: /^(apiEndpoint)(\/.*)?$/i,
+    bearerPrefix: 'Bearer',
+  });
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -43,7 +46,7 @@ export const appConfig: ApplicationConfig = {
       config: {
         url: 'http://localhost:8080',
         realm: 'moderncsharp',
-        clientId: 'bookstore-app',
+        clientId: 'bookstoreapp',
       },
       initOptions: {
         onLoad: 'check-sso',
@@ -59,7 +62,8 @@ export const appConfig: ApplicationConfig = {
     }),
     {
       provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-      useValue: [urlCondition]
+      useValue: [getUrlCondition],
+      deps: [ConfigService],
     },
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),

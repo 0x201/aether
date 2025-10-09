@@ -6,23 +6,17 @@ import {
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
-import { JwtConfig } from './jwt.config';
+import { KeycloakStrategy } from './keycloak.strategy';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   private readonly logger = new Logger(AuthGuard.name);
-  private readonly jwtConfig: JwtConfig;
+
   constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService,
     private reflector: Reflector,
-  ) {
-    this.jwtConfig = this.configService.get<JwtConfig>('jwtConfig');
-  }
+    private keycloakStrategy: KeycloakStrategy,
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isAllowAnonymous = this.reflector.getAllAndOverride<boolean>(
@@ -35,29 +29,57 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      this.logger.error('No token found in the request headers.');
-      throw new UnauthorizedException();
-    }
+
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.jwtConfig.secret,
+      // Check if Keycloak has already processed the request
+      if (request.kauth && request.kauth.grant) {
+        this.extractUserFromGrant(request);
+        return true;
+      }
+
+      // If not processed, use Keycloak's protect middleware
+      const isAuthenticated = await new Promise<boolean>((resolve) => {
+        this.keycloakStrategy.getKeycloakInstance().protect()(request, null, (nextResult) => {
+          resolve(!nextResult);
+        });
       });
-      request['user'] = payload;
-    } catch (error) {
-      this.logger.error(
-        'An error occurred while verifying the JWT token.',
-        error,
-      );
-      throw new UnauthorizedException();
+
+      if (isAuthenticated) {
+        // After authentication, check for Keycloak data again
+        if (request.kauth && request.kauth.grant) {
+          this.extractUserFromGrant(request);
+        }
+        return true;
+      }
+    } catch (keycloakError) {
+      this.logger.debug('Keycloak authentication failed', keycloakError);
     }
-    return true;
+
+    this.logger.error('Authentication failed: No valid Keycloak token found.');
+    throw new UnauthorizedException();
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  private extractUserFromGrant(request: any): void {
+    const grant = request.kauth.grant;
+    const accessToken = grant.access_token.content;
+    
+    // Extract roles from resource_access using the azp (authorized party) claim as client ID
+    let roles: string[] = [];
+    const clientId = accessToken.azp;
+    
+    if (clientId && accessToken.resource_access && accessToken.resource_access[clientId]) {
+      roles = accessToken.resource_access[clientId].roles || [];
+    } else if (accessToken.realm_access) {
+      // Fallback to realm_access if resource_access is not available
+      roles = accessToken.realm_access.roles || [];
+    }
+    
+    request['user'] = {
+      sub: accessToken.sub,
+      username: accessToken.preferred_username,
+      email: accessToken.email,
+      roles: roles,
+    };
   }
 }
 

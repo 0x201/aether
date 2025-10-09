@@ -18,7 +18,7 @@ import { Role } from './models/role.model';
 import { RecursiveMenu } from './menus/menu-item/recursive-menu';
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { UsersService } from './services/users.service';
-import keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 
 interface MenuNode {
   id: number;
@@ -66,7 +66,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   
   menuTreeData: MenuNode[] = [];
 
-  private keycloakService = inject(keycloak);
+  private keycloakService = inject(Keycloak);
   private userService = inject(UsersService);
 
   constructor(
@@ -101,12 +101,32 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   private loadMenusFromToken(): void {
     this.userService.loadUserMenus().subscribe(menus => {
       this.menus = menus;
-      const userRoles = this.userService.getCurrentUserRoles();
+      const userRoles = this.extractUserRolesFromToken();
       // Convert roles to Role[] format
       const roles: Role[] = userRoles.map(roleName => ({ id: 0, name: roleName } as Role));
       this.menuTreeData = this.buildTreeMenuData(this.menus, roles);
       this.cdRef.detectChanges();
     });
+  }
+  
+  private extractUserRolesFromToken(): string[] {
+    const accessToken = this.keycloakService.tokenParsed;
+    if (!accessToken) {
+      return [];
+    }
+
+    // Extract roles from resource_access using the azp (authorized party) claim as client ID
+    let roles: string[] = [];
+    const clientId = accessToken.azp;
+
+    if (clientId && accessToken.resource_access && accessToken.resource_access[clientId]) {
+      roles = accessToken.resource_access[clientId].roles || [];
+    } else if (accessToken.realm_access) {
+      // Fallback to realm_access if resource_access is not available
+      roles = accessToken.realm_access.roles || [];
+    }
+
+    return roles;
   }
   
   private buildTreeMenuData(menus: Menu[], roles: Role[]): MenuNode[] {

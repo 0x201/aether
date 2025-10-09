@@ -4,9 +4,8 @@ import { REQUEST } from '@nestjs/core';
 export interface UserPayload {
   sub: string;
   username: string;
-  nickname: string;
+  email: string;
   roles: string[];
-  permissions: string[];
 }
 
 @Injectable({ scope: Scope.REQUEST })
@@ -23,9 +22,5 @@ export class UserContextService {
 
   getRoles(): string[] {
     return (this.request as any).user?.roles || [];
-  }
-
-  getPermissions(): string[] {
-    return (this.request as any).user?.permissions || [];
   }
 }
