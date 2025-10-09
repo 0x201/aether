@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.5.0</AspireVersion>
+    <AspireVersion>9.5.1</AspireVersion>
     <AspnetVersion>10.0.0-rc.1.25451.107</AspnetVersion>
     <!--<AspnetVersion>9.0.9</AspnetVersion>-->
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
@@ -124,6 +124,6 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.7" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.10" />
   </ItemGroup>
 </Project>
