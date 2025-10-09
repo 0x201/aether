@@ -118,19 +118,19 @@ internal static class OpenApiOptionsExtensions
                 return Task.CompletedTask;
             }
 
-            operation.Responses ??= new OpenApiResponses();
+            operation.Responses ??= [];
             operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
             operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
 
             var oAuthScheme = new OpenApiSecuritySchemeReference("oauth2", null);
 
-            operation.Security = new List<OpenApiSecurityRequirement>
-            {
+            operation.Security =
+            [
                 new()
                 {
                     [oAuthScheme] = scopes.ToList()
                 }
-            };
+            ];
 
             return Task.CompletedTask;
         });

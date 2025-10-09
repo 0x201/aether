@@ -1,13 +1,13 @@
-namespace Workflow.API.Services;
+﻿namespace Workflow.API.Services;
 
 public class TaskScheduler : ITaskScheduler, IHostedService
 {
     private readonly ILogger<TaskScheduler> _logger;
     private readonly INodeExecutor _nodeExecutor;
-    private readonly List<WorkflowTask> _scheduledTasks = new();
-    private readonly Dictionary<string, TaskState> _taskStates = new();
-    private readonly Dictionary<string, DateTime> _nextRunTimes = new();
-    private readonly object _lockObject = new object();
+    private readonly List<WorkflowTask> _scheduledTasks = [];
+    private readonly Dictionary<string, TaskState> _taskStates = [];
+    private readonly Dictionary<string, DateTime> _nextRunTimes = [];
+    private readonly Lock _lock = new();
     private Timer? _schedulerTimer;
     private bool _isRunning = false;
 
@@ -19,7 +19,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             if (!_isRunning)
             {
@@ -33,7 +33,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             if (_isRunning)
             {
@@ -48,7 +48,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
     public Task ScheduleTaskAsync(WorkflowTask task)
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             if (!_scheduledTasks.Any(t => t.Id == task.Id))
             {
@@ -63,7 +63,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
     public Task<bool> CancelTaskAsync(string taskId)
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             var task = _scheduledTasks.FirstOrDefault(t => t.Id == taskId);
             if (task != null)
@@ -80,7 +80,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
     public Task<TaskState> GetTaskStateAsync(string taskId)
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             if (_taskStates.TryGetValue(taskId, out var state))
             {
@@ -91,7 +91,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
     }
     public Task<IEnumerable<WorkflowTask>> GetPendingTasksAsync()
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             var pendingTasks = _scheduledTasks
                 .Where(t => _taskStates[t.Id] == TaskState.Scheduled || _taskStates[t.Id] == TaskState.Queued)
@@ -102,7 +102,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
     public Task<IEnumerable<WorkflowTask>> GetRunningTasksAsync()
     {
-        lock (_lockObject)
+        using (_lock.EnterScope())
         {
             var runningTasks = _scheduledTasks
                 .Where(t => _taskStates[t.Id] == TaskState.Running)
@@ -127,9 +127,9 @@ public class TaskScheduler : ITaskScheduler, IHostedService
     {
         try
         {
-            List<WorkflowTask> tasksToExecute = new();
-            
-            lock (_lockObject)
+            List<WorkflowTask> tasksToExecute = [];
+
+            using (_lock.EnterScope())
             {
                 if (!_isRunning) return;
 
@@ -154,7 +154,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
     {
         try
         {
-            lock (_lockObject)
+            using (_lock.EnterScope())
             {
                 _taskStates[task.Id] = TaskState.Running;
             }
@@ -164,7 +164,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
 
             var result = await _nodeExecutor.ExecuteNodeAsync(task.Type, null);
 
-            lock (_lockObject)
+            using (_lock.EnterScope())
             {
                 task.EndTime = DateTime.UtcNow;
                 _taskStates[task.Id] = TaskState.Success;
@@ -173,7 +173,7 @@ public class TaskScheduler : ITaskScheduler, IHostedService
         }
         catch (Exception ex)
         {
-            lock (_lockObject)
+            lock (_lock)
             {
                 task.EndTime = DateTime.UtcNow;
                 _taskStates[task.Id] = TaskState.Failed;

@@ -6,7 +6,6 @@
 		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" />
 		<PackageReference Include="ClosedXML" />
 		<PackageReference Include="CsvHelper" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />

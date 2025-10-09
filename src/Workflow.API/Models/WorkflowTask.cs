@@ -1,4 +1,4 @@
-namespace Workflow.API.Models;
+﻿namespace Workflow.API.Models;
 
 /// <summary>
 /// 工作流任务模型，参考Apache Airflow的任务概念
@@ -36,7 +36,7 @@ public class WorkflowTask
     /// <summary>
     /// 依赖的任务ID列表（上游任务）
     /// </summary>
-    public List<string> Dependencies { get; set; } = new();
+    public List<string> Dependencies { get; set; } = [];
 
     /// <summary>
     /// 任务状态

@@ -47,7 +47,7 @@ public class ImportOrderPresenter(
         }
     }
 
-    private async Task<ImportResult<Order>> Import(string filePath)
+    private async Task<ImportResult<OrderDto>> Import(string filePath)
     {
         var extension = Path.GetExtension(filePath);
         var fileType = FileIoUtils.MapToFileType(extension);

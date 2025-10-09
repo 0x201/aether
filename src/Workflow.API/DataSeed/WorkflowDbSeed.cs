@@ -1,4 +1,4 @@
-namespace Workflow.API.DataSeed;
+﻿namespace Workflow.API.DataSeed;
 
 public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbSeeder<WorkflowDbContext>
 {
@@ -29,8 +29,8 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
         {
             Id = "1",
             Name = "Simple Linear Workflow",
-            Nodes = new List<WorkflowNode>
-            {
+            Nodes =
+            [
                 new WorkflowNode
                 {
                     Id = "1",
@@ -77,13 +77,13 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
                         OperatorType = "end"
                     }
                 }
-            },
-            Connections = new List<WorkflowConnection>
-            {
+            ],
+            Connections =
+            [
                 new WorkflowConnection { Id = "1-2", SourceNodeId = "1", TargetNodeId = "2" },
                 new WorkflowConnection { Id = "2-3", SourceNodeId = "2", TargetNodeId = "3" },
                 new WorkflowConnection { Id = "3-4", SourceNodeId = "3", TargetNodeId = "4" }
-            },
+            ],
             CreatedAt = DateTime.UtcNow
         };
 
@@ -91,8 +91,8 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
         {
             Id = "2",
             Name = "Decision Workflow",
-            Nodes = new List<WorkflowNode>
-            {
+            Nodes =
+            [
                 new WorkflowNode
                 {
                     Id = "1",
@@ -167,16 +167,16 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
                         OperatorType = "end"
                     }
                 }
-            },
-            Connections = new List<WorkflowConnection>
-            {
+            ],
+            Connections =
+            [
                 new WorkflowConnection { Id = "1-2", SourceNodeId = "1", TargetNodeId = "2" },
                 new WorkflowConnection { Id = "2-3", SourceNodeId = "2", TargetNodeId = "3" },
                 new WorkflowConnection { Id = "3-4", SourceNodeId = "3", TargetNodeId = "4", SourceHandle = "true" },
                 new WorkflowConnection { Id = "3-5", SourceNodeId = "3", TargetNodeId = "5", SourceHandle = "false" },
                 new WorkflowConnection { Id = "4-6", SourceNodeId = "4", TargetNodeId = "6" },
                 new WorkflowConnection { Id = "5-6", SourceNodeId = "5", TargetNodeId = "6" }
-            },
+            ],
             CreatedAt = DateTime.UtcNow
         };
 
@@ -184,8 +184,8 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
         {
             Id = "3",
             Name = "Complex Workflow",
-            Nodes = new List<WorkflowNode>
-            {
+            Nodes =
+            [
                 new WorkflowNode
                 {
                     Id = "1",
@@ -296,9 +296,9 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
                         OperatorType = "end"
                     }
                 }
-            },
-            Connections = new List<WorkflowConnection>
-            {
+            ],
+            Connections =
+            [
                 new WorkflowConnection { Id = "1-2", SourceNodeId = "1", TargetNodeId = "2" },
                 new WorkflowConnection { Id = "2-3", SourceNodeId = "2", TargetNodeId = "3" },
                 new WorkflowConnection { Id = "2-4", SourceNodeId = "2", TargetNodeId = "4" },
@@ -309,7 +309,7 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
                 new WorkflowConnection { Id = "6-8", SourceNodeId = "6", TargetNodeId = "8" },
                 new WorkflowConnection { Id = "7-8", SourceNodeId = "7", TargetNodeId = "8" },
                 new WorkflowConnection { Id = "8-9", SourceNodeId = "8", TargetNodeId = "9" }
-            },
+            ],
             CreatedAt = DateTime.UtcNow
         };
 
@@ -317,8 +317,8 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
         {
             Id = "4",
             Name = "ETL Workflow",
-            Nodes = new List<WorkflowNode>
-            {
+            Nodes =
+            [
                 new WorkflowNode
                 {
                     Id = "1",
@@ -385,14 +385,14 @@ public class WorkflowDbContextSeed(ILogger<WorkflowDbContextSeed> logger) : IDbS
                         OperatorType = "end"
                     }
                 }
-            },
-            Connections = new List<WorkflowConnection>
-            {
+            ],
+            Connections =
+            [
                 new WorkflowConnection { Id = "1-2", SourceNodeId = "1", TargetNodeId = "2" },
                 new WorkflowConnection { Id = "2-3", SourceNodeId = "2", TargetNodeId = "3" },
                 new WorkflowConnection { Id = "3-4", SourceNodeId = "3", TargetNodeId = "4" },
                 new WorkflowConnection { Id = "4-5", SourceNodeId = "4", TargetNodeId = "5" }
-            },
+            ],
             CreatedAt = DateTime.UtcNow
         };
 

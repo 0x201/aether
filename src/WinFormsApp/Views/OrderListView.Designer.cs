@@ -154,7 +154,7 @@ namespace ModernCSharp.WinFormsApp.Views
             // 
             // orderBindingSource
             // 
-            orderBindingSource.DataSource = typeof(Order);
+            orderBindingSource.DataSource = typeof(OrderDto);
             // 
             // ExportButton
             // 

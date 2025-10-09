@@ -1,6 +1,4 @@
-﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.WinUIApp.ViewModels;
+﻿namespace ModernCSharp.WinUIApp.ViewModels;
 
 public partial class ImportOrdersViewModel(
     IMediator mediator) : ObservableRecipient
@@ -11,7 +9,7 @@ public partial class ImportOrdersViewModel(
     [ObservableProperty] private Visibility progressBarVisibility = Visibility.Collapsed;
     [ObservableProperty] private string importResult;
 
-    public ObservableCollection<Order> Orders
+    public ObservableCollection<OrderDto> Orders
     {
         get;
         private set;

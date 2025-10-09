@@ -2,7 +2,7 @@
 
 public class ExportOrdersEventArgs
 {
-    public IReadOnlyCollection<Order> OrderToExport
+    public IReadOnlyCollection<OrderDto> OrderToExport
     {
         get;
         set;

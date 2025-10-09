@@ -1,14 +1,11 @@
-﻿using ModernCSharp.Shared.FileServices.Abstraction;
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.Ordering.Application.Services;
+﻿namespace ModernCSharp.Ordering.Application.Services;
 
 public class OrderJsonExportStrategy(ILogger<OrderJsonExportStrategy> logger) 
-    : BaseOrderFileExportStrategy<Order>(logger, FileType.OrderJson)
+    : BaseOrderFileExportStrategy<OrderDto>(logger, FileType.OrderJson)
 {
-    protected override async Task PerformExportAsync(IFileExportContext<Order> context, CancellationToken cancellationToken = default)
+    protected override async Task PerformExportAsync(IFileExportContext<OrderDto> context, CancellationToken cancellationToken = default)
     {
-        var orderWrapper = new JsonWrapper<Order>(context.DataToExport);
+        var orderWrapper = new JsonWrapper<OrderDto>(context.DataToExport);
         using var stream = new FileStream(context.OutputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
         await JsonSerializer.SerializeAsync(stream, orderWrapper, JsonSerializationConstants.DefaultOptions, cancellationToken);
         await stream.FlushAsync(cancellationToken);

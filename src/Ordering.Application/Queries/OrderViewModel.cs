@@ -1,6 +1,6 @@
 ﻿namespace ModernCSharp.Ordering.Application.Queries;
 
-public record Order
+public record OrderDto
 {
     public int ordernumber
     {

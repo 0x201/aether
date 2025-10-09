@@ -1,9 +1,6 @@
-﻿using ModernCSharp.Shared.FileServices.Abstraction;
+﻿namespace ModernCSharp.Ordering.Application.Commands;
 
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-namespace ModernCSharp.Ordering.Application.Commands;
-
-public class ImportOrderCommand : IRequest<ImportResult<Order>>
+public class ImportOrderCommand : IRequest<ImportResult<OrderDto>>
 {
     public IFileImportContext ImportContext { get; set; }
 }

@@ -1,12 +1,9 @@
-﻿using ModernCSharp.Shared.FileServices.Abstraction;
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.Ordering.Application.Services;
+﻿namespace ModernCSharp.Ordering.Application.Services;
 
 public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger) 
-    : BaseOrderFileExportStrategy<Order>(logger, FileType.OrderExcel)
+    : BaseOrderFileExportStrategy<OrderDto>(logger, FileType.OrderExcel)
 {
-    protected override Task PerformExportAsync(IFileExportContext<Order> context, CancellationToken cancellationToken = default)
+    protected override Task PerformExportAsync(IFileExportContext<OrderDto> context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -14,7 +11,7 @@ public class OrderExcelExportStrategy(ILogger<OrderExcelExportStrategy> logger)
         var ws = wb.AddWorksheet("Worksheet 1");
 
         var headerRow = ws.Row(1);
-        var properties = typeof(Order).GetProperties();
+        var properties = typeof(OrderDto).GetProperties();
 
         var headerCellIndex = 1;
         foreach (var property in properties)

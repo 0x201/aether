@@ -27,10 +27,10 @@ public static class Config
             {
                 ClientId = "webapp",
                 ClientName = "WebApp Client",
-                ClientSecrets = new List<Secret>
-                {
+                ClientSecrets =
+                [
                     new Secret("secret".Sha256())
-                },
+                ],
                 ClientUri = $"{configuration["WebAppClient"]}",                             // public uri of the client
                 AllowedGrantTypes = GrantTypes.Code,
                 AllowAccessTokensViaBrowser = false,
@@ -38,16 +38,16 @@ public static class Config
                 AllowOfflineAccess = true,
                 AlwaysIncludeUserClaimsInIdToken = true,
                 RequirePkce = false,
-                RedirectUris = new List<string>
-                {
+                RedirectUris =
+                [
                     $"{configuration["WebAppClient"]}/signin-oidc"
-                },
-                PostLogoutRedirectUris = new List<string>
-                {
+                ],
+                PostLogoutRedirectUris =
+                [
                     $"{configuration["WebAppClient"]}/signout-callback-oidc"
-                },
-                AllowedScopes = new List<string>
-                {
+                ],
+                AllowedScopes =
+                [
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.OfflineAccess,
@@ -55,7 +55,7 @@ public static class Config
                     "basket",
                     "webshoppingagg",
                     "webhooks"
-                },
+                ],
                 AccessTokenLifetime = 60*60*2, // 2 hours
                 IdentityTokenLifetime= 60*60*2 // 2 hours
             },

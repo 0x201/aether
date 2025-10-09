@@ -21,8 +21,8 @@ public static class TestUsers
                 country = "Germany"
             };
 
-            return new List<TestUser>
-            {
+            return
+            [
                 new TestUser
                 {
                     SubjectId = "1",
@@ -55,7 +55,7 @@ public static class TestUsers
                         new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address), IdentityServerConstants.ClaimValueTypes.Json)
                     }
                 }
-            };
+            ];
         }
     }
 }

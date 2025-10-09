@@ -77,13 +77,13 @@ public partial class App : System.Windows.Application
         // Core Services
         builder.Services.AddSingleton<IFileService, FileService>();
 
-        builder.Services.AddFileProcessor<Order>()
-            .AddFileImportStrategy<OrderCsvImportStrategy, Order>()
-            .AddFileImportStrategy<OrderExcelImportStrategy, Order>()
-            .AddFileImportStrategy<OrderJsonImportStrategy, Order>()
-            .AddFileExportStrategy<OrderCsvExportStrategy, Order>()
-            .AddFileExportStrategy<OrderExcelExportStrategy, Order>()
-            .AddFileExportStrategy<OrderJsonExportStrategy, Order>();
+        builder.Services.AddFileProcessor<OrderDto>()
+            .AddFileImportStrategy<OrderCsvImportStrategy, OrderDto>()
+            .AddFileImportStrategy<OrderExcelImportStrategy, OrderDto>()
+            .AddFileImportStrategy<OrderJsonImportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderCsvExportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderExcelExportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderJsonExportStrategy, OrderDto>();
 
         builder.Services.AddTransient<IOrderQueries, OrderQueries>();
 

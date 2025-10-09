@@ -1,6 +1,4 @@
-﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.WinUIApp.Views;
+﻿namespace ModernCSharp.WinUIApp.Views;
 
 public sealed partial class OrdersPage : Page
 {
@@ -17,7 +15,7 @@ public sealed partial class OrdersPage : Page
 
     private void OrderListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var selectedOrder = (Order)OrderListView.SelectedItem;
+        var selectedOrder = (OrderDto)OrderListView.SelectedItem;
         ViewModel.SelectedOrder = selectedOrder;
     }
 }

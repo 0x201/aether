@@ -6,7 +6,7 @@ public class OrdersListPresenter(
     IMediator mediator,
     IOrderQueries orderService) : AbstractPresenter<IOrderListView>(view)
 {
-    private List<Order> _orders;
+    private List<OrderDto> _orders;
 
     public async override Task InitializeAsync()
     {
@@ -28,7 +28,7 @@ public class OrdersListPresenter(
 
         var outputFileName = Path.Combine(e.ExportFilePath, "orders.csv");
 
-        var context = new FileExportContext<Order>(FileType.OrderCsv, outputFileName, e.OrderToExport);
+        var context = new FileExportContext<OrderDto>(FileType.OrderCsv, outputFileName, e.OrderToExport);
         var result = await mediator.Send(new ExportOrderCommand { ExportContext = context });
 
         if (!result.Succeeded)
@@ -64,12 +64,12 @@ public class OrdersListPresenter(
         }
     }
 
-    public async Task<List<Order>> GetOrders()
+    public async Task<List<OrderDto>> GetOrders()
     {
         return [.. await orderService.GetOrdersAsync()];
     }
 
-    public void ImportData(IEnumerable<Order> orders)
+    public void ImportData(IEnumerable<OrderDto> orders)
     {
         _orders.Clear();
         _orders.AddRange(orders);
@@ -77,7 +77,7 @@ public class OrdersListPresenter(
         View.ShowMessage("Successfully imported data", "Success");
     }
 
-    public void AppendData(IEnumerable<Order> orders)
+    public void AppendData(IEnumerable<OrderDto> orders)
     {
         _orders.AddRange(orders);
         View.DisplayData(_orders);

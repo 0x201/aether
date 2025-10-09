@@ -1,11 +1,11 @@
-using System.Text.Json;
-using Workflow.API.Abstractions;
+﻿using System.Text.Json;
 
 namespace Workflow.API.Services;
 
 public class NodeExecutor : INodeExecutor
-{    private static readonly Dictionary<string, List<Dictionary<string, object>>> _inMemoryDb = new();
-    
+{
+    private static readonly Dictionary<string, List<Dictionary<string, object>>> _inMemoryDb = [];
+
     public async Task<object?> ExecuteNodeAsync(string nodeType, object? inputData)
     {
         return (nodeType?.ToLower() ?? string.Empty) switch
@@ -33,7 +33,7 @@ public class NodeExecutor : INodeExecutor
     private async Task<object> ExecuteStartNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var startData = new
         {
             workflowStarted = true,
@@ -43,14 +43,14 @@ public class NodeExecutor : INodeExecutor
             nodeType = "start",
             message = "Workflow started"
         };
-        
+
         return startData;
     }
 
     private async Task<object> ExecuteTaskNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var taskData = new
         {
             taskId = Guid.NewGuid().ToString(),
@@ -61,23 +61,23 @@ public class NodeExecutor : INodeExecutor
             nodeType = "task",
             message = "Task executed"
         };
-        
+
         return taskData;
     }
 
     private async Task<object> ExecuteDecisionNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         bool decisionResult = false;
-        
+
         if (inputData != null)
         {
             try
             {
                 string inputJson = JsonSerializer.Serialize(inputData);
                 using var doc = JsonDocument.Parse(inputJson);
-                
+
                 // 尝试从输入数据中获取决策条件
                 if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement))
                 {
@@ -93,7 +93,7 @@ public class NodeExecutor : INodeExecutor
                 decisionResult = false;
             }
         }
-        
+
         var decisionData = new
         {
             decisionMade = true,
@@ -104,14 +104,14 @@ public class NodeExecutor : INodeExecutor
             nodeType = "decision",
             message = $"Decision evaluated as {decisionResult}"
         };
-        
+
         return decisionData;
     }
 
     private async Task<object> ExecuteEndNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var endData = new
         {
             workflowEnded = true,
@@ -121,14 +121,14 @@ public class NodeExecutor : INodeExecutor
             nodeType = "end",
             message = "Workflow completed"
         };
-        
+
         return endData;
     }
 
     private async Task<object> ExecuteBashNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var bashData = new
         {
             bashExecuted = true,
@@ -139,14 +139,14 @@ public class NodeExecutor : INodeExecutor
             message = "Bash command executed",
             output = "Bash command output"
         };
-        
+
         return bashData;
     }
 
     private async Task<object> ExecutePythonNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var pythonData = new
         {
             scriptExecuted = true,
@@ -157,14 +157,14 @@ public class NodeExecutor : INodeExecutor
             message = "Python script executed",
             output = "Python script output"
         };
-        
+
         return pythonData;
     }
 
     private async Task<object> ExecuteEmailNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var emailData = new
         {
             emailSent = true,
@@ -175,14 +175,14 @@ public class NodeExecutor : INodeExecutor
             message = "Email sent successfully",
             recipient = "user@example.com"
         };
-        
+
         return emailData;
     }
 
     private async Task<object> ExecuteHttpNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var httpData = new
         {
             requestExecuted = true,
@@ -193,14 +193,14 @@ public class NodeExecutor : INodeExecutor
             message = "HTTP request executed",
             statusCode = 200
         };
-        
+
         return httpData;
     }
 
     private async Task<object> ExecuteSqlNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var sqlData = new
         {
             queryExecuted = true,
@@ -211,14 +211,14 @@ public class NodeExecutor : INodeExecutor
             message = "SQL query executed",
             rowsAffected = 10
         };
-        
+
         return sqlData;
     }
 
     private async Task<object> ExecuteSubDagNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var subDagData = new
         {
             subDagExecuted = true,
@@ -228,14 +228,14 @@ public class NodeExecutor : INodeExecutor
             nodeType = "subdag",
             message = "SubDAG executed"
         };
-        
+
         return subDagData;
     }
 
     private async Task<object> ExecuteSensorNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var sensorData = new
         {
             sensorTriggered = true,
@@ -245,14 +245,14 @@ public class NodeExecutor : INodeExecutor
             nodeType = "sensor",
             message = "Sensor condition met"
         };
-        
+
         return sensorData;
     }
 
     private async Task<object> ExecuteCustomNodeAsync(object? inputData)
     {
         await Task.Delay(100);
-        
+
         var customData = new
         {
             customExecuted = true,
@@ -262,20 +262,20 @@ public class NodeExecutor : INodeExecutor
             nodeType = "custom",
             message = "Custom node executed"
         };
-        
+
         return customData;
     }
 
     private async Task<object> ExecuteExtractNodeAsync(object? inputData)
     {
         await Task.Delay(500);
-        
+
         string filePath = "sample_data.json";
         if (inputData is JsonElement jsonElement && jsonElement.TryGetProperty("filePath", out JsonElement filePathElement))
         {
             filePath = filePathElement.GetString() ?? filePath;
         }
-        
+
         List<Dictionary<string, object>> extractedData;
 
         try
@@ -295,7 +295,7 @@ public class NodeExecutor : INodeExecutor
             }
 
             using var doc = JsonDocument.Parse(jsonData);
-            extractedData = new List<Dictionary<string, object>>();
+            extractedData = [];
 
             foreach (var item in doc.RootElement.EnumerateArray())
             {
@@ -337,8 +337,8 @@ public class NodeExecutor : INodeExecutor
         catch (Exception)
         {
             // 如果解析失败，使用默认数据
-            extractedData = new List<Dictionary<string, object>>
-            {
+            extractedData =
+            [
                 new Dictionary<string, object>
                 {
                     { "id", 1 },
@@ -360,9 +360,9 @@ public class NodeExecutor : INodeExecutor
                     { "email", "bob@example.com" },
                     { "age", 35 }
                 }
-            };
+            ];
         }
-        
+
         var extractResult = new
         {
             nodeId = "extract",
@@ -373,31 +373,31 @@ public class NodeExecutor : INodeExecutor
             timestamp = DateTime.UtcNow,
             message = $"Successfully extracted {extractedData.Count} rows from {filePath}"
         };
-        
+
         return extractResult;
     }
 
     private async Task<object> ExecuteValidateNodeAsync(object? inputData)
     {
         await Task.Delay(300);
-        
+
         int validRows = 0;
         int invalidRows = 0;
         var validationErrors = new List<string>();
-        List<Dictionary<string, object>> validatedData = new();
-        
+        List<Dictionary<string, object>> validatedData = [];
+
         if (inputData is JsonElement jsonElement && jsonElement.TryGetProperty("data", out JsonElement dataArray))
         {
             foreach (var item in dataArray.EnumerateArray())
             {
                 bool isValid = true;
                 var rowData = new Dictionary<string, object>();
-                
+
                 // 将JsonElement转换为Dictionary
                 foreach (var property in item.EnumerateObject())
                 {
                     rowData[property.Name] = property.Value.ToString();
-                    
+
                     switch (property.Name)
                     {
                         case "id":
@@ -410,7 +410,7 @@ public class NodeExecutor : INodeExecutor
                             break;
                         case "name":
                             // 名称必须存在且非空
-                            if (property.Value.ValueKind != JsonValueKind.String || 
+                            if (property.Value.ValueKind != JsonValueKind.String ||
                                 string.IsNullOrEmpty(property.Value.GetString()))
                             {
                                 validationErrors.Add($"Row missing valid 'name' field");
@@ -419,7 +419,7 @@ public class NodeExecutor : INodeExecutor
                             break;
                         case "email":
                             // 邮箱必须存在且格式正确
-                            if (property.Value.ValueKind != JsonValueKind.String || 
+                            if (property.Value.ValueKind != JsonValueKind.String ||
                                 string.IsNullOrEmpty(property.Value.GetString()) ||
                                 !IsValidEmail(property.Value.GetString() ?? ""))
                             {
@@ -429,7 +429,7 @@ public class NodeExecutor : INodeExecutor
                             break;
                         case "age":
                             // 年龄必须存在且为正数
-                            if (property.Value.ValueKind != JsonValueKind.Number || 
+                            if (property.Value.ValueKind != JsonValueKind.Number ||
                                 property.Value.GetInt32() < 0)
                             {
                                 validationErrors.Add($"Row has invalid 'age' field");
@@ -438,7 +438,7 @@ public class NodeExecutor : INodeExecutor
                             break;
                     }
                 }
-                
+
                 if (isValid)
                 {
                     validRows++;
@@ -450,7 +450,7 @@ public class NodeExecutor : INodeExecutor
                 }
             }
         }
-        
+
         var validationResult = new
         {
             nodeId = "validate",
@@ -464,25 +464,25 @@ public class NodeExecutor : INodeExecutor
             timestamp = DateTime.UtcNow,
             message = $"Validation completed: {validRows} valid rows, {invalidRows} invalid rows"
         };
-        
+
         return validationResult;
     }
 
     private async Task<object> ExecuteLoadNodeAsync(object? inputData)
     {
         await Task.Delay(400);
-        
+
         string tableName = "etl_data";
         int loadedRows = 0;
-        
+
         if (inputData is JsonElement jsonElement && jsonElement.TryGetProperty("data", out JsonElement dataArray))
         {
             var dataList = new List<Dictionary<string, object>>();
-            
+
             foreach (var item in dataArray.EnumerateArray())
             {
                 var row = new Dictionary<string, object>();
-                
+
                 // 将JsonElement转换为Dictionary
                 foreach (var property in item.EnumerateObject())
                 {
@@ -512,29 +512,29 @@ public class NodeExecutor : INodeExecutor
                             break;
                     }
                 }
-                
+
                 dataList.Add(row);
                 loadedRows++;
             }
-            
+
             // 存储到内存数据库
             _inMemoryDb[tableName] = dataList;
         }
-        
+
         var loadResult = new
         {
             nodeId = "load",
             nodeType = "load",
             tableName = tableName,
             loadedRows = loadedRows,
-            data = _inMemoryDb.ContainsKey(tableName) ? _inMemoryDb[tableName] : new List<Dictionary<string, object>>(),
+            data = _inMemoryDb.ContainsKey(tableName) ? _inMemoryDb[tableName] : [],
             timestamp = DateTime.UtcNow,
             message = $"Successfully loaded {loadedRows} rows into table '{tableName}'"
         };
-        
+
         return loadResult;
     }
-    
+
     private bool IsValidEmail(string email)
     {
         try

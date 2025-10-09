@@ -1,13 +1,12 @@
-using System.Collections.Concurrent;
-using Workflow.API.Abstractions;
+﻿using System.Collections.Concurrent;
 
 namespace Workflow.API.Services;
 
 public class WorkflowScheduler : IWorkflowScheduler
 {
     private readonly INodeExecutor _nodeExecutor;
-    private readonly Dictionary<string, bool> _runningWorkflows = new();
-    private readonly List<ExecutionLog> _executionLogs = new();
+    private readonly Dictionary<string, bool> _runningWorkflows = [];
+    private readonly List<ExecutionLog> _executionLogs = [];
     private readonly ConcurrentDictionary<string, TaskInstance> _taskInstances = new();
 
     public WorkflowScheduler(INodeExecutor nodeExecutor)
@@ -42,7 +41,7 @@ public class WorkflowScheduler : IWorkflowScheduler
             .OrderByDescending(log => log.Timestamp)
             .Take(100)
             .ToList();
-            
+
         return Task.FromResult(recentLogs.AsEnumerable());
     }
 
@@ -52,7 +51,7 @@ public class WorkflowScheduler : IWorkflowScheduler
             .Where(log => log.WorkflowId == workflowInstanceId)
             .OrderByDescending(log => log.Timestamp)
             .ToList();
-            
+
         return Task.FromResult(workflowLogs.AsEnumerable());
     }
 
@@ -72,7 +71,7 @@ public class WorkflowScheduler : IWorkflowScheduler
             if (startNode == null)
             {
                 Console.WriteLine("No start node found in workflow");
-                
+
                 await LogExecutionAsync(new ExecutionLog
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -82,14 +81,14 @@ public class WorkflowScheduler : IWorkflowScheduler
                     Message = "No start node found in workflow",
                     Timestamp = DateTime.UtcNow
                 });
-                
+
                 return;
             }
 
             await ExecuteNodeAndChildrenAsync(startNode, workflow, null, workflowInstanceId);
 
             Console.WriteLine($"Workflow execution completed: {workflow.Name} (Instance: {workflowInstanceId})");
-            
+
             await LogExecutionAsync(new ExecutionLog
             {
                 Id = Guid.NewGuid().ToString(),
@@ -103,7 +102,7 @@ public class WorkflowScheduler : IWorkflowScheduler
         catch (Exception ex)
         {
             Console.WriteLine($"Error executing workflow {workflow.Name}: {ex.Message}");
-            
+
             await LogExecutionAsync(new ExecutionLog
             {
                 Id = Guid.NewGuid().ToString(),
@@ -123,7 +122,7 @@ public class WorkflowScheduler : IWorkflowScheduler
     private async Task ExecuteNodeAndChildrenAsync(WorkflowNode node, WorkflowModel workflow, object? inputData, string workflowInstanceId)
     {
         Console.WriteLine($"Executing node: {node.Data.Label} (Type: {node.Type})");
-        
+
         await LogExecutionAsync(new ExecutionLog
         {
             Id = Guid.NewGuid().ToString(),
@@ -139,7 +138,7 @@ public class WorkflowScheduler : IWorkflowScheduler
 
         var outputData = await _nodeExecutor.ExecuteNodeAsync(node.Type, inputData);
         Console.WriteLine($"Node execution result: {System.Text.Json.JsonSerializer.Serialize(outputData)}");
-        
+
         await LogExecutionAsync(new ExecutionLog
         {
             Id = Guid.NewGuid().ToString(),
@@ -169,7 +168,7 @@ public class WorkflowScheduler : IWorkflowScheduler
                     {
                         string outputJson = System.Text.Json.JsonSerializer.Serialize(outputData);
                         var doc = System.Text.Json.JsonDocument.Parse(outputJson);
-                        
+
                         if (doc.RootElement.TryGetProperty("decisionResult", out var decisionElement))
                         {
                             bool shouldExecute = decisionElement.GetBoolean();
@@ -184,7 +183,7 @@ public class WorkflowScheduler : IWorkflowScheduler
                     {
                     }
                 }
-                
+
                 await ExecuteNodeAndChildrenAsync(targetNode, workflow, outputData, workflowInstanceId);
             }
         }
@@ -193,7 +192,7 @@ public class WorkflowScheduler : IWorkflowScheduler
     public async Task<string> ScheduleTaskAsync(WorkflowTask task, string workflowId)
     {
         var taskInstanceId = Guid.NewGuid().ToString();
-        
+
         var taskInstance = new TaskInstance
         {
             TaskId = task.Id,
@@ -203,11 +202,11 @@ public class WorkflowScheduler : IWorkflowScheduler
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        
+
         _taskInstances[taskInstanceId] = taskInstance;
-        
+
         _ = Task.Run(async () => await ExecuteTaskAsync(task, taskInstance));
-        
+
         return taskInstanceId;
     }
 
@@ -216,9 +215,9 @@ public class WorkflowScheduler : IWorkflowScheduler
         try
         {
             await UpdateTaskInstanceStateAsync(taskInstance.WorkflowInstanceId, TaskState.Running);
-            
+
             var result = await _nodeExecutor.ExecuteNodeAsync(task.Type, null);
-            
+
             var resultJson = System.Text.Json.JsonSerializer.Serialize(result);
             await UpdateTaskInstanceStateAsync(taskInstance.WorkflowInstanceId, TaskState.Success, resultJson);
         }
@@ -256,7 +255,7 @@ public class WorkflowScheduler : IWorkflowScheduler
             taskInstance.ResultData = resultData;
             taskInstance.Log = log;
             taskInstance.UpdatedAt = DateTime.UtcNow;
-            
+
             if (state == TaskState.Running)
             {
                 taskInstance.StartTime = DateTime.UtcNow;
@@ -266,7 +265,7 @@ public class WorkflowScheduler : IWorkflowScheduler
                 taskInstance.EndTime = DateTime.UtcNow;
             }
         }
-        
+
         return Task.CompletedTask;
     }
 }

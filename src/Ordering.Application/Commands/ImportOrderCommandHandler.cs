@@ -1,12 +1,8 @@
-﻿using ModernCSharp.Shared.FileServices.Abstraction;
+﻿namespace ModernCSharp.Ordering.Application.Commands;
 
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.Ordering.Application.Commands;
-
-public class ImportOrderCommandHandler(IFileImportStrategyFactory<Order> fileImportStrategyFactory) : IRequestHandler<ImportOrderCommand, ImportResult<Order>>
+public class ImportOrderCommandHandler(IFileImportStrategyFactory<OrderDto> fileImportStrategyFactory) : IRequestHandler<ImportOrderCommand, ImportResult<OrderDto>>
 {
-    public Task<ImportResult<Order>> Handle(ImportOrderCommand request, CancellationToken cancellationToken)
+    public Task<ImportResult<OrderDto>> Handle(ImportOrderCommand request, CancellationToken cancellationToken)
     {
         var strategy = fileImportStrategyFactory.GetStrategy(request.ImportContext.FileType);
         return strategy.ImportAsync(request.ImportContext, cancellationToken);

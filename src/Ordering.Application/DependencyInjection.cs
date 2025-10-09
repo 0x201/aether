@@ -11,10 +11,6 @@ public static class DependencyInjection
 {
     public static void AddOrderingApplicationServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddAutoMapper(config => 
-        {
-        }, Assembly.GetExecutingAssembly());
-
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         builder.Services.AddMediatR(cfg =>

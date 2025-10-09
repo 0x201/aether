@@ -1,8 +1,6 @@
 ﻿using ModernCSharp.Ordering.Application;
 using ModernCSharp.Ordering.Infrastructure.Interceptors;
 
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
 namespace ModernCSharp.WinUIApp;
 
 public partial class App : Microsoft.UI.Xaml.Application
@@ -74,13 +72,13 @@ public partial class App : Microsoft.UI.Xaml.Application
         builder.Services.AddTransient<IOrderQueries, OrderQueries>();
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-        builder.Services.AddFileProcessor<Order>()
-            .AddFileImportStrategy<OrderCsvImportStrategy, Order>()
-            .AddFileImportStrategy<OrderExcelImportStrategy, Order>()
-            .AddFileImportStrategy<OrderJsonImportStrategy, Order>()
-            .AddFileExportStrategy<OrderCsvExportStrategy, Order>()
-            .AddFileExportStrategy<OrderExcelExportStrategy, Order>()
-            .AddFileExportStrategy<OrderJsonExportStrategy, Order>();
+        builder.Services.AddFileProcessor<OrderDto>()
+            .AddFileImportStrategy<OrderCsvImportStrategy, OrderDto>()
+            .AddFileImportStrategy<OrderExcelImportStrategy, OrderDto>()
+            .AddFileImportStrategy<OrderJsonImportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderCsvExportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderExcelExportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderJsonExportStrategy, OrderDto>();
 
 
         // UserControls

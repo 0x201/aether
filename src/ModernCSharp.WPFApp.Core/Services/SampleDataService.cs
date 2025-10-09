@@ -39,8 +39,8 @@ public class SampleDataService : ISampleDataService
                 Country = "Germany",
                 Phone = "030-0074321",
                 Fax = "030-0076545",
-                Orders = new List<SampleOrder>()
-                {
+                Orders =
+                [
                     new SampleOrder()
                     {
                         OrderID = 10643, // Symbol Globe
@@ -55,8 +55,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 814.50,
                         Status = "Shipped",
                         SymbolCode = 57643,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 28,
@@ -93,7 +93,7 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Seaweed and fish",
                                 Total = 18.00
                             }
-                        }
+                        ]
                     },
                     new SampleOrder()
                     {
@@ -109,8 +109,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 845.80,
                         Status = "Closed",
                         SymbolCode = 57737,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 59,
@@ -135,7 +135,7 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Sweet and savory sauces, relishes, spreads, and seasonings",
                                 Total = 20.80
                             }
-                        }
+                        ]
                     },
                     new SampleOrder()
                     {
@@ -151,8 +151,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 471.20,
                         Status = "Closed",
                         SymbolCode = 57699,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 6,
@@ -177,9 +177,9 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Dried fruit and bean curd",
                                 Total = 91.20
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             },
             new SampleCompany()
             {
@@ -193,8 +193,8 @@ public class SampleDataService : ISampleDataService
                 Country = "Mexico",
                 Phone = "(5) 555-4729",
                 Fax = "(5) 555-3745",
-                Orders = new List<SampleOrder>()
-                {
+                Orders =
+                [
                     new SampleOrder()
                     {
                         OrderID = 10625, // Symbol Camera
@@ -209,8 +209,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 469.75,
                         Status = "Shipped",
                         SymbolCode = 57620,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 14,
@@ -247,7 +247,7 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Cheeses",
                                 Total = 340.00
                             }
-                        }
+                        ]
                     },
                     new SampleOrder()
                     {
@@ -263,8 +263,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 507.20,
                         Status = "Shipped",
                         SymbolCode = 57633,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 11,
@@ -313,9 +313,9 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Cheeses",
                                 Total = 340.80
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             },
             new SampleCompany()
             {
@@ -329,8 +329,8 @@ public class SampleDataService : ISampleDataService
                 Country = "Mexico",
                 Phone = "(5) 555-3932",
                 Fax = string.Empty,
-                Orders = new List<SampleOrder>()
-                {
+                Orders =
+                [
                     new SampleOrder()
                     {
                         OrderID = 10507, // Symbol Contact
@@ -345,8 +345,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 978.50,
                         Status = "Closed",
                         SymbolCode = 57661,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 43,
@@ -371,7 +371,7 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Desserts, candies, and sweet breads",
                                 Total = 162.50
                             }
-                        }
+                        ]
                     },
                     new SampleOrder()
                     {
@@ -387,8 +387,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 2082.00,
                         Status = "Closed",
                         SymbolCode = 57619,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 17,
@@ -425,7 +425,7 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Prepared meats",
                                 Total = 820.00
                             }
-                        }
+                        ]
                     },
                     new SampleOrder()
                     {
@@ -441,8 +441,8 @@ public class SampleDataService : ISampleDataService
                         OrderTotal = 375.50,
                         Status = "Closed",
                         SymbolCode = 57615,
-                        Details = new List<SampleOrderDetail>()
-                        {
+                        Details =
+                        [
                             new SampleOrderDetail()
                             {
                                 ProductID = 33,
@@ -479,9 +479,9 @@ public class SampleDataService : ISampleDataService
                                 CategoryDescription = "Soft drinks, coffees, teas, beers, and ales",
                                 Total = 232.50
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             }
         };
     }

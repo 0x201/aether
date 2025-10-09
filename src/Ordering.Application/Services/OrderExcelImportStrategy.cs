@@ -1,19 +1,16 @@
-﻿using ModernCSharp.Shared.FileServices.Abstraction;
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.Ordering.Application.Services;
+﻿namespace ModernCSharp.Ordering.Application.Services;
 
 public class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger)
     : BaseOrderFileImportStrategy(logger, FileType.OrderExcel)
 {
-    protected override Task<List<Order>> PerformImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
+    protected override Task<List<OrderDto>> PerformImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using var stream = new FileStream(context.InputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var wb = new XLWorkbook(stream);
         var ws = wb.Worksheet(1);
 
-        List<Order> orders = [];
+        List<OrderDto> orders = [];
 
         foreach (var row in ws.RowsUsed().Skip(1))
         {
@@ -25,7 +22,7 @@ public class OrderExcelImportStrategy(ILogger<OrderExcelImportStrategy> logger)
             var username = row.Cell("F").GetValue<string>();
 
 
-            var newOrder = new Order
+            var newOrder = new OrderDto
             {
                 ordernumber = orderNumber,
                 status = orderStatus,

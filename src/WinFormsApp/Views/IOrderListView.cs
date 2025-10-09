@@ -4,7 +4,7 @@ namespace ModernCSharp.WinFormsApp.Views;
 
 public interface IOrderListView : IView
 {
-    BindingList<Order> Orders
+    BindingList<OrderDto> Orders
     {
         get;
         set;
@@ -17,5 +17,5 @@ public interface IOrderListView : IView
     event AsyncEventHandler<OperationMode> ShowImportOrdersView;
     event AsyncEventHandler<ExportOrdersEventArgs> ExportOrders;
     event EventHandler ShowClearOrdersConfirmation;
-    void DisplayData(IEnumerable<Order> orders);
+    void DisplayData(IEnumerable<OrderDto> orders);
 }

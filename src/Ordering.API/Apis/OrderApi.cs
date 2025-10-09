@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
 public static class OrderApi
 {
     public static RouteGroupBuilder MapOrdersApiV1(this IEndpointRouteBuilder app)
@@ -13,7 +11,7 @@ public static class OrderApi
         return api;
     }
 
-    public static async Task<Ok<IEnumerable<Order>>> GetOrdersByUserAsync([AsParameters] OrderService services)
+    public static async Task<Ok<IEnumerable<OrderDto>>> GetOrdersByUserAsync([AsParameters] OrderService services)
     {
         var userId = services.IdentityService.GetUserIdentity();
         var orders = await services.Queries.GetOrdersFromUserAsync(userId);

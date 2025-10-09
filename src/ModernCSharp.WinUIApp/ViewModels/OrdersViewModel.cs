@@ -1,11 +1,9 @@
-﻿using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.WinUIApp.ViewModels;
+﻿namespace ModernCSharp.WinUIApp.ViewModels;
 
 public partial class OrdersViewModel(IOrderQueries orderService) : ObservableRecipient, INavigationAware
 {
-    [ObservableProperty] private ObservableCollection<Order> _orders = [];
-    [ObservableProperty] private Order _selectedOrder;
+    [ObservableProperty] private ObservableCollection<OrderDto> _orders = [];
+    [ObservableProperty] private OrderDto _selectedOrder;
 
     [RelayCommand]
     private async Task OpenImportDialogAsync(XamlRoot xamlRoot)

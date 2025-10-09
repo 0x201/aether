@@ -1,11 +1,6 @@
-﻿using ModernCSharp.Shared.FileServices.Abstraction;
-
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-
-namespace ModernCSharp.Ordering.Application.Commands;
+﻿namespace ModernCSharp.Ordering.Application.Commands;
 
 public record ExportOrderCommand : IRequest<Result>
 {
-    public IFileExportContext<Order> ExportContext { get; set; }
+    public IFileExportContext<OrderDto> ExportContext { get; set; }
 }

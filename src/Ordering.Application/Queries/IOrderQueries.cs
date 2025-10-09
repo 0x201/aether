@@ -2,7 +2,7 @@
 
 public interface IOrderQueries
 {
-    Task<Order> GetOrderAsync(int id);
-    Task<IEnumerable<Order>> GetOrdersFromUserAsync(string userId);
-    Task<IEnumerable<Order>> GetOrdersAsync();
+    Task<OrderDto> GetOrderAsync(int id);
+    Task<IEnumerable<OrderDto>> GetOrdersFromUserAsync(string userId);
+    Task<IEnumerable<OrderDto>> GetOrdersAsync();
 }

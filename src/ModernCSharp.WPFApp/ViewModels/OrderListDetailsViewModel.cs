@@ -19,7 +19,7 @@ public class OrderListDetailsViewModel : ObservableObject, INavigationAware
         set { SetProperty(ref _selected, value); }
     }
 
-    public ObservableCollection<SampleOrder> SampleItems { get; private set; } = new ObservableCollection<SampleOrder>();
+    public ObservableCollection<SampleOrder> SampleItems { get; private set; } = [];
 
     public OrderListDetailsViewModel(ISampleDataService sampleDataService)
     {

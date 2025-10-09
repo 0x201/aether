@@ -5,8 +5,6 @@ using ModernCSharp.Ordering.Infrastructure;
 using ModernCSharp.Ordering.Infrastructure.Interceptors;
 using ModernCSharp.Ordering.Application;
 
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
 namespace ModernCSharp.WinFormsApp.Extensions;
 
 public static class Extensions
@@ -47,13 +45,13 @@ public static class Extensions
         var services = builder.Services;
 
         builder.Services
-            .AddFileProcessor<Order>()
-            .AddFileImportStrategy<OrderCsvImportStrategy, Order>()
-            .AddFileImportStrategy<OrderExcelImportStrategy, Order>()
-            .AddFileImportStrategy<OrderJsonImportStrategy, Order>()
-            .AddFileExportStrategy<OrderCsvExportStrategy, Order>()
-            .AddFileExportStrategy<OrderExcelExportStrategy, Order>()
-            .AddFileExportStrategy<OrderJsonExportStrategy, Order>();
+            .AddFileProcessor<OrderDto>()
+            .AddFileImportStrategy<OrderCsvImportStrategy, OrderDto>()
+            .AddFileImportStrategy<OrderExcelImportStrategy, OrderDto>()
+            .AddFileImportStrategy<OrderJsonImportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderCsvExportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderExcelExportStrategy, OrderDto>()
+            .AddFileExportStrategy<OrderJsonExportStrategy, OrderDto>();
 
         var connectionString = builder.Configuration.GetConnectionString("orderingdb");
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();

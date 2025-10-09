@@ -47,7 +47,7 @@ public static class OpenApiExtensions
 
         var scopes = identitySection.Exists()
             ? identitySection.GetRequiredSection("Scopes").GetChildren().ToDictionary(p => p.Key, p => p.Value)
-            : new Dictionary<string, string?>();
+            : [];
 
 
         if (!openApi.Exists())

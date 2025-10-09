@@ -4,7 +4,7 @@ namespace ModernCSharp.WinFormsApp.Views;
 
 public partial class OrderListView : BaseView, IOrderListView
 {
-    public BindingList<Order> Orders
+    public BindingList<OrderDto> Orders
     {
         get;
         set;
@@ -46,7 +46,7 @@ public partial class OrderListView : BaseView, IOrderListView
         }
     }
 
-    public void DisplayData(IEnumerable<Order> orders)
+    public void DisplayData(IEnumerable<OrderDto> orders)
     {
         Orders = [.. orders];
         _bindingSource.DataSource = Orders;
@@ -83,12 +83,12 @@ public partial class OrderListView : BaseView, IOrderListView
 
         try
         {
-            List<Order> ordersToExport = [];
+            List<OrderDto> ordersToExport = [];
 
             if (OrderDataGridView is not null)
             {
                 ordersToExport.AddRange(from DataGridViewRow row in OrderDataGridView.SelectedRows
-                                        select new Order
+                                        select new OrderDto
                                         {
                                             ordernumber = (int)row.Cells[0].Value,
                                             date = (DateTime)row.Cells[1].Value,
@@ -152,7 +152,7 @@ public partial class OrderListView : BaseView, IOrderListView
     {
         _bindingSource.Sort = $"{propertyName} {(direction == ListSortDirection.Ascending ? "ASC" : "DESC")}";
 
-        if (_bindingSource.DataSource is List<Order> list)
+        if (_bindingSource.DataSource is List<OrderDto> list)
         {
             var sortedList = direction == ListSortDirection.Ascending
                 ? list.OrderBy(x => GetPropertyValue(x, propertyName)).ToList()
@@ -162,7 +162,7 @@ public partial class OrderListView : BaseView, IOrderListView
         }
     }
 
-    private object GetPropertyValue(Order order, string propertyName)
+    private object GetPropertyValue(OrderDto order, string propertyName)
     {
         return order.GetType().GetProperty(propertyName)?.GetValue(order, null);
     }
@@ -181,7 +181,7 @@ public partial class OrderListView : BaseView, IOrderListView
         {
             var filterText = FilterTextBox.Text.ToLower();
 
-            var filteredData = new BindingList<Order>(
+            var filteredData = new BindingList<OrderDto>(
             [
                 .. Orders.Where(o =>
                     o.username.Contains(filterText, StringComparison.CurrentCultureIgnoreCase) ||

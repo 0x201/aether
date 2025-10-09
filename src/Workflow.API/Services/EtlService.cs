@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Workflow.API.Abstractions;
 using Workflow.API.Models;
 
@@ -21,8 +21,8 @@ public class EtlExecutionResult
     public string Message { get; set; } = string.Empty;
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public List<EtlStepResult> StepResults { get; set; } = new();
-    public Dictionary<string, object?> Metadata { get; set; } = new();
+    public List<EtlStepResult> StepResults { get; set; } = [];
+    public Dictionary<string, object?> Metadata { get; set; } = [];
 }
 
 public class EtlStepResult
@@ -34,7 +34,7 @@ public class EtlStepResult
     public int RowsAffected { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public Dictionary<string, object?> Details { get; set; } = new();
+    public Dictionary<string, object?> Details { get; set; } = [];
 }
 
 public class EtlExecutionException : Exception

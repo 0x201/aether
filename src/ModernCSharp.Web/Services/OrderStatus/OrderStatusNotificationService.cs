@@ -3,7 +3,7 @@
 public class OrderStatusNotificationService
 {
     private readonly object _subscriptionsLock = new();
-    private readonly Dictionary<string, HashSet<Subscription>> _subscriptionsByBuyerId = new();
+    private readonly Dictionary<string, HashSet<Subscription>> _subscriptionsByBuyerId = [];
 
     public IDisposable SubscribeToOrderStatusNotifications(string buyerId, Func<Task> callback)
     {

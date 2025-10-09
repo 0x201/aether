@@ -4,8 +4,8 @@ namespace ModernCSharp.WinFormsApp;
 
 public class OrderingApiClient(HttpClient httpClient)
 {
-    public async Task<Order[]> GetOrdersAsync(CancellationToken cancellationToken = default)
+    public async Task<OrderDto[]> GetOrdersAsync(CancellationToken cancellationToken = default)
     {
-        return await httpClient.GetFromJsonAsync<Order[]>("/orders", cancellationToken);
+        return await httpClient.GetFromJsonAsync<OrderDto[]>("/orders", cancellationToken);
     }
 }

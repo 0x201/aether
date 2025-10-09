@@ -18,5 +18,5 @@ public class EtlTable
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
     // Navigation properties
-    public ICollection<EtlColumn> Columns { get; } = new List<EtlColumn>();
+    public ICollection<EtlColumn> Columns { get; } = [];
 }

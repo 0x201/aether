@@ -1,13 +1,9 @@
-using ModernCSharp.Shared.FileServices.Abstraction;
-using ModernCSharp.Shared.Utils;
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
-
-namespace ModernCSharp.Ordering.Application.Services;
+﻿namespace ModernCSharp.Ordering.Application.Services;
 
 public abstract class BaseOrderFileImportStrategy(ILogger logger, params FileType[] fileTypes) 
-    : FileImportStrategyBase<Order>(fileTypes)
+    : FileImportStrategyBase<OrderDto>(fileTypes)
 {
-    public override async Task<ImportResult<Order>> ImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
+    public override async Task<ImportResult<OrderDto>> ImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -16,18 +12,18 @@ public abstract class BaseOrderFileImportStrategy(ILogger logger, params FileTyp
             if (!FileIoUtils.ValidateImportContext<FileImportContext>(context))
             {
                 logger.LogWarning("Invalid import context provided for {FileType}", context.FileType);
-                return ImportResult<Order>.Failure([$"Invalid import context for {context.FileType}"]);
+                return ImportResult<OrderDto>.Failure([$"Invalid import context for {context.FileType}"]);
             }
 
             var orders = await PerformImportAsync(context, cancellationToken);
             logger.LogInformation("Successfully imported {Count} orders from {InputPath}",
                 orders.Count, context.InputPath);
-            return ImportResult<Order>.Success(orders);
+            return ImportResult<OrderDto>.Success(orders);
         }
         catch (OperationCanceledException)
         {
             logger.LogError("Import {FileType} operation  was cancelled.", context.FileType);
-            return ImportResult<Order>.Failure([$"Import {context.FileType} operation was cancelled."]);
+            return ImportResult<OrderDto>.Failure([$"Import {context.FileType} operation was cancelled."]);
         }
         catch (Exception ex)
         {
@@ -36,11 +32,11 @@ public abstract class BaseOrderFileImportStrategy(ILogger logger, params FileTyp
         }
     }
 
-    protected abstract Task<List<Order>> PerformImportAsync(IFileImportContext context, CancellationToken cancellationToken = default);
+    protected abstract Task<List<OrderDto>> PerformImportAsync(IFileImportContext context, CancellationToken cancellationToken = default);
 
-    protected virtual ImportResult<Order> HandleImportException(Exception ex, IFileImportContext context)
+    protected virtual ImportResult<OrderDto> HandleImportException(Exception ex, IFileImportContext context)
     {
-        return ImportResult<Order>.Failure([$"An error occurred while importing orders from {context.InputPath}."]);
+        return ImportResult<OrderDto>.Failure([$"An error occurred while importing orders from {context.InputPath}."]);
     }
 
 }

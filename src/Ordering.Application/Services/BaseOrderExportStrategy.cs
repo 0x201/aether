@@ -1,18 +1,14 @@
-using ModernCSharp.Shared.FileServices.Abstraction;
-using ModernCSharp.Shared.Utils;
-using Order = ModernCSharp.Ordering.Application.Queries.Order;
+﻿namespace ModernCSharp.Ordering.Application.Services;
 
-namespace ModernCSharp.Ordering.Application.Services;
-
-public abstract class BaseOrderFileExportStrategy<T>(ILogger logger, params FileType[] fileTypes) : FileExportStrategyBase<Order>(fileTypes)
+public abstract class BaseOrderFileExportStrategy<T>(ILogger logger, params FileType[] fileTypes) : FileExportStrategyBase<OrderDto>(fileTypes)
 {
-    public override async Task<Result> ExportAsync(IFileExportContext<Order> context, CancellationToken cancellationToken = default)
+    public override async Task<Result> ExportAsync(IFileExportContext<OrderDto> context, CancellationToken cancellationToken = default)
     {
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!FileIoUtils.ValidateExportContext<FileExportContext<Order>, Order>(context))
+            if (!FileIoUtils.ValidateExportContext<FileExportContext<OrderDto>, OrderDto>(context))
             {
                 logger.LogWarning("Invalid export context provided for {FileType}", context.FileType);
                 return Result.Failure([$"Invalid export context for {context.FileType}"]);
@@ -41,9 +37,9 @@ public abstract class BaseOrderFileExportStrategy<T>(ILogger logger, params File
         }
     }
 
-    protected abstract Task PerformExportAsync(IFileExportContext<Order> context, CancellationToken cancellationToken = default);
+    protected abstract Task PerformExportAsync(IFileExportContext<OrderDto> context, CancellationToken cancellationToken = default);
 
-    protected virtual Result HandleExportException(Exception ex, IFileExportContext<Order> context)
+    protected virtual Result HandleExportException(Exception ex, IFileExportContext<OrderDto> context)
     {
         return Result.Failure([$"An error occurred while exporting orders to {context.OutputPath}."]);
     }
