@@ -30,7 +30,6 @@ var keycloak = builder.AddKeycloak("keycloak", port: 8080)
                       .WithContainerName("keycloak");
 
 var bookstoredb = sqlServer.AddDatabase("bookstoredb");
-var identitydb = sqlServer.AddDatabase("identitydb");
 var orderingdb = sqlServer.AddDatabase("orderingdb");
 var catalogdb = sqlServer.AddDatabase("catalogdb");
 var workflowdb = sqlServer.AddDatabase("workflowdb");
@@ -38,12 +37,6 @@ var etldb = sqlServer.AddDatabase("etldb");
 
 
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
-
-var identityApi = builder.AddProject<Projects.Identity_API>("identityapi", launchProfileName)
-    .WithExternalHttpEndpoints()
-    .WithReference(identitydb).WaitFor(identitydb);
-
-var identityEndpoint = identityApi.GetEndpoint("https");
 
 var catalogApi = builder.AddProject<Projects.Catalog_API>("catalogapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
@@ -54,8 +47,7 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderingdb).WaitFor(orderingdb)
     .WithHttpHealthCheck("/health")
-    .WithEnvironment("Identity__Url", identityEndpoint)
-    .WithReference(keycloak).WaitFor(keycloak);
+        .WithReference(keycloak).WaitFor(keycloak);
 
 var workflowApi = builder.AddProject<Projects.Workflow_API>("workflowapi")
     .WithReference(workflowdb).WaitFor(workflowdb)
@@ -80,8 +72,7 @@ var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi)
     .WithReference(catalogApi)
-    .WithReference(rabbitmq).WaitFor(rabbitmq)
-    .WithEnvironment("IdentityUrl", identityEndpoint);
+    .WithReference(rabbitmq).WaitFor(rabbitmq);
 
 var bookStoreApi = builder.AddPnpmApp("bookstoreapi", @"../bookstore-api", "start:dev")
     .WithHttpEndpoint(port: 3011, env: "PORT")
@@ -134,8 +125,6 @@ if (OperatingSystem.IsWindows())
 
 
 webApp.WithEnvironment("CallBackUrl", webApp.GetEndpoint("https"));
-identityApi.WithEnvironment("OrderingApiClient", orderingApi.GetEndpoint("https"))
-           .WithEnvironment("WebAppClient", webApp.GetEndpoint("https"));
 
 
 builder.Build().Run();
