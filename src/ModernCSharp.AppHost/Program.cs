@@ -47,7 +47,7 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderingdb).WaitFor(orderingdb)
     .WithHttpHealthCheck("/health")
-        .WithReference(keycloak).WaitFor(keycloak);
+    .WithReference(keycloak).WaitFor(keycloak);
 
 var workflowApi = builder.AddProject<Projects.Workflow_API>("workflowapi")
     .WithReference(workflowdb).WaitFor(workflowdb)
@@ -68,7 +68,7 @@ builder.AddProject<Projects.OrderProcessor>("orderprocessor")
     .WithReference(orderingdb)
     .WaitFor(orderingApi);
 
-var webApp = builder.AddProject<Projects.ModernCSharp_Web>("webapp")
+var webApp = builder.AddProject<Projects.ModernCSharp_WebApp>("webapp")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi)
     .WithReference(catalogApi)

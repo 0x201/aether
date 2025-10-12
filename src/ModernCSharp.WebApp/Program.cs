@@ -1,7 +1,7 @@
 ﻿using Microsoft.FluentUI.AspNetCore.Components;
 
-using ModernCSharp.Web;
-using ModernCSharp.Web.Components;
+using ModernCSharp.WebApp;
+using ModernCSharp.WebApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

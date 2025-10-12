@@ -18,7 +18,7 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-    <Project Path="src/IntegrationEventLogEF/IntegrationEventLogEF.csproj" />
+  <Project Path="src/IntegrationEventLogEF/IntegrationEventLogEF.csproj" />
   <Project Path="src/Inventory.Domain/Inventory.Domain.csproj" />
   <Project Path="src/ModernCSharp.AppDefaults/ModernCSharp.AppDefaults.csproj" />
   <Project Path="src/ModernCSharp.AppHost/ModernCSharp.AppHost.csproj">
@@ -31,7 +31,7 @@
     <Platform Solution="*|x86" Project="x86" />
   </Project>
   <Project Path="src/ModernCSharp.Shared/ModernCSharp.Shared.csproj" />
-  <Project Path="src/ModernCSharp.Web/ModernCSharp.Web.csproj">
+  <Project Path="src/ModernCSharp.WebApp/ModernCSharp.WebApp.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>

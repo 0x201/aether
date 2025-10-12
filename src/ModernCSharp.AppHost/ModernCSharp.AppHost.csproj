@@ -14,10 +14,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Catalog.API\Catalog.API.csproj" />
-        <ProjectReference Include="..\ModernCSharp.WPFApp\ModernCSharp.WPFApp.csproj" />
+    <ProjectReference Include="..\ModernCSharp.WPFApp\ModernCSharp.WPFApp.csproj" />
     <ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />
     <ProjectReference Include="..\OrderProcessor\OrderProcessor.csproj" />
-    <ProjectReference Include="..\ModernCSharp.Web\ModernCSharp.Web.csproj" />
+    <ProjectReference Include="..\ModernCSharp.WebApp\ModernCSharp.WebApp.csproj" />
     <ProjectReference Include="..\WinFormsApp\WinFormsApp.csproj" />
     <ProjectReference Include="..\Workflow.API\Workflow.API.csproj" />
   </ItemGroup>

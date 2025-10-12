@@ -6,9 +6,9 @@ using Microsoft.IdentityModel.JsonWebTokens;
 
 using ModernCSharp.EventBus.Abstractions;
 using ModernCSharp.ServiceDefaults;
-using ModernCSharp.Web.Services;
+using ModernCSharp.WebApp.Services;
 
-namespace ModernCSharp.Web;
+namespace ModernCSharp.WebApp;
 
 public static class Extensions
 {

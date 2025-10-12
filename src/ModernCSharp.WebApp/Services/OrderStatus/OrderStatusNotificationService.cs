@@ -1,4 +1,4 @@
-﻿namespace ModernCSharp.Web.Services;
+﻿namespace ModernCSharp.WebApp.Services;
 
 public class OrderStatusNotificationService
 {
