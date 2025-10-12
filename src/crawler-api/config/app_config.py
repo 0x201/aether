@@ -14,6 +14,7 @@ from .model import (
     DatabaseConfig,
     JwtConfig,
     NPPAConfig,
+    KeycloakConfig,
 )
 
 
@@ -123,3 +124,8 @@ class AppConfig(BaseModel):
     def nppa_config(self) -> NPPAConfig:
         nppa = self._config_dic.get("nppa", {})
         return NPPAConfig(**nppa)
+
+    @property
+    def keycloak_config(self) -> KeycloakConfig:
+        keycloak = self._config_dic.get("keycloak", {})
+        return KeycloakConfig(**keycloak)

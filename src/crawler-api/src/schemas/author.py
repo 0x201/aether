@@ -1,30 +1,18 @@
 from typing import Optional
-
 from pydantic import BaseModel
 
 
-class AuthorBase(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    full_name: Optional[str] = None
-    is_active: bool = False
+class AuthorDto(BaseModel):
+    id: Optional[int] = None
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    isActive: bool = False
 
 
-class AuthorCreate(AuthorBase):
-    first_name: str
-    last_name: str
+class AuthorCreateDto(AuthorDto):
+    firstName: str
+    lastName: str
 
 
-class AuthorUpdate(AuthorBase):
-    pass
-
-
-class AuthorInDBBase(AuthorBase):
-    id: int
-
-    class ConfigDict:
-        from_attributes = True
-
-
-class Author(AuthorInDBBase):
+class AuthorUpdateDto(AuthorDto):
     pass

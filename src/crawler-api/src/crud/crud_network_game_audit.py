@@ -2,10 +2,9 @@
 
 from typing import Optional
 
-from sqlalchemy import or_, text, func
+from sqlalchemy import or_, func, delete, text, select
 from sqlalchemy.orm import Session
 
-from src import models
 from src.crud.base import CRUDBase
 from src.models.network_game_audit import NetworkGameAudit
 from src.schemas import (
@@ -43,37 +42,52 @@ class CRUDNetworkGameAudit(
     def get_paged_network_games_audits(
         self, db: Session, query_str: Optional[str], skip: int = 0, limit: int = 10
     ) -> PagedResult:
-        query = db.query(NetworkGameAudit)
+        stmt = select(NetworkGameAudit)
+        count_stmt = select(func.count()).select_from(NetworkGameAudit)
+
         if query_str:
-            query = query.filter(
+            stmt = stmt.where(
                 or_(
-                    models.NetworkGameAudit.name.like(f"%{query_str}%"),
-                    models.NetworkGameAudit.publisher.like(f"%{query_str}%"),
-                    models.NetworkGameAudit.operator.like(f"%{query_str}%"),
+                    NetworkGameAudit.name.like(f"%{query_str}%"),
+                    NetworkGameAudit.publisher.like(f"%{query_str}%"),
+                    NetworkGameAudit.operator.like(f"%{query_str}%"),
+                )
+            )
+            count_stmt = count_stmt.where(
+                or_(
+                    NetworkGameAudit.name.like(f"%{query_str}%"),
+                    NetworkGameAudit.publisher.like(f"%{query_str}%"),
+                    NetworkGameAudit.operator.like(f"%{query_str}%"),
                 )
             )
 
-        audits = query.offset(skip).limit(limit).all()
-        total_count = query.count()
-        return PagedResult(total_count=total_count, data=audits)
+        stmt = stmt.offset(skip).limit(limit)
+        result = db.execute(stmt)
+        audits = result.scalars().all()
+
+        count_result = db.execute(count_stmt)
+        total_count = count_result.scalar()
+
+        return PagedResult(items=audits, totalCount=total_count)
 
     def get_all(self, db: Session) -> list[NetworkGameAudit]:
-        return (
-            db.query(NetworkGameAudit)
-            .order_by(NetworkGameAudit.publish_date.desc())
-            .all()
-        )
+        stmt = select(NetworkGameAudit).order_by(NetworkGameAudit.publish_date.desc())
+        result = db.execute(stmt)
+        return result.scalars().all()
 
     def multiple_create(self, db: Session, *, objs_in: list[NetworkGameAudit]) -> None:
         db.add_all(objs_in)
         db.commit()
 
     def delete_all(self, db: Session) -> None:
-        db.query(NetworkGameAudit).delete()
+        stmt = delete(NetworkGameAudit)
+        db.execute(stmt)
         db.commit()
 
     def is_empty(self, db: Session) -> bool:
-        return False if db.query(NetworkGameAudit).first() else True
+        stmt = select(NetworkGameAudit).limit(1)
+        result = db.execute(stmt)
+        return result.scalars().first() is None
 
     def get_audit_category_top_10(self, db: Session, category: Optional[int]) -> Chart:
         """Get the top 10 audit category

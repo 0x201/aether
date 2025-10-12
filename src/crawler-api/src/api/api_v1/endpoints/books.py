@@ -6,17 +6,18 @@ from starlette import status
 
 from src import crud, schemas
 from src.api import deps
+from src.schemas.paged_result import PagedResult
 
 router = APIRouter()
 
 
-@router.get("", response_model=list[schemas.Book])
+@router.get("", response_model=PagedResult[schemas.BookDto])
 def read_books(
-    *,
-    db: Session = Depends(deps.get_db),
-    title: Optional[str] = None,
-    skip: int = 0,
-    limit: int = 100,
+        *,
+        db: Session = Depends(deps.get_db),
+        title: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 100,
 ) -> Any:
     """
     Retrieve books.
@@ -25,12 +26,12 @@ def read_books(
     return books
 
 
-@router.post("", response_model=schemas.Book)
+@router.post("", response_model=schemas.BookDto)
 def create_book(
-    *,
-    db: Session = Depends(deps.get_db),
-    book_in: schemas.BookCreate,
-    current_user = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        book_in: schemas.BookCreateDto,
+        current_user=Depends(deps.get_current_user),
 ) -> Any:
     """
     Create new book.
@@ -40,11 +41,11 @@ def create_book(
     return book
 
 
-@router.get("/{book_id}", response_model=schemas.Book)
+@router.get("/{book_id}", response_model=schemas.BookDto)
 def get_book(
-    *, 
-    db: Session = Depends(deps.get_db), 
-    book_id: int,
+        *,
+        db: Session = Depends(deps.get_db),
+        book_id: int,
 ) -> Any:
     """
     Get book by ID.
@@ -58,13 +59,13 @@ def get_book(
     return book
 
 
-@router.put("/{book_id}", response_model=schemas.Book)
+@router.put("/{book_id}", response_model=schemas.BookDto)
 def update_book(
-    *, 
-    db: Session = Depends(deps.get_db), 
-    book_id: int, 
-    book_in: schemas.BookUpdate,
-    current_user = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        book_id: int,
+        book_in: schemas.BookUpdateDto,
+        current_user=Depends(deps.get_current_user),
 ) -> Any:
     """
     Update a book.
@@ -79,12 +80,12 @@ def update_book(
     return book
 
 
-@router.delete("/{book_id}", response_model=schemas.Book)
+@router.delete("/{book_id}", response_model=schemas.BookDto)
 def delete_book(
-    *,
-    db: Session = Depends(deps.get_db),
-    book_id: int,
-    current_user = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        book_id: int,
+        current_user=Depends(deps.get_current_user),
 ) -> Any:
     """
     Delete a book.

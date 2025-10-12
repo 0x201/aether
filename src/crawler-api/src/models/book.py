@@ -19,7 +19,16 @@ class Book(Base, Auditable):
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, name="IsActive")
 
-    book_authors = relationship("BookAuthor", back_populates="book", primaryjoin="Book.id==foreign(BookAuthor.book_id)")
+    book_authors = relationship(
+        "BookAuthor",
+        back_populates="book",
+    )
+    authors = relationship(
+        "Author",
+        secondary="BookAuthor",
+        back_populates="books",
+        viewonly=True,
+    )
 
 
 Index("IDX_BOOK_TITLE", "title", unique=True)

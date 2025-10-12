@@ -33,3 +33,9 @@ nppa:
   base_url: "https://www.nppa.gov.cn/bsfw/jggs/yxspjg"
   data_url: "/index"
   suffix: ".html"
+
+keycloak:
+  server_url: "http://localhost:8080/"
+  client_id: "crawler-api"
+  client_secret: "your-client-secret"
+  realm: "moderncsharp"

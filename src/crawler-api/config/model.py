@@ -33,3 +33,10 @@ class NPPAConfig(BaseModel):
     base_url: str
     data_url: str
     suffix: str
+
+
+class KeycloakConfig(BaseModel):
+    server_url: str
+    client_id: str
+    client_secret: str
+    realm: str

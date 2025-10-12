@@ -11,7 +11,7 @@ class SessionConnector:
 
     def _get_database_config(self) -> DatabaseConfig:
         if self._database_config is None:
-            self._database_config = config.database_config
+            self._database_config = config.app_config.database_config
         return self._database_config
 
     def _get_database(self) -> MSSQLSession:

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import delete, select
 
 from src.crud.base import CRUDBase
 from src.models.egame_audit import EGameAudit
@@ -13,7 +14,9 @@ class CRUDEGameAudit(CRUDBase[EGameAudit, EGameAuditCreate, EGameAuditUpdate]):
         return obj_in
 
     def get_all(self, db: Session) -> list[EGameAudit]:
-        return db.query(EGameAudit).order_by(EGameAudit.publish_date.desc()).all()
+        stmt = select(EGameAudit).order_by(EGameAudit.publish_date.desc())
+        result = db.execute(stmt)
+        return result.scalars().all()
 
     def multiple_create(self, db: Session, *, objs_in: list[EGameAudit]) -> None:
         db.add_all(objs_in)
@@ -21,15 +24,20 @@ class CRUDEGameAudit(CRUDBase[EGameAudit, EGameAuditCreate, EGameAuditUpdate]):
 
     # def get_latest_date(self, db: Session) -> datetime.datetime:
     #     """获取最新发布日期"""
-    #     return db.query(NPPATable).order_by(NPPATable.publish_date.desc()).first().publish_date
+    #     stmt = select(EGameAudit).order_by(EGameAudit.publish_date.desc()).limit(1)
+    #     result = db.execute(stmt)
+    #     return result.scalars().first().publish_date
 
     def delete_all(self, db: Session) -> None:
         """删除所有数据"""
-        db.query(EGameAudit).delete()
+        stmt = delete(EGameAudit)
+        db.execute(stmt)
         db.commit()
 
     def is_empty(self, db: Session) -> bool:
-        return False if db.query(EGameAudit).first() else True
+        stmt = select(EGameAudit).limit(1)
+        result = db.execute(stmt)
+        return result.scalars().first() is None
 
 
 egame_audit = CRUDEGameAudit(EGameAudit)
