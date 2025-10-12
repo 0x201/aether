@@ -6,7 +6,7 @@
     <AspnetVersion>10.0.0-rc.1.25451.107</AspnetVersion>
     <!--<AspnetVersion>9.0.9</AspnetVersion>-->
     <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
-    <MSTestVersion>3.9.3</MSTestVersion>
+    <MSTestVersion>4.0</MSTestVersion>
     <FluentUIVersion>4.13.0</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.4</DuendeVersion>
@@ -88,9 +88,9 @@
     <!--Testing-->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="MSTest" Version="4.0.0-preview.25372.6" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="4.0.0-preview.25372.6" />
-    <PackageVersion Include="MSTest.TestFramework" Version="4.0.0-preview.25372.6" />
+    <PackageVersion Include="MSTest" Version="$(MSTestVersion)" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
+    <PackageVersion Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
     <PackageVersion Include="xunit.v3" Version="3.0.0" />
