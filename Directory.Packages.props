@@ -87,9 +87,6 @@
     <PackageVersion Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
-    <PackageVersion Include="xunit.v3" Version="3.0.0" />
-    <PackageVersion Include="xunit.v3.abstraction" Version="2.0.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.3" />
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
     <!--WinUI-->
