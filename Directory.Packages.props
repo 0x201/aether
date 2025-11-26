@@ -9,7 +9,7 @@
     <FluentUIVersion>4.13.0</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
     <DuendeVersion>7.2.4</DuendeVersion>
-    <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
+    <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
     <AspireCommunityVersion>9.8.0</AspireCommunityVersion>
   </PropertyGroup>
   <ItemGroup>
