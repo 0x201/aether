@@ -5,7 +5,7 @@
     <AspireVersion>13.0.0</AspireVersion>
     <AspnetVersion>10.0.0</AspnetVersion>
         <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
-    <MSTestVersion>4.0</MSTestVersion>
+    <MSTestVersion>4.0.2</MSTestVersion>
     <FluentUIVersion>4.13.1</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
         <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
