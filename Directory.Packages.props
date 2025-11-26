@@ -8,10 +8,8 @@
     <MSTestVersion>4.0</MSTestVersion>
     <FluentUIVersion>4.13.0</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
-    <DuendeVersion>7.2.4</DuendeVersion>
-    <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
-    <AspireCommunityVersion>9.8.0</AspireCommunityVersion>
-  </PropertyGroup>
+        <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
+      </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
     <PackageVersion Include="Aspire.Hosting.Keycloak" Version="9.5.1-preview.1.25502.11" />
