@@ -4,15 +4,15 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>13.0.0</AspireVersion>
     <AspnetVersion>10.0.0</AspnetVersion>
-        <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
+    <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>4.0.2</MSTestVersion>
     <FluentUIVersion>4.13.1</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
-        <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
-      </PropertyGroup>
+    <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
+  </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
-    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="9.5.1-preview.1.25502.11" />
+    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.0.0-preview.1.25560.3" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="$(AspireVersion)" />
@@ -32,7 +32,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.OpenApi" Version="2.3.4" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.3.10" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspnetVersion)" />
@@ -68,7 +68,6 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />
@@ -83,10 +82,10 @@
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
     <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
-    <PackageVersion Include="WinUIEx" Version="2.8.0" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
+    <PackageVersion Include="WinUIEx" Version="2.9.0" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
     <PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="$(CommunityToolkitWinUIVersion)" />
@@ -103,11 +102,11 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.2" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
-    <PackageVersion Include="MediatR" Version="13.0.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
+    <PackageVersion Include="MediatR" Version="13.1.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.11" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.11.0" />
   </ItemGroup>
 </Project>
