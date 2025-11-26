@@ -3,9 +3,8 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>13.0.0</AspireVersion>
-    <AspnetVersion>10.0.0-rc.1.25451.107</AspnetVersion>
-    <!--<AspnetVersion>9.0.9</AspnetVersion>-->
-    <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
+    <AspnetVersion>10.0.0</AspnetVersion>
+        <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>4.0</MSTestVersion>
     <FluentUIVersion>4.13.0</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
