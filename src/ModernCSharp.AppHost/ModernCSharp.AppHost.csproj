@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.1" />
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.0" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -29,8 +29,6 @@
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
     <PackageReference Include="Aspire.Hosting.SqlServer" />
     <PackageReference Include="Aspire.Hosting.Python" />
-    <PackageReference Include="Aspire.Hosting.NodeJS" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Python.Extensions" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
   </ItemGroup>
 </Project>
