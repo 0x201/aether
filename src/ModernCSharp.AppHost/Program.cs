@@ -2,13 +2,7 @@
 
 var redis = builder.AddRedis("redis", port: 6379)
                    .WithLifetime(ContainerLifetime.Persistent)
-                   .WithRedisInsight(config =>
-                   {
-                       config.WithHostPort(6378);
-                       config.WithContainerName("redis-insight");
-                       config.WithLifetime(ContainerLifetime.Persistent);
-                   })
-                   .WithDataVolume()
+                                      .WithDataVolume()
                    .WithContainerName("redis");
 
 var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
