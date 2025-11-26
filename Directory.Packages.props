@@ -6,7 +6,7 @@
     <AspnetVersion>10.0.0</AspnetVersion>
         <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
     <MSTestVersion>4.0</MSTestVersion>
-    <FluentUIVersion>4.13.0</FluentUIVersion>
+    <FluentUIVersion>4.13.1</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
         <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
       </PropertyGroup>
