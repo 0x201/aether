@@ -10,8 +10,8 @@ import { PagedResult } from '../models/paged-result.model';
 import { HttpClient } from '@angular/common/http';
 
 interface JwtPayload {
-  userId: string;
-  username: string;
+  sub: string;
+  preferred_username: string;
   email: string;
   // Keycloak specific claims
   azp: string;
@@ -72,12 +72,12 @@ export class UsersService {
 
   getCurrentUserId(): string | null {
     const token = this.parseAccessToken();
-    return token ? (token.userId || null) : null;
+    return token ? (token.sub || null) : null;
   }
 
   getCurrentUsername(): string | null {
     const token = this.parseAccessToken();
-    return token ? (token.username || null) : null;
+    return token ? (token.preferred_username || null) : null;
   }
 
   loadUserMenus(): Observable<Menu[]> {
