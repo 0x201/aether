@@ -1,0 +1,10 @@
+.capture-container {
+  height: auto;
+  padding: 0 20px;
+}
+
+.pagination-container {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}

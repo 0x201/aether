@@ -1,0 +1,49 @@
+.header-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  width: 60px;
+  height: 80%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.header-left h1 {
+  margin: 0 16px 0 0;
+  color: #1677ff;
+  font-size: 18px;
+}
+
+.header-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.header-right {
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  gap: 16px;
+  flex: 0 0 auto;
+}
+
+.sider-container {
+  padding: 0;
+  border-right: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.content-container {
+  flex: 1;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}

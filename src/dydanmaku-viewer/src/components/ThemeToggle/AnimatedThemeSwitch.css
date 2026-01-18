@@ -1,0 +1,36 @@
+.animated-theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.animated-switch.ant-switch {
+  width: 50px;
+  height: 26px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-switch.ant-switch .ant-switch-handle {
+  width: 22px;
+  height: 22px;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-switch.ant-switch.ant-switch-checked .ant-switch-handle {
+  left: calc(100% - 24px);
+  transform: rotate(360deg);
+}
+
+.switch-icon.moon {
+  color: #177ddc;
+}
+
+.switch-icon.sun {
+  color: #faad14;
+}
+
+.animated-switch.ant-switch:hover {
+  transform: scale(1.05);
+}

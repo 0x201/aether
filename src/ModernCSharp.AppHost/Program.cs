@@ -41,18 +41,9 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithHttpHealthCheck("/health")
     .WithReference(keycloak).WaitFor(keycloak);
 
-var workflowApi = builder.AddProject<Projects.Workflow_API>("workflowapi")
-    .WithReference(workflowdb).WaitFor(workflowdb)
-    .WithReference(etldb).WaitFor(etldb)
-    .WithHttpHealthCheck("/health")
-    .WithReference(keycloak).WaitFor(keycloak);
-
-var workflowApp = builder.AddPnpmApp("workflowapp", @"../workflow-app", "dev")
-    .WithReference(workflowApi)
-    .WithHttpEndpoint(port: 3010, env: "VITE_PORT")
-    .WithPnpmPackageInstallation()
-    .WithExternalHttpEndpoints()
-    .WithReference(keycloak).WaitFor(keycloak);
+var dydanmakuApi = builder.AddProject<Projects.DyDanmaku_API>("dydanmakuapi")
+    .WithReference(dydanmakudb).WaitFor(dydanmakudb)
+    .WithHttpHealthCheck("/health");
 
 builder.AddProject<Projects.OrderProcessor>("orderprocessor")
     .WithReference(redis)
@@ -66,39 +57,53 @@ var webApp = builder.AddProject<Projects.ModernCSharp_WebApp>("webapp")
     .WithReference(catalogApi)
     .WithReference(rabbitmq).WaitFor(rabbitmq);
 
-var bookStoreApi = builder.AddPnpmApp("bookstoreapi", @"../bookstore-api", "start:dev")
+var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api", "start:dev")
+    .WithPnpm()
     .WithHttpEndpoint(port: 3011, env: "PORT")
-    .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(keycloak).WaitFor(keycloak)
     .WithReference(bookstoredb).WaitFor(bookstoredb);
+
 var bookstoreApiHttpEndpoint = bookStoreApi.GetEndpoint("http");
 bookStoreApi.WithUrl($"{bookstoreApiHttpEndpoint}/scalar", "Book Store API Scalar Reference");
 
-var bookstoreApp = builder.AddPnpmApp("bookstoreapp", @"../bookstore-app", "start")
+builder.AddJavaScriptApp("bookstoreapp", @"../bookstore-app", "start")
+    .WithPnpm()
     .WithHttpEndpoint(port: 3012, env: "PORT")
-    .WithPnpmPackageInstallation()
     .WithExternalHttpEndpoints()
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-#pragma warning disable ASPIREHOSTINGPYTHON001
 var crawlerApi = builder.AddPythonApp("crawlerapi", @"../crawler-api", "main.py")
+    .WithUv()
     .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter()
     .WithReference(bookstoredb).WaitFor(bookstoredb)
     .WithReference(keycloak).WaitFor(keycloak);
-#pragma warning restore ASPIREHOSTINGPYTHON001
+
 crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/scalar", "Crawler API Scalar Reference");
 
-var crawlerApp = builder.AddPnpmApp("crawlerapp", @"../crawler-app", "dev")
+var dydanmakuAnalysisApi = builder.AddPythonApp("danmakuanalysisapi", @"../dydanmaku-api", "main.py")
+    .WithUv()
+    .WithHttpEndpoint(port: 8000, env: "PORT")
+    .WithExternalHttpEndpoints()
+    .WithReference(dydanmakudb).WaitFor(dydanmakudb);
+
+dydanmakuAnalysisApi.WithUrl($"{dydanmakuAnalysisApi.GetEndpoint("http")}/docs", "Douyu Danmaku Analysis API Docs");
+
+builder.AddJavaScriptApp("crawlerapp", @"../crawler-app")
+    .WithPnpm()
     .WithHttpEndpoint(port: 3014, env: "PORT")
-    .WithPnpmPackageInstallation()
     .WithReference(crawlerApi)
     .WithExternalHttpEndpoints()
     .WithReference(keycloak).WaitFor(keycloak);
 
+builder.AddJavaScriptApp("danmakuviewer", @"../dydanmaku-viewer")
+    .WithPnpm()
+    .WithHttpEndpoint(port: 3015, env: "PORT")
+    .WithReference(dydanmakuApi)
+    .WithExternalHttpEndpoints();
 
 if (OperatingSystem.IsWindows())
 {

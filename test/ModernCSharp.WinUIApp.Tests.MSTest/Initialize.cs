@@ -1,7 +1,5 @@
 ﻿using Microsoft.Windows.ApplicationModel.DynamicDependency;
 
-[assembly: WinUITestTarget(typeof(ModernCSharp.WinUIApp.App))]
-
 namespace ModernCSharp.WinUIApp.Tests.MSTest;
 
 [TestClass]

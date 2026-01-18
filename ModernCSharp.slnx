@@ -14,6 +14,9 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
+  <Project Path="src/DyDanmaku.API/DyDanmaku.API.csproj" />
+  <Project Path="src/DyDanmaku.Domain/DyDanmaku.Domain.csproj" />
+  <Project Path="src/DyDanmaku.Infrastructure/DyDanmaku.Infrastructure.csproj" />
   <Project Path="src/EventBusRabbitMQ/EventBusRabbitMQ.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
@@ -79,7 +82,6 @@
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="src/Workflow.API/Workflow.API.csproj" />
   <Project Path="test/ModernCSharp.Tests/ModernCSharp.Tests.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />

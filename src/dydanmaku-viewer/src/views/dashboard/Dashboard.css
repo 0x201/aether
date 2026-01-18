@@ -1,0 +1,11 @@
+.dashboard-container {
+  position: relative;
+  padding: 16px;
+}
+
+.dashboard-chart-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

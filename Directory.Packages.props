@@ -2,25 +2,25 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>13.0.0</AspireVersion>
-    <AspnetVersion>10.0.0</AspnetVersion>
-    <ApiVersioningVersion>8.1.0</ApiVersioningVersion>
+    <AspireVersion>13.1.0</AspireVersion>
+    <AspnetVersion>10.0.2</AspnetVersion>
+    <ApiVersioningVersion>8.1.1</ApiVersioningVersion>
     <MSTestVersion>4.0.2</MSTestVersion>
-    <FluentUIVersion>4.13.1</FluentUIVersion>
-    <CommunityToolkitWinUIVersion>8.2.250402</CommunityToolkitWinUIVersion>
+    <FluentUIVersion>4.13.2</FluentUIVersion>
+    <CommunityToolkitWinUIVersion>8.2.251219</CommunityToolkitWinUIVersion>
     <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
     <!--Aspire-->
-    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.0.0-preview.1.25560.3" />
-    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.1.0-preview.1.25616.3" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.RabbitMQ.Client" Version="$(AspireVersion)" />
     <!--OpenTelemetry-->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
@@ -40,7 +40,8 @@
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
     <!-- Version together with Asp.Versioning -->
     <PackageVersion Include="Asp.Versioning.Http" Version="$(ApiVersioningVersion)" />
-    <PackageVersion Include="Asp.Versioning.Http.Client" Version="$(ApiVersioningVersion)" />
+    <!--<PackageVersion Include="Asp.Versioning.Http.Client" Version="$(ApiVersioningVersion)" />-->
+    <PackageVersion Include="Asp.Versioning.Http.Client" Version="8.1.0" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="$(ApiVersioningVersion)" />
     <!--Microsoft.Extensions.*-->
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspnetVersion)" />
@@ -54,9 +55,9 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.2.0" />
     <!--FluentUI-->
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="$(FluentUIVersion)" />
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="$(FluentUIVersion)" />
@@ -68,12 +69,12 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />
     <!--Testing-->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="MSTest" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
@@ -102,11 +103,12 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.2" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-    <PackageVersion Include="MediatR" Version="13.1.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageVersion Include="MediatR" Version="14.0.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.11.0" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.6" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.1" />
   </ItemGroup>
 </Project>

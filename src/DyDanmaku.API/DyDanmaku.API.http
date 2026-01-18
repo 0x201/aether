@@ -1,0 +1,6 @@
+@DyDanmaku.Crawler_HostAddress = http://localhost:5001
+
+GET {{DyDanmaku.Crawler_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

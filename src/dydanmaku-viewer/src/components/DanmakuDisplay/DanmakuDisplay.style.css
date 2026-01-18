@@ -1,0 +1,253 @@
+:root {
+    --user-level-0: #e6cca3;
+    --user-level-1: #9fdd9f;
+    --user-level-2: #72b7f6;
+    --user-level-3: #8aa3ff;
+    --user-level-4: #9587fe;
+    --user-level-5: #c382fd;
+    --user-level-6: #e979fc;
+    --user-level-7: #ff76b1;
+    --user-level-8: #ff6960;
+    --fan-medal-0-level: #45b7d1;
+    --fan-medal-0-name: #87cefa;
+    --fan-medal-1-level: #4ecdc4;
+    --fan-medal-1-name: #81e6d9;
+    --fan-medal-2-level: #ff6b6b;
+    --fan-medal-2-name: #ff9e9e;
+    --fan-medal-3-level: #9587fe;
+    --fan-medal-3-name: #8176da;
+    --fan-medal-4-level: #c382fd;
+    --fan-medal-4-name: #c98cff;
+    --fan-medal-5-level: #ff76b1;
+    --fan-medal-5-name: #fa78b0;
+}
+
+.danmaku-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    /* CSS Variables for Danmaku Display */
+    --danmaku-spacing-xs: 4px;
+    --danmaku-spacing-sm: 8px;
+    --danmaku-spacing-md: 12px;
+    --danmaku-spacing-lg: 16px;
+    --danmaku-font-size-sm: 12px;
+    --danmaku-font-size-md: 14px;
+    --danmaku-font-size-lg: 16px;
+}
+
+.danmaku-container,
+.danmaku-main {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.danmaku-main {
+    flex: 1;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+ul {
+    list-style: none;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    outline: none;
+    list-style: none;
+}
+
+/* Danmu List */
+.danmaku-list {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-anchor: none;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.danmaku-item {
+    position: relative;
+    line-height: 20px;
+    word-break: break-all;
+    word-wrap: break-word;
+    margin: var(--danmaku-spacing-sm) 0;
+    font-size: var(--danmaku-font-size-md);
+    letter-spacing: .2px;
+    text-align: left;
+}
+
+.danmaku-notice {
+    padding-left: var(--danmaku-spacing-sm);
+    padding-right: var(--danmaku-spacing-sm);
+}
+
+/* User Level */
+.danmaku-item .user-level {
+    margin-right: 3px;
+    cursor: pointer;
+}
+
+.user-level {
+    margin-right: 5px;
+    display: inline-block;
+    width: 34px;
+    height: 16px;
+    font-size: var(--danmaku-font-size-md);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: auto 100%;
+    vertical-align: middle;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 16px;
+    color: white;
+}
+
+/* User Level Colors */
+.user-level[data-level="0"] {
+    background-color: var(--user-level-0);
+}
+
+.user-level[data-level="1"] {
+    background-color: var(--user-level-1);
+}
+
+.user-level[data-level="2"] {
+    background-color: var(--user-level-2);
+}
+
+.user-level[data-level="3"] {
+    background-color: var(--user-level-3);
+}
+
+.user-level[data-level="4"] {
+    background-color: var(--user-level-4);
+}
+
+.user-level[data-level="5"] {
+    background-color: var(--user-level-5);
+}
+
+.user-level[data-level="6"] {
+    background-color: var(--user-level-6);
+}
+
+.user-level[data-level="7"] {
+    background-color: var(--user-level-7);
+}
+
+.user-level[data-level="8"] {
+    background-color: var(--user-level-8);
+}
+
+/* Fan Medal Container */
+.fan-medal-container {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    font-size: var(--danmaku-font-size-sm);
+    margin-right: 6px;
+    margin-left: 6px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.fan-medal-container .fan-medal-level,
+.fan-medal-container .fan-medal-name {
+    color: white;
+    padding: 2px 6px;
+    font-size: var(--danmaku-font-size-sm);
+}
+
+.fan-medal-container .fan-medal-level {
+    border-radius: 10px 0 0 10px;
+}
+
+.fan-medal-container .fan-medal-name {
+    border-radius: 0 10px 10px 0;
+}
+
+/* Fan Medal Colors */
+.fan-medal-container[data-level="0"] .fan-medal-level {
+    background-color: var(--fan-medal-0-level);
+}
+
+.fan-medal-container[data-level="0"] .fan-medal-name {
+    background-color: var(--fan-medal-0-name);
+}
+
+.fan-medal-container[data-level="1"] .fan-medal-level {
+    background-color: var(--fan-medal-1-level);
+}
+
+.fan-medal-container[data-level="1"] .fan-medal-name {
+    background-color: var(--fan-medal-1-name);
+}
+
+.fan-medal-container[data-level="2"] .fan-medal-level {
+    background-color: var(--fan-medal-2-level);
+}
+
+.fan-medal-container[data-level="2"] .fan-medal-name {
+    background-color: var(--fan-medal-2-name);
+}
+
+.fan-medal-container[data-level="3"] .fan-medal-level {
+    background-color: var(--fan-medal-3-level);
+}
+
+.fan-medal-container[data-level="3"] .fan-medal-name {
+    background-color: var(--fan-medal-3-name);
+}
+
+.fan-medal-container[data-level="4"] .fan-medal-level {
+    background-color: var(--fan-medal-4-level);
+}
+
+.fan-medal-container[data-level="4"] .fan-medal-name {
+    background-color: var(--fan-medal-4-name);
+}
+
+.fan-medal-container[data-level="5"] .fan-medal-level {
+    background-color: var(--fan-medal-5-level);
+}
+
+.fan-medal-container[data-level="5"] .fan-medal-name {
+    background-color: var(--fan-medal-5-name);
+}
+
+/* Username and Content */
+.username {
+    color: grey;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 3px;
+}
+
+.content {
+    /* color: #000000; */
+    font-size: var(--danmaku-font-size-md);
+    word-break: break-all;
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+.is-colon {
+    margin-left: 2px;
+    margin-right: 4px;
+}
