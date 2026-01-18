@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<RootNamespace>ModernCSharp.Ordering.Infrastructure</RootNamespace>
 		<AssemblyName>ModernCSharp.Ordering.Infrastructure</AssemblyName>
 		<Platforms>AnyCPU;x64;x86</Platforms>
-	</PropertyGroup>
+	  <UserSecretsId>844448f4-5960-437e-afe0-f184fde5ec67</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
@@ -15,7 +16,7 @@
 	<ItemGroup>
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="CsvHelper" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
 	</ItemGroup>
 

@@ -65,7 +65,7 @@ public partial class App : System.Windows.Application
             var connectionString = builder.Configuration.GetConnectionString("orderingdb");
 
             options
-                .UseSqlServer(connectionString)
+                .UseNpgsql(connectionString)
                 .AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
         });
 

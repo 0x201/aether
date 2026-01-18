@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using ModernCSharp.AppDefaults;
+using ModernCSharp.ServiceDefaults;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -26,6 +28,9 @@ public static class ServiceDefaultsExtensions
 
         builder.AddDefaultHealthChecks();
 
+        // Add Keycloak authentication
+        builder.AddKeycloakAuthentication();
+
         // Uncomment the following to restrict the allowed schemes for service discovery.
         // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
         // {
@@ -44,7 +49,6 @@ public static class ServiceDefaultsExtensions
             })
             .WithTracing(tracing =>
             {
-                tracing.AddGrpcClientInstrumentation();
                 tracing.AddAspNetCoreInstrumentation(tracing =>
                     tracing.Filter = httpContext =>
                     !(httpContext.Request.Path.StartsWithSegments(HealthEndpointPath)

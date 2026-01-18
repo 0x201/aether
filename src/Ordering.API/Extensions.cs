@@ -9,7 +9,7 @@ internal static class Extensions
     {
         var services = builder.Services;
 
-        builder.AddDefaultAuthentication();
+        builder.AddKeycloakAuthentication();
 
         var connectionString = builder.Configuration.GetConnectionString("orderingdb");
 
@@ -18,10 +18,10 @@ internal static class Extensions
         services.AddDbContext<OrderingDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString, sqlBuilderOptions => { sqlBuilderOptions.EnableRetryOnFailure(5); });
+            options.UseNpgsql(connectionString, sqlBuilderOptions => { sqlBuilderOptions.EnableRetryOnFailure(5); });
         });
 
-        builder.EnrichSqlServerDbContext<OrderingDbContext>();
+        builder.EnrichNpgsqlDbContext<OrderingDbContext>();
 
         services.AddMigration<OrderingDbContext, OrderingDbContextSeed>();
 

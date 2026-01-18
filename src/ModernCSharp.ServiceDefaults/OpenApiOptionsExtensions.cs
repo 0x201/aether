@@ -128,7 +128,7 @@ internal static class OpenApiOptionsExtensions
             [
                 new()
                 {
-                    [oAuthScheme] = scopes.ToList()
+                    [oAuthScheme] = [.. scopes]
                 }
             ];
 

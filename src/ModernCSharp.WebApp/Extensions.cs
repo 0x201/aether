@@ -39,9 +39,11 @@ public static class Extensions
 
         JsonWebTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
 
-        var identityUrl = configuration.GetRequiredValue("IdentityUrl");
-        var callBackUrl = configuration.GetRequiredValue("CallBackUrl");
-        var sessionCookieLifetime = configuration.GetValue("SessionCookieLifetimeMinutes", 60);
+        var identityUrl = configuration.GetRequiredValue("Auth:IdentityUrl");
+        var callBackUrl = configuration.GetRequiredValue("Auth:CallbackUrl");
+        var sessionCookieLifetime = configuration.GetValue("Auth:SessionCookieLifetimeMinutes", 60);
+        var clientId = configuration.GetRequiredValue("Auth:ClientId");
+        var clientSecret = configuration.GetRequiredValue("Auth:ClientSecret");
 
         // Add Authentication services
         services.AddAuthorization();
@@ -56,8 +58,8 @@ public static class Extensions
             options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.Authority = identityUrl;
             options.SignedOutRedirectUri = callBackUrl;
-            options.ClientId = "webapp";
-            options.ClientSecret = "secret";
+            options.ClientId = clientId;
+            options.ClientSecret = clientSecret;
             options.ResponseType = "code";
             options.SaveTokens = true;
             options.GetClaimsFromUserInfoEndpoint = true;

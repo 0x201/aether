@@ -15,31 +15,24 @@ public class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
         builder.OwnsOne(x => x.Address);
 
         builder.Property(x => x.Quantity)
-            .HasColumnType("decimal(18,2)")
             .IsRequired();
 
         builder.Property(x => x.Total)
-            .HasColumnType("decimal(18,2)")
             .IsRequired();
 
         builder.Property(x => x.CustomerName)
-            .HasColumnType("nvarchar(100)")
             .IsRequired();
 
         builder.Property(x => x.OrderDate)
-            .HasColumnType("datetime")
             .IsRequired();
 
         builder.Property(x => x.OrderStatus)
-            .HasColumnType("nvarchar(50)")
             .HasConversion<string>()
             .IsRequired();
 
         builder.Property(x => x.CreatedBy)
-            .HasColumnType("nvarchar(500)")
             .IsRequired();
 
-        builder.Property(x => x.LastModifiedBy)
-            .HasColumnType("nvarchar(500)");
+        builder.Property(x => x.LastModifiedBy);
     }
 }

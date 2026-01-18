@@ -100,8 +100,6 @@ public sealed class RabbitMQEventBus(
                     mandatory: true,
                     basicProperties: properties,
                     body: body);
-
-                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -248,9 +246,10 @@ public sealed class RabbitMQEventBus(
 
                 _consumerChannel = await _rabbitMQConnection.CreateChannelAsync();
 
-                _consumerChannel.CallbackExceptionAsync += async (sender, ea) =>
+                _consumerChannel.CallbackExceptionAsync += (sender, ea) =>
                 {
                     logger.LogWarning(ea.Exception, "Error with RabbitMQ consumer channel");
+                    return Task.CompletedTask;
                 };
 
                 await _consumerChannel.ExchangeDeclareAsync(exchange: ExchangeName,

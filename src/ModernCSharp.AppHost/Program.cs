@@ -1,33 +1,31 @@
 ﻿var builder = DistributedApplication.CreateBuilder(args);
 
 var redis = builder.AddRedis("redis", port: 6379)
-                   .WithLifetime(ContainerLifetime.Persistent)
-                                      .WithDataVolume()
-                   .WithContainerName("redis");
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithDataVolume()
+    .WithContainerName("redis");
 
 var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
-                      .WithLifetime(ContainerLifetime.Persistent)
-                      .WithManagementPlugin(port: 15672)
-                      .WithDataVolume()
-                      .WithContainerName("eventbus");
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithManagementPlugin(port: 15672)
+    .WithDataVolume()
+    .WithContainerName("eventbus");
 
-var sqlServer = builder.AddSqlServer("sqlserver", port: 14330)
-                       .WithImage("mssql/server", "2025-latest")
-                       .WithLifetime(ContainerLifetime.Persistent)
-                       .WithDataVolume()
-                       .WithContainerName("sql-server");
+var postgres = builder.AddPostgres("postgres", port: 5432)
+    .WithImageTag("latest")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithContainerName("postgres");
 
 var keycloak = builder.AddKeycloak("keycloak", port: 8080)
-                      .WithLifetime(ContainerLifetime.Persistent)
-                      .WithDataVolume()
-                      .WithRealmImport("./realm.json")
-                      .WithContainerName("keycloak");
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithDataVolume()
+    .WithRealmImport("./realm.json")
+    .WithContainerName("keycloak");
 
-var bookstoredb = sqlServer.AddDatabase("bookstoredb");
-var orderingdb = sqlServer.AddDatabase("orderingdb");
-var catalogdb = sqlServer.AddDatabase("catalogdb");
-var workflowdb = sqlServer.AddDatabase("workflowdb");
-var etldb = sqlServer.AddDatabase("etldb");
+var bookstoredb = postgres.AddDatabase("bookstoredb");
+var orderingdb = postgres.AddDatabase("orderingdb");
+var catalogdb = postgres.AddDatabase("catalogdb");
+var dydanmakudb = postgres.AddDatabase("dydanmakudb");
 
 
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";

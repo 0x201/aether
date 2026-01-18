@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using ModernCSharp.EventBusRabbitMQ;
 
@@ -10,18 +8,11 @@ public static class RabbitMqDependencyInjectionExtensions
 {
     private const string SectionName = "EventBus";
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:RequiresUnreferencedCode",
-        Justification = "EventBusOptions is a simple POCO with public properties that are safe for trimming.")]
-    [UnconditionalSuppressMessage("AOT", "IL3050:RequiresDynamicCode",
-        Justification = "EventBusOptions is a simple POCO with public properties that are safe for AOT.")]
     public static IEventBusBuilder AddRabbitMqEventBus(this IHostApplicationBuilder builder, string connectionName)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.AddRabbitMQClient(connectionName, configureConnectionFactory: static factory =>
-        {
-            
-        });
+        builder.AddRabbitMQClient(connectionName);
 
         // RabbitMQ.Client doesn't have built-in support for OpenTelemetry, so we need to add it ourselves
         builder.Services.AddOpenTelemetry()

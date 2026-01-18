@@ -57,7 +57,7 @@ public static class Extensions
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddDbContext<OrderingDbContext>((sp, options) =>
         {
-            options.UseSqlServer(connectionString)
+            options.UseNpgsql(connectionString)
                 .AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
         });
 
