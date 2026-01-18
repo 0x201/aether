@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace DyDanmaku.API.Services;
 
 internal class DanmakuCaptureService(
-    IDbContextFactory<ApplicationDbContext> dbContextFactory,
+    IDbContextFactory<DyDanmakuDbContext> dbContextFactory,
     DyDanmakuClient dyDanmakuClient,
     IHttpClientFactory httpClientFactory,
     ICaptureJobRepository captureJobService,

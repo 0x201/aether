@@ -8,7 +8,7 @@ internal class DanmakuCaptureServiceFactory(IServiceProvider serviceProvider) : 
         using var scope = serviceProvider.CreateScope();
         
         return new DanmakuCaptureService(
-            scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>(),
+            scope.ServiceProvider.GetRequiredService<IDbContextFactory<DyDanmakuDbContext>>(),
             scope.ServiceProvider.GetRequiredService<DyDanmakuClient>(),
             scope.ServiceProvider.GetRequiredService<IHttpClientFactory>(),
             scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>(),

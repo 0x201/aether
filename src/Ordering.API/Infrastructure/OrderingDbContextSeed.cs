@@ -6,5 +6,4 @@ public class OrderingDbContextSeed : IDbSeeder<OrderingDbContext>
     {
         await context.SaveChangesAsync();
     }
-
 }

@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\ActivityExtensions.cs" Link="Extensions\ActivityExtensions.cs" />
+    <Compile Include="..\Shared\MigrateDbContextExtensions.cs" Link="Extensions\MigrateDbContextExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
@@ -24,6 +29,7 @@
     <ProjectReference Include="..\DyDanmaku.Infrastructure\DyDanmaku.Infrastructure.csproj" />
     <ProjectReference Include="..\ModernCSharp.AppDefaults\ModernCSharp.AppDefaults.csproj" />
     <ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

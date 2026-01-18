@@ -25,7 +25,7 @@ internal class DanmakuPushService(
         try
         {
             using var scope = serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
 
             // Get the last push time for this room, defaulting to 10 seconds ago if not found
             var lastPushTime = _lastPushTime.GetValueOrDefault(roomId, DateTimeOffset.UtcNow.AddSeconds(-10));

@@ -1,19 +1,14 @@
-﻿using System.Reflection;
-using DyDanmaku.Domain.Entity;
-using Microsoft.EntityFrameworkCore;
+﻿namespace DyDanmaku.Infrastructure;
 
-namespace DyDanmaku.Infrastructure;
-
-public class ApplicationDbContext : DbContext
+public class DyDanmakuDbContext : DbContext, IUnitOfWork
 {
-
     public DbSet<Danmaku> Danmakus { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public DbSet<CaptureJob> CaptureJobs { get; set; }
 
     public DbSet<DanmakuAnalysis> DanmakuAnalyses { get; set; }
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    public DyDanmakuDbContext(DbContextOptions<DyDanmakuDbContext> options) : base(options)
     {
 
     }
@@ -25,5 +20,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.HasDefaultSchema("dydanmaku");
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
+    {
+
+        _ = await base.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }

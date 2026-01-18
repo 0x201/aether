@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DyDanmaku.Infrastructure.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(DyDanmakuDbContext))]
     [Migration("20260110143620_DisableAutoGenRoomId")]
     partial class DisableAutoGenRoomId
     {

@@ -1,9 +1,9 @@
+﻿using System.Net;
+using System.Text.Json;
+
 using Asp.Versioning;
 
 using DyDanmaku.API.Mappings;
-
-using System.Net;
-using System.Text.Json;
 
 internal static class DanmakuApi
 {
@@ -27,7 +27,7 @@ internal static class DanmakuApi
         group.MapPost("/capture/start", async (
             [FromBody] CaptureRequest request,
             [FromServices] ICaptureJobManager jobManager,
-            [FromServices] ApplicationDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext) =>
         {
             var success = await jobManager.StartAsync(request.RoomId, request.Duration);
 
@@ -73,7 +73,7 @@ internal static class DanmakuApi
         .Produces<Result>(StatusCodes.Status200OK)
         .Produces<Result>(StatusCodes.Status404NotFound);
 
-        group.MapGet("/count", async ([FromServices] ApplicationDbContext dbContext) =>
+        group.MapGet("/count", async ([FromServices] DyDanmakuDbContext dbContext) =>
         {
             var count = await dbContext.Danmakus.CountAsync();
             return Results.Ok(new { count });
@@ -84,7 +84,7 @@ internal static class DanmakuApi
 
         group.MapGet("", async (
             [AsParameters] DanmakuRequest request,
-            [FromServices] ApplicationDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext) =>
         {
             var query = dbContext.Danmakus
                 .AsNoTracking()
@@ -137,7 +137,7 @@ internal static class DanmakuApi
 
         group.MapGet("/rooms", async (
             [AsParameters] RoomRequest request,
-            [FromServices] ApplicationDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext) =>
         {
             var query = dbContext.Rooms
                 .AsNoTracking()
@@ -163,7 +163,7 @@ internal static class DanmakuApi
 
         group.MapDelete("/{id:int}", async (
             [FromRoute] int id,
-            [FromServices] ApplicationDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext) =>
         {
             var entity = await dbContext.Danmakus.FindAsync(id);
             if (entity is null)
@@ -178,7 +178,7 @@ internal static class DanmakuApi
 
         group.MapGet("/capture/jobs", async (
             [AsParameters] DanmakuRequest request,
-            [FromServices] ApplicationDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext) =>
         {
             var query = dbContext.CaptureJobs
                 .AsNoTracking();
@@ -209,7 +209,7 @@ internal static class DanmakuApi
 
         group.MapGet("/analysis-data", async (
             [AsParameters] DanmakuAnalysisRequest request,
-            [FromServices] ApplicationDbContext dbContext,
+            [FromServices] DyDanmakuDbContext dbContext,
             ILoggerFactory loggerFactory) =>
         {
             var logger = loggerFactory.CreateLogger(LogCategory);
@@ -254,7 +254,7 @@ internal static class DanmakuApi
 
         group.MapGet("/stats", async (
             [AsParameters] DanmakuAnalysisRequest request,
-            [FromServices] ApplicationDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext) =>
         {
             var totalCount = await dbContext.Danmakus
                 .WhereIf(request.StartTime.HasValue, x => x.CreatedAt >= request.StartTime)

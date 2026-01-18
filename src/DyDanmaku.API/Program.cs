@@ -1,34 +1,21 @@
-﻿using ModernCSharp.ServiceDefaults;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-
-var corsAllowOrigins = builder.Configuration.GetSection("Cors:AllowOrigins").Get<string[]>() ?? [];
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", (policy) =>
-    {
-        policy.WithOrigins(corsAllowOrigins)
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-    });
-});
+builder.AddApplicationService();
 builder.Services.AddSignalR();
-builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 builder.Services.AddProblemDetails();
-builder.AddDefaultOpenApi();
-builder.Services.AddApiVersioningAndDocumentation();
-builder.AddApplicationService();
+
+var withApiVersioning = builder.Services.AddApiVersioning();
+builder.AddDefaultOpenApi(withApiVersioning);
 
 var app = builder.Build();
 
-app.UseCors("AllowAll");
 app.MapDefaultEndpoints();
-app.UseDefaultOpenApi();
+
 app.MapDanmakuApi();
+
+app.UseDefaultOpenApi();
+
 app.MapHub<DyDanmakuHub>("/danmaku-hub");
 app.Run();

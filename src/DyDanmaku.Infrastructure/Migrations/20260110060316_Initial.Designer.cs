@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DyDanmaku.Infrastructure.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(DyDanmakuDbContext))]
     [Migration("20260110060316_Initial")]
     partial class Initial
     {

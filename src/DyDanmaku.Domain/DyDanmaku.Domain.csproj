@@ -7,4 +7,8 @@
 	<RootNamespace>DyDanmaku.Domain</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModernCSharp.DDD\ModernCSharp.DDD.csproj" />
+  </ItemGroup>
+
 </Project>

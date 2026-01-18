@@ -1,8 +1,3 @@
-using DyDanmaku.Domain.Entity;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
 
 public class CaptureJobTypeConfiguration : IEntityTypeConfiguration<CaptureJob>

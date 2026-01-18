@@ -7,7 +7,7 @@ internal class DyDanmakuClient(
     ILogger<DyDanmakuClient> logger,
     ICaptureJobRepository captureJobService,
     IConfiguration configuration,
-    IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    IDbContextFactory<DyDanmakuDbContext> dbContextFactory)
 {
     private string SERVERPREFIX = configuration.GetSection("Douyu:Apis:DanmakuUrl").Get<string>() ?? "wss://danmuproxy.douyu.com";
     private string _serverUrl = string.Empty;

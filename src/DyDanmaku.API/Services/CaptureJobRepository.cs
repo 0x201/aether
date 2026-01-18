@@ -1,7 +1,7 @@
 namespace DyDanmaku.API.Services;
 
 internal class CaptureJobRepository(
-    IDbContextFactory<ApplicationDbContext> dbContextFactory) : ICaptureJobRepository
+    IDbContextFactory<DyDanmakuDbContext> dbContextFactory) : ICaptureJobRepository
 {
     public async Task<CaptureJob?> CreateJobAsync(int roomId, int duration, CancellationToken cancellationToken = default)
     {
