@@ -13,7 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Catalog.API\Catalog.API.csproj" />
     <ProjectReference Include="..\DyDanmaku.API\DyDanmaku.API.csproj" />
     <ProjectReference Include="..\ModernCSharp.WPFApp\ModernCSharp.WPFApp.csproj" />
     <ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />

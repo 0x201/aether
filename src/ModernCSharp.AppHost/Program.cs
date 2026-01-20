@@ -1,39 +1,44 @@
-﻿var builder = DistributedApplication.CreateBuilder(args);
+﻿using Microsoft.Extensions.Configuration;
+
+var builder = DistributedApplication.CreateBuilder(args);
+
+builder.AddDockerComposeEnvironment("env");
+
+
+var dataMountPath = builder.Configuration.GetSection("Docker:DataMountPath").Get<string>() ?? @"/dockerdata";
+var redisDataPath = Path.Combine(dataMountPath, "redis");
+var postgresDataPath = Path.Combine(dataMountPath, "postgres");
+var rabbitmqDataPath = Path.Combine(dataMountPath, "rabbitmq");
+var keycloakDataPath = Path.Combine(dataMountPath, "keycloak");
 
 var redis = builder.AddRedis("redis", port: 6379)
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithDataVolume()
+    .WithBindMount(redisDataPath, "/data")
     .WithContainerName("redis");
 
 var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithManagementPlugin(port: 15672)
-    .WithDataVolume()
+    .WithBindMount(rabbitmqDataPath, "/var/lib/rabbitmq")
     .WithContainerName("eventbus");
 
 var postgres = builder.AddPostgres("postgres", port: 5432)
     .WithImageTag("latest")
     .WithLifetime(ContainerLifetime.Persistent)
+    .WithBindMount(Path.GetFullPath(postgresDataPath), "/var/lib/postgresql")
     .WithContainerName("postgres");
 
 var keycloak = builder.AddKeycloak("keycloak", port: 8080)
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithDataVolume()
+    .WithBindMount(keycloakDataPath, "/opt/keycloak/data")
     .WithRealmImport("./realm.json")
     .WithContainerName("keycloak");
 
 var bookstoredb = postgres.AddDatabase("bookstoredb");
 var orderingdb = postgres.AddDatabase("orderingdb");
-var catalogdb = postgres.AddDatabase("catalogdb");
 var dydanmakudb = postgres.AddDatabase("dydanmakudb");
 
-
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
-
-var catalogApi = builder.AddProject<Projects.Catalog_API>("catalogapi")
-    .WithReference(rabbitmq).WaitFor(rabbitmq)
-    .WithReference(catalogdb)
-    .WithReference(keycloak).WaitFor(keycloak);
 
 var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
@@ -54,7 +59,6 @@ builder.AddProject<Projects.OrderProcessor>("orderprocessor")
 var webApp = builder.AddProject<Projects.ModernCSharp_WebApp>("webapp")
     .WithExternalHttpEndpoints()
     .WithReference(orderingApi)
-    .WithReference(catalogApi)
     .WithReference(rabbitmq).WaitFor(rabbitmq);
 
 var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api", "start:dev")
@@ -74,16 +78,6 @@ builder.AddJavaScriptApp("bookstoreapp", @"../bookstore-app", "start")
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-var crawlerApi = builder.AddPythonApp("crawlerapi", @"../crawler-api", "main.py")
-    .WithUv()
-    .WithHttpEndpoint(port: 3013, env: "PORT")
-    .WithExternalHttpEndpoints()
-    .WithOtlpExporter()
-    .WithReference(bookstoredb).WaitFor(bookstoredb)
-    .WithReference(keycloak).WaitFor(keycloak);
-
-crawlerApi.WithUrl($"{crawlerApi.GetEndpoint("http")}/scalar", "Crawler API Scalar Reference");
-
 var dydanmakuAnalysisApi = builder.AddPythonApp("danmakuanalysisapi", @"../dydanmaku-api", "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
@@ -91,13 +85,6 @@ var dydanmakuAnalysisApi = builder.AddPythonApp("danmakuanalysisapi", @"../dydan
     .WithReference(dydanmakudb).WaitFor(dydanmakudb);
 
 dydanmakuAnalysisApi.WithUrl($"{dydanmakuAnalysisApi.GetEndpoint("http")}/docs", "Douyu Danmaku Analysis API Docs");
-
-builder.AddJavaScriptApp("crawlerapp", @"../crawler-app")
-    .WithPnpm()
-    .WithHttpEndpoint(port: 3014, env: "PORT")
-    .WithReference(crawlerApi)
-    .WithExternalHttpEndpoints()
-    .WithReference(keycloak).WaitFor(keycloak);
 
 builder.AddJavaScriptApp("danmakuviewer", @"../dydanmaku-viewer")
     .WithPnpm()
