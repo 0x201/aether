@@ -1,3 +1,5 @@
+import os
+from scalar_fastapi import get_scalar_api_reference, Theme
 import logging
 from contextlib import asynccontextmanager
 import sys
@@ -101,8 +103,25 @@ app.include_router(api_router)
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {"message": "Welcome to Douyu Danmaku API"}
+    return {"message": "Welcome to Douyu Danmaku Analytics API"}
 
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "environment": ENVIRONMENT}
+
+
+@app.get("/scalar", include_in_schema=False)
+async def scalar_html():
+    return get_scalar_api_reference(
+        openapi_url=app.openapi_url,
+        title=app.title,
+        hide_client_button=True,
+        show_developer_tools="never",
+        theme=Theme.KEPLER,
+    )
 
 if __name__ == "__main__":
     setup_logging()

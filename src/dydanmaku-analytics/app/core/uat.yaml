@@ -1,4 +1,4 @@
-project_name: "Douyu Danmaku API"
+project_name: "Douyu Danmaku Analytics API"
 version: "0.0.1"
 
 cors:

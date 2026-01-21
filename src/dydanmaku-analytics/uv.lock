@@ -177,6 +177,7 @@ dev = [
     { name = "coverage" },
     { name = "pytest" },
     { name = "pytest-mock" },
+    { name = "scalar-fastapi" },
 ]
 
 [package.metadata]
@@ -200,6 +201,7 @@ dev = [
     { name = "coverage", specifier = ">=7.13.0" },
     { name = "pytest", specifier = ">=9.0.1" },
     { name = "pytest-mock", specifier = ">=3.15.1" },
+    { name = "scalar-fastapi", specifier = ">=1.6.1" },
 ]
 
 [[package]]
@@ -825,6 +827,15 @@ wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/fc/d3/18210222b37e87e36357f7b300b7d98c6dd62b133771e71ae27acba83a4f/rignore-0.7.6-cp314-cp314t-win32.whl", hash = "sha256:c1d8f117f7da0a4a96a8daef3da75bc090e3792d30b8b12cfadc240c631353f9" },
     { url = "https://mirrors.aliyun.com/pypi/packages/3e/87/033eebfbee3ec7d92b3bb1717d8f68c88e6fc7de54537040f3b3a405726f/rignore-0.7.6-cp314-cp314t-win_amd64.whl", hash = "sha256:ca36e59408bec81de75d307c568c2d0d410fb880b1769be43611472c61e85c96" },
     { url = "https://mirrors.aliyun.com/pypi/packages/79/62/b88e5879512c55b8ee979c666ee6902adc4ed05007226de266410ae27965/rignore-0.7.6-cp314-cp314t-win_arm64.whl", hash = "sha256:b83adabeb3e8cf662cabe1931b83e165b88c526fa6af6b3aa90429686e474896" },
+]
+
+[[package]]
+name = "scalar-fastapi"
+version = "1.6.1"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/db/56/bb31bc04d42b989db6933c2c3272d229d68baff0f95214e28e20886da8f6/scalar_fastapi-1.6.1.tar.gz", hash = "sha256:5d3cc96f0f384d388b58aba576a903b907e3c98dacab1339072210e946c4f033" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/e9/d9/6794a883410a01389ba6c7fece82f0586a57a7eaad9372b26016ad84e922/scalar_fastapi-1.6.1-py3-none-any.whl", hash = "sha256:880b3fa76b916fd2ee54b0fe340662944a1f95201f606902c2424b673c2cedaf" },
 ]
 
 [[package]]
