@@ -2,7 +2,7 @@
 Scheduled analyzer service for precomputing word frequency and wordcloud data
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from abc import ABC, abstractmethod
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -184,7 +184,7 @@ class ScheduledAnalyzer:
 
     async def _precompute_analyses(self, date_range: DateRange = DateRange.HOURLY):
         """Precompute analyses for the last completed period based on date_range"""
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
 
         strategy = TimeRangeStrategyFactory.get_strategy(date_range)
         start_time, end_time = strategy.calculate_time_range(now)
@@ -212,7 +212,7 @@ class ScheduledAnalyzer:
         stmt = (
             select(Danmaku.room_id)
             .where(
-                Danmaku.created_at >= datetime.now() - timedelta(hours=24),
+                Danmaku.created_at >= datetime.now(timezone.utc) - timedelta(hours=24),
                 Danmaku.room_id.isnot(None),
             )
             .distinct()
