@@ -305,6 +305,7 @@ internal static class DanmakuApi
                     Hour = x.Key.ToString(),
                     Count = x.Count()
                 })
+                .OrderBy(x => x.Hour)
                 .ToList();
 
             var topRoomsQuery = dbContext.Danmakus
