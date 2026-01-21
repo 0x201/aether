@@ -1,3 +1,5 @@
+import { IResult } from "../response/Result";
+
 interface IFilteredResultQuery {
   filter: string | null;
 }
@@ -7,12 +9,10 @@ interface IHasTotalCount {
 }
 
 interface ILimitedResultQuery {
-  maxResultCount: number;
+  pageSize: number;
 }
 
-interface IListResult<T> {
-  readonly items: ReadonlyArray<T>;
-}
+interface IListResult<T> extends IResult<ReadonlyArray<T>> {}
 
 interface IPagedAndSortedResultQuery
   extends IPagedResultQuery,
@@ -20,7 +20,7 @@ interface IPagedAndSortedResultQuery
     ISortedResultQuery {}
 
 interface IPagedResultQuery extends ILimitedResultQuery {
-  skipCount: number;
+  page: number;
 }
 
 interface ISortedResultQuery {

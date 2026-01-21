@@ -241,10 +241,16 @@ export abstract class GenericCrudBaseService<T extends BaseAuditableEntity, Crea
     const sortField = query.sorting || "id";
     const sortOrder = query.order && query.order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
+    if (query.page < 1) {
+      query.page = 1;
+    }
+
+    query.page = query.page - 1;
+
     return await qb
       .orderBy(`${entityName.toLowerCase()}.${sortField}`, sortOrder)
-      .skip(query.skipCount || 0)
-      .take(query.maxResultCount || 10)
+      .skip(query.page * query.pageSize || 0)
+      .take(query.pageSize || 10)
       .getManyAndCount();
   }
 

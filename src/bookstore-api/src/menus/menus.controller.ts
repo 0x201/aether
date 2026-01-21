@@ -26,7 +26,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { UserPayload } from '../shared/services/user-context.service';
 import { MenuQuery } from './queries/menu.query';
-import { PagedResult } from 'src/common/response/ListResultResponse';
+import { PagedResult } from 'src/common/response/Result';
 import { CreateMenuCommand } from './commands/create-menu.command';
 import { UpdateMenuCommand } from './commands/update-menu.command';
 

@@ -11,7 +11,7 @@ import {
   HttpStatus,
   Res,
 } from '@nestjs/common';
-import { PagedResult } from '../common/response/ListResultResponse';
+import { Result, PagedResult } from '../common/Response/Result';
 import { BooksService } from './books.service';
 import { BookDto } from './dtos/book.dto';
 import { BookQuery } from './queries/book.query';
@@ -59,8 +59,8 @@ export class BooksController {
   })
   async findBooks(@Query() query: BookQuery): Promise<PagedResult<BookDto>> {
     const [books, totalCount] = await this.booksService.findBooks(query);
-    const items: BookDto[] = books.map((book) => this.mapBookToBookDto(book));
-    return new PagedResult<BookDto>(items, totalCount);
+    const data: BookDto[] = books.map((book) => this.mapBookToBookDto(book));
+    return PagedResult.success(data, totalCount);
   }
 
   @Get(':id')
@@ -69,15 +69,15 @@ export class BooksController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Return book by id',
-    type: BookDto,
+    type: Result<BookDto>,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Book not found' })
-  async findOne(@Param('id') id: number): Promise<BookDto> {
+  async findOne(@Param('id') id: number): Promise<Result<BookDto>> {
     const entity = await this.booksService.findOne(id);
     if (!entity) {
       throw new HttpException(`Cannot find the entity with id ${id}`, 404);
     }
-    return this.mapBookToBookDto(entity);
+    return Result.success(this.mapBookToBookDto(entity));
   }
 
   @Roles(RoleEnum.Admin)
@@ -88,7 +88,6 @@ export class BooksController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Book updated successfully',
-    type: BookDto,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Book not found' })
   async update(

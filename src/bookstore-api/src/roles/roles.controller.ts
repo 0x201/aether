@@ -24,7 +24,7 @@ import { CreateRoleCommand } from './commands/create-role.command';
 import { UpdateRoleCommand } from './commands/update-role.command';
 import { Role } from './entities/role.entity';
 import { RoleDto } from './dtos/role.dto';
-import { PagedResult } from 'src/common/response/ListResultResponse';
+import { PagedResult } from 'src/common/response/Result';
 import { RoleQuery } from './queries/role.query';
 import { Roles } from './role.decorator';
 import { RoleEnum } from './role.enum';
@@ -47,8 +47,8 @@ export class RolesController {
   })
   async findPaginatedList(@Query() query: RoleQuery): Promise<PagedResult<RoleDto>> {
     const [roles, totalCount] = await this.rolesService.findRoles(query);
-    const items: RoleDto[] = roles.map((role) => Role.mapRoleToRoleDto(role));
-    return new PagedResult<RoleDto>(items, totalCount);
+    const data: RoleDto[] = roles.map((role) => Role.mapRoleToRoleDto(role));
+    return new PagedResult<RoleDto>(data, totalCount);
   }
 
   @Get('/all')

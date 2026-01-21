@@ -10,7 +10,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PagedResult } from 'src/common/response/ListResultResponse';
+import { PagedResult } from 'src/common/response/Result';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorCommand } from './commands/create-author.command';
 import { UpdateAuthorCommand } from './commands/update-author.command';

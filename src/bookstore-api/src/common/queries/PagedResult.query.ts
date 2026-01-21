@@ -7,7 +7,7 @@ class LimitedResultQuery {
     default: 20,
     type: Number,
   })
-  maxResultCount: number = 10;
+  pageSize: number = 10;
 }
 
 class PagedResultQuery extends OmitType(LimitedResultQuery, []) {
@@ -17,7 +17,7 @@ class PagedResultQuery extends OmitType(LimitedResultQuery, []) {
     default: 0,
     type: Number,
   })
-  skipCount: number = 0;
+  page: number = 0;
 }
 
 class PagedAndSortedResultQuery extends OmitType(PagedResultQuery, []) {
@@ -36,7 +36,7 @@ class PagedSortedAndFilteredResultQuery {
     default: 20,
     type: Number,
   })
-  maxResultCount: number = 10;
+  pageSize: number = 10;
   @ApiPropertyOptional()
   order: string | null = 'asc';
   @ApiProperty({
@@ -45,7 +45,7 @@ class PagedSortedAndFilteredResultQuery {
     default: 0,
     type: Number,
   })
-  skipCount: number = 0;
+  page: number = 0;
   @ApiPropertyOptional()
   sorting: string | null = 'id';
 }
