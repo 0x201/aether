@@ -77,13 +77,13 @@ builder.AddJavaScriptApp("bookstoreapp", @"../bookstore-app", "start")
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-var dydanmakuAnalysisApi = builder.AddPythonApp("danmakuanalytics", @"../dydanmaku-analytics", "main.py")
+var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../dydanmaku-analytics", "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(dydanmakudb).WaitFor(dydanmakudb);
 
-dydanmakuAnalysisApi.WithUrl($"{dydanmakuAnalysisApi.GetEndpoint("http")}/docs", "Douyu Danmaku Analytics API Docs");
+danmakuanalytics.WithUrl($"{danmakuanalytics.GetEndpoint("http")}/scalar", "Douyu Danmaku Analytics API Docs");
 
 builder.AddJavaScriptApp("danmakuviewer", @"../dydanmaku-viewer")
     .WithPnpm()
