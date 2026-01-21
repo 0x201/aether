@@ -1,7 +1,7 @@
 [project]
-name = "dydamuku"
+name = "dydamuku-analytics"
 version = "0.1.0"
-description = "Add your description here"
+description = "Douyu Danmaku Analytics Service"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
