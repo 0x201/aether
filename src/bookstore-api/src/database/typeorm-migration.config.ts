@@ -19,7 +19,7 @@ const config = load(configFile) as AppConfig;
 
 
 const dataSource = new DataSource({
-  type: 'mssql',
+  type: 'postgres',
   host: config.database.host,
   port: config.database.port ?? 1433,
   username: config.database.username,
@@ -29,7 +29,6 @@ const dataSource = new DataSource({
   entities: ['src/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*{.ts,.js}'],
   synchronize:config.database.synchronize,
-  options: config.database.options,
-  pool: config.database.pool,
+  schema: config.database.schema,
 });
 export default dataSource;

@@ -18,18 +18,20 @@ import { RoleMenu } from 'src/menus/entities/role-menu.entity';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const config: TypeOrmModuleOptions = {
-          type: 'mssql',
+          type: 'postgres',
           username: configService.get('database.username'),
           host: configService.get('database.host'),
           port: configService.get('database.port'),
           password: configService.get('database.password'),
           database: configService.get('database.database'),
           entities: [Author, Book, BookAuthor, Role, Menu, RoleMenu],
-          pool: configService.get('database.pool'),
-          options: configService.get('database.options'),
           synchronize: configService.get('database.synchronize'),
           logging: configService.get('database.logging'),
           autoLoadEntities: configService.get('database.autoLoadEntities'),
+          schema: configService.get('database.schema'),
+          // extra: {
+          //   options:
+          // }
         };
         return config;
       },

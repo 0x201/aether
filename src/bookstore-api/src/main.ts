@@ -24,6 +24,9 @@ function useSwaggerModule(app: INestApplication, configService: ConfigService) {
   app.use(
     '/scalar',
     apiReference({
+      theme: 'kepler',
+      showDeveloperTools: "never",
+      hideClientButton: true,
       content: document,
       authentication: {
         preferredSecurityScheme: 'oauth2',

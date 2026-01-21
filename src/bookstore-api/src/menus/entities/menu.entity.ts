@@ -3,30 +3,30 @@ import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 import { RoleMenu } from './role-menu.entity';
 import { MenuDto } from '../dtos/menu.dto';
 
-@Entity('Menus')
+@Entity('menus', { schema: 'bookstore' })
 export class Menu extends BaseAuditableEntity {
-  @PrimaryGeneratedColumn({ name: 'Id' })
+  @PrimaryGeneratedColumn({ name: 'id', primaryKeyConstraintName: 'menus_pk' })
   id: number;
 
-  @Column({ name: 'Name', type: 'varchar', length: 100 })
+  @Column({ name: 'name', length: 100 })
   name: string;
 
-  @Column({ name: 'Title', type: 'varchar', length: 100 })
+  @Column({ name: 'title', length: 100 })
   title: string;
 
-  @Column({ name: 'Icon', type: 'varchar', length: 200, nullable: true })
+  @Column({ name: 'icon', nullable: true })
   icon: string;
 
-  @Column({ name: 'Route', type: 'varchar', length: 200, nullable: true })
+  @Column({ name: 'route', nullable: true })
   route: string;
 
-  @Column({ name: 'Order', type: 'int' })
+  @Column({ name: 'order' })
   order: number;
 
-  @Column({ name: 'ParentId', type: 'int', nullable: true })
+  @Column({ name: 'parent_id', nullable: true })
   parentId: number;
 
-  @Column({ name: 'IsActive', default: true })
+  @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
   @OneToMany(() => RoleMenu, roleMenu => roleMenu.menu, {
@@ -44,7 +44,7 @@ export class Menu extends BaseAuditableEntity {
       order: menu.order,
       parentId: menu.parentId,
       isActive: menu.isActive,
-      roles: menu.roleMenus.map(roleMenu => ({id: roleMenu.role.id, name: roleMenu.role.name}))
+      roles: menu.roleMenus.map(roleMenu => ({ id: roleMenu.role.id, name: roleMenu.role.name }))
     };
   }
 }

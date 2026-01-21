@@ -8,19 +8,19 @@ export interface IAuditable {
 }
 
 export class BaseAuditableEntity implements IAuditable {
-  @CreateDateColumn({ name: 'CreatedTime', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_time', type: 'timestamp with time zone' })
   createdTime: string;
 
-  @Column({ name: 'CreatedBy', default: '', length: 200 })
+  @Column({ name: 'created_by', default: '', length: 200 })
   createdBy: string;
 
   @UpdateDateColumn({
-    name: 'LastModifiedTime',
+    name: 'last_modified_time',
+    type: 'timestamp with time zone',
     nullable: true,
-    type: 'datetime',
   })
   lastModifiedTime: string;
 
-  @Column({ name: 'LastModifiedBy', nullable: true, length: 200 })
+  @Column({ name: 'last_modified_by', nullable: true, length: 200 })
   lastModifiedBy: string;
 }

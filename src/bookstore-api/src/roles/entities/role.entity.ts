@@ -3,16 +3,16 @@ import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity';
 import { RoleMenu } from '../../menus/entities/role-menu.entity';
 import { RoleDto } from '../dtos/role.dto';
 
-@Entity('Roles')
-@Index('IDX_ROLE_NAME', ['name'], { unique: true })
+@Entity('roles', { schema: 'bookstore' })
+@Index('roles_name_idx', ['name'], { unique: true })
 export class Role extends BaseAuditableEntity {
-  @PrimaryGeneratedColumn({ name: 'Id' })
+  @PrimaryGeneratedColumn({ name: 'id', primaryKeyConstraintName: 'roles_pk' })
   id: number;
 
-  @Column({ name: 'Name', type: 'varchar', length: 200 })
+  @Column({ name: 'name', length: 200 })
   name: string;
 
-  @Column({ name: 'IsActive', default: true })
+  @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
   @OneToMany(() => RoleMenu, roleMenu => roleMenu.role, {

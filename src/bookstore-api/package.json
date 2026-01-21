@@ -19,9 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky",
-    "migration:generate": "npx typeorm-ts-node-commonjs migration:generate ./src/database/migrations -d ./src/database/typeorm-migration.config.ts",
+    "migration:generate": "node scripts/generate-migration.mjs",
     "migration:run": "npx typeorm-ts-node-commonjs migration:run -d ./src/database/typeorm-migration.config.ts",
-    "migration:revert": "npx typeorm-ts-node-commonjs migration:revert ./src/database/migrations -d ./src/database/typeorm-migration.config.ts"
+    "migration:revert": "npx typeorm-ts-node-commonjs migration:revert -d ./src/database/typeorm-migration.config.ts"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.0",
@@ -49,9 +49,9 @@
     "js-yaml": "^4.1.0",
     "keycloak-connect": "^26.1.1",
     "moment": "^2.30.1",
-    "mssql": "^11.0.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pg": "^8.17.2",
     "reflect-metadata": "^0.2.1",
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.1",

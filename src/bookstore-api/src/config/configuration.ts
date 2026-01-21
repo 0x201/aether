@@ -15,18 +15,8 @@ export interface AppConfig {
     entities: string[];
     migrations: string[];
     synchronize: boolean;
-    pool: {
-      max: number;
-      min: number;
-      idleTimeoutMillis: number;
-      createTimeoutMillis: number;
-      destroyTimeoutMillis: number;
-      acquireTimeoutMillis: number;
-    };
-    options: {
-      encrypt?: boolean,
-      trustServerCertificate?: boolean,
-    }
+    schema: string;
+    options: {}
   },
   otel: OtelConfig,
   keycloak: {

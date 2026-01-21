@@ -2,27 +2,27 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } 
 import { Book } from './book.entity';
 import { Author } from '../../authors/entities/author.entity';
 
-@Entity('BookAuthor')
-@Index("IDX_BookAuthor_BookId_AuthorId", ['bookId', 'authorId'], { unique: true })
+@Entity('book_author', { schema: 'bookstore' })
+@Index("book_author_book_id_author_id_idx", ['bookId', 'authorId'], { unique: true })
 export class BookAuthor {
-  @PrimaryGeneratedColumn({ name: "Id" })
+  @PrimaryGeneratedColumn({ name: "id", primaryKeyConstraintName: 'book_author_pk' })
   id: number;
 
-  @Column({ name: 'BookId' })
+  @Column({ name: 'book_id' })
   bookId: number;
 
-  @Column({ name: 'AuthorId' })
+  @Column({ name: 'author_id' })
   authorId: number;
 
   @ManyToOne(() => Book, book => book.bookAuthors, {
     createForeignKeyConstraints: false
   })
-  @JoinColumn({name: 'BookId'})
+  @JoinColumn({name: 'book_id'})
   book: Book;
 
   @ManyToOne(() => Author, author => author.bookAuthors, {
     createForeignKeyConstraints: false,
   })
-  @JoinColumn({name: 'AuthorId'})
+  @JoinColumn({name: 'author_id'})
   author: Author;
 }
