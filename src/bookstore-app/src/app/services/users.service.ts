@@ -135,15 +135,15 @@ export class UsersService {
   getUsers(page: number = 0, pageSize: number = 10): Observable<PagedResult<User>> {
     this.updateUsersState({ loading: true, error: null });
     const params = {
-      skipCount: (page * pageSize),
-      maxResultCount: pageSize
+      page: page,
+      pageSize: pageSize
     };
 
     return this.http.get<PagedResult<User>>(this.baseUrl, { params })
       .pipe(
         tap(res => {
           this.updateUsersState({
-            data: res.items,
+            data: res.data,
             loading: false,
             timestamp: Date.now()
           });

@@ -1,5 +1,7 @@
-export interface PagedResult<T> {
-  items: T[];
+import { Result } from "./result.mpdel";
+
+export interface PagedResult<T> extends Result {
+  data: T[];
   totalCount: number;
 }
 

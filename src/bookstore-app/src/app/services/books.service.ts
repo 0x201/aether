@@ -37,15 +37,15 @@ export class BooksService {
     this.updateBooksState({ loading: true, error: null });
 
     const params = {
-      skipCount: page * pageSize,
-      maxResultCount: pageSize
+      page: page,
+      pageSize: pageSize
     };
 
     return this.http.get<PagedResult<Book>>(this.baseUrl, { params })
       .pipe(
         tap(res => {
           this.updateBooksState({
-            data: res.items,
+            data: res.data,
             loading: false,
             timestamp: Date.now()
           });

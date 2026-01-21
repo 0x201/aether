@@ -39,8 +39,8 @@ export class RolesService {
   getRoles(query: PagedQuery): Observable<PagedResult<Role>> {
     this.updateRolesState({ loading: true, error: null });
     const params = new HttpParams()
-      .set('skipCount', query.page * query.pageSize)
-      .set('maxResultCount', query.pageSize);
+      .set('page', query.page * query.pageSize)
+      .set('pageSize', query.pageSize);
     if (query.filter) {
       params.set('filter', query.filter);
     }
@@ -51,7 +51,7 @@ export class RolesService {
       .pipe(
         tap(res => {
           this.updateRolesState({
-            data: res.items,
+            data: res.data,
             loading: false,
             timestamp: Date.now()
           });

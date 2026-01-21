@@ -40,15 +40,15 @@ export class MenusService {
   getMenus(page: number = 0, pageSize: number = 10): Observable<PagedResult<Menu>> {
     this.updateMenusState({ loading: true, error: null });
     const params = {
-      skipCount: page * pageSize,
-      maxResultCount: pageSize
+      page: page,
+      pageSize: pageSize
     };
 
     return this.http.get<PagedResult<Menu>>(this.baseUrl, { params })
       .pipe(
         tap(res => {
           this.updateMenusState({
-            data: res.items,
+            data: res.data,
             loading: false,
             timestamp: Date.now()
           });

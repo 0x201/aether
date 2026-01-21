@@ -74,7 +74,7 @@ export class UserManagementComponent implements OnInit {
       .getUsers(this.currentPage, this.pageSize)
       .subscribe({
         next: (res) => {
-          this.users.data = res.items;
+          this.users.data = res.data;
           this.totalUsers = res.totalCount;
           if (this.paginator) {
             this.paginator.length = this.totalUsers;

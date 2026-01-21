@@ -100,7 +100,7 @@ export class UserDialogComponent implements OnInit {
           pageSize: 10
         }
         return this.rolesService.getRoles(query).pipe(
-          map(result => result.items)
+          map(result => result.data)
         );
       }),
     );
