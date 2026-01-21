@@ -31,6 +31,10 @@ public static class OpenApiExtensions
             {
                 // Disable default fonts to avoid download unnecessary fonts
                 options.DefaultFonts = false;
+                options.Layout = ScalarLayout.Modern;
+                options.Theme = ScalarTheme.Kepler;
+                options.HideClientButton = true;
+                options.ShowSidebar = true;
             });
             app.MapGet("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
         }

@@ -171,7 +171,10 @@ internal static class DanmakuApi
             dbContext.Remove(entity);
             await dbContext.SaveChangesAsync();
             return Results.Ok(Result.Success("Deleted"));
-        });
+        })
+        .WithName("DeleteDanmaku")
+        .WithDescription("Delete a danmaku by ID")
+        .WithSummary("Delete danmaku");
 
         group.MapGet("/capture/jobs", async (
             [AsParameters] DanmakuRequest request,
