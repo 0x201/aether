@@ -1,7 +1,4 @@
-﻿using ModernCSharp.Ordering.Application;
-using ModernCSharp.Ordering.Infrastructure.Interceptors;
-
-namespace ModernCSharp.WinUIApp;
+﻿namespace ModernCSharp.WinUIApp;
 
 public partial class App : Microsoft.UI.Xaml.Application
 {

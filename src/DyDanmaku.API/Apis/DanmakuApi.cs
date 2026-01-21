@@ -81,7 +81,6 @@ internal static class DanmakuApi
         .WithName("GetDanmakuCount")
         .WithSummary("Get count of danmakus");
 
-
         group.MapGet("", async (
             [AsParameters] DanmakuRequest request,
             [FromServices] DyDanmakuDbContext dbContext) =>
@@ -160,7 +159,6 @@ internal static class DanmakuApi
         .Produces<PagedListResult<RoomDto>>(StatusCodes.Status200OK)
         .Produces<Result>(StatusCodes.Status404NotFound);
 
-
         group.MapDelete("/{id:int}", async (
             [FromRoute] int id,
             [FromServices] DyDanmakuDbContext dbContext) =>
@@ -174,7 +172,6 @@ internal static class DanmakuApi
             await dbContext.SaveChangesAsync();
             return Results.Ok(Result.Success("Deleted"));
         });
-
 
         group.MapGet("/capture/jobs", async (
             [AsParameters] DanmakuRequest request,

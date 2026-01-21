@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ModernCSharp.WPFApp.Contracts.Services;
 using ModernCSharp.WPFApp.Models;

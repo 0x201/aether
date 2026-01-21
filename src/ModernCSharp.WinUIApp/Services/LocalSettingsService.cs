@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-
-using ModernCSharp.WinUIApp.Core.Helpers;
 using ModernCSharp.WinUIApp.Helpers;
 
 using Windows.Storage;

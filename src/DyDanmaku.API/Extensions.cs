@@ -1,4 +1,6 @@
-﻿namespace DyDanmaku.API;
+﻿using DyDanmaku.API.Infrastructure;
+
+namespace DyDanmaku.API;
 
 public static class Extensions
 {

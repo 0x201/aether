@@ -1,4 +1,4 @@
-﻿namespace DyDanmaku.Infrastructure;
+﻿namespace DyDanmaku.API.Infrastructure;
 
 public class DyDanmakuDbContextSeed : IDbSeeder<DyDanmakuDbContext>
 {
