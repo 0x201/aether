@@ -24,7 +24,7 @@ databases:
     port: 5432
     username: "postgres"
     password: "Pass123$"
-    database: "postgres"
+    database: "dydanmakudb"
 
 logging:
   level: "INFO"
