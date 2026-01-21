@@ -75,11 +75,16 @@ internal static class DanmakuApi
 
         group.MapGet("/count", async ([FromServices] DyDanmakuDbContext dbContext) =>
         {
-            var count = await dbContext.Danmakus.CountAsync();
-            return Results.Ok(new { count });
+            var danamkuCount = await dbContext.Danmakus.AsNoTracking().CountAsync();
+            var roomCount = await dbContext.Rooms.AsNoTracking().CountAsync();
+            var userCount = await dbContext.Danmakus.AsNoTracking().Select(d => d.UserId).Distinct().CountAsync();
+            var count = new DataCount(danamkuCount, roomCount, userCount);
+            return Results.Ok(Result<DataCount>.Success(count));
         })
-        .WithName("GetDanmakuCount")
-        .WithSummary("Get count of danmakus");
+        .WithName("GetDataCount")
+        .WithDescription("Returns the count of all data in the database")
+        .WithSummary("Get count of data")
+        .Produces<Result<DataCount>>(StatusCodes.Status200OK);
 
         group.MapGet("", async (
             [AsParameters] DanmakuRequest request,

@@ -12,10 +12,11 @@ internal record DanmakuRequest : PaginationRequest, ISortedRequest, ITimeRangeRe
 }
 
 
-internal record RoomRequest : PaginationRequest
+internal record RoomRequest : PaginationRequest, ISortedRequest
 {
     public string? RoomName { get; set; }
     public int? RoomId { get; set; }
+    public string? Sorter { get; set; }
 }
 
 internal record DanmakuAnalysisRequest

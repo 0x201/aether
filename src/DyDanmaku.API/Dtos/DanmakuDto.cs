@@ -52,3 +52,5 @@ internal record WordFrequency
     public string Word { get; set; } = string.Empty;
     public int Count { get; set; }
 }
+
+internal record DataCount(int DanmakuCount, int RoomCount, int UserCount);
