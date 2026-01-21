@@ -35,6 +35,7 @@ public static class OpenApiExtensions
                 options.Theme = ScalarTheme.Kepler;
                 options.HideClientButton = true;
                 options.ShowSidebar = true;
+                options.ShowDeveloperTools = DeveloperToolsVisibility.Never;
             });
             app.MapGet("/", () => Results.Redirect("/scalar/v1")).ExcludeFromDescription();
         }

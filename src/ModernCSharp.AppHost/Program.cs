@@ -4,7 +4,6 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddDockerComposeEnvironment("env");
 
-
 var dataMountPath = builder.Configuration.GetSection("Docker:DataMountPath").Get<string>() ?? @"/dockerdata";
 var redisDataPath = Path.Combine(dataMountPath, "redis");
 var postgresDataPath = Path.Combine(dataMountPath, "postgres");
@@ -78,13 +77,13 @@ builder.AddJavaScriptApp("bookstoreapp", @"../bookstore-app", "start")
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-var dydanmakuAnalysisApi = builder.AddPythonApp("danmakuanalysisapi", @"../dydanmaku-api", "main.py")
+var dydanmakuAnalysisApi = builder.AddPythonApp("danmakuanalytics", @"../dydanmaku-analytics", "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(dydanmakudb).WaitFor(dydanmakudb);
 
-dydanmakuAnalysisApi.WithUrl($"{dydanmakuAnalysisApi.GetEndpoint("http")}/docs", "Douyu Danmaku Analysis API Docs");
+dydanmakuAnalysisApi.WithUrl($"{dydanmakuAnalysisApi.GetEndpoint("http")}/docs", "Douyu Danmaku Analytics API Docs");
 
 builder.AddJavaScriptApp("danmakuviewer", @"../dydanmaku-viewer")
     .WithPnpm()
@@ -107,12 +106,9 @@ if (OperatingSystem.IsWindows())
         .ExcludeFromManifest();
 }
 
-
 webApp.WithEnvironment("CallBackUrl", webApp.GetEndpoint("https"));
 
-
 builder.Build().Run();
-
 
 static bool ShouldUseHttpForEndpoints()
 {
