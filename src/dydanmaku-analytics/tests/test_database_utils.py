@@ -16,7 +16,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt)
-        
+
         # We expect it to order by created_at desc by default
         compiled = result_stmt.compile()
         # Check if the compiled SQL contains the expected order by clause
@@ -27,7 +27,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "user_name")
-        
+
         compiled = result_stmt.compile()
         assert "ORDER BY danmakus.user_name DESC" in str(compiled)
 
@@ -36,7 +36,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "user_name asc")
-        
+
         compiled = result_stmt.compile()
         assert "ORDER BY danmakus.user_name ASC" in str(compiled)
 
@@ -45,7 +45,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "user_name desc")
-        
+
         compiled = result_stmt.compile()
         assert "ORDER BY danmakus.user_name DESC" in str(compiled)
 
@@ -54,7 +54,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "user_name desc, content asc")
-        
+
         compiled = result_stmt.compile()
         sql_str = str(compiled)
         # Check that both order by clauses are present
@@ -66,7 +66,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "user_name, content desc")
-        
+
         compiled = result_stmt.compile()
         sql_str = str(compiled)
         # The 'content' has explicit 'desc', user_name should default to desc
@@ -80,7 +80,7 @@ class TestDatabaseUtils:
         stmt = select(Danmaku)
         # This should not raise an error but log a warning
         result_stmt = utils.apply_order_by(stmt, "nonexistent_field")
-        
+
         # Should still return a valid statement with default order
         compiled = result_stmt.compile()
         # Should default to created_at desc since nonexistent field is skipped
@@ -91,7 +91,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "asc user_name")
-        
+
         # From the actual behavior, the parser still applies default ordering to user_name
         compiled = result_stmt.compile()
         # The 'asc' at the beginning is skipped, but 'user_name' still gets default desc ordering
@@ -102,7 +102,7 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Danmaku)
         stmt = select(Danmaku)
         result_stmt = utils.apply_order_by(stmt, "user_name asc desc")
-        
+
         compiled = result_stmt.compile()
         # Should handle properly, applying asc to user_name (the 'desc' after 'asc' is ignored)
         assert "danmakus.user_name ASC" in str(compiled)
@@ -112,6 +112,6 @@ class TestDatabaseUtils:
         utils = DatabaseUtils(Room)
         stmt = select(Room)
         result_stmt = utils.apply_order_by(stmt, "room_name asc")
-        
+
         compiled = result_stmt.compile()
         assert "ORDER BY rooms.room_name ASC" in str(compiled)

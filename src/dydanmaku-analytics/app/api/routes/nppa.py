@@ -29,5 +29,7 @@ async def get_nppa_game_audits(
         ..., description="End time in ISO 8601 format (e.g., 2026-01-11T10:00:00Z)"
     ),
 ):
-    game_audits, total_cout = nppa_repo.get_paged_network_game_audits(page, page_size, name, start_time, end_time)
+    game_audits, total_cout = nppa_repo.get_paged_network_game_audits(
+        page, page_size, name, start_time, end_time
+    )
     return PagedResult(data=game_audits, total_count=total_cout)
