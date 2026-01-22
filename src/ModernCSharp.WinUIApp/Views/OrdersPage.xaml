@@ -39,7 +39,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="OrderItemTemplate" x:DataType="local:Order">
+        <DataTemplate x:Key="OrderItemTemplate" x:DataType="local:OrderDto">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />

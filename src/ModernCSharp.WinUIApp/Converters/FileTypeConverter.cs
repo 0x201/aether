@@ -1,5 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Data;
 
+using ModernCSharp.Shared.FileServices;
+
 namespace ModernCSharp.WinUIApp.Converters;
 
 public partial class FileTypeConverter : IValueConverter

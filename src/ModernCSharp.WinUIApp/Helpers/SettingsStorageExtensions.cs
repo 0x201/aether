@@ -1,4 +1,6 @@
-﻿using Windows.Storage;
+﻿using ModernCSharp.WinUIApp.Core.Helpers;
+
+using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace ModernCSharp.WinUIApp.Helpers;

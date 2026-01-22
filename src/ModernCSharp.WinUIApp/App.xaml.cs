@@ -1,4 +1,15 @@
-﻿namespace ModernCSharp.WinUIApp;
+﻿using ModernCSharp.Ordering.Application;
+using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Ordering.Application.Services;
+using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
+using ModernCSharp.Ordering.Infrastructure;
+using ModernCSharp.Ordering.Infrastructure.Interceptors;
+using ModernCSharp.Ordering.Infrastructure.Repositories;
+using ModernCSharp.Shared;
+using ModernCSharp.WinUIApp.Core.Contracts.Services;
+using ModernCSharp.WinUIApp.Core.Services;
+
+namespace ModernCSharp.WinUIApp;
 
 public partial class App : Microsoft.UI.Xaml.Application
 {
@@ -60,7 +71,7 @@ public partial class App : Microsoft.UI.Xaml.Application
             var connectionString = builder.Configuration.GetConnectionString("orderingdb");
 
             options
-                .UseSqlServer(connectionString)
+                .UseNpgsql(connectionString)
                 .AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
         });
 

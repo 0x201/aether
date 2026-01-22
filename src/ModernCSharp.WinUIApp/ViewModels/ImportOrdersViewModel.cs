@@ -1,4 +1,9 @@
-﻿namespace ModernCSharp.WinUIApp.ViewModels;
+﻿using ModernCSharp.Ordering.Application.Commands;
+using ModernCSharp.Ordering.Application.Queries;
+using ModernCSharp.Shared.FileServices;
+using ModernCSharp.Shared.FileServices.Import;
+
+namespace ModernCSharp.WinUIApp.ViewModels;
 
 public partial class ImportOrdersViewModel(
     IMediator mediator) : ObservableRecipient

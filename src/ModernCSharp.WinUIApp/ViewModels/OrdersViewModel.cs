@@ -1,4 +1,6 @@
-﻿namespace ModernCSharp.WinUIApp.ViewModels;
+﻿using ModernCSharp.Ordering.Application.Queries;
+
+namespace ModernCSharp.WinUIApp.ViewModels;
 
 public partial class OrdersViewModel(IOrderQueries orderService) : ObservableRecipient, INavigationAware
 {
