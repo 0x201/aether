@@ -1,13 +1,9 @@
-from sqlalchemy import String, DateTime, Index, Integer, LargeBinary
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, DateTime, Index, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
 from datetime import datetime, timezone
 
-
-class Base(DeclarativeBase):
-    """Base class for all models"""
-
-    pass
+from .base import Base
 
 
 class Danmaku(Base):

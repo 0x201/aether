@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
-from app.dataclass.model import CaptureJobStatus
-from app.common import DatabaseUtils
+from loguru import logger
 from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from .models import CaptureJob, Danmaku, Room
-
-from loguru import logger
+from app.dataclass.model import CaptureJobStatus
+from app.common import DatabaseUtils
+from .danmaku_models import CaptureJob, Danmaku, Room
 
 
 class DanmakuRepository:
@@ -352,7 +351,7 @@ class DanmakuRepository:
 
             db_utils = DatabaseUtils(Danmaku)
             stmt = db_utils.apply_order_by(stmt, sort)
-                
+
             stmt = stmt.limit(limit).offset(offset)
 
             result = self.session.execute(stmt).all()
@@ -549,7 +548,9 @@ class DanmakuRepository:
             self.session.rollback()
             return 0
 
-    def get_capture_jobs(self, page: int, limit: int, sort: Optional[str] = None) -> Tuple[List[CaptureJob], int]:
+    def get_capture_jobs(
+        self, page: int, limit: int, sort: Optional[str] = None
+    ) -> Tuple[List[CaptureJob], int]:
         """
         Get capture jobs with pagination
 
@@ -571,7 +572,7 @@ class DanmakuRepository:
 
             # Get paginated jobs
             stmt = select(CaptureJob)
-            
+
             if sort:
                 db_utils = DatabaseUtils(CaptureJob)
                 stmt = db_utils.apply_order_by(stmt, sort)

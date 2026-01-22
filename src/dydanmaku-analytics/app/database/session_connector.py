@@ -274,7 +274,7 @@ class PostgreSQLSession:
                 pool_pre_ping=self.pool_pre_ping,
                 pool_recycle=self.pool_recycle,
                 future=True,
-                connect_args={'options': '-csearch_path=dydanmaku'}
+                connect_args={"options": "-csearch_path=dydanmaku"},
             )
 
             self.session_local = sessionmaker(
@@ -336,7 +336,9 @@ class PostgreSQLSession:
 class SessionConnector:
     def __init__(self):
         self.database_config: Optional[DatabaseConfig] = None
-        self.database_instance: Optional[Union[MSSQLSession, SQLiteSession, PostgreSQLSession]] = None
+        self.database_instance: Optional[
+            Union[MSSQLSession, SQLiteSession, PostgreSQLSession]
+        ] = None
 
     def _get_database_config(self) -> DatabaseConfig:
         if self.database_config is None:
