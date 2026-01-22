@@ -111,7 +111,7 @@ class TimeRangeStrategyFactory:
         return strategy
 
 
-class ScheduledAnalyzer:
+class ScheduledDanmakuAnalyzer:
     def __init__(self):
         self.scheduler = AsyncIOScheduler()
         self.session_connector = SessionConnector()

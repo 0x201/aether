@@ -1,18 +1,18 @@
 import os
-from scalar_fastapi import get_scalar_api_reference, Theme
 import logging
-from contextlib import asynccontextmanager
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
-
-from app.api import api_router
-from app.core.config import settings
-from app.schedulers.scheduled_analyzer import ScheduledAnalyzer
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
+from scalar_fastapi import get_scalar_api_reference, Theme
+
+from app.api import api_router
+from app.core.config import settings
+from app.schedulers import start_scheduled_tasks, stop_scheduled_tasks
 
 
 class InterceptHandler(logging.Handler):
@@ -74,18 +74,15 @@ def setup_logging():
     access_logger.disabled = True
 
 
-scheduled_analyzer = ScheduledAnalyzer()
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Start scheduled analyzer and capture job scheduler on app startup"""
-    scheduled_analyzer.start()
+    start_scheduled_tasks()
     logger.info("Application started successfully")
     yield
 
     """Stop schedulers and terminate all capture jobs on app shutdown"""
-    scheduled_analyzer.stop()
+    stop_scheduled_tasks()
     logger.info("Application shutdown successfully")
 
 
@@ -108,6 +105,7 @@ async def root():
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "environment": ENVIRONMENT}
@@ -122,6 +120,7 @@ async def scalar_html():
         show_developer_tools="never",
         theme=Theme.KEPLER,
     )
+
 
 if __name__ == "__main__":
     setup_logging()

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.api.deps import (
+from app.deps import (
     DanmakuAnalyzerDep,
     SessionDep,
 )
@@ -29,10 +29,12 @@ def convert_to_utc(dt_str: str) -> datetime:
     return utc_dt
 
 
-@router.post("/analysis/generate", 
-             tags=["Analysis"], 
-             description="Generate danmaku analysis for a specified time range", 
-             summary="Generate danmaku analysis for a specified time range")
+@router.post(
+    "/analysis/generate",
+    tags=["Analysis"],
+    description="Generate danmaku analysis for a specified time range",
+    summary="Generate danmaku analysis for a specified time range",
+)
 async def generate_analysis(
     session: SessionDep,
     analyzer: DanmakuAnalyzerDep,

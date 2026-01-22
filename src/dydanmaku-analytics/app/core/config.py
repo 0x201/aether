@@ -57,13 +57,23 @@ def get_yaml_file() -> Path:
 
 class LoggingConfig(BaseSettings):
     """Logging configuration"""
+
     level: str = Field(default="INFO", description="Log level")
-    format: str = Field(default="[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] [{level}] <level>{message}</level>", description="Log format")
+    format: str = Field(
+        default="[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] [{level}] <level>{message}</level>",
+        description="Log format",
+    )
     rotation: str = Field(default="100 MB", description="Log rotation size")
     serialize: bool = Field(default=False, description="Serialize logs to JSON format")
     dir_path: str = Field(default="./logs", description="Log file storage path")
     enable_console: bool = Field(default=True, description="Enable console logging")
     enable_file: bool = Field(default=True, description="Enable file logging")
+
+
+class NPPAConfig(BaseSettings):
+    base_url: str = Field(default="", description="Base URL for NPPAs")
+    data_url: str = Field(default="", description="Data URL for NPPAs")
+    suffix: str = Field(default=".html", description="Suffix for NPPAs URLs")
 
 
 class Settings(BaseSettings):
@@ -85,7 +95,10 @@ class Settings(BaseSettings):
         description="Database configuration",
     )
     cors: Optional[List[str]] = Field(default=[], description="CORS origins to allow")
-    logging: LoggingConfig = Field(default=LoggingConfig(), description="Logging configuration")
+    logging: LoggingConfig = Field(
+        default=LoggingConfig(), description="Logging configuration"
+    )
+    nppa: NPPAConfig = Field(default=NPPAConfig(), description="NPPAs configuration")
 
     @classmethod
     def settings_customise_sources(

@@ -14,7 +14,7 @@ class TimedRoute(APIRoute):
             before = time.time()
             response: Response = await original_route_handler(request)
             duration = (time.time() - before) * 1000
-            (client_host, client_port) = (
+            client_host, client_port = (
                 (request.client.host, request.client.port)
                 if request.client
                 else ("", "")

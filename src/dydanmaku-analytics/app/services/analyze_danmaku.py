@@ -141,7 +141,9 @@ class DanmakuAnalyzer:
         word_freq = Counter(filtered_words)
         word_frequency_result = word_freq.most_common(top_n)
         end = time.perf_counter()
-        logger.info(f"Generated word frequency for time range {start_time} to {end_time}. Elaspsped time: {end - start:.6f}s")
+        logger.info(
+            f"Generated word frequency for time range {start_time} to {end_time}. Elaspsped time: {end - start:.6f}s"
+        )
 
         danmaku_analysis = DanmakuAnalysis(
             type="combined_analysis",

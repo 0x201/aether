@@ -34,3 +34,8 @@ logging:
   dir_path: "./logs/"
   enable_console: true
   enable_file: true
+
+nppa:
+  base_url: "https://www.nppa.gov.cn/bsfw/jggs/yxspjg/"
+  data_url: "index"
+  suffix: ".html"
