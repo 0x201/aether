@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@/src/contexts/ThemeContext';
-import Layout, { Content, Footer, Header } from 'antd/es/layout/layout';
+import Layout, { Content, Header } from 'antd/es/layout/layout';
 import React, { useState } from 'react';
 import Sider from 'antd/es/layout/Sider';
 import { Route, Routes } from 'react-router-dom';

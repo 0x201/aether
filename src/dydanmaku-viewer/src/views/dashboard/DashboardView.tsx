@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
               <Select
                 className="room-select-container"
                 placeholder="搜索并选择房间"
-                value={selectedRoomId === -1 ? -1 : selectedRoomId} // 正确处理 -1 值
+                value={selectedRoomId === -1 ? -1 : selectedRoomId}
                 onChange={handleRoomChangeSelect}
                 showSearch={{ onSearch: handleSearch, filterOption: false }}
                 loading={loadingRooms}
@@ -264,18 +264,18 @@ const Dashboard: React.FC = () => {
           <Card title="词云图" style={{ height: '100%' }} extra={
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <span>选择配色方案：</span>
-              <select
+              <Select
                 value={selectedColormap}
-                onChange={(e) => setSelectedColormap(e.target.value as any)}
+                onChange={(e) => setSelectedColormap(e)}
                 style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #d9d9d9' }}
               >
                 {colormapOptions.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           }>
-            <div style={{ height: 500 }}>
+            <div>
               {loadingWordcloud ? (
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
                   <Spin size="large" />
