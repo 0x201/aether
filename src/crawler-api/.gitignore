@@ -1,9 +1,0 @@
-__pycache__
-.idea/
-.venv/
-*.db
-*.local.yaml
-*.local
-
-# test reports
-coverage_reports/
