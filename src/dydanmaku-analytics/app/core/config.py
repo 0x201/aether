@@ -85,7 +85,6 @@ class RabbitMQConfig(BaseSettings):
     password: str = Field(default="guest", description="RabbitMQ password")
 
 
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
     project_name: str = Field(default="DyDanmaku API", description="Project name")

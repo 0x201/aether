@@ -1,7 +1,7 @@
 from .base import Base
 from .danmaku_repository import DanmakuRepository
 from .nppa_repository import NPPARepository
-from .session_connector import SessionConnector
+from .session_factory import SessionFactory
 from .danmaku_models import Danmaku, Room, DanmakuAnalysis
 from .nppa_models import (
     EGameAudit,
@@ -16,7 +16,7 @@ __all__ = [
     "DanmakuRepository",
     "DanmakuAnalysis",
     "NPPARepository",
-    "SessionConnector",
+    "SessionFactory",
     "Danmaku",
     "Room",
     "EGameAudit",

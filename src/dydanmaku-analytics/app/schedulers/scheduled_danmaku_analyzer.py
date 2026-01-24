@@ -7,13 +7,13 @@ from enum import Enum
 from abc import ABC, abstractmethod
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from app.database import Danmaku
 from app.dataclass import DanmakuAnalysisDto
-from app.database.session_connector import SessionConnector
-from app.services import DanmakuAnalyzer, rabbitmq_publisher
+from app.database import SessionFactory
+from app.services import DanmakuAnalyzer
+from app.common import EventBus
 
 
 from loguru import logger
@@ -113,10 +113,17 @@ class TimeRangeStrategyFactory:
 
 
 class ScheduledDanmakuAnalyzer:
-    def __init__(self):
+
+    def __init__(
+        self,
+        session_factory: SessionFactory,
+        danmaku_analyzer: DanmakuAnalyzer,
+        event_bus: EventBus,
+    ):
         self.scheduler = AsyncIOScheduler()
-        self.session_connector = SessionConnector()
-        self.analyzer = DanmakuAnalyzer()
+        self.session_factory = session_factory
+        self.analyzer = danmaku_analyzer
+        self.event_bus = event_bus
 
     async def _execute_precompute_analyses(self, date_range: DateRange):
         await self._precompute_analyses(date_range)
@@ -195,25 +202,21 @@ class ScheduledDanmakuAnalyzer:
         )
 
         try:
-            with self.session_connector.get_session() as db:
-                overall_analytics = self.analyzer.precompute_analyses(
-                    session=db, start_time=start_time, end_time=end_time, room_id=None
-                )
-                overall_analytics.periodType = date_range.value
+            overall_analytics = self.analyzer.precompute_analyses(
+                start_time=start_time, end_time=end_time, room_id=None
+            )
+            overall_analytics.periodType = date_range.value
 
-                # Send analytics completed event
-                await self._send_analytics_completed_event(overall_analytics)
+            # Send analytics completed event
+            await self._send_analytics_completed_event(overall_analytics)
 
-                await self._precompute_for_all_rooms(
-                    db, date_range, start_time, end_time
-                )
+            await self._precompute_for_all_rooms(date_range, start_time, end_time)
 
         except Exception as e:
             logger.error(f"Error during scheduled precomputation: {e}")
 
     async def _precompute_for_all_rooms(
         self,
-        db: Session,
         date_range: DateRange,
         start_time: datetime,
         end_time: datetime,
@@ -229,13 +232,13 @@ class ScheduledDanmakuAnalyzer:
             )
             .distinct()
         )
-        recent_rooms = db.execute(stmt).scalars().all()
+        with self.session_factory.get_session() as session:
+            recent_rooms = session.execute(stmt).scalars().all()
 
         for room_result in recent_rooms:
             room_id = room_result
             try:
                 analytic = self.analyzer.precompute_analyses(
-                    session=db,
                     start_time=start_time,
                     end_time=end_time,
                     room_id=room_id,
@@ -252,8 +255,19 @@ class ScheduledDanmakuAnalyzer:
         self, danmaku_analysis: DanmakuAnalysisDto
     ):
         try:
-            success = rabbitmq_publisher.send_analytics_completed_event(
-                danmaku_analysis
+
+            event_data = {
+                "roomId": danmaku_analysis.roomId,
+                "startDate": danmaku_analysis.startDate.isoformat(),
+                "endDate": danmaku_analysis.endDate.isoformat(),
+                "periodType": danmaku_analysis.periodType,
+                "frequenciesCount": danmaku_analysis.frequenciesCount,
+                "completedAt": danmaku_analysis.createdAt.isoformat(),
+            }
+
+            success = self.event_bus.publish(
+                event_type_name="AnalyticsCompletedIntegrationEvent",
+                event_data=event_data,
             )
 
             if success:

@@ -1,5 +1,5 @@
 from .analyze_danmaku import DanmakuAnalyzer
 from .nppa_game_audit_crawler import NPPAGameAuditCrawler
-from .rabbitmq_publisher import rabbitmq_publisher
+from .analytics_notification import AnalyticsNotification
 
-__all__ = ["DanmakuAnalyzer", "NPPAGameAuditCrawler", "rabbitmq_publisher"]
+__all__ = ["DanmakuAnalyzer", "NPPAGameAuditCrawler", "AnalyticsNotification"]

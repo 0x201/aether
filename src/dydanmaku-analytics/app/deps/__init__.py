@@ -1,35 +1,17 @@
-from typing import Annotated, Generator
+from typing import Annotated
 
-from app.database import SessionConnector, DanmakuRepository, NPPARepository
+from app.database import DanmakuRepository, NPPARepository
 from app.services import DanmakuAnalyzer
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from dependency_injector.wiring import Provide
+from .container import Container
 
-# Initialize session connector
-session_connector = SessionConnector()
-
-
-# Dependency to get database session
-def get_db() -> Generator[Session, None, None]:
-    with session_connector.get_session() as session:
-        yield session
-
-
-def get_danmaku_analyzer():
-    return DanmakuAnalyzer()
-
-
-SessionDep = Annotated[Session, Depends(get_db)]
-
-
-def get_danmaku_repository(session: SessionDep) -> DanmakuRepository:
-    return DanmakuRepository(session)
-
-
-def get_nppa_repository(session: SessionDep) -> NPPARepository:
-    return NPPARepository(session)
-
-
-DanmakuAnalyzerDep = Annotated[DanmakuAnalyzer, Depends(get_danmaku_analyzer)]
-DanmakuRepositoryDep = Annotated[DanmakuRepository, Depends(get_danmaku_repository)]
-NPPARepositoryDep = Annotated[NPPARepository, Depends(get_nppa_repository)]
+DanmakuAnalyzerDep = Annotated[
+    DanmakuAnalyzer, Depends(Provide[Container.danmaku_analyzer])
+]
+DanmakuRepositoryDep = Annotated[
+    DanmakuRepository, Depends(Provide[Container.danmaku_repository])
+]
+NPPARepositoryDep = Annotated[
+    NPPARepository, Depends(Provide[Container.nppa_repository])
+]

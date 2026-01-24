@@ -7,7 +7,7 @@ from app.core.model import DatabaseConfig, DatabaseType
 
 from sqlalchemy import URL, Engine, create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker, scoped_session
 
 from loguru import logger
 
@@ -236,7 +236,7 @@ class PostgreSQLSession:
         self.port = port
         self.username = username
         self.password = password
-        self.session_local: Optional[sessionmaker] = None
+        self.session_local: Optional[scoped_session] = None
         self.pool_size = pool_size
         self.max_overflow = max_overflow
         self.pool_pre_ping = pool_pre_ping
@@ -277,8 +277,10 @@ class PostgreSQLSession:
                 connect_args={"options": "-csearch_path=dydanmaku"},
             )
 
-            self.session_local = sessionmaker(
-                bind=self.engine, autoflush=False, autocommit=False, future=True
+            self.session_local = scoped_session(
+                sessionmaker(
+                    bind=self.engine, autoflush=False, autocommit=False, future=True
+                )
             )
             self._connected = True
             logger.info(
@@ -333,7 +335,7 @@ class PostgreSQLSession:
         self.session_local = None
 
 
-class SessionConnector:
+class SessionFactory:
     def __init__(self):
         self.database_config: Optional[DatabaseConfig] = None
         self.database_instance: Optional[
@@ -345,7 +347,7 @@ class SessionConnector:
             self.database_config = settings.databases
         return self.database_config
 
-    def get_database(self) -> Union[MSSQLSession, SQLiteSession, PostgreSQLSession]:
+    def _get_database(self) -> Union[MSSQLSession, SQLiteSession, PostgreSQLSession]:
         if self.database_instance is None:
             database_config = self._get_database_config()
 
@@ -377,9 +379,9 @@ class SessionConnector:
         return self.database_instance
 
     def get_session(self):
-        db = self.get_database()
+        db = self._get_database()
         return db.get_session()
 
     def get_transaction(self, autocommit=True):
-        db = self.get_database()
+        db = self._get_database()
         return db.get_transaction(autocommit=autocommit)

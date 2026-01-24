@@ -12,7 +12,8 @@ from scalar_fastapi import get_scalar_api_reference, Theme
 
 from app.api import api_router
 from app.core.config import settings
-from app.schedulers import start_scheduled_tasks, stop_scheduled_tasks
+from app.schedulers import start_scheduled_tasks, stop_scheduled_tasks, set_container
+from app.deps import Container
 
 
 class InterceptHandler(logging.Handler):
@@ -77,24 +78,44 @@ def setup_logging():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Start scheduled analyzer and capture job scheduler on app startup"""
+    container = Container()
+    container.config.from_dict(settings.model_dump())
+    app.container = container
+
+    set_container(container)
+
     start_scheduled_tasks()
     logger.info("Application started successfully")
     yield
 
     """Stop schedulers and terminate all capture jobs on app shutdown"""
     stop_scheduled_tasks()
+
+    if hasattr(app.state, "container"):
+        event_bus = app.state.container.event_bus()
+        event_bus.close()
+
     logger.info("Application shutdown successfully")
 
 
-app = FastAPI(title=settings.project_name, version=settings.version, lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-app.include_router(api_router)
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title=settings.project_name, version=settings.version, lifespan=lifespan
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    app.include_router(api_router)
+
+    return app
+
+
+app = create_app()
 
 
 @app.get("/")

@@ -1,14 +1,13 @@
 from typing import List, Optional
 from fastapi import APIRouter, Query
+from dependency_injector.wiring import inject
 
 from .timed_route import TimedRoute
 from app.dataclass.common import PagedResult
 from app.database import GameAudit, NetworkGameAudit
 from app.dataclass import GameAuditDto, NetworkGameAuditDto
 
-from app.deps import (
-    NPPARepositoryDep,
-)
+from app.deps import NPPARepositoryDep
 
 router = APIRouter(route_class=TimedRoute)
 
@@ -18,6 +17,7 @@ router = APIRouter(route_class=TimedRoute)
     description="Get NPPA netwrok game audits with pagination and filtering",
     summary="Get NPPA netwrok game audits with pagination and filtering",
 )
+@inject
 async def get_nppa_network_game_audits(
     nppa_repo: NPPARepositoryDep,
     page: int = Query(1, description="Current page number"),
@@ -43,6 +43,7 @@ async def get_nppa_network_game_audits(
     description="Get NPPA game audits with pagination and filtering",
     summary="Get NPPA game audits with pagination and filtering",
 )
+@inject
 async def get_nppa_game_audits(
     nppa_repo: NPPARepositoryDep,
     page: int = Query(1, description="Current page number"),

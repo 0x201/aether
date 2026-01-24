@@ -4,10 +4,10 @@ from typing import List, Optional, Tuple
 from loguru import logger
 from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
 
 from app.dataclass.danmaku_model import CaptureJobStatus
 from app.common import DatabaseUtils
+from .session_factory import SessionFactory
 from .danmaku_models import CaptureJob, Danmaku, Room
 
 
@@ -16,8 +16,8 @@ class DanmakuRepository:
     Repository class for Danmaku entity with full CRUD operations
     """
 
-    def __init__(self, session: Session):
-        self.session = session
+    def __init__(self, session_factory: SessionFactory):
+        self.session_factory: SessionFactory = session_factory
 
     def insert_danmaku(
         self,
@@ -35,7 +35,8 @@ class DanmakuRepository:
         Returns:
             bool: True if inserted successfully, False if duplicate
         """
-        try:
+
+        with self.session_factory.get_transaction() as transaction:
             danmaku = Danmaku(
                 user_id=user_id,
                 user_name=user_name,
@@ -45,56 +46,8 @@ class DanmakuRepository:
                 user_level=user_level,
                 room_id=room_id,
             )
-
-            self.session.add(danmaku)
-            self.session.commit()
-            self.session.refresh(danmaku)
+            transaction.add(danmaku)
             return True
-        except SQLAlchemyError as e:
-            logger.error(f"Database error inserting danmaku: {e}")
-            self.session.rollback()
-            return False
-
-    def get_or_create_room(self, room_id: int, room_name: str) -> Room:
-        """
-        Get room from database or create it if it doesn't exist
-
-        Args:
-            room_id: Unique identifier for the room
-            room_name: Name of the room
-
-        Returns:
-            Room: Room object from database
-        """
-        try:
-            # Try to get existing room
-            logger.info(f"Getting room: {room_name}")
-            stmt = select(Room).where(Room.room_id == room_id)
-            result = self.session.execute(stmt)
-            room = result.scalar_one_or_none()
-
-            # If room doesn't exist, create it
-            if room is None:
-                room = Room(
-                    room_id=room_id,
-                    room_name=room_name,
-                )
-                self.session.add(room)
-                self.session.commit()
-                self.session.refresh(room)
-                logger.info(f"Created new room: {room_id} - {room_name}")
-            else:
-                # Update existing room info
-                room.room_name = room_name
-                self.session.commit()
-                self.session.refresh(room)
-                logger.info(f"Updated existing room: {room_id} - {room_name}")
-
-            return room
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting/creating room: {e}")
-            self.session.rollback()
-            raise
 
     def insert_danmaku_batch(self, danmu_list: List[Danmaku]) -> int:
         """
@@ -109,65 +62,63 @@ class DanmakuRepository:
         """
         if not danmu_list:
             return 0
-
-        try:
+        with self.session_factory.get_transaction() as transaction:
             inserted_count = len(danmu_list)
-            self.session.add_all(danmu_list)
-            self.session.commit()
+            transaction.add_all(danmu_list)
             return inserted_count
-        except SQLAlchemyError as e:
-            logger.error(f"Database error during batch insert: {e}")
-            self.session.rollback()
-            return 0
 
     def get_danmaku_count(self) -> int:
         """Get total number of danmaku in database"""
-        try:
-            stmt = select(func.count()).select_from(Danmaku)
-            count = self.session.execute(stmt).scalar()
-            return count if count is not None else 0
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting danmaku count: {e}")
-            return 0
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = select(func.count()).select_from(Danmaku)
+                count = session.execute(stmt).scalar()
+                return count if count is not None else 0
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting danmaku count: {e}")
+                return 0
 
     def get_recent_danmaku(self, limit: int = 10) -> List[Danmaku]:
         """Get most recent danmaku entries"""
-        try:
-            stmt = select(Danmaku).order_by(Danmaku.created_at.desc()).limit(limit)
-            result = self.session.execute(stmt).scalars().all()
-            return list(result)
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting recent danmaku: {e}")
-            return []
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = select(Danmaku).order_by(Danmaku.created_at.desc()).limit(limit)
+                result = session.execute(stmt).scalars().all()
+                return list(result)
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting recent danmaku: {e}")
+                return []
 
     def get_danmaku_by_user(self, user_name: str) -> List[Danmaku]:
         """Get all danmaku by a specific user"""
-        try:
-            stmt = (
-                select(Danmaku)
-                .where(Danmaku.user_name == user_name)
-                .order_by(Danmaku.created_at.desc())
-            )
-            result = self.session.execute(stmt).scalars().all()
-            return list(result)
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting danmaku by user: {e}")
-            return []
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = (
+                    select(Danmaku)
+                    .where(Danmaku.user_name == user_name)
+                    .order_by(Danmaku.created_at.desc())
+                )
+                result = session.execute(stmt).scalars().all()
+                return list(result)
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting danmaku by user: {e}")
+                return []
 
     def get_danmaku_by_room(self, room_id: int, limit: int = 100) -> List[Danmaku]:
         """Get recent danmaku for a specific room with limit"""
-        try:
-            stmt = (
-                select(Danmaku)
-                .where(Danmaku.room_id == room_id)
-                .order_by(Danmaku.created_at.desc())
-                .limit(limit)
-            )
-            result = self.session.execute(stmt).scalars().all()
-            return list(result)
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting danmaku by room: {e}")
-            return []
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = (
+                    select(Danmaku)
+                    .where(Danmaku.room_id == room_id)
+                    .order_by(Danmaku.created_at.desc())
+                    .limit(limit)
+                )
+                result = session.execute(stmt).scalars().all()
+                return list(result)
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting danmaku by room: {e}")
+                return []
 
     def update_danmaku(
         self,
@@ -184,52 +135,58 @@ class DanmakuRepository:
         Returns:
             bool: True if updated successfully, False otherwise
         """
-        try:
-            # Build dynamic update query based on provided fields
-            values = {}
-            if user_name is not None:
-                values[Danmaku.user_name] = user_name
-            if content is not None:
-                values[Danmaku.content] = content
-            if fan_medal_name is not None:
-                values[Danmaku.fan_medal_name] = fan_medal_name
-            if fan_medal_level is not None:
-                values[Danmaku.fan_medal_level] = fan_medal_level
-            if user_level is not None:
-                values[Danmaku.user_level] = user_level
 
-            # Only proceed if there are fields to update
-            if not values:
+        with self.session_factory.get_transaction(autocommit=False) as transaction:
+            try:
+                # Build dynamic update query based on provided fields
+                values = {}
+                if user_name is not None:
+                    values[Danmaku.user_name] = user_name
+                if content is not None:
+                    values[Danmaku.content] = content
+                if fan_medal_name is not None:
+                    values[Danmaku.fan_medal_name] = fan_medal_name
+                if fan_medal_level is not None:
+                    values[Danmaku.fan_medal_level] = fan_medal_level
+                if user_level is not None:
+                    values[Danmaku.user_level] = user_level
+
+                # Only proceed if there are fields to update
+                if not values:
+                    return False
+
+                # Using RETURNING clause to check if any rows were affected
+                stmt = (
+                    update(Danmaku)
+                    .where(Danmaku.id == id)
+                    .values(**values)
+                    .returning(Danmaku.id)
+                )
+                result = transaction.execute(stmt)
+                transaction.commit()
+
+                # If we got any rows back, the update was successful
+                updated_rows = result.fetchall()
+                return len(updated_rows) > 0
+            except SQLAlchemyError as e:
+                logger.error(f"Database error updating danmaku: {e}")
+                transaction.rollback()
                 return False
-
-            # Using RETURNING clause to check if any rows were affected
-            stmt = (
-                update(Danmaku)
-                .where(Danmaku.id == id)
-                .values(**values)
-                .returning(Danmaku.id)
-            )
-            result = self.session.execute(stmt)
-            self.session.commit()
-
-            # If we got any rows back, the update was successful
-            updated_rows = result.fetchall()
-            return len(updated_rows) > 0
-        except SQLAlchemyError as e:
-            logger.error(f"Database error updating danmaku: {e}")
-            self.session.rollback()
-            return False
 
     def delete_danmaku(self, id: str) -> bool:
         """
         Delete a danmaku from the database
 
+        Parameters:
+            id (str): ID of the danmaku to delete
+
         Returns:
             bool: True if deleted successfully, False otherwise
         """
-        try:
+        with self.session_factory.get_transaction() as transaction:
+
             # First check if the record exists before attempting deletion
-            existing = self.session.execute(
+            existing = transaction.execute(
                 select(Danmaku).where(Danmaku.id == id)
             ).first()
             if not existing:
@@ -237,17 +194,8 @@ class DanmakuRepository:
 
             # Delete the danmaku
             stmt = delete(Danmaku).where(Danmaku.id == id)
-            _ = self.session.execute(stmt)
-
-            self.session.commit()
-
-            # Since we checked existence first, and assuming no concurrent modifications,
-            # we can safely return True if commit was successful
+            _ = transaction.execute(stmt)
             return True
-        except SQLAlchemyError as e:
-            logger.error(f"Database error deleting danmaku: {e}")
-            self.session.rollback()
-            return False
 
     def get_danmaku_by_id(self, id: str) -> Optional[Danmaku]:
         """
@@ -256,13 +204,14 @@ class DanmakuRepository:
         Returns:
             Danmu: Danmu object if found, None otherwise
         """
-        try:
-            stmt = select(Danmaku).where(Danmaku.id == id)
-            result = self.session.execute(stmt).scalars().first()
-            return result
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting danmaku by id: {e}")
-            return None
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = select(Danmaku).where(Danmaku.id == id)
+                result = session.execute(stmt).scalars().first()
+                return result
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting danmaku by id: {e}")
+                return None
 
     def get_all_danmaku(
         self, limit: int = 100, offset: int = 0, sort: Optional[str] = None
@@ -273,20 +222,21 @@ class DanmakuRepository:
         Returns:
             List[Tuple[Danmu, str]]: List of tuples containing (danmaku, room_name)
         """
-        try:
-            # Base query - always join with Room to get room_name
-            stmt = select(Danmaku, Room.room_name).join(
-                Room, Danmaku.room_id == Room.room_id, isouter=True
-            )
-            db_utils = DatabaseUtils(Danmaku)
-            stmt = db_utils.apply_order_by(stmt, sort).limit(limit).offset(offset)
+        with self.session_factory.get_session() as session:
+            try:
+                # Base query - always join with Room to get room_name
+                stmt = select(Danmaku, Room.room_name).join(
+                    Room, Danmaku.room_id == Room.room_id, isouter=True
+                )
+                db_utils = DatabaseUtils(Danmaku)
+                stmt = db_utils.apply_order_by(stmt, sort).limit(limit).offset(offset)
 
-            result = self.session.execute(stmt).all()
-            # Convert Row objects to tuples to match the return type
-            return [(row[0], row[1]) for row in result]
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting all danmaku: {e}")
-            return []
+                result = session.execute(stmt).all()
+                # Convert Row objects to tuples to match the return type
+                return [(row[0], row[1]) for row in result]
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting all danmaku: {e}")
+                return []
 
     def search_danmaku(
         self,
@@ -321,45 +271,48 @@ class DanmakuRepository:
         Returns:
             List[Tuple[Danmaku, str]]: List of tuples containing (danmaku, room_name) matching the criteria
         """
-        try:
-            # Base query - always join with Room to get room_name
-            stmt = select(Danmaku, Room.room_name).join(
-                Room, Danmaku.room_id == Room.room_id, isouter=True
-            )
+        with self.session_factory.get_session() as session:
+            try:
+                # Base query - always join with Room to get room_name
+                stmt = select(Danmaku, Room.room_name).join(
+                    Room, Danmaku.room_id == Room.room_id, isouter=True
+                )
 
-            # Add filters
-            conditions = []
-            if user_name:
-                conditions.append(Danmaku.user_name.like(f"%{user_name}%"))
-            if content:
-                conditions.append(Danmaku.content.like(f"%{content}%"))
-            if room_id:
-                conditions.append(Danmaku.room_id == room_id)
-            if user_level_min is not None:
-                conditions.append(Danmaku.user_level >= user_level_min)
-            if user_level_max is not None:
-                conditions.append(Danmaku.user_level <= user_level_max)
-            if fan_medal_level_min is not None:
-                conditions.append(Danmaku.fan_medal_level >= fan_medal_level_min)
-            if fan_medal_level_max is not None:
-                conditions.append(Danmaku.fan_medal_level <= fan_medal_level_max)
-            if fan_medal_name is not None:
-                conditions.append(Danmaku.fan_medal_name.like(f"%{fan_medal_name}%"))
+                # Add filters
+                conditions = []
+                if user_name:
+                    conditions.append(Danmaku.user_name.like(f"%{user_name}%"))
+                if content:
+                    conditions.append(Danmaku.content.like(f"%{content}%"))
+                if room_id:
+                    conditions.append(Danmaku.room_id == room_id)
+                if user_level_min is not None:
+                    conditions.append(Danmaku.user_level >= user_level_min)
+                if user_level_max is not None:
+                    conditions.append(Danmaku.user_level <= user_level_max)
+                if fan_medal_level_min is not None:
+                    conditions.append(Danmaku.fan_medal_level >= fan_medal_level_min)
+                if fan_medal_level_max is not None:
+                    conditions.append(Danmaku.fan_medal_level <= fan_medal_level_max)
+                if fan_medal_name is not None:
+                    conditions.append(
+                        Danmaku.fan_medal_name.like(f"%{fan_medal_name}%")
+                    )
 
-            if conditions:
-                stmt = stmt.where(and_(*conditions))
+                if conditions:
+                    stmt = stmt.where(and_(*conditions))
 
-            db_utils = DatabaseUtils(Danmaku)
-            stmt = db_utils.apply_order_by(stmt, sort)
+                db_utils = DatabaseUtils(Danmaku)
+                stmt = db_utils.apply_order_by(stmt, sort)
 
-            stmt = stmt.limit(limit).offset(offset)
+                stmt = stmt.limit(limit).offset(offset)
 
-            result = self.session.execute(stmt).all()
-            # Convert Row objects to tuples to match the return type
-            return [(row[0], row[1]) for row in result]
-        except SQLAlchemyError as e:
-            logger.error(f"Database error searching danmaku: {e}")
-            return []
+                result = session.execute(stmt).all()
+                # Convert Row objects to tuples to match the return type
+                return [(row[0], row[1]) for row in result]
+            except SQLAlchemyError as e:
+                logger.error(f"Database error searching danmaku: {e}")
+                return []
 
     def get_search_count(
         self,
@@ -378,37 +331,40 @@ class DanmakuRepository:
         Returns:
             int: Count of matching danmaku
         """
-        try:
-            # Base query
-            stmt = select(func.count()).select_from(Danmaku)
+        with self.session_factory.get_session() as session:
+            try:
+                # Base query
+                stmt = select(func.count()).select_from(Danmaku)
 
-            # Add filters
-            conditions = []
-            if user_name:
-                conditions.append(Danmaku.user_name.like(f"%{user_name}%"))
-            if content:
-                conditions.append(Danmaku.content.like(f"%{content}%"))
-            if room_id:
-                conditions.append(Danmaku.room_id == room_id)
-            if user_level_min is not None:
-                conditions.append(Danmaku.user_level >= user_level_min)
-            if user_level_max is not None:
-                conditions.append(Danmaku.user_level <= user_level_max)
-            if fan_medal_level_min is not None:
-                conditions.append(Danmaku.fan_medal_level >= fan_medal_level_min)
-            if fan_medal_level_max is not None:
-                conditions.append(Danmaku.fan_medal_level <= fan_medal_level_max)
-            if fan_medal_name is not None:
-                conditions.append(Danmaku.fan_medal_name.like(f"%{fan_medal_name}%"))
+                # Add filters
+                conditions = []
+                if user_name:
+                    conditions.append(Danmaku.user_name.like(f"%{user_name}%"))
+                if content:
+                    conditions.append(Danmaku.content.like(f"%{content}%"))
+                if room_id:
+                    conditions.append(Danmaku.room_id == room_id)
+                if user_level_min is not None:
+                    conditions.append(Danmaku.user_level >= user_level_min)
+                if user_level_max is not None:
+                    conditions.append(Danmaku.user_level <= user_level_max)
+                if fan_medal_level_min is not None:
+                    conditions.append(Danmaku.fan_medal_level >= fan_medal_level_min)
+                if fan_medal_level_max is not None:
+                    conditions.append(Danmaku.fan_medal_level <= fan_medal_level_max)
+                if fan_medal_name is not None:
+                    conditions.append(
+                        Danmaku.fan_medal_name.like(f"%{fan_medal_name}%")
+                    )
 
-            if conditions:
-                stmt = stmt.where(and_(*conditions))
+                if conditions:
+                    stmt = stmt.where(and_(*conditions))
 
-            count = self.session.execute(stmt).scalar()
-            return count if count is not None else 0
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting search count: {e}")
-            return 0
+                count = session.execute(stmt).scalar()
+                return count if count is not None else 0
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting search count: {e}")
+                return 0
 
     def create_capture_job(self, room_id: int, url: str, duration: int) -> CaptureJob:
         """
@@ -422,26 +378,27 @@ class DanmakuRepository:
         Returns:
             CaptureJob: The created capture job record
         """
-        try:
-            job = CaptureJob(
-                room_id=room_id,
-                url=url,
-                status=CaptureJobStatus.RUNNING.value,
-                duration=duration,
-                start_time=datetime.now(timezone(timedelta(hours=8))),
-                end_time=None,  # Will be set when the job ends
-            )
+        with self.session_factory.get_transaction(autocommit=False) as transaction:
+            try:
+                job = CaptureJob(
+                    room_id=room_id,
+                    url=url,
+                    status=CaptureJobStatus.RUNNING.value,
+                    duration=duration,
+                    start_time=datetime.now(timezone(timedelta(hours=8))),
+                    end_time=None,  # Will be set when the job ends
+                )
 
-            self.session.add(job)
-            self.session.commit()
-            self.session.refresh(job)
+                transaction.add(job)
+                transaction.commit()
+                transaction.refresh(job)
 
-            logger.info(f"Created capture job for room {room_id}, ID: {job.id}")
-            return job
-        except SQLAlchemyError as e:
-            logger.error(f"Database error creating capture job: {e}")
-            self.session.rollback()
-            raise
+                logger.info(f"Created capture job for room {room_id}, ID: {job.id}")
+                return job
+            except SQLAlchemyError as e:
+                logger.error(f"Database error creating capture job: {e}")
+                transaction.rollback()
+                raise
 
     def update_capture_job_status(
         self, job_id: int, status: str, end_time: Optional[datetime] = None
@@ -457,29 +414,30 @@ class DanmakuRepository:
         Returns:
             bool: True if updated successfully, False otherwise
         """
-        try:
-            stmt = (
-                update(CaptureJob)
-                .where(CaptureJob.id == job_id)
-                .values(status=status, end_time=end_time)
-                .returning(CaptureJob.id)
-            )
-            result = self.session.execute(stmt)
+        with self.session_factory.get_transaction(autocommit=False) as transaction:
+            try:
+                stmt = (
+                    update(CaptureJob)
+                    .where(CaptureJob.id == job_id)
+                    .values(status=status, end_time=end_time)
+                    .returning(CaptureJob.id)
+                )
+                result = transaction.execute(stmt)
 
-            updated_rows = result.fetchall()
+                updated_rows = result.fetchall()
 
-            self.session.commit()
+                transaction.commit()
 
-            if len(updated_rows) > 0:
-                logger.info(f"Updated capture job {job_id} status to {status}")
-                return True
-            else:
-                logger.warning(f"No capture job found with ID {job_id} to update")
+                if len(updated_rows) > 0:
+                    logger.info(f"Updated capture job {job_id} status to {status}")
+                    return True
+                else:
+                    logger.warning(f"No capture job found with ID {job_id} to update")
+                    return False
+            except SQLAlchemyError as e:
+                logger.error(f"Database error updating capture job status: {e}")
+                transaction.rollback()
                 return False
-        except SQLAlchemyError as e:
-            logger.error(f"Database error updating capture job status: {e}")
-            self.session.rollback()
-            return False
 
     def get_running_capture_job(self, room_id: int) -> Optional[CaptureJob]:
         """
@@ -491,18 +449,19 @@ class DanmakuRepository:
         Returns:
             Optional[CaptureJob]: The capture job record, or None if not found
         """
-        try:
-            stmt = select(CaptureJob).where(
-                and_(
-                    CaptureJob.room_id == room_id,
-                    CaptureJob.status == CaptureJobStatus.RUNNING.value,
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = select(CaptureJob).where(
+                    and_(
+                        CaptureJob.room_id == room_id,
+                        CaptureJob.status == CaptureJobStatus.RUNNING.value,
+                    )
                 )
-            )
-            result = self.session.execute(stmt).scalar_one_or_none()
-            return result
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting capture job: {e}")
-            return None
+                result = session.execute(stmt).scalar_one_or_none()
+                return result
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting capture job: {e}")
+                return None
 
     def get_active_capture_jobs(self) -> List[CaptureJob]:
         """
@@ -511,42 +470,16 @@ class DanmakuRepository:
         Returns:
             List[CaptureJob]: List of active capture jobs
         """
-        try:
-            stmt = select(CaptureJob).where(
-                CaptureJob.status == CaptureJobStatus.RUNNING.value
-            )
-            result = self.session.execute(stmt).scalars().all()
-            return list(result)
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting active capture jobs: {e}")
-            return []
-
-    def terminate_all_capture_jobs(self) -> int:
-        """
-        Mark all running capture jobs as terminated
-
-        Returns:
-            int: Number of jobs that were updated
-        """
-        try:
-            current_time = datetime.now(timezone(timedelta(hours=8)))
-
-            stmt = (
-                update(CaptureJob)
-                .where(CaptureJob.status == CaptureJobStatus.RUNNING.value)
-                .values(status=CaptureJobStatus.TERMINATED.value, end_time=current_time)
-                .returning(CaptureJob.id)
-            )
-            result = self.session.execute(stmt)
-            updated_count = len(result.fetchall())
-
-            logger.info(f"Terminated {updated_count} active capture jobs")
-            self.session.commit()
-            return updated_count
-        except SQLAlchemyError as e:
-            logger.error(f"Database error terminating capture jobs: {e}")
-            self.session.rollback()
-            return 0
+        with self.session_factory.get_session() as session:
+            try:
+                stmt = select(CaptureJob).where(
+                    CaptureJob.status == CaptureJobStatus.RUNNING.value
+                )
+                result = session.execute(stmt).scalars().all()
+                return list(result)
+            except SQLAlchemyError as e:
+                logger.error(f"Database error getting active capture jobs: {e}")
+                return []
 
     def get_capture_jobs(
         self, page: int, limit: int, sort: Optional[str] = None
@@ -561,26 +494,45 @@ class DanmakuRepository:
         Returns:
             Tuple[List[CaptureJob], int]: A tuple containing the list of jobs for the current page and the total count
         """
-        try:
-            # Calculate offset
-            offset = (page - 1) * limit
+        with self.session_factory.get_session() as session:
+            try:
+                # Calculate offset
+                offset = (page - 1) * limit
 
-            # Count total number of jobs
-            total_count = self.session.execute(
-                select(func.count(CaptureJob.id))
-            ).scalar()
+                # Count total number of jobs
+                total_count = session.execute(
+                    select(func.count(CaptureJob.id))
+                ).scalar()
 
-            # Get paginated jobs
-            stmt = select(CaptureJob)
+                # Get paginated jobs
+                stmt = select(CaptureJob)
 
-            if sort:
-                db_utils = DatabaseUtils(CaptureJob)
-                stmt = db_utils.apply_order_by(stmt, sort)
+                if sort:
+                    db_utils = DatabaseUtils(CaptureJob)
+                    stmt = db_utils.apply_order_by(stmt, sort)
 
-            stmt = stmt.offset(offset).limit(limit)
-            result = self.session.execute(stmt).scalars().all()
+                stmt = stmt.offset(offset).limit(limit)
+                result = session.execute(stmt).scalars().all()
 
-            return list(result), (total_count or 0)
-        except SQLAlchemyError as e:
-            logger.error(f"Database error getting capture jobs with pagination: {e}")
-            return [], 0
+                return list(result), (total_count or 0)
+            except SQLAlchemyError as e:
+                logger.error(
+                    f"Database error getting capture jobs with pagination: {e}"
+                )
+                return [], 0
+
+    def get_danmaku_in_time_range(
+        self, start_time: datetime, end_time: datetime, room_id: Optional[int] = None
+    ) -> List[Danmaku]:
+        query = select(Danmaku).where(
+            and_(
+                Danmaku.room_id == room_id,
+                Danmaku.created_at >= start_time,
+                Danmaku.created_at <= end_time,
+            )
+        )
+        if room_id:
+            query = query.where(Danmaku.room_id == room_id)
+        with self.session_factory.get_session() as session:
+            result = list(session.execute(query).scalars().all())
+        return result

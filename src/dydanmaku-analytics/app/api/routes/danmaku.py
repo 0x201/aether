@@ -1,11 +1,9 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.deps import (
-    DanmakuAnalyzerDep,
-    SessionDep,
-)
+from app.deps import DanmakuAnalyzerDep
 from fastapi import APIRouter, HTTPException, Query
+from dependency_injector.wiring import inject
 
 from .timed_route import TimedRoute
 
@@ -34,8 +32,8 @@ def convert_to_utc(dt_str: str) -> datetime:
     description="Generate danmaku analysis for a specified time range",
     summary="Generate danmaku analysis for a specified time range",
 )
+@inject
 async def generate_analysis(
-    session: SessionDep,
     analyzer: DanmakuAnalyzerDep,
     start_time: str = Query(
         ..., description="Start time in ISO 8601 format (e.g., 2026-01-11T10:00:00Z)"
@@ -50,7 +48,6 @@ async def generate_analysis(
             status_code=400,
             detail="Both start_time and end_time are required for fetching precomputed data",
         )
-
     try:
         start_dt = convert_to_utc(start_time)
         end_dt = convert_to_utc(end_time)
@@ -59,7 +56,6 @@ async def generate_analysis(
 
     _ = analyzer.generate_analysis(
         top_n=100,
-        session=session,
         start_time=start_dt,
         end_time=end_dt,
         room_id=room_id,

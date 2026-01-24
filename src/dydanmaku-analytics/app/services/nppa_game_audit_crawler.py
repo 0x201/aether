@@ -211,15 +211,16 @@ class NPPAGameAuditCrawler:
     National Press and Publication Administration (NPPA) Game Audit Crawler
     """
 
-    def __init__(self):
+    def __init__(self, nppa_repository: NPPARepository):
         self.base_url = settings.nppa.base_url
         self.data_url = settings.nppa.data_url
         self.suffix = settings.nppa.suffix
         self.playwright = None
         self.browser = None
         self.random_number = random.randint(1, 1000_000)
+        self.nppa_repository = nppa_repository
 
-    async def run(self, nppa_repo: NPPARepository, mode: int = 0) -> None:
+    async def run(self, mode: int = 0) -> None:
         """
         Entry of the crawler
 
@@ -229,9 +230,9 @@ class NPPAGameAuditCrawler:
         GameAuditStrategyFactory.initialize_default_strategies()
         try:
             if mode == 0:
-                await self._get_latest_game_audits(nppa_repo)
+                await self._get_latest_game_audits()
             else:
-                await self._get_all_game_audits(nppa_repo)
+                await self._get_all_game_audits()
         finally:
             await self._close_browser()
 
@@ -762,12 +763,12 @@ class NPPAGameAuditCrawler:
         )
         return alterations
 
-    async def _get_latest_game_audits(self, nppa_repo: NPPARepository) -> None:
+    async def _get_latest_game_audits(self) -> None:
         """Get incremental game audits and save to database"""
         game_audits = await self._parse_table(
             self.base_url + self.data_url + self.suffix
         )
-        latest_game_audit = nppa_repo.get_latest_game_audit()
+        latest_game_audit = self.nppa_repository.get_latest_game_audit()
         if game_audits and len(game_audits) > 0 and latest_game_audit is not None:
             # check the last game audit in links whether is newer than latest_game_audit
             if game_audits[-1].publish_date <= latest_game_audit.publish_date:
@@ -780,13 +781,13 @@ class NPPAGameAuditCrawler:
                 if audit.publish_date > latest_game_audit.publish_date
             ]
 
-            nppa_repo.insert_many_game_audits(new_audits)
+            self.nppa_repository.insert_many_game_audits(new_audits)
             logger.info(f"Saved total {len(game_audits)} game audits to CSV")
-            await self._parse_game_audits(game_audits, nppa_repo)
+            await self._parse_game_audits(game_audits)
         else:
             logger.info("No new NPPA game audit to save.")
 
-    async def _get_all_game_audits(self, nppa_repo: NPPARepository) -> None:
+    async def _get_all_game_audits(self) -> None:
         """Get full game audits and save to database"""
         await self._initialize_browser()
 
@@ -824,15 +825,13 @@ class NPPAGameAuditCrawler:
             parsed_data = await self._parse_table(url)
             game_audit_list.extend(parsed_data)
         if game_audit_list:
-            nppa_repo.insert_many_game_audits(game_audit_list)
+            self.nppa_repository.insert_many_game_audits(game_audit_list)
             logger.info(f"Saved total {len(game_audit_list)} game audits to CSV")
-            await self._parse_game_audits(game_audit_list, nppa_repo)
+            await self._parse_game_audits(game_audit_list)
         else:
             logger.info("No NPPA game audit to save.")
 
-    async def _parse_game_audits(
-        self, game_audits: List[GameAudit], nppa_repo: NPPARepository
-    ) -> None:
+    async def _parse_game_audits(self, game_audits: List[GameAudit]) -> None:
         """
         Parse game audits and save to CSV
 
@@ -863,7 +862,7 @@ class NPPAGameAuditCrawler:
                     all_parsed_data.extend(parsed_data)
 
                 if all_parsed_data:
-                    strategy.save_data(all_parsed_data, nppa_repo)
+                    strategy.save_data(all_parsed_data, self.nppa_repository)
                     logger.info(
                         f"Saved total {len(all_parsed_data)} records to database."
                     )
