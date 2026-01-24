@@ -59,5 +59,5 @@ class NetworkGameAudit(Base):
     operator: Mapped[str] = mapped_column(String(512))
     audit_no: Mapped[str] = mapped_column(String(128))
     isbn: Mapped[str] = mapped_column(String(128))
-    category: Mapped[str] = mapped_column(Integer)  # 1 国产 2 进口
+    category: Mapped[int] = mapped_column(Integer)  # 1 国产 2 进口
     publish_date: Mapped[datetime] = mapped_column(DateTime)

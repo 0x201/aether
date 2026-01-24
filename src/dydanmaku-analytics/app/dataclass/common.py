@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 class PagedRequestBase(BaseModel):
     page: int = Field(default=1, description="Current page number")
-    page_size: int = Field(default=10, description="Number of items per page")
+    pageSize: int = Field(default=10, description="Number of items per page")
 
 
 class ResultBase(BaseModel):
@@ -27,4 +27,4 @@ class ResultBase(BaseModel):
 
 class PagedResult(ResultBase, Generic[T]):
     data: List[T] = Field(default=[], description="List of items")
-    total_count: int = Field(default=0, description="Total number of items")
+    totalCount: int = Field(default=0, description="Total number of items")

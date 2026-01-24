@@ -1,8 +1,9 @@
 from typing import List, Optional, Tuple
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from .common import get_generic_paged_data
 from .nppa_models import (
     GameAudit,
     NetworkGameAudit,
@@ -79,33 +80,39 @@ class NPPARepository:
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
     ) -> Tuple[List[NetworkGameAudit], int]:
-        stmt = select(NetworkGameAudit)
-        count_stmt = select(func.count()).select_from(NetworkGameAudit)
 
-        if name:
-            stmt = stmt.where(NetworkGameAudit.name.like(f"%{name}%"))
-            count_stmt = count_stmt.where(NetworkGameAudit.name.like(f"%{name}%"))
+        conditions = []
+        if start_time and end_time:
+            conditions.append(NetworkGameAudit.publish_date >= start_time)
+            conditions.append(NetworkGameAudit.publish_date <= end_time)
 
-        if start_time:
-            stmt = stmt.where(NetworkGameAudit.publish_date >= start_time)
-            count_stmt = count_stmt.where(NetworkGameAudit.publish_date >= start_time)
-
-        if end_time:
-            stmt = stmt.where(NetworkGameAudit.publish_date <= end_time)
-            count_stmt = count_stmt.where(NetworkGameAudit.publish_date <= end_time)
-
-        if page < 0:
-            page = 1
-
-        page = page - 1
-
-        stmt = (
-            stmt.order_by(NetworkGameAudit.id).offset(page * page_size).limit(page_size)
+        return get_generic_paged_data(
+            self.session,
+            NetworkGameAudit,
+            page=page,
+            page_size=page_size,
+            filters={"name": name},
+            custom_conditions=conditions,
         )
-        result = self.session.execute(stmt)
-        game_audits = result.scalars().unique().all()
 
-        count_result = self.session.execute(count_stmt)
-        total_count = count_result.scalar()
+    def get_paged_game_audits(
+        self,
+        page: int,
+        page_size: int,
+        title: Optional[str] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+    ) -> Tuple[List[GameAudit], int]:
+        conditions = []
+        if start_time and end_time:
+            conditions.append(NetworkGameAudit.publish_date >= start_time)
+            conditions.append(NetworkGameAudit.publish_date <= end_time)
 
-        return (list(game_audits), total_count or 0)
+        return get_generic_paged_data(
+            self.session,
+            GameAudit,
+            page=page,
+            page_size=page_size,
+            filters={"title": title},
+            custom_conditions=conditions,
+        )

@@ -6,7 +6,7 @@ from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.dataclass.model import CaptureJobStatus
+from app.dataclass.danmaku_model import CaptureJobStatus
 from app.common import DatabaseUtils
 from .danmaku_models import CaptureJob, Danmaku, Room
 
