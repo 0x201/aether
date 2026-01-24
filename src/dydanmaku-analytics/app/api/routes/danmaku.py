@@ -31,7 +31,6 @@ def convert_to_utc(dt_str: str) -> datetime:
 
 @router.post(
     "/analysis/generate",
-    tags=["Analysis"],
     description="Generate danmaku analysis for a specified time range",
     summary="Generate danmaku analysis for a specified time range",
 )
