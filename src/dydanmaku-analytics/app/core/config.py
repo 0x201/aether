@@ -76,6 +76,16 @@ class NPPAConfig(BaseSettings):
     suffix: str = Field(default=".html", description="Suffix for NPPAs URLs")
 
 
+class RabbitMQConfig(BaseSettings):
+    """RabbitMQ configuration"""
+
+    host: str = Field(default="localhost", description="RabbitMQ host")
+    port: int = Field(default=5672, description="RabbitMQ port")
+    username: str = Field(default="guest", description="RabbitMQ username")
+    password: str = Field(default="guest", description="RabbitMQ password")
+
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
     project_name: str = Field(default="DyDanmaku API", description="Project name")
@@ -99,6 +109,9 @@ class Settings(BaseSettings):
         default=LoggingConfig(), description="Logging configuration"
     )
     nppa: NPPAConfig = Field(default=NPPAConfig(), description="NPPAs configuration")
+    messaging: RabbitMQConfig = Field(
+        default=RabbitMQConfig(), description="RabbitMQ configuration"
+    )
 
     @classmethod
     def settings_customise_sources(
