@@ -34,4 +34,4 @@ class ScheduledNPPACrawler:
 
     async def _daily_check(self):
         """Perform daily checks and operations using dependency injection"""
-        await self.crawler.run(mode=1)
+        await self.crawler.run(mode=0)

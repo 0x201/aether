@@ -59,7 +59,7 @@ class DanmakuAnalyzer:
         if self.session_factory is None:
             raise ValueError("Database session_factory is required for analysis")
 
-        with self.session_factory.get_transaction() as transaction:
+        with self.session_factory.get_transaction(autocommit=False) as transaction:
             # Directly check for cached data in the database
             if start_time and end_time:
                 stmt = select(DanmakuAnalysis).where(
@@ -165,4 +165,5 @@ class DanmakuAnalyzer:
             )
 
             transaction.add(danmaku_analysis)
+            transaction.commit()
             return danmaku_analysis

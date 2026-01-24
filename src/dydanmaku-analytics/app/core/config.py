@@ -83,6 +83,7 @@ class RabbitMQConfig(BaseSettings):
     port: int = Field(default=5672, description="RabbitMQ port")
     username: str = Field(default="guest", description="RabbitMQ username")
     password: str = Field(default="guest", description="RabbitMQ password")
+    virtual_host: str = Field(default="/", description="RabbitMQ virtual host")
 
 
 class Settings(BaseSettings):

@@ -8,8 +8,8 @@ class AnalyticsNotification:
     Service for sending analytics completion notifications via the event bus.
     """
 
-    def __init__(self, event_bus: Optional[EventBus] = None):
-        self.event_bus = event_bus or EventBus()
+    def __init__(self, event_bus: EventBus):
+        self.event_bus = event_bus
 
     def notify_analytics_completed(
         self,
