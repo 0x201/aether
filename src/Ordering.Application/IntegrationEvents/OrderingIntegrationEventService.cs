@@ -23,7 +23,7 @@ public class OrderingIntegrationEventService(
         await _eventLogService.SaveEventAsync(@event, _orderingDbContext.GetCurrentTransaction());
     }
 
-    public async Task PublishEventsThroughEventBusAsync(Guid transactionId)
+    public async Task PublishEventsThroughEventBusAsync(Guid transactionId, CancellationToken cancellationToken = default)
     {
         var pendingLogEvents = await _eventLogService.RetrieveEventLogsPendingToPublishAsync(transactionId);
 
@@ -34,7 +34,7 @@ public class OrderingIntegrationEventService(
             try
             {
                 await _eventLogService.MarkEventAsInProgressAsync(logEvent.EventId);
-                await _eventBus.PublishAsync(logEvent.IntegrationEvent);
+                await _eventBus.PublishAsync(logEvent.IntegrationEvent, cancellationToken);
                 await _eventLogService.MarkEventAsPublishedAsync(logEvent.EventId);
             }
             catch (Exception ex)

@@ -19,3 +19,6 @@ global using ModernCSharp.ServiceDefaults;
 global using ModernCSharp.Shared;
 
 global using Scalar.AspNetCore;
+
+global using DyDanmaku.Application.IntegrationEvents.Events;
+global using ModernCSharp.EventBus.Abstractions;

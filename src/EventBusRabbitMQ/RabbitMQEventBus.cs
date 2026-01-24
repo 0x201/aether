@@ -30,7 +30,7 @@ public sealed class RabbitMQEventBus(
 
     private IChannel _consumerChannel;
 
-    public async Task PublishAsync(IntegrationEvent @event)
+    public async Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default)
     {
         var routingKey = @event.GetType().Name;
 
@@ -39,14 +39,14 @@ public sealed class RabbitMQEventBus(
             logger.LogTrace("Creating RabbitMQ channel to publish event: {EventId} ({EventName})", @event.Id, routingKey);
         }
 
-        using var channel = await _rabbitMQConnection?.CreateChannelAsync() ?? throw new InvalidOperationException("RabbitMQ connection is not open");
+        using var channel = await _rabbitMQConnection?.CreateChannelAsync(cancellationToken: cancellationToken) ?? throw new InvalidOperationException("RabbitMQ connection is not open");
 
         if (logger.IsEnabled(LogLevel.Trace))
         {
             logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
         }
 
-        await channel.ExchangeDeclareAsync(exchange: ExchangeName, type: "direct");
+        await channel.ExchangeDeclareAsync(exchange: ExchangeName, type: "direct", cancellationToken: cancellationToken);
 
         var body = SerializeMessage(@event);
 

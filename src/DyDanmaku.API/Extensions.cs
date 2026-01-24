@@ -1,4 +1,5 @@
 ﻿using DyDanmaku.API.Infrastructure;
+using DyDanmaku.Application.EventHandlers;
 
 namespace DyDanmaku.API;
 
@@ -7,6 +8,10 @@ public static class Extensions
     internal static void AddApplicationService(this IHostApplicationBuilder builder)
     {
         var services = builder.Services;
+
+        builder.AddRabbitMqEventBus("eventbus")
+            .AddEventBusSubscriptions();
+
         var connectionString = builder.Configuration.GetConnectionString("dydanmakudb");
 
         services.AddDbContextFactory<DyDanmakuDbContext>(options =>
@@ -27,5 +32,10 @@ public static class Extensions
         services.AddHostedService(provider => (DanmakuPushService)provider.GetRequiredService<IDanmakuPushService>());
         services.AddHostedService<CaptureJobMonitoringService>();
         services.AddHostedService<ScheduleTaskService>();
+    }
+
+    private static void AddEventBusSubscriptions(this IEventBusBuilder eventBus)
+    {
+        eventBus.AddSubscription<AnalyticsCompletedIntegrationEvent, AnalyticsCompletedEventHandler>();
     }
 }

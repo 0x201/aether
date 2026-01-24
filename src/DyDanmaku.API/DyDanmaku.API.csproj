@@ -26,10 +26,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DyDanmaku.Application\DyDanmaku.Application.csproj" />
     <ProjectReference Include="..\DyDanmaku.Infrastructure\DyDanmaku.Infrastructure.csproj" />
     <ProjectReference Include="..\ModernCSharp.AppDefaults\ModernCSharp.AppDefaults.csproj" />
     <ProjectReference Include="..\ModernCSharp.ServiceDefaults\ModernCSharp.ServiceDefaults.csproj" />
     <ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
+    <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
+    <ProjectReference Include="..\IntegrationEventLogEF\IntegrationEventLogEF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

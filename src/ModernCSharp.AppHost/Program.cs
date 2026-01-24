@@ -47,6 +47,8 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
 
 var dydanmakuApi = builder.AddProject<Projects.DyDanmaku_API>("dydanmakuapi")
     .WithReference(dydanmakudb).WaitFor(dydanmakudb)
+    .WithReference(redis).WaitFor(redis)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithHttpHealthCheck("/health");
 
 builder.AddProject<Projects.OrderProcessor>("orderprocessor")
@@ -64,6 +66,7 @@ var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api",
     .WithPnpm()
     .WithHttpEndpoint(port: 3011, env: "PORT")
     .WithExternalHttpEndpoints()
+    .WithReference(redis).WaitFor(redis)
     .WithReference(keycloak).WaitFor(keycloak)
     .WithReference(bookstoredb).WaitFor(bookstoredb);
 
@@ -81,6 +84,8 @@ var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../dydanmaku-a
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
+    .WithReference(redis).WaitFor(redis)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(dydanmakudb).WaitFor(dydanmakudb);
 
 danmakuanalytics.WithUrl($"{danmakuanalytics.GetEndpoint("http")}/scalar", "Douyu Danmaku Analytics API Docs");
