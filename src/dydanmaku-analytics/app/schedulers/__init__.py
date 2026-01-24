@@ -1,7 +1,7 @@
-from .scheduled_crawler import ScheduledNPPACrawler
-from .scheduled_analyzer import ScheduledAnalyzer
+from .scheduled_nppa_crawler import ScheduledNPPACrawler
+from .scheduled_danmaku_analyzer import ScheduledDanmakuAnalyzer
 
-__all__ = ["ScheduledNPPACrawler", "ScheduledAnalyzer"]
+__all__ = ["ScheduledNPPACrawler", "ScheduledDanmakuAnalyzer"]
 
 
 to_run_tasks = []
@@ -10,7 +10,7 @@ to_run_tasks = []
 def _initialize_scheduled_tasks():
     """Initialize scheduled tasks."""
     global to_run_tasks
-    to_run_tasks = [ScheduledNPPACrawler(), ScheduledAnalyzer()]
+    to_run_tasks = [ScheduledNPPACrawler(), ScheduledDanmakuAnalyzer()]
 
 
 def start_scheduled_tasks():

@@ -1,15 +1,13 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
-
-from app.database.session_connector import SessionConnector
 from app.services.nppa_game_audit_crawler import NPPAGameAuditCrawler
+from app.deps import get_nppa_repository, session_connector
 
 
 class ScheduledNPPACrawler:
     def __init__(self):
         self.scheduler = AsyncIOScheduler()
-        self.session_connector = SessionConnector()
         self.crawler = NPPAGameAuditCrawler()
 
     async def _execute_daily_check(self):
@@ -37,4 +35,6 @@ class ScheduledNPPACrawler:
 
     async def _daily_check(self):
         """Perform daily checks and operations"""
-        await self.crawler.run(mode=1)
+        with session_connector.get_session() as session:
+            nppa_repo = get_nppa_repository(session)
+            await self.crawler.run(nppa_repo, mode=1)

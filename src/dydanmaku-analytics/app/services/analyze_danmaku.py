@@ -9,7 +9,8 @@ from datetime import datetime
 from typing import Optional
 
 import jieba3
-from app.database.models import Danmaku, DanmakuAnalysis
+from app.database import Danmaku, DanmakuAnalysis
+from app.dataclass import DanmakuAnalysisDto
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -22,10 +23,10 @@ class DanmakuAnalyzer:
         start_time: datetime,
         end_time: datetime,
         room_id: Optional[int] = None,
-    ):
+    ) -> DanmakuAnalysisDto:
         """Precompute word frequency and wordcloud data for a time range in a single entry"""
         # Generate both word frequency and wordcloud data
-        _ = self.generate_analysis(
+        analysis = self.generate_analysis(
             top_n=100,
             session=session,
             start_time=start_time,
@@ -36,6 +37,15 @@ class DanmakuAnalyzer:
         logger.info(
             f"Precomputed analyses for time range {start_time} to {end_time} and room {room_id}"
         )
+        dto = DanmakuAnalysisDto(
+            startDate=start_time,
+            endDate=end_time,
+            roomId=room_id,
+            frequenciesCount=len(analysis.frequencies) if analysis.frequencies else 0,
+            periodType="",
+            createdAt=analysis.created_at,
+        )
+        return dto
 
     def generate_analysis(
         self,

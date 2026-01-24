@@ -10,10 +10,11 @@ from apscheduler.triggers.cron import CronTrigger
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
-from app.database.models import Danmaku
-
+from app.database import Danmaku
+from app.dataclass import DanmakuAnalysisDto
 from app.database.session_connector import SessionConnector
-from app.services.analyze_danmaku import DanmakuAnalyzer
+from app.services import DanmakuAnalyzer, rabbitmq_publisher
+
 
 from loguru import logger
 
@@ -195,16 +196,27 @@ class ScheduledDanmakuAnalyzer:
 
         try:
             with self.session_connector.get_session() as db:
-                self.analyzer.precompute_analyses(
+                overall_analytics = self.analyzer.precompute_analyses(
                     session=db, start_time=start_time, end_time=end_time, room_id=None
                 )
-                await self._precompute_for_all_rooms(db, start_time, end_time)
+                overall_analytics.periodType = date_range.value
+
+                # Send analytics completed event
+                await self._send_analytics_completed_event(overall_analytics)
+
+                await self._precompute_for_all_rooms(
+                    db, date_range, start_time, end_time
+                )
 
         except Exception as e:
             logger.error(f"Error during scheduled precomputation: {e}")
 
     async def _precompute_for_all_rooms(
-        self, db: Session, start_time: datetime, end_time: datetime
+        self,
+        db: Session,
+        date_range: DateRange,
+        start_time: datetime,
+        end_time: datetime,
     ):
         """Precompute analyses for all rooms individually"""
 
@@ -222,12 +234,35 @@ class ScheduledDanmakuAnalyzer:
         for room_result in recent_rooms:
             room_id = room_result
             try:
-                self.analyzer.precompute_analyses(
+                analytic = self.analyzer.precompute_analyses(
                     session=db,
                     start_time=start_time,
                     end_time=end_time,
                     room_id=room_id,
                 )
+                analytic.periodType = date_range.value
+
+                await self._send_analytics_completed_event(analytic)
+
                 logger.info(f"Precomputed analyses for room {room_id}")
             except Exception as e:
                 logger.error(f"Error precomputing analyses for room {room_id}: {e}")
+
+    async def _send_analytics_completed_event(
+        self, danmaku_analysis: DanmakuAnalysisDto
+    ):
+        try:
+            success = rabbitmq_publisher.send_analytics_completed_event(
+                danmaku_analysis
+            )
+
+            if success:
+                logger.info(
+                    f"Sent analytics completed event for {danmaku_analysis.roomId}"
+                )
+            else:
+                logger.error(
+                    f"Failed to send analytics completed event for {danmaku_analysis.roomId}"
+                )
+        except Exception as e:
+            logger.error(f"Error sending analytics completed event: {e}")
