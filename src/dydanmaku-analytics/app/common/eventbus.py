@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Protocol
 import pika
 from loguru import logger
 from app.core.config import settings
+import threading
 
 
 class IEventBus(Protocol):
@@ -23,15 +24,10 @@ class EventBus(IEventBus):
 
     def __init__(self, exchange_name: str = "mc_event_bus"):
         self.exchange_name = exchange_name
-        self.connection = None
-        self.channel = None
-        self.exchange_declared = False
-        self._connect()
+        self._lock = threading.Lock()
 
-    def _connect(self):
-        """Establish connection to RabbitMQ"""
+    def _create_connection(self):
         try:
-            # Create connection
             credentials = pika.PlainCredentials(
                 settings.messaging.username, settings.messaging.password
             )
@@ -40,37 +36,31 @@ class EventBus(IEventBus):
                 port=settings.messaging.port,
                 virtual_host=settings.messaging.virtual_host,
                 credentials=credentials,
+                heartbeat=600,
+                blocked_connection_timeout=300,
             )
-            self.connection = pika.BlockingConnection(parameters)
-            self.channel = self.connection.channel()
+            connection = pika.BlockingConnection(parameters)
+            channel = connection.channel()
 
-            # Declare exchange
-            self.channel.exchange_declare(
+            channel.exchange_declare(
                 exchange=self.exchange_name,
                 exchange_type="direct",
                 durable=False,
                 auto_delete=False,
             )
-            self.exchange_declared = True
-            logger.info(
-                f"Connected to RabbitMQ, exchange '{self.exchange_name}' declared"
-            )
-        except Exception as ex:
-            logger.error(f"Error connecting to RabbitMQ: {ex}")
-            self.connection = None
-            self.channel = None
 
-    def _ensure_connection(self):
-        if not self.connection or self.connection.is_closed:
-            logger.warning("Connection closed, attempting to reconnect...")
-            self._connect()
-        elif not self.channel or self.channel.is_closed:
-            logger.warning("Channel closed, attempting to recreate...")
-            self._connect()
+            logger.info(
+                f"Created temporary connection to RabbitMQ, exchange '{self.exchange_name}'"
+            )
+
+            return connection, channel
+        except Exception as ex:
+            logger.error(f"Error creating connection to RabbitMQ: {ex}")
+            return None, None
 
     def publish(self, event_type_name: str, event_data: Dict[str, Any]):
         """
-        Publish an integration event to RabbitMQ.
+        Publish an integration event to RabbitMQ using context manager.
 
         Parameters
             event_type_name: event type name
@@ -80,45 +70,50 @@ class EventBus(IEventBus):
         Return
             bool: True if the message was published successfully, False otherwise.
         """
-        try:
-            self._ensure_connection()
-            if not self.channel:
+        with self.get_connection() as conn:
+            connection, channel = conn["connection"], conn["channel"]
+
+            if not channel:
                 logger.error("Cannot publish: no channel available")
                 return False
 
-            body = json.dumps(event_data, ensure_ascii=False)
-            self.channel.basic_publish(
-                exchange=self.exchange_name,
-                routing_key=event_type_name,
-                body=body,
-                properties=pika.BasicProperties(
-                    delivery_mode=2
-                ),  # Make message persistent
-            )
-            logger.info(
-                f"Published event '{event_type_name}' to exchange '{self.exchange_name}'"
-            )
-            return True
-        except Exception as ex:
-            logger.error(f"Error publishing event: {ex}")
-            return False
+            try:
+                body = json.dumps(event_data, ensure_ascii=False)
+                properties = pika.BasicProperties(
+                    delivery_mode=2,
+                    headers={"traceparent": f"{event_type_name}"},
+                )
+                channel.basic_publish(
+                    exchange=self.exchange_name,
+                    routing_key=event_type_name,
+                    body=body,
+                    properties=properties,
+                )
+                logger.info(
+                    f"Published event '{event_type_name}' to exchange '{self.exchange_name}'"
+                )
+                return True
+            except Exception as ex:
+                logger.error(f"Error publishing event: {ex}")
+                return False
 
     def subscribe(
         self, event_type_name: str, callback: Callable[[Dict[str, Any]], None]
     ):
-        """Subscribe to an event type"""
-        try:
-            self._ensure_connection()
-            if not self.channel:
-                logger.error("Cannot subscribe: no channel available")
-                return
+        """Subscribe to an event type using direct connection"""
+        connection, channel = self._create_connection()
 
+        if not channel:
+            logger.error("Cannot subscribe: no channel available")
+            return
+
+        try:
             # Declare a queue for this consumer
             queue_name = f"{event_type_name}_queue"
-            self.channel.queue_declare(queue=queue_name, durable=True)
+            channel.queue_declare(queue=queue_name, durable=True)
 
             # Bind the queue to the exchange with the routing key
-            self.channel.queue_bind(
+            channel.queue_bind(
                 exchange=self.exchange_name,
                 queue=queue_name,
                 routing_key=event_type_name,
@@ -134,35 +129,35 @@ class EventBus(IEventBus):
                     logger.error(f"Error processing message: {e}")
                     ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
-            self.channel.basic_consume(
+            channel.basic_consume(
                 queue=queue_name, on_message_callback=wrapper_callback
             )
             logger.info(f"Subscribed to event '{event_type_name}'")
+
+            logger.info("Starting to consume messages...")
+            channel.start_consuming()
         except Exception as ex:
             logger.error(f"Error subscribing to event: {ex}")
-
-    def close(self):
-        if self.connection and not self.connection.is_closed:
-            self.connection.close()
-            logger.info("RabbitMQ connection closed")
+        finally:
+            if connection and not connection.is_closed:
+                try:
+                    connection.close()
+                    logger.debug("Closed temporary RabbitMQ connection after subscribe")
+                except Exception as ex:
+                    logger.error(f"Error closing connection: {ex}")
 
     @contextmanager
     def get_connection(self):
         """Context manager for getting a connection"""
+        connection, channel = self._create_connection()
         try:
-            self._ensure_connection()
-            yield self
+            yield {"connection": connection, "channel": channel}
         finally:
-            self.close()
-            pass
-
-    def start_consuming(self):
-        """Start consuming messages (blocking operation)"""
-        try:
-            if self.channel:
-                logger.info("Starting to consume messages...")
-                self.channel.start_consuming()
-        except KeyboardInterrupt:
-            logger.info("Stopping message consumption...")
-            self.channel.stop_consuming()
-            self.close()
+            if connection and not connection.is_closed:
+                try:
+                    connection.close()
+                    logger.debug(
+                        "Closed temporary RabbitMQ connection from context manager"
+                    )
+                except Exception as ex:
+                    logger.error(f"Error closing connection: {ex}")

@@ -4,10 +4,10 @@ using ModernCSharp.EventBus.Events;
 namespace DyDanmaku.Application.IntegrationEvents.Events;
 
 public record AnalyticsCompletedIntegrationEvent(
-    int RoomId,
-    DateTime StartDate,
-    DateTime EndDate,
-    string PeriodType,
-    int FrequenciesCount,
-    DateTime CompletedAt
+    int? roomId,
+    string startDate,
+    string endDate,
+    string periodType,
+    int frequenciesCount,
+    string completedAt
 ) : IntegrationEvent;

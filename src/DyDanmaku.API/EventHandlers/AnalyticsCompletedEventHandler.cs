@@ -8,18 +8,18 @@ internal class AnalyticsCompletedEventHandler(
     public async Task Handle(AnalyticsCompletedIntegrationEvent @event)
     {
         logger.LogInformation("Handling analytics completed event for room {RoomId}, completed at {CompletedAt}", 
-                @event.RoomId, @event.CompletedAt);
+                @event.roomId, @event.completedAt);
 
         await hubContext.Clients.All.SendAsync("AnalyticsCompleted", new
         {
-            @event.CompletedAt,
-            @event.RoomId,
-            @event.FrequenciesCount,
-            @event.PeriodType,
-            @event.StartDate,
-            @event.EndDate
+            @event.completedAt,
+            @event.roomId,
+            @event.frequenciesCount,
+            @event.periodType,
+            @event.startDate,
+            @event.endDate
         });
 
-        logger.LogInformation("Analytics completed notification sent to clients for room {RoomId}", @event.RoomId);
+        logger.LogInformation("Analytics completed notification sent to clients for room {RoomId}", @event.roomId.HasValue ? @event.roomId : "All");
     }
 }

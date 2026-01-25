@@ -261,18 +261,15 @@ const Dashboard: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: '20px' }}>
         <Col span={24}>
-          <Card title="词云图" style={{ height: '100%' }} extra={
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <span>选择配色方案：</span>
+          <Card title="词云图" extra={
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: "16em" }}>
+              <span style={{ width: "100%" }}>选择配色方案：</span>
               <Select
                 value={selectedColormap}
                 onChange={(e) => setSelectedColormap(e)}
-                style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #d9d9d9' }}
-              >
-                {colormapOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </Select>
+                style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #d9d9d9', width: "100%" }}
+                options={colormapOptions}
+              />
             </div>
           }>
             <div>
@@ -323,7 +320,7 @@ const ChartComponent = React.memo(({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 12 }} />
               <YAxis />
-              <Tooltip content={CustomTooltip} contentStyle={{color: color}}/>
+              <Tooltip content={CustomTooltip} contentStyle={{ color: color }} />
               <Legend verticalAlign="top" layout="horizontal" />
               <Bar dataKey="value" name="弹幕数量" fill={color} />
             </ReBarChart>

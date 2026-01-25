@@ -17,7 +17,8 @@ public class EventBusSubscriptionInfo
 
     internal static readonly JsonSerializerOptions DefaultSerializerOptions = new()
     {
-        TypeInfoResolver = JsonSerializer.IsReflectionEnabledByDefault ? CreateDefaultTypeResolver() : JsonTypeInfoResolver.Combine()
+        TypeInfoResolver = JsonSerializer.IsReflectionEnabledByDefault ? CreateDefaultTypeResolver() : JsonTypeInfoResolver.Combine(),
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
 #pragma warning disable IL2026

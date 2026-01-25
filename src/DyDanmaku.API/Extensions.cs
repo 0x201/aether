@@ -21,7 +21,7 @@ public static class Extensions
 
         builder.EnrichNpgsqlDbContext<DyDanmakuDbContext>();
 
-        services.AddMigration<DyDanmakuDbContext, DyDanmakuDbContextSeed>();
+        //services.AddMigration<DyDanmakuDbContext, DyDanmakuDbContextSeed>();
 
         services.AddSingleton<IDanmakuCaptureServiceFactory, DanmakuCaptureServiceFactory>();
         services.AddSingleton<ICaptureJobManager, CaptureJobManager>();

@@ -3,8 +3,6 @@ import { HttpTransportType, HubConnection, HubConnectionBuilder, HubConnectionSt
 import { Button, Input, Card, Space, message } from 'antd';
 import DanmakuDisplay from '@/src/components/DanmakuDisplay';
 import type { Danmaku } from '@/src/interface/Danmaku';
-import config from '@/src/config';
-
 import "./RealtimeDanmakuView.css";
 
 const RealtimeDanmakuView: React.FC = () => {
@@ -14,7 +12,7 @@ const RealtimeDanmakuView: React.FC = () => {
   const danmakuQueueRef = useRef<Danmaku[]>([]); // Queue to store incoming danmaku
   const [isJoined, setIsJoined] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const { apiBaseUrl } = config;
+
 
   // Function to process danmaku queue one by one at regular intervals
   useEffect(() => {

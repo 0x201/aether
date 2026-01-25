@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Optional
 
 import jieba3
+from app.common import EventBus
 from app.database import Danmaku, DanmakuAnalysis, SessionFactory
 from app.dataclass import DanmakuAnalysisDto
 from sqlalchemy import and_, select
@@ -16,8 +17,9 @@ from loguru import logger
 
 
 class DanmakuAnalyzer:
-    def __init__(self, session_factory: SessionFactory) -> None:
+    def __init__(self, session_factory: SessionFactory, event_bus: EventBus) -> None:
         self.session_factory = session_factory
+        self.event_bus = event_bus
 
     def precompute_analyses(
         self,
@@ -166,4 +168,22 @@ class DanmakuAnalyzer:
 
             transaction.add(danmaku_analysis)
             transaction.commit()
+
+            event_data = {
+                "roomId": danmaku_analysis.room_id,
+                "startDate": danmaku_analysis.start_time.isoformat(),
+                "endDate": danmaku_analysis.end_time.isoformat(),
+                "periodType": "realtime",
+                "frequenciesCount": (
+                    len(danmaku_analysis.frequencies)
+                    if danmaku_analysis.frequencies
+                    else 0
+                ),
+                "completedAt": danmaku_analysis.created_at.isoformat(),
+            }
+
+            self.event_bus.publish(
+                event_type_name="AnalyticsCompletedIntegrationEvent",
+                event_data=event_data,
+            )
             return danmaku_analysis
