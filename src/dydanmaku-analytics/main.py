@@ -74,6 +74,8 @@ def setup_logging():
     access_logger = logging.getLogger("uvicorn.access")
     access_logger.disabled = True
 
+    logging.getLogger("pika").setLevel(logging.WARNING)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
