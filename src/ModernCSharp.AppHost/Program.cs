@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using ModernCSharp.AppHost.Extensions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -47,6 +48,7 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
 
 var dydanmakuApi = builder.AddProject<Projects.DyDanmaku_API>("dydanmakuapi")
     .WithReference(dydanmakudb).WaitFor(dydanmakudb)
+    .WithPostgresConnection(dydanmakudb, "dydanmaku")
     .WithReference(redis).WaitFor(redis)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithHttpHealthCheck("/health");

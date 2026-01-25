@@ -1,6 +1,4 @@
-﻿using ModernCSharp.Ordering.Application.Queries;
-
-namespace ModernCSharp.WinUIApp.Views;
+﻿namespace ModernCSharp.WinUIApp.Views;
 
 public sealed partial class OrdersPage : Page
 {

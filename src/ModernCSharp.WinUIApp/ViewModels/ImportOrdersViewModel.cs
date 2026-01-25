@@ -1,6 +1,4 @@
 ﻿using ModernCSharp.Ordering.Application.Commands;
-using ModernCSharp.Ordering.Application.Queries;
-using ModernCSharp.Shared.FileServices;
 using ModernCSharp.Shared.FileServices.Import;
 
 namespace ModernCSharp.WinUIApp.ViewModels;

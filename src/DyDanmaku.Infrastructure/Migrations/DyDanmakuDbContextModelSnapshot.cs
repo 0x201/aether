@@ -3,7 +3,6 @@ using System;
 using DyDanmaku.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,16 +11,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DyDanmaku.Infrastructure.Migrations
 {
     [DbContext(typeof(DyDanmakuDbContext))]
-    [Migration("20260112134833_RenameWordFrequenciesToDanmakuAnalyses")]
-    partial class RenameWordFrequenciesToDanmakuAnalyses
+    partial class DyDanmakuDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("dydanmaku")
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -36,8 +33,17 @@ namespace DyDanmaku.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("")
+                        .HasColumnName("created_by");
 
                     b.Property<int>("Duration")
                         .HasColumnType("integer")
@@ -46,6 +52,16 @@ namespace DyDanmaku.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end_time");
+
+                    b.Property<DateTimeOffset>("LastModifiedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("integer")
@@ -89,8 +105,17 @@ namespace DyDanmaku.Infrastructure.Migrations
                         .HasColumnName("content");
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("")
+                        .HasColumnName("created_by");
 
                     b.Property<int?>("FanMedalLevel")
                         .HasColumnType("integer")
@@ -99,6 +124,16 @@ namespace DyDanmaku.Infrastructure.Migrations
                     b.Property<string>("FanMedalName")
                         .HasColumnType("text")
                         .HasColumnName("fan_medal_name");
+
+                    b.Property<DateTimeOffset>("LastModifiedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
 
                     b.Property<int?>("RoomId")
                         .HasColumnType("integer")
@@ -125,8 +160,15 @@ namespace DyDanmaku.Infrastructure.Migrations
                     b.HasIndex("RoomId")
                         .HasDatabaseName("danmakus_room_id_idx");
 
-                    b.HasIndex("UserId", "UserName")
+                    b.HasIndex("UserId")
                         .HasDatabaseName("danmakus_user_id_idx");
+
+                    b.HasIndex("UserName")
+                        .HasDatabaseName("danmakus_user_name_idx");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("danmakus_created_at_idx");
+                    
 
                     b.ToTable("danmakus", "dydanmaku");
                 });
@@ -141,8 +183,17 @@ namespace DyDanmaku.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("")
+                        .HasColumnName("created_by");
 
                     b.Property<DateTimeOffset>("EndTime")
                         .HasColumnType("timestamp with time zone")
@@ -151,6 +202,16 @@ namespace DyDanmaku.Infrastructure.Migrations
                     b.Property<string>("Frequencies")
                         .HasColumnType("text")
                         .HasColumnName("frequencies");
+
+                    b.Property<DateTimeOffset>("LastModifiedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
 
                     b.Property<int?>("RoomId")
                         .HasColumnType("integer")
@@ -164,10 +225,6 @@ namespace DyDanmaku.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("type");
-
-                    b.Property<byte[]>("WordCloud")
-                        .HasColumnType("bytea")
-                        .HasColumnName("word_cloud");
 
                     b.HasKey("Id")
                         .HasName("danmaku_analyses_pk");
@@ -183,20 +240,46 @@ namespace DyDanmaku.Infrastructure.Migrations
 
             modelBuilder.Entity("DyDanmaku.Domain.Entity.Room", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTimeOffset>("LastModifiedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("last_modified_by");
+
                     b.Property<int>("RoomId")
                         .HasColumnType("integer")
                         .HasColumnName("room_id");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
 
                     b.Property<string>("RoomName")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("room_name");
 
-                    b.HasKey("RoomId")
+                    b.HasKey("Id")
                         .HasName("rooms_pk");
 
                     b.ToTable("rooms", "dydanmaku");

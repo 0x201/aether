@@ -1,4 +1,5 @@
 ﻿using ModernCSharp.Ordering.Infrastructure.Extensions;
+using ModernCSharp.Shared;
 
 namespace ModernCSharp.Ordering.Infrastructure;
 
@@ -37,6 +38,7 @@ public class OrderingDbContext : DbContext, IUnitOfWork
         builder.HasDefaultSchema("ordering");
         builder.ApplyConfiguration(new OrderEntityTypeConfiguration());
         builder.ApplyConfiguration(new ClientRequestEntityTypeConfiguration());
+        builder.ApplyAuditableEntityConfiguration();
         builder.UseIntegrationEventLogs();
     }
 

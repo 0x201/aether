@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 using ModernCSharp.Ordering.Infrastructure;
-using ModernCSharp.Ordering.Infrastructure.Interceptors;
 using ModernCSharp.Ordering.Application;
+using ModernCSharp.Shared.Interceptors;
 
 namespace ModernCSharp.WinFormsApp.Extensions;
 

@@ -1,4 +1,4 @@
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 
 namespace DyDanmaku.API.Services;
@@ -7,7 +7,7 @@ internal class DyDanmakuClient(
     ILogger<DyDanmakuClient> logger,
     ICaptureJobRepository captureJobService,
     IConfiguration configuration,
-    IDbContextFactory<DyDanmakuDbContext> dbContextFactory)
+    IServiceProvider serviceProvider)
 {
     private string SERVERPREFIX = configuration.GetSection("Douyu:Apis:DanmakuUrl").Get<string>() ?? "wss://danmuproxy.douyu.com";
     private string _serverUrl = string.Empty;
@@ -318,7 +318,8 @@ internal class DyDanmakuClient(
         {
             try
             {
-                using var dbContext = dbContextFactory.CreateDbContext();
+                using var scope = serviceProvider.CreateScope();
+                using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
                 await dbContext.Danmakus.AddRangeAsync(danmakusToSave);
                 var savedRows = await dbContext.SaveChangesAsync();
                 logger.LogInformation("Saved [{SavedRows}] chat message(s) to database for room [{RoomId}]", savedRows, RoomId);

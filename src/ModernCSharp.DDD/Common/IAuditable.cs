@@ -1,7 +1,7 @@
 ﻿namespace ModernCSharp.DDD.Common;
 public interface IAuditable
 {
-    DateTimeOffset Created
+    DateTimeOffset CreatedAt
     {
         get; set;
     }
@@ -11,7 +11,7 @@ public interface IAuditable
         get; set;
     }
 
-    DateTimeOffset LastModified
+    DateTimeOffset LastModifiedAt
     {
         get; set;
     }

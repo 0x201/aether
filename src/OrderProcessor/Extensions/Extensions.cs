@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 using ModernCSharp.Ordering.Application.Common.Interfaces;
 using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
-using ModernCSharp.Ordering.Infrastructure.Interceptors;
+using ModernCSharp.Shared.Interceptors;
 using ModernCSharp.Ordering.Infrastructure.Repositories;
 using ModernCSharp.Ordering.OrderProcessor.Services;
 

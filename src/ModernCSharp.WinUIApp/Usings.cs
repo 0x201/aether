@@ -22,3 +22,6 @@ global using ModernCSharp.WinUIApp.ViewModels;
 global using ModernCSharp.WinUIApp.Views;
 
 global using WinUIEx;
+
+global using ModernCSharp.Ordering.Application.Queries;
+global using ModernCSharp.Shared.FileServices;

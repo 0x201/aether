@@ -1,4 +1,4 @@
-namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
+﻿namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
 
 public class DanmakuAnalysisTypeConfiguration : IEntityTypeConfiguration<DanmakuAnalysis>
 {
@@ -30,10 +30,6 @@ public class DanmakuAnalysisTypeConfiguration : IEntityTypeConfiguration<Danmaku
 
         builder.Property(d => d.Frequencies)
             .HasColumnName("frequencies");
-
-        builder.Property(d => d.CreatedAt)
-            .IsRequired()
-            .HasColumnName("created_at");
 
         builder.HasIndex(d => d.Id)
             .HasDatabaseName("danmaku_analyses_id_idx");

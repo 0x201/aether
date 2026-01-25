@@ -1,4 +1,4 @@
-namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
+﻿namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
 
 public class DanmakuTypeConfiguration : IEntityTypeConfiguration<Danmaku>
 {
@@ -34,12 +34,11 @@ public class DanmakuTypeConfiguration : IEntityTypeConfiguration<Danmaku>
         builder.Property(d => d.RoomId)
             .HasColumnName("room_id");
 
-        builder.Property(d => d.CreatedAt)
-            .HasColumnName("created_at");
-
 
         builder.HasIndex(d => d.Id).HasDatabaseName("danmakus_id_idx");
         builder.HasIndex(d => d.RoomId).HasDatabaseName("danmakus_room_id_idx");
-        builder.HasIndex(d => new { d.UserId, d.UserName }).HasDatabaseName("danmakus_user_id_idx");
+        builder.HasIndex(d => d.UserId).HasDatabaseName("danmakus_user_id_idx");
+        builder.HasIndex(d => d.UserName).HasDatabaseName("danmakus_user_name_idx");
+        builder.HasIndex(d => d.CreatedAt).HasDatabaseName("danmakus_created_at_idx");
     }
 }

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
 	<RootNamespace>DyDanmaku.Infrastructure</RootNamespace>
   </PropertyGroup>
 
@@ -13,5 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DyDanmaku.Domain\DyDanmaku.Domain.csproj" />
+    <ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
   </ItemGroup>
 </Project>

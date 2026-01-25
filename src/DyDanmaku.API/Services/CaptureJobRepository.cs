@@ -1,11 +1,10 @@
-namespace DyDanmaku.API.Services;
+﻿namespace DyDanmaku.API.Services;
 
 internal class CaptureJobRepository(
-    IDbContextFactory<DyDanmakuDbContext> dbContextFactory) : ICaptureJobRepository
+    DyDanmakuDbContext dbContext) : ICaptureJobRepository
 {
     public async Task<CaptureJob?> CreateJobAsync(int roomId, int duration, CancellationToken cancellationToken = default)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
         var activeJob = await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
 
@@ -32,7 +31,6 @@ internal class CaptureJobRepository(
 
     public async Task UpdateJobStatusAsync(int roomId, JobStatus status, CancellationToken cancellationToken = default)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
         var activeJob = await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
 
@@ -49,7 +47,6 @@ internal class CaptureJobRepository(
 
     public async Task<List<CaptureJob>> GetExpiredJobsAsync(CancellationToken cancellationToken = default)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
         return await dbContext.CaptureJobs
             .Where(j => j.Status == JobStatus.Running.ToString() && j.StartTime.AddSeconds(j.Duration) < DateTimeOffset.UtcNow)
             .ToListAsync(cancellationToken);
@@ -57,7 +54,6 @@ internal class CaptureJobRepository(
 
     public async Task<CaptureJob?> GetActiveJobByRoomIdAsync(int roomId, CancellationToken cancellationToken = default)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
         return await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
     }

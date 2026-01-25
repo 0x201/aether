@@ -9,6 +9,7 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Project Path="src/EventBus/EventBus.csproj" />
+  <Project Path="src/DyDanmaku.Application/DyDanmaku.Application.csproj" />
   <Project Path="src/DyDanmaku.API/DyDanmaku.API.csproj" />
   <Project Path="src/DyDanmaku.Domain/DyDanmaku.Domain.csproj" />
   <Project Path="src/DyDanmaku.Infrastructure/DyDanmaku.Infrastructure.csproj" />

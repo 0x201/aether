@@ -10,5 +10,5 @@ global using ModernCSharp.Ordering.Application.Queries;
 global using ModernCSharp.Ordering.Domain.Aggregates.OrderAggregate;
 global using ModernCSharp.Ordering.Infrastructure;
 global using ModernCSharp.Ordering.Infrastructure.Idempotency;
-global using ModernCSharp.Ordering.Infrastructure.Interceptors;
+global using ModernCSharp.Shared.Interceptors;
 global using ModernCSharp.Ordering.Infrastructure.Repositories;

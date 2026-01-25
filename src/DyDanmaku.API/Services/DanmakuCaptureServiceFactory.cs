@@ -1,4 +1,4 @@
-namespace DyDanmaku.API.Services;
+﻿namespace DyDanmaku.API.Services;
 
 internal class DanmakuCaptureServiceFactory(IServiceProvider serviceProvider) : IDanmakuCaptureServiceFactory
 {
@@ -8,7 +8,7 @@ internal class DanmakuCaptureServiceFactory(IServiceProvider serviceProvider) : 
         using var scope = serviceProvider.CreateScope();
         
         return new DanmakuCaptureService(
-            scope.ServiceProvider.GetRequiredService<IDbContextFactory<DyDanmakuDbContext>>(),
+            scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>(),
             scope.ServiceProvider.GetRequiredService<DyDanmakuClient>(),
             scope.ServiceProvider.GetRequiredService<IHttpClientFactory>(),
             scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>(),

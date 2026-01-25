@@ -4,7 +4,12 @@ using MediatR;
 
 namespace ModernCSharp.DDD.Common;
 
-public abstract class Entity<TKey> : IHasDomainEvents
+public interface IHasId<TKey>
+{
+    TKey Id { get; set; }
+}
+
+public abstract class Entity<TKey> : IHasDomainEvents, IHasId<TKey>
 {
     public TKey Id
     {

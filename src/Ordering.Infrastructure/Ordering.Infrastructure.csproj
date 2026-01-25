@@ -17,7 +17,7 @@
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
+	<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
 	</ItemGroup>
 
 	<ItemGroup>

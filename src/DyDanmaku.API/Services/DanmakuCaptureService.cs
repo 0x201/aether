@@ -1,10 +1,10 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DyDanmaku.API.Services;
 
 internal class DanmakuCaptureService(
-    IDbContextFactory<DyDanmakuDbContext> dbContextFactory,
+    DyDanmakuDbContext dbContext,
     DyDanmakuClient dyDanmakuClient,
     IHttpClientFactory httpClientFactory,
     ICaptureJobRepository captureJobService,
@@ -59,7 +59,6 @@ internal class DanmakuCaptureService(
 
     private async Task UpdateRoomInfo(int roomId)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
         var roomExists = await dbContext.Rooms.AnyAsync(x => x.RoomId == roomId);
         if (!roomExists)
         {

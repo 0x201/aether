@@ -11,7 +11,7 @@ using ModernCSharp.Ordering.Application;
 using ModernCSharp.Ordering.Application.Queries;
 using ModernCSharp.Ordering.Application.Services;
 using ModernCSharp.Ordering.Infrastructure;
-using ModernCSharp.Ordering.Infrastructure.Interceptors;
+using ModernCSharp.Shared.Interceptors;
 using ModernCSharp.Shared;
 using ModernCSharp.WPFApp.Contracts.Services;
 using ModernCSharp.WPFApp.Contracts.Views;

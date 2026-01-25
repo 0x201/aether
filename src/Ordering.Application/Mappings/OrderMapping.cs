@@ -4,9 +4,9 @@ public class OrderMapping : ClassMap<Order>
 {
     public OrderMapping()
     {
-        Map(x => x.Created).Ignore();
+        Map(x => x.CreatedAt).Ignore();
         Map(x => x.CreatedBy).Ignore();
-        Map(x => x.LastModified).Ignore();
+        Map(x => x.LastModifiedAt).Ignore();
         Map(x => x.LastModifiedBy).Ignore();
         Map(x => x.DomainEvents).Ignore();
 

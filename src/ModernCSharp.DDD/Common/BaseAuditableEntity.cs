@@ -2,7 +2,7 @@
 
 public abstract class BaseAuditableEntity<TKey> : Entity<TKey>, IAuditable
 {
-    public DateTimeOffset Created
+    public DateTimeOffset CreatedAt
     {
         get; set;
     }
@@ -12,7 +12,7 @@ public abstract class BaseAuditableEntity<TKey> : Entity<TKey>, IAuditable
         get; set;
     }
 
-    public DateTimeOffset LastModified
+    public DateTimeOffset LastModifiedAt
     {
         get; set;
     }

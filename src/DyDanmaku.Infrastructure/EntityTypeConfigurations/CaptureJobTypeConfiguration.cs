@@ -1,4 +1,4 @@
-namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
+﻿namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
 
 public class CaptureJobTypeConfiguration : IEntityTypeConfiguration<CaptureJob>
 {
@@ -27,10 +27,6 @@ public class CaptureJobTypeConfiguration : IEntityTypeConfiguration<CaptureJob>
 
         builder.Property(j => j.EndTime)
             .HasColumnName("end_time");
-
-        builder.Property(j => j.CreatedAt)
-            .IsRequired()
-            .HasColumnName("created_at");
 
         builder.Property(j => j.Duration)
             .IsRequired()

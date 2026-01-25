@@ -13,6 +13,7 @@
   <ItemGroup>
     <!--Aspire-->
     <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.1.0-preview.1.25616.3" />
+    <PackageVersion Include="Aspire.Hosting.Docker" Version="13.1.0-preview.1.25616.3" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="$(AspireVersion)" />
@@ -83,9 +84,9 @@
     <!--WPF-->
     <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
     <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
-    <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
+    <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
     <PackageVersion Include="WinUIEx" Version="2.9.0" />
     <!--CommunityToolkit.WinUI-->
     <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
@@ -108,7 +109,7 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.6" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.12" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.1" />
   </ItemGroup>
 </Project>

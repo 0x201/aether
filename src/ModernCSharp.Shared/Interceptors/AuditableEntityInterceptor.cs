@@ -1,4 +1,4 @@
-﻿namespace ModernCSharp.Ordering.Infrastructure.Interceptors;
+﻿namespace ModernCSharp.Shared.Interceptors;
 
 public class AuditableEntityInterceptor : SaveChangesInterceptor
 {
@@ -25,14 +25,14 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         {
             if (entry.State is EntityState.Added or EntityState.Modified || entry.HasChangedOwnedEntities())
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTimeOffset.UtcNow;
                 if (entry.State == EntityState.Added)
                 {
                     entry.Entity.CreatedBy = "";
-                    entry.Entity.Created = utcNow;
+                    entry.Entity.CreatedAt = utcNow;
                 }
                 entry.Entity.LastModifiedBy = "";
-                entry.Entity.LastModified = utcNow;
+                entry.Entity.LastModifiedAt = utcNow;
             }
         }
     }

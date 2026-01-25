@@ -1,4 +1,4 @@
-namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
+﻿namespace DyDanmaku.Infrastructure.EntityTypeConfigurations;
 
 public class RoomTypeConfiguration : IEntityTypeConfiguration<Room>
 {
@@ -6,7 +6,12 @@ public class RoomTypeConfiguration : IEntityTypeConfiguration<Room>
     {
         builder.ToTable("rooms");
 
-        builder.HasKey(r => r.RoomId).HasName("rooms_pk");
+        builder.HasKey(r => r.Id).HasName("rooms_pk");
+
+        builder.Property(r => r.Id)
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd()
+            .IsRequired();
 
         builder.Property(r => r.RoomId)
             .IsRequired()
