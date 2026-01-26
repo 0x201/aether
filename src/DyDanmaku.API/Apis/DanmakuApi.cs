@@ -4,6 +4,7 @@ using System.Text.Json;
 using Asp.Versioning;
 
 using DyDanmaku.API.Mappings;
+using StackExchange.Redis;
 
 internal static class DanmakuApi
 {
@@ -259,8 +260,21 @@ internal static class DanmakuApi
 
         group.MapGet("/stats", async (
             [AsParameters] DanmakuAnalysisRequest request,
-            [FromServices] DyDanmakuDbContext dbContext) =>
+            [FromServices] DyDanmakuDbContext dbContext,
+            [FromServices] IConnectionMultiplexer cache) =>
         {
+
+            var cacheKey = $"danmaku-stats:{request.StartTime:yyyyMMddTHHmmssZ}:{request.EndTime:yyyyMMddTHHmmssZ}:{request.RoomId.GetValueOrDefault()}";
+
+            var cacheValue = await cache.GetDatabase().StringGetAsync(cacheKey);
+
+            if (cacheValue.HasValue)
+            {
+                var cachedStats = JsonSerializer.Deserialize(cacheValue.ToString(), DanmakuJsonSerializerContext.Default.DanmakuStats);
+                if (cachedStats is not null)
+                    return Results.Ok(Result<DanmakuStats>.Success(cachedStats));
+            }
+
             var totalCount = await dbContext.Danmakus
                 .WhereIf(request.StartTime.HasValue, x => x.CreatedAt >= request.StartTime)
                 .WhereIf(request.EndTime.HasValue, x => x.CreatedAt <= request.EndTime)
@@ -343,6 +357,11 @@ internal static class DanmakuApi
                 TopRooms = topRooms,
             };
 
+            await cache.GetDatabase().StringSetAsync(
+                key: cacheKey,
+                value: JsonSerializer.Serialize(stats, DanmakuJsonSerializerContext.Default.DanmakuStats),
+                expiry: TimeSpan.FromHours(1));
+
 
             var res = Result<DanmakuStats>.Success(stats);
             return Results.Ok(res);
@@ -351,7 +370,8 @@ internal static class DanmakuApi
         .WithDescription("Returns danmaku stats")
         .WithSummary("Danmaku stats")
         .Produces<DanmakuStats>(StatusCodes.Status200OK)
-        .Produces<Result>(StatusCodes.Status404NotFound);
+        .Produces<Result>(StatusCodes.Status404NotFound)
+        .Produces<Result>(StatusCodes.Status500InternalServerError);
 
         static List<WordFrequency> ParseFrequenciesFromNestedArray(string frequenciesJson, int? topN)
         {

@@ -13,6 +13,7 @@ public static class Extensions
 
         builder.AddRabbitMqEventBus("eventbus")
             .AddEventBusSubscriptions();
+        builder.AddRedisDistributedCache(connectionName: "redis");
 
         var connectionString = builder.Configuration.GetConnectionString("dydanmakudb");
 

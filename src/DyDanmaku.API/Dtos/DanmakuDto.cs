@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DyDanmaku.API.Dtos;
 
 internal record DanmakuDto
@@ -45,6 +47,18 @@ internal record DanmakuStats
     public IReadOnlyList<TopUser> TopUsers { get; set; } = [];
     public IReadOnlyList<TopRoom> TopRooms { get; set; } = [];
     public IReadOnlyList<HourlyDistribution> HourlyDistributions { get; set; } = [];
+}
+
+[JsonSerializable(typeof(DanmakuStats))]
+[JsonSerializable(typeof(TopUser))]
+[JsonSerializable(typeof(TopRoom))]
+[JsonSerializable(typeof(HourlyDistribution))]
+[JsonSerializable(typeof(IReadOnlyList<TopUser>))]
+[JsonSerializable(typeof(IReadOnlyList<TopRoom>))]
+[JsonSerializable(typeof(IReadOnlyList<HourlyDistribution>))]
+[JsonSerializable(typeof(Dictionary<string, object>))]
+internal partial class DanmakuJsonSerializerContext : JsonSerializerContext
+{
 }
 
 internal record WordFrequency
