@@ -53,7 +53,7 @@ internal class DyDanmakuClient(
             await combinedCts.Token.WhenCanceled();
 
             logger.LogInformation("Danmaku capture completed for room [{RoomId}] due to timeout", RoomId);
-            await captureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed);
+            await captureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed, combinedCts.Token);
             DanmakuApi.CaptureServices.TryRemove(roomId, out var _);
         }
         catch (OperationCanceledException)

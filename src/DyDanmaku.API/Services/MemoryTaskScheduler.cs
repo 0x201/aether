@@ -20,7 +20,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
             return false;
         }
 
-        var task = Task.Run(async () =>
+        var task = Task.Factory.StartNew(async () =>
         {
             try
             {
@@ -38,7 +38,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
             {
                 CleanupTask(taskId);
             }
-        }, cts.Token);
+        }, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         if (!_runningTasks.TryAdd(taskId, task))
         {
