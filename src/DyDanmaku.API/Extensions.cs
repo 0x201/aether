@@ -1,4 +1,4 @@
-﻿using DyDanmaku.API.Infrastructure;
+using DyDanmaku.API.Infrastructure;
 using DyDanmaku.Application.EventHandlers;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using ModernCSharp.Shared.Interceptors;
@@ -28,6 +28,7 @@ public static class Extensions
 
         services.AddMigration<DyDanmakuDbContext, DyDanmakuDbContextSeed>();
 
+        services.AddSingleton<IMemoryTaskScheduler, MemoryTaskScheduler>();
         services.AddSingleton<IDanmakuCaptureServiceFactory, DanmakuCaptureServiceFactory>();
         services.AddSingleton<ICaptureJobManager, CaptureJobManager>();
         services.AddSingleton<IDanmakuPushService, DanmakuPushService>();

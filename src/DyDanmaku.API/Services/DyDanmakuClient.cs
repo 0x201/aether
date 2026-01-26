@@ -1,4 +1,4 @@
-﻿using System.Net.WebSockets;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace DyDanmaku.API.Services;
@@ -25,39 +25,49 @@ internal class DyDanmakuClient(
     public int RoomId { get { return _roomId; } }
 
 
-    public async Task StartAsync(int roomId, int durationSeconds = 3600)
+    public async Task StartAsync(int roomId, int durationInSeconds = 3600, CancellationToken cancellationToken = default)
     {
         _roomId = roomId;
         int port = 8500 + Random.Shared.Next(1, 6);
         _serverUrl = $"{SERVERPREFIX}:{port}/";
         logger.LogInformation("Connecting [{Url}]...", _serverUrl);
         _isConnected = false;
-        
-        _cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(durationSeconds));
-        
+
+        using var durationCts = new CancellationTokenSource(TimeSpan.FromSeconds(durationInSeconds));
+        using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, durationCts.Token);
+
         try
         {
             _client = new ClientWebSocket();
-            await _client.ConnectAsync(new Uri(_serverUrl), _cancellationTokenSource.Token);
+            await _client.ConnectAsync(new Uri(_serverUrl), combinedCts.Token);
 
             _isConnected = true;
 
-            _ = Task.Run(() => ReceiveLoop(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
+            _ = Task.Run(() => ReceiveLoop(combinedCts.Token), combinedCts.Token);
 
             Precheck();
             Login();
             JoinGroup();
             StartHeartbeat();
-            
-            await _cancellationTokenSource.Token.WhenCanceled();
-            
+
+            await combinedCts.Token.WhenCanceled();
+
             logger.LogInformation("Danmaku capture completed for room [{RoomId}] due to timeout", RoomId);
             await captureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed);
             DanmakuApi.CaptureServices.TryRemove(roomId, out var _);
         }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("Danmaku capture cancelled for room [{RoomId}]", RoomId);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to connect: [{ServerUrl}]", _serverUrl);
+            throw;
+        }
+        finally
+        {
+            await CleanupResources();
         }
     }
 
@@ -85,7 +95,7 @@ internal class DyDanmakuClient(
         _cancellationTokenSource?.Cancel();
 
         await FlushBufferAsync();
-        
+
         _isStopping = false;
     }
 
@@ -112,7 +122,7 @@ internal class DyDanmakuClient(
                 {
                     var receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                     receiveCts.CancelAfter(TimeSpan.FromSeconds(30));
-                    
+
                     var result = await _client.ReceiveAsync(new ArraySegment<byte>(buffer), receiveCts.Token);
 
                     if (result.MessageType == WebSocketMessageType.Text)
@@ -173,28 +183,28 @@ internal class DyDanmakuClient(
     private async Task<bool> ReconnectAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Attempting to reconnect for room [{RoomId}]...", RoomId);
-        
+
         _heartbeatTimer?.Dispose();
         _heartbeatTimer = null;
-        
+
         try
         {
             if (_client?.State == WebSocketState.Open)
             {
                 await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Reconnecting", CancellationToken.None);
             }
-            
+
             _client = new ClientWebSocket();
             await _client.ConnectAsync(new Uri(_serverUrl), cancellationToken);
-            
+
             _isConnected = true;
-            
+
             Precheck();
             Login();
             JoinGroup();
-            
+
             StartHeartbeat();
-            
+
             logger.LogInformation("Reconnected successfully for room [{RoomId}]", RoomId);
             return true;
         }
@@ -211,6 +221,30 @@ internal class DyDanmakuClient(
                 return false;
             }
         }
+    }
+
+    private async Task CleanupResources()
+    {
+        _heartbeatTimer?.Dispose();
+        _flushTimer?.Dispose();
+
+        if (_client?.State == WebSocketState.Open)
+        {
+            try
+            {
+                var logoutMsg = "type@=logout/";
+                SendMsg(logoutMsg);
+                await Task.Delay(100);
+
+                await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", CancellationToken.None);
+            }
+            catch (WebSocketException)
+            {
+                logger.LogWarning("WebSocket already in invalid state during cleanup: {State}", _client?.State);
+            }
+        }
+
+        await FlushBufferAsync();
     }
 
     private async Task OnMessage(string message)
@@ -276,7 +310,7 @@ internal class DyDanmakuClient(
                     else if (_danmakuBuffer.Count == 1)
                     {
                         _flushTimer?.Dispose();
-                        _flushTimer = new Timer(async _ => 
+                        _flushTimer = new Timer(async _ =>
                         {
                             _ = Task.Run(async () => await FlushBufferAsync());
                         }, null, TimeSpan.FromSeconds(5), Timeout.InfiniteTimeSpan);
@@ -329,8 +363,8 @@ internal class DyDanmakuClient(
                 logger.LogError(ex, "Failed to save danmaku to database.");
             }
         }
-    }    
-    
+    }
+
     private void Precheck()
     {
         var precheckMsg = "type@=unsub/mt@=dyh_legend_subscribe/";
