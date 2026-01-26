@@ -3,7 +3,7 @@ namespace ModernCSharp.AppHost.Extensions;
 
 public static class PostgresExtensions
 {
-    public static IResourceBuilder<T> WithPostgresConnection<T>(
+    public static IResourceBuilder<T> WithPostgresSchema<T>(
         this IResourceBuilder<T> builder,
         IResourceBuilder<PostgresDatabaseResource> database,
         string schema)
@@ -14,13 +14,15 @@ public static class PostgresExtensions
             var postgres = database.Resource.Parent;
             if (postgres is not null)
             {
-                var endpoint = postgres.GetEndpoint("tcp");
+                var host = postgres.PrimaryEndpoint.Host;
+                var port = postgres.PrimaryEndpoint.Port;
+                var username = await postgres.UserNameReference.GetValueAsync(CancellationToken.None);
                 var password = await postgres.PasswordParameter.GetValueAsync(CancellationToken.None);
                 
-                var connectionString = $"Host={endpoint.Host};" +
-                                      $"Port={endpoint.Port};" +
+                var connectionString = $"Host={host};" +
+                                      $"Port={port};" +
                                       $"Database={database.Resource.Name};" +
-                                      "Username=postgres;" +
+                                      $"Username={username};" +
                                       $"Password={password};" +
                                       $"Search Path={schema}";
                 

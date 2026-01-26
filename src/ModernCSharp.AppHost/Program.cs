@@ -43,12 +43,13 @@ var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 var orderingApi = builder.AddProject<Projects.Ordering_API>("orderingapi")
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(orderingdb).WaitFor(orderingdb)
+    .WithPostgresSchema(orderingdb, "ordering")
     .WithHttpHealthCheck("/health")
     .WithReference(keycloak).WaitFor(keycloak);
 
 var dydanmakuApi = builder.AddProject<Projects.DyDanmaku_API>("dydanmakuapi")
     .WithReference(dydanmakudb).WaitFor(dydanmakudb)
-    .WithPostgresConnection(dydanmakudb, "dydanmaku")
+    .WithPostgresSchema(dydanmakudb, "dydanmaku")
     .WithReference(redis).WaitFor(redis)
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithHttpHealthCheck("/health");

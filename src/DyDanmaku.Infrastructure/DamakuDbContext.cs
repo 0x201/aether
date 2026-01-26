@@ -26,11 +26,9 @@ public class DyDanmakuDbContext : DbContext, IUnitOfWork
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-        modelBuilder.ApplyAuditableEntityConfiguration();
-
         modelBuilder.HasDefaultSchema("dydanmaku");
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        modelBuilder.ApplyAuditableEntityConfiguration();
 
         base.OnModelCreating(modelBuilder);
     }
@@ -41,7 +39,7 @@ public class DyDanmakuDbContext : DbContext, IUnitOfWork
         return true;
     }
 
-      public async Task<IDbContextTransaction> BeginTransactionAsync()
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
         if (_currentTransaction != null) return null;
 
