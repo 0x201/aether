@@ -364,7 +364,7 @@ const DanmakuMgt: React.FC = () => {
           <Row gutter={16}>
             <Col xs={24} sm={12} md={3} lg={3} xl={4}>
               <Form.Item name="userName" label="用户名">
-                <Input placeholder="支持模糊搜索" />
+                <Input placeholder="精确匹配" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={3} lg={3} xl={4}>

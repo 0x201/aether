@@ -52,6 +52,7 @@ export default defineConfig(() => {
         '/api': {
           target: process.env.services__dydanmakuapi__http__0 || process.env.services__dydanmakuapi__https__0,
           changeOrigin: true,
+          ws: true,
           secure: process.env["NODE_ENV"] !== "development",
           rewrite: (path) => path.replace(/^\/api/, '')
         },

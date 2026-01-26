@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { HubConnection, HubConnectionBuilder, HttpTransportType, HubConnectionState } from '@microsoft/signalr';
-import config from '@/src/config';
 
 interface Notification {
   id: string;
@@ -32,38 +31,35 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [reconnectAttempts, setReconnectAttempts] = useState<number>(0);
 
-  // 使用 useRef 来跟踪组件是否已挂载
   const isMountedRef = React.useRef(true);
 
   useEffect(() => {
     const maxRetries = 5;
     let retryTimeout: NodeJS.Timeout;
     
-    // 创建连接函数
     const createHubConnection = (): HubConnection => {
       const hubConnection = new HubConnectionBuilder()
         .withUrl(`/api/danmaku-hub`, {
           transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents,
-          timeout: 15000, // 增加超时时间到15秒
+          timeout: 15000,
           headers: {
-            // 如果需要认证，可以在这里添加headers
-            // 'Authorization': `Bearer ${token}` // 如果需要的话
           }
         })
         .withAutomaticReconnect([0, 2000, 10000, 30000])
         .build();
 
-      hubConnection.on('AnalyticsCompleted', (data: Notification) => {
-        if (!isMountedRef.current) return; // 检查组件是否仍挂载
+      hubConnection.on('AnalyticsCompleted', (notification: Notification) => {
+        console.log('New notification:', notification);
+        if (!isMountedRef.current) return;
         
         const newNotification: Notification = {
-          id: `${data.roomId}-${data.completedAt}`,
-          completedAt: data.completedAt,
-          roomId: data.roomId,
-          frequenciesCount: data.frequenciesCount,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          periodType: data.periodType
+          id: `${notification.roomId}-${notification.completedAt}`,
+          completedAt: notification.completedAt,
+          roomId: notification.roomId,
+          frequenciesCount: notification.frequenciesCount,
+          startDate: notification.startDate,
+          endDate: notification.endDate,
+          periodType: notification.periodType
         };
 
         setNotifications(prev => [newNotification, ...prev]);
@@ -71,22 +67,21 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       });
 
       hubConnection.on('NewNotification', (count: number) => {
-        if (!isMountedRef.current) return; // 检查组件是否仍挂载
+        if (!isMountedRef.current) return;
         setUnreadCount(count);
       });
 
       hubConnection.onclose((error?: Error) => {
-        if (!isMountedRef.current) return; // 检查组件是否仍挂载
+        if (!isMountedRef.current) return;
         
         console.log('Message context SignalR connection closed', error);
         setIsConnected(false);
         setConnection(null);
         
-        // 如果不是手动断开且未达到最大重试次数，则尝试重连
         if (reconnectAttempts < maxRetries && error && !error.message.includes('stop')) {
           setReconnectAttempts(prev => prev + 1);
           retryTimeout = setTimeout(() => {
-            if (isMountedRef.current) { // 再次检查组件是否仍挂载
+            if (isMountedRef.current) {
               console.log(`Attempting to reconnect... (${reconnectAttempts + 1}/${maxRetries})`);
               startConnection();
             }
@@ -95,13 +90,13 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       });
 
       hubConnection.onreconnecting((error?: Error) => {
-        if (!isMountedRef.current) return; // 检查组件是否仍挂载
+        if (!isMountedRef.current) return;
         console.log('Message context SignalR reconnecting...', error);
         setIsConnected(false);
       });
 
       hubConnection.onreconnected((connectionId?: string) => {
-        if (!isMountedRef.current) return; // 检查组件是否仍挂载
+        if (!isMountedRef.current) return;
         console.log('Message context SignalR reconnected', connectionId);
         setIsConnected(true);
         setConnection(hubConnection);
@@ -111,16 +106,15 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       return hubConnection;
     };
 
-    // 启动连接函数
+
     const startConnection = async () => {
-      if (!isMountedRef.current) return; // 检查组件是否仍挂载
+      if (!isMountedRef.current) return;
 
       const hubConnection = createHubConnection();
       
       try {
         await hubConnection.start();
-        if (!isMountedRef.current) { // 连接成功后再次检查组件是否仍挂载
-          // 如果组件已卸载，立即停止连接
+        if (!isMountedRef.current) {
           hubConnection.stop();
           return;
         }
@@ -130,18 +124,17 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         setReconnectAttempts(0);
         console.log('Message context SignalR connection started');
       } catch (err: any) {
-        if (!isMountedRef.current) return; // 检查组件是否仍挂载
+        if (!isMountedRef.current) return;
         
         console.error('Message context SignalR connection error: ', err);
         
-        // 区分不同类型的错误
         if (err.message && (err.message.includes('negotiation') || err.message.includes('Network Error'))) {
           console.warn('Negotiation failed or network error, will attempt to retry...');
           
           if (reconnectAttempts < maxRetries) {
             setReconnectAttempts(prev => prev + 1);
             retryTimeout = setTimeout(() => {
-              if (isMountedRef.current) { // 检查组件是否仍挂载
+              if (isMountedRef.current) {
                 console.log(`Negotiation failed, retrying... (${reconnectAttempts + 1}/${maxRetries})`);
                 startConnection();
               }
@@ -151,12 +144,10 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
     };
 
-    // 开始连接
     startConnection();
 
-    // 清理函数
     return () => {
-      isMountedRef.current = false; // 标记组件已卸载
+      isMountedRef.current = false;
       
       if (retryTimeout) {
         clearTimeout(retryTimeout);
@@ -170,15 +161,15 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         });
       }
     };
-  }, []); // 注意：依赖数组为空，确保只运行一次
+  }, []);
 
   const connect = async () => {
-    if (!isMountedRef.current) return; // 检查组件是否仍挂载
+    if (!isMountedRef.current) return;
     
-    if (connection && connection.state === HubConnectionState.Disconnected) { // 使用枚举而不是数字
+    if (connection && connection.state === HubConnectionState.Disconnected) {
       try {
         await connection.start();
-        if (isMountedRef.current) { // 检查组件是否仍挂载
+        if (isMountedRef.current) {
           setIsConnected(true);
           setReconnectAttempts(0);
           console.log('Message context SignalR connection restarted');
@@ -190,12 +181,12 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const disconnect = async () => {
-    if (!isMountedRef.current) return; // 检查组件是否仍挂载
+    if (!isMountedRef.current) return;
     
     if (connection) {
       try {
         await connection.stop();
-        if (isMountedRef.current) { // 检查组件是否仍挂载
+        if (isMountedRef.current) {
           setIsConnected(false);
         }
         console.log('Message context SignalR connection stopped');
@@ -206,12 +197,12 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const markAsRead = (id: string) => {
-    if (!isMountedRef.current) return; // 检查组件是否仍挂载
+    if (!isMountedRef.current) return;
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const clearAll = () => {
-    if (!isMountedRef.current) return; // 检查组件是否仍挂载
+    if (!isMountedRef.current) return;
     setNotifications([]);
     setUnreadCount(0);
   };

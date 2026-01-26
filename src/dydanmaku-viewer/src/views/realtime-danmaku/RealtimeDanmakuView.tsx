@@ -9,46 +9,41 @@ const RealtimeDanmakuView: React.FC = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [roomId, setRoomId] = useState<number | null>(null);
   const [danmakuList, setDanmakuList] = useState<Danmaku[]>([]);
-  const danmakuQueueRef = useRef<Danmaku[]>([]); // Queue to store incoming danmaku
+  const danmakuQueueRef = useRef<Danmaku[]>([]);
   const [isJoined, setIsJoined] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-
-  // Function to process danmaku queue one by one at regular intervals
   useEffect(() => {
-    // Set up an interval to process the queue every 100ms
     const intervalId = setInterval(() => {
       if (danmakuQueueRef.current.length > 0) {
-        // Get the first item from the queue
         const danmakuToAdd = danmakuQueueRef.current.shift();
         if (danmakuToAdd) {
           setDanmakuList(prev => {
-            // Add the new danmaku to the front of the list and keep only the most recent 100
             const updatedList = [danmakuToAdd, ...prev];
             return updatedList.slice(0, 100);
           });
         }
       }
-    }, 100); // Process one danmaku every 100ms
+    }, 100);
 
-    // Cleanup interval on unmount
     return () => {
       clearInterval(intervalId);
     };
-  }, []); // Only run once on component mount
+  }, []);
 
   const startHubConnection = async () => {
     if (!connection) {
-      // Rebuild connection if stopped
       const hubConnection = new HubConnectionBuilder()
-        .withUrl(`/api/danmaku-hub`,
-          HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents
-        )
-        .withAutomaticReconnect()
+        .withUrl(`/api/danmaku-hub`, {
+          transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents,
+          timeout: 15000,
+          headers: {
+          }
+        })
+        .withAutomaticReconnect([0, 2000, 10000, 30000])
         .build();
 
       hubConnection.on('ReceiveNewDanmaku', (danmakuItems: Danmaku[]) => {
-        // Add new danmaku to the queue instead of directly to the list
         danmakuQueueRef.current = [...danmakuQueueRef.current, ...danmakuItems];
       });
 
@@ -59,7 +54,7 @@ const RealtimeDanmakuView: React.FC = () => {
       hubConnection.on('RoomLeft', (message: string) => {
         console.log('User left:', message);
         setDanmakuList([]);
-        danmakuQueueRef.current = []; // Clear the queue as well
+        danmakuQueueRef.current = [];
       });
 
       hubConnection.start()
@@ -75,7 +70,6 @@ const RealtimeDanmakuView: React.FC = () => {
   }
 
   useEffect(() => {
-    // Clean up connection on component unmount
     return () => {
       if (connection) {
         connection.stop();
@@ -89,7 +83,7 @@ const RealtimeDanmakuView: React.FC = () => {
         await connection.stop();
         setConnection(null);
         setDanmakuList([]);
-        danmakuQueueRef.current = []; // Clear the queue as well
+        danmakuQueueRef.current = [];
         messageApi.success('SignalR Connection Stopped');
       }
     } catch (error) {
@@ -122,7 +116,7 @@ const RealtimeDanmakuView: React.FC = () => {
       try {
         await connection.invoke('LeaveRoom', roomId);
         setDanmakuList([]);
-        danmakuQueueRef.current = []; // Clear the queue as well
+        danmakuQueueRef.current = [];
         messageApi.success(`Left room: ${roomId}`);
         setIsJoined(false);
         setRoomId(null);
@@ -141,9 +135,9 @@ const RealtimeDanmakuView: React.FC = () => {
       <Card title="实时弹幕" style={{ marginBottom: '20px' }}>
         <Space wrap>
           <Button
-            type={connection ? 'default' : 'primary'}
+            type={connection && connection.state === HubConnectionState.Connected ? 'default' : 'primary'}
             onClick={startHubConnection}
-            disabled={!!connection}
+            disabled={!!connection && connection.state === HubConnectionState.Connected}
           >
             建立连接
           </Button>
