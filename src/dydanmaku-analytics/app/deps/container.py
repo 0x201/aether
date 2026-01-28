@@ -29,7 +29,7 @@ class Container(containers.DeclarativeContainer):
     analytics_notifier = providers.Factory(AnalyticsNotification, event_bus=event_bus)
 
     danmaku_analyzer = providers.Factory(
-        DanmakuAnalyzer, 
+        DanmakuAnalyzer,
         session_factory=session_factory,
         notifier=analytics_notifier,
     )

@@ -17,7 +17,9 @@ from loguru import logger
 
 
 class DanmakuAnalyzer:
-    def __init__(self, session_factory: SessionFactory, notifier: AnalyticsNotification) -> None:
+    def __init__(
+        self, session_factory: SessionFactory, notifier: AnalyticsNotification
+    ) -> None:
         self.session_factory = session_factory
         self.notifier = notifier
 
@@ -26,7 +28,7 @@ class DanmakuAnalyzer:
         start_time: datetime,
         end_time: datetime,
         room_id: Optional[int] = None,
-        period_type: Optional[PeriodType] = None
+        period_type: Optional[PeriodType] = None,
     ) -> DanmakuAnalysisDto:
         """Precompute word frequency and wordcloud data for a time range in a single entry"""
         # Generate both word frequency and wordcloud data
@@ -35,7 +37,7 @@ class DanmakuAnalyzer:
             start_time=start_time,
             end_time=end_time,
             room_id=room_id,
-            perid_type=period_type
+            perid_type=period_type,
         )
 
         logger.info(
@@ -57,7 +59,7 @@ class DanmakuAnalyzer:
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
         room_id: Optional[int] = None,
-        perid_type: Optional[PeriodType] = None
+        perid_type: Optional[PeriodType] = None,
     ) -> DanmakuAnalysis:
         """Generate word frequency and wordcloud analysis with optional time filtering"""
         # This method should not be called without a db session
@@ -176,12 +178,15 @@ class DanmakuAnalyzer:
                 room_id=danmaku_analysis.room_id,
                 start_date=danmaku_analysis.start_time.isoformat(),
                 end_date=danmaku_analysis.end_time.isoformat(),
-                period_type=perid_type.value if perid_type else PeriodType.REALTIME.value,
-                frequencies_count= len(danmaku_analysis.frequencies)
+                period_type=(
+                    perid_type.value if perid_type else PeriodType.REALTIME.value
+                ),
+                frequencies_count=(
+                    len(danmaku_analysis.frequencies)
                     if danmaku_analysis.frequencies
-                    else 0,
+                    else 0
+                ),
                 completed_at=danmaku_analysis.created_at.isoformat(),
-
             )
 
             return danmaku_analysis

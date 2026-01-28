@@ -82,7 +82,7 @@ async def lifespan(app: FastAPI):
     """Start scheduled analyzer and capture job scheduler on app startup"""
     container = Container()
     container.config.from_dict(settings.model_dump())
-    app.container = container
+    app.container = container  # type: ignore
 
     set_container(container)
 

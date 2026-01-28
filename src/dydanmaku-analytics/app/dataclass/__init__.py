@@ -1,4 +1,9 @@
-from .danmaku_model import DanmakuUpdateDto, CaptureJobStatus, DanmakuAnalysisDto, PeriodType
+from .danmaku_model import (
+    DanmakuUpdateDto,
+    CaptureJobStatus,
+    DanmakuAnalysisDto,
+    PeriodType,
+)
 from .nppa_model import GameAuditDto, NetworkGameAuditDto
 from .common import PagedResult
 
