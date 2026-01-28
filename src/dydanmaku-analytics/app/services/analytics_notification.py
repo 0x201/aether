@@ -13,7 +13,7 @@ class AnalyticsNotification:
 
     def notify_analytics_completed(
         self,
-        room_id: int,
+        room_id: Optional[int],
         start_date: str,
         end_date: str,
         period_type: str,
@@ -24,12 +24,12 @@ class AnalyticsNotification:
         Sends an analytics completed notification via the event bus.
         """
         event_data = {
-            "RoomId": room_id,
-            "StartDate": start_date,
-            "EndDate": end_date,
-            "PeriodType": period_type,
-            "FrequenciesCount": frequencies_count,
-            "CompletedAt": completed_at,
+            "roomId": room_id,
+            "startDate": start_date,
+            "endDate": end_date,
+            "periodType": period_type,
+            "frequenciesCount": frequencies_count,
+            "completedAt": completed_at,
         }
 
         success = self.event_bus.publish(

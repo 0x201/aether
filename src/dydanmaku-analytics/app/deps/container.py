@@ -26,10 +26,12 @@ class Container(containers.DeclarativeContainer):
     )
     nppa_repository = providers.Factory(NPPARepository, session_factory=session_factory)
 
+    analytics_notifier = providers.Factory(AnalyticsNotification, event_bus=event_bus)
+
     danmaku_analyzer = providers.Factory(
         DanmakuAnalyzer, 
         session_factory=session_factory,
-        event_bus=event_bus,
+        notifier=analytics_notifier,
     )
     nppa_crawler = providers.Factory(
         NPPAGameAuditCrawler,

@@ -105,3 +105,12 @@ class DanmakuAnalysisDto(BaseModel):
     periodType: str
     frequenciesCount: int
     createdAt: datetime
+
+
+class PeriodType(Enum):
+    HOURLY = "hourly"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+    REALTIME = "realtime"

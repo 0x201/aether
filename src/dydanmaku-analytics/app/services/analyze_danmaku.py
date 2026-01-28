@@ -9,23 +9,24 @@ from datetime import datetime
 from typing import Optional
 
 import jieba3
-from app.common import EventBus
 from app.database import Danmaku, DanmakuAnalysis, SessionFactory
-from app.dataclass import DanmakuAnalysisDto
+from app.dataclass import DanmakuAnalysisDto, PeriodType
+from .analytics_notification import AnalyticsNotification
 from sqlalchemy import and_, select
 from loguru import logger
 
 
 class DanmakuAnalyzer:
-    def __init__(self, session_factory: SessionFactory, event_bus: EventBus) -> None:
+    def __init__(self, session_factory: SessionFactory, notifier: AnalyticsNotification) -> None:
         self.session_factory = session_factory
-        self.event_bus = event_bus
+        self.notifier = notifier
 
     def precompute_analyses(
         self,
         start_time: datetime,
         end_time: datetime,
         room_id: Optional[int] = None,
+        period_type: Optional[PeriodType] = None
     ) -> DanmakuAnalysisDto:
         """Precompute word frequency and wordcloud data for a time range in a single entry"""
         # Generate both word frequency and wordcloud data
@@ -34,6 +35,7 @@ class DanmakuAnalyzer:
             start_time=start_time,
             end_time=end_time,
             room_id=room_id,
+            perid_type=period_type
         )
 
         logger.info(
@@ -44,7 +46,7 @@ class DanmakuAnalyzer:
             endDate=end_time,
             roomId=room_id,
             frequenciesCount=len(analysis.frequencies) if analysis.frequencies else 0,
-            periodType="",
+            periodType=period_type.value if period_type else "",
             createdAt=analysis.created_at,
         )
         return dto
@@ -55,6 +57,7 @@ class DanmakuAnalyzer:
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
         room_id: Optional[int] = None,
+        perid_type: Optional[PeriodType] = None
     ) -> DanmakuAnalysis:
         """Generate word frequency and wordcloud analysis with optional time filtering"""
         # This method should not be called without a db session
@@ -169,21 +172,16 @@ class DanmakuAnalyzer:
             transaction.add(danmaku_analysis)
             transaction.commit()
 
-            event_data = {
-                "roomId": danmaku_analysis.room_id,
-                "startDate": danmaku_analysis.start_time.isoformat(),
-                "endDate": danmaku_analysis.end_time.isoformat(),
-                "periodType": "realtime",
-                "frequenciesCount": (
-                    len(danmaku_analysis.frequencies)
+            self.notifier.notify_analytics_completed(
+                room_id=danmaku_analysis.room_id,
+                start_date=danmaku_analysis.start_time.isoformat(),
+                end_date=danmaku_analysis.end_time.isoformat(),
+                period_type=perid_type.value if perid_type else PeriodType.REALTIME.value,
+                frequencies_count= len(danmaku_analysis.frequencies)
                     if danmaku_analysis.frequencies
-                    else 0
-                ),
-                "completedAt": danmaku_analysis.created_at.isoformat(),
-            }
+                    else 0,
+                completed_at=danmaku_analysis.created_at.isoformat(),
 
-            self.event_bus.publish(
-                event_type_name="AnalyticsCompletedIntegrationEvent",
-                event_data=event_data,
             )
+
             return danmaku_analysis
