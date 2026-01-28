@@ -15,18 +15,19 @@
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
-    <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" />
-    <PackageReference Include="System.Linq.Dynamic.Core" />
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="System.Linq.Dynamic.Core" />
+    <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DyDanmaku.Domain\DyDanmaku.Domain.csproj" />
     <ProjectReference Include="..\DyDanmaku.Application\DyDanmaku.Application.csproj" />
     <ProjectReference Include="..\DyDanmaku.Infrastructure\DyDanmaku.Infrastructure.csproj" />
     <ProjectReference Include="..\ModernCSharp.AppDefaults\ModernCSharp.AppDefaults.csproj" />
@@ -34,12 +35,6 @@
     <ProjectReference Include="..\ModernCSharp.Shared\ModernCSharp.Shared.csproj" />
     <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
     <ProjectReference Include="..\IntegrationEventLogEF\IntegrationEventLogEF.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Apis\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Mappings\" />
   </ItemGroup>
 
 </Project>

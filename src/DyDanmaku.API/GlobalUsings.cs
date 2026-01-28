@@ -1,24 +1,38 @@
 ﻿global using System.Collections.Concurrent;
 global using System.Linq.Dynamic.Core;
-
+global using System.Net;
+global using System.Net.WebSockets;
+global using System.Text;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+global using System.Threading.Channels;
+global using Asp.Versioning;
 global using DyDanmaku.API;
-global using DyDanmaku.API.Dtos;
-global using DyDanmaku.API.Enums;
-global using DyDanmaku.API.Hubs;
-global using DyDanmaku.API.Interfaces;
-global using DyDanmaku.API.Services;
+global using DyDanmaku.API.Apis;
+global using DyDanmaku.API.Application.Commands;
+global using DyDanmaku.API.Application.Enums;
+global using DyDanmaku.API.Application.Hubs;
+global using DyDanmaku.API.Application.IntegrationEvents.Events;
+global using DyDanmaku.API.Application.Interfaces;
+global using DyDanmaku.API.Application.Mappings;
+global using DyDanmaku.API.Application.Models;
+global using DyDanmaku.API.Application.Queries;
+global using DyDanmaku.API.Application.Services;
 global using DyDanmaku.Domain.Entity;
 global using DyDanmaku.Infrastructure;
-
+global using MediatR;
 global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.EntityFrameworkCore;
-
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Logging;
+global using ModernCSharp.EventBus.Abstractions;
 global using ModernCSharp.ServiceDefaults;
 global using ModernCSharp.Shared;
-
+global using ModernCSharp.Shared.Models;
 global using Scalar.AspNetCore;
-
-global using DyDanmaku.Application.IntegrationEvents.Events;
-global using ModernCSharp.EventBus.Abstractions;
+global using StackExchange.Redis;

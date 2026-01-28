@@ -1,5 +1,7 @@
+using System.Reflection;
 using DyDanmaku.API.Infrastructure;
-using DyDanmaku.Application.EventHandlers;
+using DyDanmaku.API.Application.EventHandlers;
+using DyDanmaku.API.Application.Queries;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using ModernCSharp.Shared.Interceptors;
 
@@ -27,18 +29,25 @@ public static class Extensions
 
         builder.EnrichNpgsqlDbContext<DyDanmakuDbContext>();
 
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssemblyContaining<Program>();
+        });
+
         services.AddMigration<DyDanmakuDbContext, DyDanmakuDbContextSeed>();
 
         services.AddSingleton<IMemoryTaskScheduler, MemoryTaskScheduler>();
-        services.AddSingleton<IDanmakuCaptureServiceFactory, DanmakuCaptureServiceFactory>();
         services.AddSingleton<ICaptureJobManager, CaptureJobManager>();
         services.AddSingleton<IDanmakuPushService, DanmakuPushService>();
         services.AddTransient<IDanmakuCaptureService, DanmakuCaptureService>();
-        services.AddTransient<DyDanmakuClient>();
         services.AddScoped<ICaptureJobRepository, CaptureJobRepository>();
+        services.AddSingleton<DyDanmakuClientPool>();
         services.AddHostedService(provider => (DanmakuPushService)provider.GetRequiredService<IDanmakuPushService>());
+        services.AddHostedService(provider => (CaptureJobManager)provider.GetRequiredService<ICaptureJobManager>());
         services.AddHostedService<CaptureJobMonitoringService>();
         services.AddHostedService<ScheduleTaskService>();
+
+        services.AddScoped<IDanmakuQueries, DanmakuQueries>();
     }
 
     private static void AddEventBusSubscriptions(this IEventBusBuilder eventBus)
