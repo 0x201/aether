@@ -10,29 +10,30 @@ public class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(x => x.Id)
             .IsRequired()
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedOnAdd()
+            .HasColumnName("id");
 
         builder.OwnsOne(x => x.Address);
 
         builder.Property(x => x.Quantity)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnName("quantity");
 
         builder.Property(x => x.Total)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnName("total");
 
         builder.Property(x => x.CustomerName)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnName("customer_name");
 
         builder.Property(x => x.OrderDate)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnName("order_date");
 
         builder.Property(x => x.OrderStatus)
             .HasConversion<string>()
-            .IsRequired();
-
-        builder.Property(x => x.CreatedBy)
-            .IsRequired();
-
-        builder.Property(x => x.LastModifiedBy);
+            .IsRequired()
+            .HasColumnName("order_status");
     }
 }
