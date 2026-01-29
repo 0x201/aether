@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 from app.database import Danmaku, SessionFactory
 from app.services import DanmakuAnalyzer
-from app.common import EventBus
+from app.messaging import EventBus
 from app.dataclass import PeriodType
 
 

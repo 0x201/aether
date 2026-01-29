@@ -11,7 +11,7 @@ from loguru import logger
 from scalar_fastapi import get_scalar_api_reference, Theme
 
 from app.api import api_router
-from app.core.config import settings
+from app.core import settings
 from app.schedulers import start_scheduled_tasks, stop_scheduled_tasks, set_container
 from app.deps import Container
 

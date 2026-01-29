@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 from app.database import SessionFactory
-from app.common import EventBus
+from app.messaging import EventBus
+from app.cache import CacheSession
 from app.services import AnalyticsNotification, DanmakuAnalyzer, NPPAGameAuditCrawler
 from app.database import DanmakuRepository, NPPARepository
 from app.schedulers import ScheduledDanmakuAnalyzer, ScheduledNPPACrawler
@@ -20,6 +21,8 @@ class Container(containers.DeclarativeContainer):
     )
 
     session_factory = providers.Singleton(SessionFactory)
+
+    cache_session = providers.Factory(CacheSession)
 
     danmaku_repository = providers.Factory(
         DanmakuRepository, session_factory=session_factory

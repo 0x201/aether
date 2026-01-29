@@ -40,7 +40,36 @@ class MSSQLSession:
         self.engine: Optional[Engine] = None
         self._connected = False
 
-    def connect(self) -> None:
+    @contextmanager
+    def get_session(self) -> Iterator[Session]:
+        session: Session = self._create_session()
+        try:
+            yield session
+        except SQLAlchemyError as e:
+            logger.error(f"Database error during session: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error during session: {str(e)}")
+            raise
+        finally:
+            session.close()
+
+    @contextmanager
+    def get_transaction(self, autocommit=True) -> Iterator[Session]:
+        session: Session = self._create_session()
+        try:
+            yield session
+            if autocommit:
+                session.commit()
+        except Exception as e:
+            if autocommit:
+                session.rollback()
+            logger.error(f"Transaction failed: {str(e)}")
+            raise
+        finally:
+            session.close()
+
+    def _connect(self) -> None:
         if self._connected:
             return
         try:
@@ -81,38 +110,9 @@ class MSSQLSession:
             logger.error(f"failed to connect to database {str(e)}")
             raise e
 
-    @contextmanager
-    def get_session(self) -> Iterator[Session]:
-        session: Session = self._create_session()
-        try:
-            yield session
-        except SQLAlchemyError as e:
-            logger.error(f"Database error during session: {str(e)}")
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error during session: {str(e)}")
-            raise
-        finally:
-            session.close()
-
-    @contextmanager
-    def get_transaction(self, autocommit=True) -> Iterator[Session]:
-        session: Session = self._create_session()
-        try:
-            yield session
-            if autocommit:
-                session.commit()
-        except Exception as e:
-            if autocommit:
-                session.rollback()
-            logger.error(f"Transaction failed: {str(e)}")
-            raise
-        finally:
-            session.close()
-
     def _create_session(self) -> Session:
         if self.engine is None or self.session_local is None:
-            self.connect()
+            self._connect()
 
         assert self.session_local is not None
         return self.session_local()
@@ -144,35 +144,6 @@ class SQLiteSession:
         self.engine: Optional[Engine] = None
         self._connected = False
 
-    def connect(self) -> None:
-        if self._connected:
-            return
-        try:
-            # Ensure directory exists
-            db_dir = os.path.dirname(self.database_path)
-            if db_dir and not os.path.exists(db_dir):
-                os.makedirs(db_dir)
-
-            # Create SQLite engine
-            self.engine = create_engine(
-                f"sqlite:///{self.database_path}",
-                pool_pre_ping=self.pool_pre_ping,
-                pool_recycle=self.pool_recycle,
-                future=True,
-                echo=False,
-            )
-
-            self.session_local = sessionmaker(
-                bind=self.engine, autoflush=False, autocommit=False, future=True
-            )
-            self._connected = True
-            logger.info(
-                f"successfully connected to SQLite database {self.database_path}"
-            )
-        except Exception as e:
-            logger.error(f"failed to connect to SQLite database {str(e)}")
-            raise e
-
     @contextmanager
     def get_session(self) -> Iterator[Session]:
         session: Session = self._create_session()
@@ -202,9 +173,38 @@ class SQLiteSession:
         finally:
             session.close()
 
+    def _connect(self) -> None:
+        if self._connected:
+            return
+        try:
+            # Ensure directory exists
+            db_dir = os.path.dirname(self.database_path)
+            if db_dir and not os.path.exists(db_dir):
+                os.makedirs(db_dir)
+
+            # Create SQLite engine
+            self.engine = create_engine(
+                f"sqlite:///{self.database_path}",
+                pool_pre_ping=self.pool_pre_ping,
+                pool_recycle=self.pool_recycle,
+                future=True,
+                echo=False,
+            )
+
+            self.session_local = sessionmaker(
+                bind=self.engine, autoflush=False, autocommit=False, future=True
+            )
+            self._connected = True
+            logger.info(
+                f"successfully connected to SQLite database {self.database_path}"
+            )
+        except Exception as e:
+            logger.error(f"failed to connect to SQLite database {str(e)}")
+            raise e
+
     def _create_session(self) -> Session:
         if self.engine is None or self.session_local is None:
-            self.connect()
+            self._connect()
 
         assert self.session_local is not None
         return self.session_local()
@@ -244,7 +244,36 @@ class PostgreSQLSession:
         self.engine: Optional[Engine] = None
         self._connected = False
 
-    def connect(self) -> None:
+    @contextmanager
+    def get_session(self) -> Iterator[Session]:
+        session: Session = self._create_session()
+        try:
+            yield session
+        except SQLAlchemyError as e:
+            logger.error(f"Database error during session: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error during session: {str(e)}")
+            raise
+        finally:
+            session.close()
+
+    @contextmanager
+    def get_transaction(self, autocommit=True) -> Iterator[Session]:
+        session: Session = self._create_session()
+        try:
+            yield session
+            if autocommit:
+                session.commit()
+        except Exception as e:
+            if autocommit:
+                session.rollback()
+            logger.error(f"Transaction failed: {str(e)}")
+            raise
+        finally:
+            session.close()
+
+    def _connect(self) -> None:
         if self._connected:
             return
         try:
@@ -290,38 +319,9 @@ class PostgreSQLSession:
             logger.error(f"failed to connect to PostgreSQL database {str(e)}")
             raise e
 
-    @contextmanager
-    def get_session(self) -> Iterator[Session]:
-        session: Session = self._create_session()
-        try:
-            yield session
-        except SQLAlchemyError as e:
-            logger.error(f"Database error during session: {str(e)}")
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error during session: {str(e)}")
-            raise
-        finally:
-            session.close()
-
-    @contextmanager
-    def get_transaction(self, autocommit=True) -> Iterator[Session]:
-        session: Session = self._create_session()
-        try:
-            yield session
-            if autocommit:
-                session.commit()
-        except Exception as e:
-            if autocommit:
-                session.rollback()
-            logger.error(f"Transaction failed: {str(e)}")
-            raise
-        finally:
-            session.close()
-
     def _create_session(self) -> Session:
         if self.engine is None or self.session_local is None:
-            self.connect()
+            self._connect()
 
         assert self.session_local is not None
         return self.session_local()

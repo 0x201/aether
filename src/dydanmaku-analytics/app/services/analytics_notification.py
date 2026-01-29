@@ -1,6 +1,6 @@
 from typing import Optional
 from loguru import logger
-from app.common.eventbus import EventBus
+from app.messaging import EventBus
 
 
 class AnalyticsNotification:
