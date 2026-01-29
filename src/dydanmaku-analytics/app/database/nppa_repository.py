@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from sqlalchemy import select
+from sqlalchemy import select, update
 from .session_factory import SessionFactory
 
 from .common import get_generic_paged_data
@@ -27,30 +27,46 @@ class NPPARepository:
             result = session.execute(stmt).scalar_one_or_none()
             return result
 
-    def insert_many_game_audits(self, audits: List[GameAudit]):
+    def insert_many_game_audits(self, audits: List[GameAudit]) -> bool:
         """Insert multiple game audits into the database."""
-        with self.session_factory.get_transaction() as transaction:
-            transaction.add_all(audits)
+        try:
+            with self.session_factory.get_transaction() as transaction:
+                transaction.add_all(audits)
+                return True
+        except Exception:
+            return False
 
     def insert_many_network_game_audits(self, audits: List[NetworkGameAudit]):
         """Insert multiple network game audits into the database."""
-        with self.session_factory.get_transaction() as transaction:
-            transaction.add_all(audits)
+        try:
+            with self.session_factory.get_transaction() as transaction:
+                transaction.add_all(audits)
+        except Exception:
+            return False
 
     def insert_many_egame_audits(self, audits: List[EGameAudit]):
         """Insert multiple egame audits into the database."""
-        with self.session_factory.get_transaction() as transaction:
-            transaction.add_all(audits)
+        try:
+            with self.session_factory.get_transaction() as transaction:
+                transaction.add_all(audits)
+        except Exception:
+            return False
 
     def insert_many_game_alteration_audits(self, audits: List[GameAlterationAudit]):
         """Insert multiple game alteration audits into the database."""
-        with self.session_factory.get_transaction() as transaction:
-            transaction.add_all(audits)
+        try:
+            with self.session_factory.get_transaction() as transaction:
+                transaction.add_all(audits)
+        except Exception:
+            return False
 
     def insert_many_game_revocation_audits(self, audits: List[GameRevocationAudit]):
         """Insert multiple game revocation audits into the database."""
-        with self.session_factory.get_transaction() as transaction:
-            transaction.add_all(audits)
+        try:
+            with self.session_factory.get_transaction() as transaction:
+                transaction.add_all(audits)
+        except Exception:
+            return False
 
     def get_paged_network_game_audits(
         self,
@@ -98,3 +114,14 @@ class NPPARepository:
                 custom_conditions=conditions,
             )
             return audits
+
+    def update_game_audit_publish_date_by_title(self, title: str, publish_date: str):
+        """Update the publish date of a game audit by title."""
+        with self.session_factory.get_transaction() as transaction:
+            stmt = (
+                update(GameAudit)
+                .where(GameAudit.title == title)
+                .values(publish_date=publish_date)
+            )
+
+            transaction.execute(stmt)

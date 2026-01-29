@@ -35,7 +35,7 @@ class GameAuditParsingStrategy(ABC):
         """
         Parse the given URL and return a list of audit data
 
-        Parameters:
+        Args:
             crawler: The NPPA game audit crawler instance
             url: The URL to parse
 
@@ -49,7 +49,7 @@ class GameAuditParsingStrategy(ABC):
         """
         Save the parsed data to repository
 
-        Parameters:
+        Args:
             data: The parsed audit data
             nppa_repo: The repository dependency
         """
@@ -70,9 +70,11 @@ class DomesticNetworkGameParsingStrategy(GameAuditParsingStrategy):
     async def parse(
         self, crawler: NPPAGameAuditCrawler, url: str
     ) -> List[NetworkGameAudit]:
-        return await crawler._parse_network_game_audits(
+        network_game_audits = await crawler._parse_network_game_audits(
             url, NPPAGameAuditType.DOMESTIC_NETWORK_GAME_AUDIT.value
         )
+        network_game_audits.reverse()
+        return network_game_audits
 
     def save_data(self, data: List, nppa_repo: NPPARepository) -> None:
         nppa_repo.insert_many_network_game_audits(data)
@@ -85,9 +87,11 @@ class ForeignNetworkGameParsingStrategy(GameAuditParsingStrategy):
     async def parse(
         self, crawler: NPPAGameAuditCrawler, url: str
     ) -> List[NetworkGameAudit]:
-        return await crawler._parse_network_game_audits(
+        network_game_audits = await crawler._parse_network_game_audits(
             url, NPPAGameAuditType.FOREIGN_NETWOKR_GAME_AUDIT.value
         )
+        network_game_audits.reverse()
+        return network_game_audits
 
     def save_data(self, data: List, nppa_repo: NPPARepository) -> None:
         nppa_repo.insert_many_network_game_audits(data)
@@ -100,7 +104,9 @@ class GameAlterationParsingStrategy(GameAuditParsingStrategy):
     async def parse(
         self, crawler: NPPAGameAuditCrawler, url: str
     ) -> List[GameAlterationAudit]:
-        return await crawler._parse_game_alteration_audits(url)
+        game_alteration_audits = await crawler._parse_game_alteration_audits(url)
+        game_alteration_audits.reverse()
+        return game_alteration_audits
 
     def save_data(self, data: List, nppa_repo: NPPARepository) -> None:
         nppa_repo.insert_many_game_alteration_audits(data)
@@ -113,7 +119,9 @@ class GameRevocationParsingStrategy(GameAuditParsingStrategy):
     async def parse(
         self, crawler: NPPAGameAuditCrawler, url: str
     ) -> List[GameRevocationAudit]:
-        return await crawler._parse_game_revocation_audits(url)
+        game_revocation_audits = await crawler._parse_game_revocation_audits(url)
+        game_revocation_audits.reverse()
+        return game_revocation_audits
 
     def save_data(self, data: List, nppa_repo: NPPARepository) -> None:
         nppa_repo.insert_many_game_revocation_audits(data)
@@ -124,7 +132,9 @@ class GameRevocationParsingStrategy(GameAuditParsingStrategy):
 
 class EGameParsingStrategy(GameAuditParsingStrategy):
     async def parse(self, crawler: NPPAGameAuditCrawler, url: str) -> List[EGameAudit]:
-        return await crawler._parse_egame_audits(url)
+        egame_audits = await crawler._parse_egame_audits(url)
+        egame_audits.reverse()
+        return egame_audits
 
     def save_data(self, data: List, nppa_repo: NPPARepository) -> None:
         nppa_repo.insert_many_egame_audits(data)
@@ -327,10 +337,23 @@ class NPPAGameAuditCrawler:
         self, url: str, game_type: str
     ) -> List[NetworkGameAudit]:
         """Parse network game audits
-        :param url: url of network game
-        :param game_type: gcwlyxspxx -> domestic jkwlyxspxx -> foreign
-        :return: List of network game audits
+
+        Args:
+            url (str): url of network game
+            game_type (str): game type
+
+        Returns:
+            List of network game audits
+
+        Examples:
+            >>> await self._parse_network_game_audits(url, game_type)
+            []
         """
+        game_type_name = (
+            "DOMESTIC"
+            if game_type == NPPAGameAuditType.DOMESTIC_NETWORK_GAME_AUDIT.value
+            else "FOREIGN"
+        )
         await self._initialize_browser()
 
         if self.browser is None:
@@ -338,7 +361,7 @@ class NPPAGameAuditCrawler:
             return []
 
         page = await self.browser.new_page()
-        logger.info(f"Start to parse network game audit, url: {url}.")
+        logger.info(f"Start to parse {game_type_name} network game audit, url: {url}.")
         network_games = []
 
         try:
@@ -457,7 +480,7 @@ class NPPAGameAuditCrawler:
             await page.close()
 
         logger.info(
-            f"Parsed total {len(network_games)} network game audits from url: {url}."
+            f"Parsed total {len(network_games)} {game_type_name} network game audits from url: {url}."
         )
         return network_games
 
@@ -781,9 +804,39 @@ class NPPAGameAuditCrawler:
                 if audit.publish_date > latest_game_audit.publish_date
             ]
 
-            self.nppa_repository.insert_many_game_audits(new_audits)
-            logger.info(f"Saved total {len(game_audits)} game audits to CSV")
-            await self._parse_game_audits(game_audits)
+            alteration_keywords = ["年游戏审批变更信息"]
+
+            alteration_audits = [
+                audit
+                for audit in new_audits
+                if any(keyword in audit.title for keyword in alteration_keywords)
+            ]
+
+            if alteration_audits:
+                for audit in alteration_audits:
+                    self.nppa_repository.update_game_audit_publish_date_by_title(
+                        audit.title, audit.publish_date.strftime("%Y-%m-%d")
+                    )
+
+            non_alteration_audits = [
+                audit
+                for audit in new_audits
+                if not any(keyword in audit.title for keyword in alteration_keywords)
+            ]
+
+            if non_alteration_audits:
+                await self._parse_game_audits(non_alteration_audits)
+                success = self.nppa_repository.insert_many_game_audits(
+                    non_alteration_audits
+                )
+
+                if not success:
+                    logger.error("Failed to save game audits to database")
+                    return
+                logger.info(
+                    f"Saved total {len(non_alteration_audits)} game audits to database"
+                )
+
         else:
             logger.info("No new NPPA game audit to save.")
 
@@ -825,15 +878,21 @@ class NPPAGameAuditCrawler:
             parsed_data = await self._parse_table(url)
             game_audit_list.extend(parsed_data)
         if game_audit_list:
-            self.nppa_repository.insert_many_game_audits(game_audit_list)
-            logger.info(f"Saved total {len(game_audit_list)} game audits to CSV")
             await self._parse_game_audits(game_audit_list)
+            success = self.nppa_repository.insert_many_game_audits(game_audit_list)
+
+            if not success:
+                logger.error("Failed to save game audits to database")
+                return
+
+            logger.info(f"Saved total {len(game_audit_list)} game audits to database")
+
         else:
             logger.info("No NPPA game audit to save.")
 
     async def _parse_game_audits(self, game_audits: List[GameAudit]) -> None:
         """
-        Parse game audits and save to CSV
+        Parse game audits and save to database
 
         Parameters:
             param game_audits: List of game audits
