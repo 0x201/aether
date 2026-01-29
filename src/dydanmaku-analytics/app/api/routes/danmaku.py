@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.deps import DanmakuAnalyzerDep
+from app.deps import DanmakuAnalyzerDep, CacheSessionDep
 from fastapi import APIRouter, HTTPException, Query
 from dependency_injector.wiring import inject
 
@@ -62,3 +62,14 @@ async def generate_analysis(
     )
 
     return {"message": "Analysis generated"}
+
+
+@router.get("/analysis/cache")
+@inject
+async def cached_analyses(
+    cache_session: CacheSessionDep,
+):
+    async with cache_session.get_cache() as cache:
+        await cache.set("fastapi-test-key", "hello from fastapi")
+
+    return {"message": "Cache set"}

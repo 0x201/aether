@@ -86,6 +86,22 @@ class RabbitMQConfig(BaseSettings):
     virtual_host: str = Field(default="/", description="RabbitMQ virtual host")
 
 
+class RedisConfig(BaseSettings):
+    host: str = Field(default="localhost", description="Redis host")
+    port: int = Field(default=6379, description="Redis port")
+    password: Optional[str] = Field(default=None, description="Redis password")
+    ssl: bool = Field(default=False, description="Use SSL for Redis")
+    ssl_ca_certs: str = Field(
+        default="", description="Path to SSL CA certificates"
+    )
+    ssl_certfile: str = Field(
+        default="", description="Path to SSL certificate file"
+    )
+    ssl_keyfile: str = Field(
+        default="", description="Path to SSL key file"
+    )
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
     project_name: str = Field(default="DyDanmaku API", description="Project name")
@@ -112,6 +128,7 @@ class Settings(BaseSettings):
     messaging: RabbitMQConfig = Field(
         default=RabbitMQConfig(), description="RabbitMQ configuration"
     )
+    cache: RedisConfig = Field(default=RedisConfig(), description="Redis configuration")
 
     @classmethod
     def settings_customise_sources(
