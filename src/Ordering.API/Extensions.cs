@@ -1,6 +1,5 @@
 ﻿using ModernCSharp.Ordering.API.Infrastructure;
 using ModernCSharp.ServiceDefaults;
-using ModernCSharp.Shared.Interceptors;
 
 namespace ModernCSharp.Ordering.API;
 
@@ -36,7 +35,7 @@ internal static class Extensions
 
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssemblyContaining(typeof(Program));
+            cfg.RegisterServicesFromAssemblyContaining<Program>();
 
             //cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
         });
