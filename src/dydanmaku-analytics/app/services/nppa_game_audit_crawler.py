@@ -795,6 +795,7 @@ class NPPAGameAuditCrawler:
         if game_audits and len(game_audits) > 0 and latest_game_audit is not None:
             # check the last game audit in links whether is newer than latest_game_audit
             if game_audits[-1].publish_date <= latest_game_audit.publish_date:
+                logger.info("No new NPPA game audit to process")
                 return
 
             # get game audits newer than latest_game_audit
@@ -837,8 +838,6 @@ class NPPAGameAuditCrawler:
                     f"Saved total {len(non_alteration_audits)} game audits to database"
                 )
 
-        else:
-            logger.info("No new NPPA game audit to save.")
 
     async def _get_all_game_audits(self) -> None:
         """Get full game audits and save to database"""
