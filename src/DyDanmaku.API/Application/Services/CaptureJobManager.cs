@@ -35,34 +35,43 @@ public class CaptureJobManager(
 
     private async Task ProcessStartRequests(CancellationToken stoppingToken)
     {
-        await foreach (var (roomId, duration, tcs) in _startRequests.Reader.ReadAllAsync(stoppingToken))
+        try
         {
-            try
+            await foreach (var (roomId, duration, tcs) in _startRequests.Reader.ReadAllAsync(stoppingToken))
             {
-                var result = await ProcessStartRequestInternal(roomId, duration, stoppingToken);
-                tcs.SetResult(result);
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
+                try
+                {
+                    var result = await ProcessStartRequestInternal(roomId, duration, stoppingToken);
+                    tcs.SetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
             }
         }
+        catch (OperationCanceledException) { }
+
     }
 
     private async Task ProcessStopRequests(CancellationToken stoppingToken)
     {
-        await foreach (var (roomId, _, tcs) in _stopRequests.Reader.ReadAllAsync(stoppingToken))
+        try
         {
-            try
+            await foreach (var (roomId, _, tcs) in _stopRequests.Reader.ReadAllAsync(stoppingToken))
             {
-                var result = await ProcessStopRequestInternal(roomId, stoppingToken);
-                tcs.SetResult(result);
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
+                try
+                {
+                    var result = await ProcessStopRequestInternal(roomId, stoppingToken);
+                    tcs.SetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
             }
         }
+        catch (OperationCanceledException) { }
     }
 
     private async Task<bool> ProcessStartRequestInternal(int roomId, int? duration, CancellationToken cancellationToken)
@@ -100,7 +109,7 @@ public class CaptureJobManager(
             return false;
         }
 
-        await service.Start(roomId, duration.GetValueOrDefault(3600));
+        await service.StartAsync(roomId, duration.GetValueOrDefault(3600));
 
         var activeJob = new ActiveCaptureJob
         {
@@ -121,7 +130,7 @@ public class CaptureJobManager(
 
         if (_activeJobs.TryGetValue(roomId, out var activeJob))
         {
-            await activeJob.Service.Stop();
+            await activeJob.Service.StopAsync();
             _activeJobs.TryRemove(roomId, out _);
             wasRunning = true;
         }
@@ -133,14 +142,20 @@ public class CaptureJobManager(
 
         if (activeJobInDb is not null)
         {
-            var finalStatus = wasRunning ? JobStatus.Completed : JobStatus.Cancelled;
-            await jobRepository.UpdateJobStatusAsync(roomId, finalStatus, cancellationToken);
+            await jobRepository.UpdateJobStatusAsync(roomId, JobStatus.Cancelled, cancellationToken);
 
-            logger.LogInformation("Stopped capture for room {RoomId}, updated DB status to {Status}", roomId, finalStatus);
+            logger.LogInformation("Stopped capture for room {RoomId}, updated DB status to {Status}", roomId, JobStatus.Cancelled);
         }
         else
         {
-            logger.LogWarning("Attempted to stop capture for room {RoomId}, but no active job found in database", roomId);
+            if (wasRunning)
+            {
+                logger.LogWarning("Stopped capture for room {RoomId}, job was active in memory but already completed in database", roomId);
+            }
+            else
+            {
+                logger.LogWarning("Attempted to stop capture for room {RoomId}, but no active job found in memory or database", roomId);
+            }
         }
 
         return wasRunning;
@@ -156,8 +171,24 @@ public class CaptureJobManager(
 
     public override void Dispose()
     {
-        _startRequests.Writer.Complete();
-        _stopRequests.Writer.Complete();
+        try
+        {
+            if (!_startRequests.Writer.TryComplete())
+            {
+                _startRequests.Writer.Complete();
+            }
+        }
+        catch (InvalidOperationException){}
+
+        try
+        {
+            if (!_stopRequests.Writer.TryComplete())
+            {
+                _stopRequests.Writer.Complete();
+            }
+        }
+        catch (InvalidOperationException) {}
+
         base.Dispose();
     }
 }

@@ -64,6 +64,7 @@ public record DataCount(int DanmakuCount, int RoomCount, int UserCount);
 [JsonSerializable(typeof(TopUser))]
 [JsonSerializable(typeof(TopRoom))]
 [JsonSerializable(typeof(HourlyDistribution))]
+[JsonSerializable(typeof(DanmakuAnalysis))]
 [JsonSerializable(typeof(IReadOnlyList<TopUser>))]
 [JsonSerializable(typeof(IReadOnlyList<TopRoom>))]
 [JsonSerializable(typeof(IReadOnlyList<HourlyDistribution>))]

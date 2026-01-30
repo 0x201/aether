@@ -87,6 +87,14 @@
         .Produces<Result>(StatusCodes.Status400BadRequest)
         .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
 
+        api.MapGet("/active-job/", GetActiveJobAsync)
+        .WithName("AttiveJob")
+        .WithDescription("Returns active job")
+        .WithSummary("Active capture job")
+        .Produces<Result<CaptureJobDto>>(StatusCodes.Status200OK)
+        .Produces<Result>(StatusCodes.Status400BadRequest)
+        .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
+
         return api;
     }
 
@@ -253,5 +261,24 @@
             return TypedResults.NotFound(Result.Failure(HttpStatusCode.NotFound, "Danmaku not found"));
         }
         return TypedResults.NoContent();
+    }
+
+    static async Task<Results<Ok<Result<CaptureJobDto>>, BadRequest<Result>, NotFound<Result>, ProblemHttpResult>> GetActiveJobAsync(
+            [FromQuery] int roomId,
+            [AsParameters] DanmakuServices service)
+    {
+        if (roomId <= 0)
+        {
+            return TypedResults.BadRequest(Result.Failure(HttpStatusCode.BadRequest, "Invalid room ID"));
+        }
+
+        var res = await service.Queries.GetActiveJob(roomId);
+
+        if (res.Status != HttpStatusCode.OK)
+        {
+            return TypedResults.NotFound(Result.Failure(HttpStatusCode.NotFound, "Room not found"));
+        }
+
+        return TypedResults.Ok(res);
     }
 }

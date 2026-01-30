@@ -15,7 +15,7 @@ public class DanmakuCaptureService(
         _onCaptureCompleted = onCaptureCompleted;
     }
 
-    public async Task Start(int roomId, int duration = 3600)
+    public async Task StartAsync(int roomId, int duration = 3600)
     {
         var taskId = $"capture_{roomId}";
 
@@ -80,7 +80,7 @@ public class DanmakuCaptureService(
         }
     }
 
-    public async Task Stop(int roomId)
+    public async Task StopAsync(int roomId)
     {
         if (!_activeTasks.TryGetValue(roomId, out var taskId))
         {
@@ -93,7 +93,7 @@ public class DanmakuCaptureService(
         await memoryTaskScheduler.CancelTaskAsync(taskId);
     }
 
-    public async Task Stop()
+    public async Task StopAsync()
     {
         logger.LogInformation("Stopping all danmaku capture jobs");
 

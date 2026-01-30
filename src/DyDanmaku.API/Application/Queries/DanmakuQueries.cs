@@ -8,6 +8,19 @@ public class DanmakuQueries(
     public async Task<Result<IReadOnlyList<WordFrequency>>> GetAnalysisData(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<WordFrequency> wordFrequencies = [];
+        var roomIdStr = request.RoomId.HasValue ? request.RoomId.ToString() : "All";
+        var cacheKey = $"danmaku_analysis:{request.StartTime:yyyyMMddTHHmmssZ}:{request.EndTime:yyyyMMddTHHmmssZ}:{roomIdStr}";
+        var cacheValue = await cache.GetDatabase().StringGetAsync(cacheKey);
+
+        if (cacheValue.HasValue)
+        {
+            var cachedAnalysis = JsonSerializer.Deserialize(cacheValue.ToString(), DanmakuJsonSerializerContext.Default.DanmakuAnalysis);
+            if (cachedAnalysis is not null && cachedAnalysis.Frequencies is not null)
+            {
+                wordFrequencies = ParseFrequenciesFromNestedArray(cachedAnalysis.Frequencies, request.TopN);
+                return Result<IReadOnlyList<WordFrequency>>.Success(wordFrequencies);
+            }
+        }
 
         var danmakuAnalysis = await dbContext.DanmakuAnalyses
             .AsNoTracking()
@@ -157,7 +170,8 @@ public class DanmakuQueries(
 
     public async Task<Result<DanmakuStats>> GetDanmakuStats(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"danmaku-stats:{request.StartTime:yyyyMMddTHHmmssZ}:{request.EndTime:yyyyMMddTHHmmssZ}:{request.RoomId.GetValueOrDefault()}";
+        var roomIdStr = request.RoomId.HasValue ? request.RoomId.Value.ToString() : "all";
+        var cacheKey = $"danmaku-stats:{request.StartTime:yyyyMMddTHHmmssZ}:{request.EndTime:yyyyMMddTHHmmssZ}:{roomIdStr}";
 
         var cacheValue = await cache.GetDatabase().StringGetAsync(cacheKey);
 
@@ -267,5 +281,26 @@ public class DanmakuQueries(
         var userCount = await dbContext.Danmakus.AsNoTracking().Select(d => d.UserId).Distinct().CountAsync(cancellationToken);
         var res = new DataCount(danamkuCount, roomCount, userCount);
         return Result<DataCount>.Success(res);
+    }
+
+    public async Task<Result<CaptureJobDto>> GetActiveJob(int roomId, CancellationToken cancellationToken = default)
+    {
+        var job = await dbContext.CaptureJobs
+            .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
+        
+        var dto = job is null ? null : new CaptureJobDto(
+            job.Id,
+            job.RoomId,
+            job.Duration,
+            job.Status,
+            job.StartTime.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            job.EndTime?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            job.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        );
+        if (dto is null)
+        {
+            return Result<CaptureJobDto>.Failure(HttpStatusCode.NotFound, "No active job found", null);
+        }
+        return Result<CaptureJobDto>.Success(dto);
     }
 }

@@ -5,7 +5,7 @@ namespace ModernCSharp.Shared.Models;
 public record Result
 {
     public HttpStatusCode Status { get; set; }
-    public string Message { get; set; } = "Request Success";
+    public string Message { get; set; } = "Request Successfully";
 
     public static Result Success(string message)
     {
@@ -37,7 +37,7 @@ public record Result<T> : Result
         return new Result<T>
         {
             Status = HttpStatusCode.OK,
-            Message = message ?? "Request Success",
+            Message = message ?? "Request Successfully",
             Data = data
         };
     }

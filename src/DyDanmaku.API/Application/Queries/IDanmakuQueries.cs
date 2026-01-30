@@ -8,5 +8,5 @@ public interface IDanmakuQueries
     Task<Result<IReadOnlyList<WordFrequency>>> GetAnalysisData(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default);
     Task<Result<DanmakuStats>> GetDanmakuStats(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default);
     Task<Result<DataCount>> GetDanmakuCount(CancellationToken cancellationToken = default);
-
+    Task<Result<CaptureJobDto>> GetActiveJob(int roomId, CancellationToken cancellationToken = default);
 }
