@@ -39,3 +39,19 @@ nppa:
   base_url: "https://www.nppa.gov.cn/bsfw/jggs/yxspjg/"
   data_url: "index"
   suffix: ".html"
+
+messaging:
+  host: "localhost"
+  port: 5672
+  username: "guest"
+  password: "Pass123$"
+  virtual_host: "/"
+
+cache:
+  host: "localhost"
+  port: 6379
+  password: "Pass123$"
+  ssl: false
+  ssl_ca_certs: ""
+  ssl_certfile: ""
+  ssl_keyfile: ""

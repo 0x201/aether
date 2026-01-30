@@ -35,6 +35,7 @@ class Container(containers.DeclarativeContainer):
         DanmakuAnalyzer,
         session_factory=session_factory,
         notifier=analytics_notifier,
+        cache_session=cache_session,
     )
     nppa_crawler = providers.Factory(
         NPPAGameAuditCrawler,

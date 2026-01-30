@@ -193,7 +193,7 @@ class ScheduledDanmakuAnalyzer:
         )
 
         try:
-            self.analyzer.precompute_analyses(
+            await self.analyzer.precompute_analyses(
                 start_time=start_time,
                 end_time=end_time,
                 room_id=None,
@@ -228,7 +228,7 @@ class ScheduledDanmakuAnalyzer:
         for room_result in recent_rooms:
             room_id = room_result
             try:
-                self.analyzer.precompute_analyses(
+                await self.analyzer.precompute_analyses(
                     start_time=start_time,
                     end_time=end_time,
                     room_id=room_id,

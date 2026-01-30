@@ -5,12 +5,13 @@ Data analysis module for Douyu danmu
 import json
 import time
 from collections import Counter
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta
+from typing import LiteralString, Optional
 
 import jieba3
+from app.cache import CacheSession
 from app.database import Danmaku, DanmakuAnalysis, SessionFactory
-from app.dataclass import DanmakuAnalysisDto, PeriodType
+from app.dataclass import PeriodType
 from .analytics_notification import AnalyticsNotification
 from sqlalchemy import and_, select
 from loguru import logger
@@ -18,24 +19,28 @@ from loguru import logger
 
 class DanmakuAnalyzer:
     def __init__(
-        self, session_factory: SessionFactory, notifier: AnalyticsNotification
+        self,
+        session_factory: SessionFactory,
+        notifier: AnalyticsNotification,
+        cache_session: CacheSession,
     ) -> None:
         self.session_factory = session_factory
         self.notifier = notifier
+        self.cache_session = cache_session
 
-    def precompute_analyses(
+    async def precompute_analyses(
         self,
         start_time: datetime,
         end_time: datetime,
         room_id: Optional[int] = None,
         period_type: Optional[PeriodType] = None,
-    ) -> DanmakuAnalysisDto:
+    ):
         """Precompute word frequency and wordcloud data for a time range in a single entry"""
         # Generate both word frequency and wordcloud data
-        analysis = self.generate_analysis(
-            top_n=100,
+        await self.generate_analysis(
             start_time=start_time,
             end_time=end_time,
+            top_n=100,
             room_id=room_id,
             perid_type=period_type,
         )
@@ -43,133 +48,87 @@ class DanmakuAnalyzer:
         logger.info(
             f"Precomputed analyses for time range {start_time} to {end_time} and room {room_id}"
         )
-        dto = DanmakuAnalysisDto(
-            startDate=start_time,
-            endDate=end_time,
-            roomId=room_id,
-            frequenciesCount=len(analysis.frequencies) if analysis.frequencies else 0,
-            periodType=period_type.value if period_type else "",
-            createdAt=analysis.created_at,
-        )
-        return dto
 
-    def generate_analysis(
+    async def generate_analysis(
         self,
+        start_time: datetime,
+        end_time: datetime,
         top_n: int = 100,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
         room_id: Optional[int] = None,
         perid_type: Optional[PeriodType] = None,
-    ) -> DanmakuAnalysis:
-        """Generate word frequency and wordcloud analysis with optional time filtering"""
-        # This method should not be called without a db session
+    ):
+        if top_n <= 0:
+            raise ValueError("top_n must be a positive integer")
+
         if self.session_factory is None:
             raise ValueError("Database session_factory is required for analysis")
 
+        if self.cache_session is None:
+            raise ValueError("Cache session is required for analysis")
+
+        analysis_cache_key = (
+            f"danmaku_analysis:{start_time.isoformat()}:{end_time.isoformat()}:"
+        )
+
+        danmaku_stmt = select(Danmaku.content).where(
+            and_(
+                Danmaku.created_at >= start_time,
+                Danmaku.created_at <= end_time,
+                Danmaku.content.isnot(None),
+            )
+        )
+        analysis_stmt = select(DanmakuAnalysis).where(
+            and_(
+                DanmakuAnalysis.start_time == start_time,
+                DanmakuAnalysis.end_time == end_time,
+                DanmakuAnalysis.type == "combined_analysis",
+            )
+        )
+
+        if room_id:
+            analysis_stmt = analysis_stmt.where(DanmakuAnalysis.room_id == room_id)
+            danmaku_stmt = danmaku_stmt.where(Danmaku.room_id == room_id)
+            analysis_cache_key = f"{analysis_cache_key}{room_id}"
+        else:
+            analysis_cache_key = f"{analysis_cache_key}all"
+
+        async with self.cache_session.get_cache() as cache:
+            cached_analysis = await cache.get(analysis_cache_key)
+            if cached_analysis:
+                # already computed
+                return
+
         with self.session_factory.get_transaction(autocommit=False) as transaction:
-            # Directly check for cached data in the database
-            if start_time and end_time:
-                stmt = select(DanmakuAnalysis).where(
-                    and_(
-                        DanmakuAnalysis.start_time == start_time,
-                        DanmakuAnalysis.end_time == end_time,
-                        DanmakuAnalysis.type == "combined_analysis",
-                        DanmakuAnalysis.room_id == room_id,
-                    )
-                )
+            existing_data = transaction.execute(analysis_stmt).scalar_one_or_none()
 
-                existing_data = transaction.execute(stmt).scalar_one_or_none()
+            if existing_data and existing_data.frequencies:
+                # already computed
+                # update cache
+                await self._set_analysis_cache(analysis_cache_key, existing_data)
+                return
 
-                if existing_data and existing_data.frequencies:
-                    return existing_data
-
-            # Build query with time and room filters
-            query = select(Danmaku.content).where(Danmaku.content.isnot(None))
-
-            if start_time:
-                query = query.where(Danmaku.created_at >= start_time)
-            if end_time:
-                query = query.where(Danmaku.created_at <= end_time)
-            if room_id:
-                query = query.where(Danmaku.room_id == room_id)
-
-            # Use streaming to avoid loading all data into memory at once for word frequency
             text_parts = []
             batch_size = 1000
 
-            # Execute the query and fetch results in chunks to avoid locks
-            result = transaction.execute(query)
+            result = transaction.execute(danmaku_stmt)
             while True:
                 chunk = result.fetchmany(batch_size)
                 if not chunk:
                     break
-                # Process the chunk
                 for row in chunk:
                     if row.content:
                         text_parts.append(row.content)
 
-            # Combine all content
             text = " ".join(text_parts)
-
-            # Use jieba3 to segment Chinese text
-            tokenizer = jieba3.jieba3()
-
-            logger.info(f"Tokenizing text for room {room_id}")
-            logger.info(f"Total text length: {len(text)}")
-            start = time.perf_counter()
-            words = tokenizer.cut_text(text)
-
-            # Filter out single characters and common stop words
-            stop_words = {
-                " ",
-                "的",
-                "了",
-                "在",
-                "是",
-                "我",
-                "有",
-                "和",
-                "就",
-                "不",
-                "人",
-                "都",
-                "一",
-                "一个",
-                "上",
-                "也",
-                "很",
-                "到",
-                "说",
-                "要",
-                "去",
-                "你",
-                "会",
-                "着",
-                "没有",
-                "看",
-                "好",
-                "自己",
-                "这",
-            }
-            filtered_words = [
-                word for word in words if len(word) > 1 and word not in stop_words
-            ]
-
-            # Count word frequency
-            word_freq = Counter(filtered_words)
-            word_frequency_result = word_freq.most_common(top_n)
-            end = time.perf_counter()
-            logger.info(
-                f"Generated word frequency for time range {start_time} to {end_time}. Elaspsped time: {end - start:.6f}s"
-            )
-
-            danmaku_analysis = DanmakuAnalysis(
-                type="combined_analysis",
+            danmaku_analysis = self._calculate_core(
+                room_id=room_id,
                 start_time=start_time,
                 end_time=end_time,
-                room_id=room_id,
-                frequencies=json.dumps(word_frequency_result),
+                top_n=top_n,
+                text=text,
             )
+
+            await self._set_analysis_cache(analysis_cache_key, danmaku_analysis)
 
             transaction.add(danmaku_analysis)
             transaction.commit()
@@ -189,4 +148,76 @@ class DanmakuAnalyzer:
                 completed_at=danmaku_analysis.created_at.isoformat(),
             )
 
-            return danmaku_analysis
+    async def _set_analysis_cache(self, key: str, danmaku_analysis: DanmakuAnalysis):
+        async with self.cache_session.get_cache() as cache:
+            await cache.set(
+                name=key,
+                value=json.dumps(danmaku_analysis),
+                ex=timedelta(hours=1),
+            )
+
+    def _calculate_core(
+        self,
+        room_id: Optional[int],
+        start_time: datetime,
+        end_time: datetime,
+        top_n: int,
+        text: LiteralString,
+    ) -> DanmakuAnalysis:
+        tokenizer = jieba3.jieba3()
+        start = time.perf_counter()
+        words = tokenizer.cut_text(text)
+        logger.info(f"Tokenizing text for room {room_id or "All"}")
+        logger.info(f"Total text length: {len(text)}")
+
+        stop_words = {
+            " ",
+            "的",
+            "了",
+            "在",
+            "是",
+            "我",
+            "有",
+            "和",
+            "就",
+            "不",
+            "人",
+            "都",
+            "一",
+            "一个",
+            "上",
+            "也",
+            "很",
+            "到",
+            "说",
+            "要",
+            "去",
+            "你",
+            "会",
+            "着",
+            "没有",
+            "看",
+            "好",
+            "自己",
+            "这",
+        }
+
+        filtered_words = [
+            word for word in words if len(word) > 1 and word not in stop_words
+        ]
+
+        word_freq = Counter(filtered_words)
+        word_frequency_result = word_freq.most_common(top_n)
+        end = time.perf_counter()
+        logger.info(
+            f"Generated word frequency for time range {start_time} to {end_time}. Elaspsed time: {end - start:.6f}s"
+        )
+
+        danmaku_analysis = DanmakuAnalysis(
+            type="combined_analysis",
+            start_time=start_time,
+            end_time=end_time,
+            room_id=room_id,
+            frequencies=json.dumps(word_frequency_result),
+        )
+        return danmaku_analysis
