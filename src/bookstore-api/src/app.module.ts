@@ -1,5 +1,4 @@
 import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BooksModule } from './books/books.module';
@@ -14,6 +13,7 @@ import configuration from './config/configuration';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { KeycloakMiddleware } from './auth/keycloak.middleware';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -22,13 +22,13 @@ import { KeycloakMiddleware } from './auth/keycloak.middleware';
       isGlobal: true,
       load: [configuration],
     }),
-    CacheModule.register(),
     DatabaseModule,
     AuthModule,
     BooksModule,
     AuthorsModule,
     DataSeedModule,
     RolesModule,
+    CacheModule,
   ],
   controllers: [AppController],
   providers: [

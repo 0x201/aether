@@ -3,6 +3,31 @@ import * as yaml from 'js-yaml';
 import { readFileSync } from 'fs';
 import { OtelConfig } from './otel.config';
 
+
+export interface CacheConfig {
+  host: string;
+  port: number;
+  password: string;
+  db: number;
+  rejectUnauth: boolean;
+  tls: {
+    ca: string;
+    cert: string;
+    key: string;
+  }
+}
+
+export interface MessagingConfig {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  exchange: string;
+  queue: string;
+  routingKey: string;
+}
+
+
 export interface AppConfig {
   database: {
     type: string;
@@ -26,6 +51,8 @@ export interface AppConfig {
     clientSecret: string;
     scopes: string[];
   };
+  cache: CacheConfig,
+  messaging: MessagingConfig,
 }
 
 console.log(`ENV: ${process.env.NODE_ENV}`);

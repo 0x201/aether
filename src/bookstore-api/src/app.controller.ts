@@ -2,10 +2,13 @@ import { Controller, Get } from '@nestjs/common';
 import { AllowAnonymous } from './auth/auth.guard';
 import { trace } from '@opentelemetry/api';
 import { DataSeedService } from './data-seed/data-seed.service';
+import { RedisService } from './cache/redis/redis.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly dataSeedService: DataSeedService) { }
+  constructor(private readonly dataSeedService: DataSeedService,
+    private readonly cache: RedisService
+  ) { }
 
   @AllowAnonymous()
   @Get('/health')
