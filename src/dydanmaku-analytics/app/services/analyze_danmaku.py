@@ -56,7 +56,7 @@ class DanmakuAnalyzer:
         top_n: int = 100,
         room_id: Optional[int] = None,
         perid_type: Optional[PeriodType] = None,
-    ):
+    ) -> None:
         if top_n <= 0:
             raise ValueError("top_n must be a positive integer")
 
@@ -152,7 +152,15 @@ class DanmakuAnalyzer:
         async with self.cache_session.get_cache() as cache:
             await cache.set(
                 name=key,
-                value=json.dumps(danmaku_analysis),
+                value=json.dumps(
+                    {
+                        "frequencies": danmaku_analysis.frequencies,
+                        "type": danmaku_analysis.type,
+                        "start_time": danmaku_analysis.start_time.isoformat(),
+                        "end_time": danmaku_analysis.end_time.isoformat(),
+                        "room_id": danmaku_analysis.room_id,
+                    }
+                ),
                 ex=timedelta(hours=1),
             )
 

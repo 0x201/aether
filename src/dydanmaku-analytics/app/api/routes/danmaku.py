@@ -54,7 +54,7 @@ async def generate_analysis(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
 
-    _ = analyzer.generate_analysis(
+    await analyzer.generate_analysis(
         top_n=100,
         start_time=start_dt,
         end_time=end_dt,
