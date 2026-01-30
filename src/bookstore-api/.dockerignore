@@ -1,12 +1,9 @@
-node_modules
-dist
+node_modules/
+dist/
 .env
-.git
+.git/
 .gitignore
 README.md
 .env.local
-.nyc_output
-coverage
-.nyc_output
-.vscode
+.vscode/
 .husky
