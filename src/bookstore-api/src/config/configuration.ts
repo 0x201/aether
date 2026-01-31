@@ -53,5 +53,14 @@ export default () => {
     password: process.env.EVENTBUS_PASSWORD,
   }
 
+  config.otel = {
+    ...config.otel,
+    OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS,
+    OTEL_EXPORTER_OTLP_PROTOCOL: process.env.OTEL_EXPORTER_OTLP_PROTOCOL,
+    OTEL_SERVICE_NAME: process.env.OTEL_SERVICE_NAME,
+
+  }
+
   return config;
 };

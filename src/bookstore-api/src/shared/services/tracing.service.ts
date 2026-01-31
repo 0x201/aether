@@ -30,22 +30,22 @@ export class TracingService implements OnModuleInit, OnApplicationShutdown {
     this.otelConfig = this.configService.get<OtelConfig>('otel');
 
     this.logger.log(
-      `Initializing OpenTelemetry with OTLP endpoint: ${this.otelConfig.otelServer}`,
+      `Initializing OpenTelemetry with OTLP endpoint: ${this.otelConfig.OTEL_EXPORTER_OTLP_ENDPOINT}`,
     );
-    this.logger.log(`Service name: ${this.otelConfig.serviceName}`);
+    this.logger.log(`Service name: ${this.otelConfig.OTEL_SERVICE_NAME}`);
 
     this.sdk = new NodeSDK({
       resource: resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: this.otelConfig.serviceName,
+        [ATTR_SERVICE_NAME]: this.otelConfig.OTEL_SERVICE_NAME,
         [ATTR_SERVICE_VERSION]: '0.1.0',
       }),
       logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter()),
       traceExporter: new OTLPTraceExporter({
-        url: this.otelConfig.otelServer,
+        url: this.otelConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
       }),
       metricReader: new PeriodicExportingMetricReader({
         exporter: new OTLPMetricExporter({
-          url: this.otelConfig.otelServer,
+          url: this.otelConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
         }),
         exportIntervalMillis: 5000,
       }),

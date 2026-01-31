@@ -8,10 +8,6 @@ database:
   timeout: 30000
   schema: "bookstore"
 
-otel:
-  otelServer: http://localhost:19109
-  serviceName: bookstore-api
-
 keycloak:
   realm: moderncsharp
   authServerUrl: http://localhost:8080

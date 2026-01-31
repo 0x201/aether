@@ -48,7 +48,9 @@ export interface AppConfig {
 }
 
 export interface OtelConfig {
-    otelServer: string;
-    serviceName: string;
+    OTEL_EXPORTER_OTLP_ENDPOINT: string;
+    OTEL_EXPORTER_OTLP_HEADERS: string;
+    OTEL_EXPORTER_OTLP_PROTOCOL: string;
+    OTEL_SERVICE_NAME: string;
 }
 
