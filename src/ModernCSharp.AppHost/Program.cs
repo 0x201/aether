@@ -70,6 +70,7 @@ var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api",
     .WithHttpEndpoint(port: 3011, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(redis).WaitFor(redis)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(keycloak).WaitFor(keycloak)
     .WithReference(bookstoredb).WaitFor(bookstoredb);
 
