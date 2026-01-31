@@ -23,7 +23,7 @@ export class Result<T> implements IResult<T> {
         this.data = data;
     }
 
-    static success<T>(data: T, message = 'Request successful'): Result<T> {
+    static success<T>(data: T, message = 'Request successfully'): Result<T> {
         return new Result<T>(200, message, data);
     }
 

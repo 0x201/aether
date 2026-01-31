@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis, { RedisOptions } from 'ioredis';
-import { CacheConfig } from 'src/config/configuration';
-import * as fs from 'fs';
+import { CacheConfig } from 'src/config/config.interface';
+import { readFileSync } from 'fs';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -12,6 +12,7 @@ export class RedisService implements OnModuleDestroy {
 
     constructor(private configService: ConfigService) {
         const cacheConfig = this.configService.get<CacheConfig>('cache');
+
         this.options = {
             host: cacheConfig.host,
             port: cacheConfig.port,
@@ -26,15 +27,16 @@ export class RedisService implements OnModuleDestroy {
                 this.logger.warn(`Redis connection failed, retrying in ${delay}ms...`);
                 return delay;
             },
-            tls: {
-                ca: fs.readFileSync(cacheConfig.tls.ca),
-                cert: fs.readFileSync(cacheConfig.tls.cert),
-                key: fs.readFileSync(cacheConfig.tls.key),
-                rejectUnauthorized: cacheConfig.rejectUnauth,
-            },
             lazyConnect: true,
             enableReadyCheck: true,
             connectTimeout: 10000,
+        }
+
+        if (cacheConfig.ssl) {
+            this.options.tls = {
+                ca: readFileSync(cacheConfig.tls.ca, 'utf8'),
+                rejectUnauthorized: cacheConfig.tls.rejectUnauth,
+            };
         }
     }
 

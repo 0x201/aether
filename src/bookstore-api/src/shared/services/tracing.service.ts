@@ -17,7 +17,7 @@ import {
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { GrpcInstrumentation } from '@opentelemetry/instrumentation-grpc';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { OtelConfig } from '../../config/otel.config';
+import { OtelConfig } from '../../config/config.interface';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

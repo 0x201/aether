@@ -2,11 +2,6 @@ NODE_ENV: Development
 HTTP_PORT: 3000
 
 database:
-  host: "127.0.0.1"
-  username: "postgres"
-  password: "Pass123$"
-  database: "bookstoredb"
-  port: 5432
   synchronize: false
   logging: false
   encrypt: true
@@ -24,19 +19,12 @@ keycloak:
   clientSecret: Ody6pEuqq3oSPJ7OaiwdZi6FN5AeljvN
 
 cache:
-  host: "localhost"
-  port: 6379
-  password: "Pass123$"
   db: 0
-  rejectUnauth: false
+  ssl: true
   tls:
-    ca: "D:\\dockerdata\\redis\\cert.pem"
-    cert: "D:\\dockerdata\\redis\\16F5D45BDF2184B56F2D23A2C802860B072B6A7B.crt"
-    key: "D:\\dockerdata\\redis\\16F5D45BDF2184B56F2D23A2C802860B072B6A7B.key"
+    rejectUnauth: false
 
 messaging:
-  host: "localhost"
-  port: 5672
-  username: "guest"
-  password: "Pass123$"
+  excchange: "mc_event_bus"
+  queue: "Bookstore"
   virtual_host: "/"

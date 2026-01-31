@@ -29,9 +29,6 @@ import { RoleMenu } from 'src/menus/entities/role-menu.entity';
           logging: configService.get('database.logging'),
           autoLoadEntities: configService.get('database.autoLoadEntities'),
           schema: configService.get('database.schema'),
-          // extra: {
-          //   options:
-          // }
         };
         return config;
       },
