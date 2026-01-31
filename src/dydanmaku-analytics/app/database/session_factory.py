@@ -226,6 +226,7 @@ class PostgreSQLSession:
         port: Optional[int] = 5432,
         username: Optional[str] = None,
         password: Optional[str] = None,
+        dbschema: Optional[str] = None,
         pool_size: int = 10,
         max_overflow: int = 20,
         pool_pre_ping: bool = True,
@@ -236,6 +237,7 @@ class PostgreSQLSession:
         self.port = port
         self.username = username
         self.password = password
+        self.dbschema = dbschema
         self.session_local: Optional[scoped_session] = None
         self.pool_size = pool_size
         self.max_overflow = max_overflow
@@ -303,7 +305,7 @@ class PostgreSQLSession:
                 pool_pre_ping=self.pool_pre_ping,
                 pool_recycle=self.pool_recycle,
                 future=True,
-                connect_args={"options": "-csearch_path=dydanmaku"},
+                connect_args={"options": f"-csearch_path={self.dbschema or "dydanmaku"}"},
             )
 
             self.session_local = scoped_session(
@@ -351,31 +353,15 @@ class SessionFactory:
         if self.database_instance is None:
             database_config = self._get_database_config()
 
-            if database_config.active_database == DatabaseType.SQLITE:
-                self.database_instance = SQLiteSession(
-                    database_path=database_config.sqlite.sqlite_path
-                )
-            elif database_config.active_database == DatabaseType.SQLSERVER:
-                if not database_config.sqlserver:
-                    raise ValueError("SQLServer config not found")
-                self.database_instance = MSSQLSession(
-                    server=database_config.sqlserver.server or "localhost",
-                    database=database_config.sqlserver.database or "dydanmaku",
-                    port=database_config.sqlserver.port,
-                    username=database_config.sqlserver.username,
-                    password=database_config.sqlserver.password,
-                    trusted_connection=database_config.sqlserver.trusted_connection,
-                )
-            else:
-                if not database_config.postgres:
-                    raise ValueError("PostgreSQL config not found")
-                self.database_instance = PostgreSQLSession(
-                    host=database_config.postgres.host or "localhost",
-                    database=database_config.postgres.database or "dydanmaku",
-                    port=database_config.postgres.port,
-                    username=database_config.postgres.username,
-                    password=database_config.postgres.password,
-                )
+            if not database_config.postgres:
+                raise ValueError("PostgreSQL config not found")
+            self.database_instance = PostgreSQLSession(
+                host=database_config.postgres.host,
+                database=database_config.postgres.database,
+                port=database_config.postgres.port,
+                username=database_config.postgres.username,
+                password=database_config.postgres.password,
+            )
         return self.database_instance
 
     def get_session(self):

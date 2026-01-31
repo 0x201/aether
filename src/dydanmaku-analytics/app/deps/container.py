@@ -5,6 +5,7 @@ from app.cache import CacheSession
 from app.services import AnalyticsNotification, DanmakuAnalyzer, NPPAGameAuditCrawler
 from app.database import DanmakuRepository, NPPARepository
 from app.schedulers import ScheduledDanmakuAnalyzer, ScheduledNPPACrawler
+from app.core import settings
 
 
 class Container(containers.DeclarativeContainer):
@@ -14,7 +15,7 @@ class Container(containers.DeclarativeContainer):
         modules=["app.api.routes.danmaku", "app.api.routes.nppa"]
     )
 
-    event_bus = providers.Singleton(EventBus, exchange_name="mc_event_bus")
+    event_bus = providers.Singleton(EventBus, exchange_name=settings.messaging.exchange or "mc_event_bus")
 
     analytics_notification = providers.Singleton(
         AnalyticsNotification, event_bus=event_bus

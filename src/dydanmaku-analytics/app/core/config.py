@@ -11,7 +11,7 @@ from pydantic_settings import (
     SettingsConfigDict,
     YamlConfigSettingsSource,
 )
-from .model import DatabaseConfig, SqliteConfig
+from .model import DatabaseConfig, PostgreSQLConfig, SqliteConfig
 from loguru import logger
 
 
@@ -79,26 +79,22 @@ class NPPAConfig(BaseSettings):
 class RabbitMQConfig(BaseSettings):
     """RabbitMQ configuration"""
 
-    host: str = Field(default="localhost", description="RabbitMQ host")
-    port: int = Field(default=5672, description="RabbitMQ port")
-    username: str = Field(default="guest", description="RabbitMQ username")
-    password: str = Field(default="guest", description="RabbitMQ password")
+    host: str = Field(default=os.getenv("EVENTBUS_HOST", "localhost"), description="RabbitMQ host")
+    port: int = Field(default=int(os.getenv("EVENTBUS_PORT", "5672")), description="RabbitMQ port")
+    username: str = Field(default=os.getenv("EVENTBUS_USERNAME", "guest"), description="RabbitMQ username")
+    password: str = Field(default=os.getenv("EVENTBUS_PASSWORD", "guest"), description="RabbitMQ password")
     virtual_host: str = Field(default="/", description="RabbitMQ virtual host")
+    exchange: str = Field(default="mc_event_bus", description="RabbitMQ exchange")
+    queue: str = Field(default="Danmaku", description="RabbitMQ queue")
 
 
 class RedisConfig(BaseSettings):
-    host: str = Field(default="localhost", description="Redis host")
-    port: int = Field(default=6379, description="Redis port")
-    password: Optional[str] = Field(default=None, description="Redis password")
-    ssl: bool = Field(default=False, description="Use SSL for Redis")
+    host: str = Field(default=os.getenv("REDIS_HOST", "localhost"), description="Redis host")
+    port: int = Field(default=int(os.getenv("REDIS_PORT", "6379")), description="Redis port")
+    password: Optional[str] = Field(default=os.getenv("REDIS_PASSWORD", None), description="Redis password")
+    ssl: bool = Field(default=bool(os.getenv("REDIS_SSL", "false").lower() == "true"), description="Use SSL for Redis")
     ssl_ca_certs: str = Field(
-        default="", description="Path to SSL CA certificates"
-    )
-    ssl_certfile: str = Field(
-        default="", description="Path to SSL certificate file"
-    )
-    ssl_keyfile: str = Field(
-        default="", description="Path to SSL key file"
+        default=os.getenv("SSL_CERT_FILE", ""), description="Path to SSL CA certificates"
     )
 
 
@@ -113,10 +109,14 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, description="Port to run the server on")
     databases: DatabaseConfig = Field(
         default=DatabaseConfig(
-            active_database="sqlite",
-            sqlserver=None,
-            sqlite=SqliteConfig(sqlite_path="danmaku.db"),
-            postgres=None,
+            postgres=PostgreSQLConfig(
+                host=os.getenv("DYDANMAKUDB_HOST", "localhost"),
+                port=int(os.getenv("DYDANMAKUDB_PORT", "5432")),
+                username=os.getenv("DYDANMAKUDB_USERNAME", "postgres"),
+                password=os.getenv("DYDANMAKUDB_PASSWORD", ""),
+                database=os.getenv("DYDANMAKUDB_DATABASENAME", "dydanmakudb"),
+                dbschema="dydanmaku"
+            ),
         ),
         description="Database configuration",
     )

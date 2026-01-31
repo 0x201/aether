@@ -5,26 +5,8 @@ cors:
   - "http://localhost:5173"
 
 databases:
-  active_database: "postgres"
-  sqlserver:
-    type: "sqlserver"
-    server: "127.0.0.1"
-    port: 14330
-    trusted_connection: false
-    username: "sa"
-    password: "Pass123$"
-    database: "dydanmakudb"
-  
-  sqlite:
-    type: "sqlite"
-    sqlite_path: "../danmaku.db"
-
   postgres:
-    host: "localhost"
-    port: 5432
-    username: "postgres"
-    password: ""
-    database: "dydanmakudb"
+    dbschema: "dydanmaku"
 
 logging:
   level: "INFO"
@@ -41,17 +23,9 @@ nppa:
   suffix: ".html"
 
 messaging:
-  host: "localhost"
-  port: 5672
-  username: "guest"
-  password: "Pass123$"
   virtual_host: "/"
+  exchange: "mc_event_bus"
+  queue: "Danmaku"
 
 cache:
-  host: "localhost"
-  port: 6379
-  password: "Pass123$"
   ssl: false
-  ssl_ca_certs: ""
-  ssl_certfile: ""
-  ssl_keyfile: ""
