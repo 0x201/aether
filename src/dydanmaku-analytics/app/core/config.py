@@ -77,24 +77,37 @@ class NPPAConfig(BaseSettings):
 
 
 class RabbitMQConfig(BaseSettings):
-    """RabbitMQ configuration"""
-
-    host: str = Field(default=os.getenv("EVENTBUS_HOST", "localhost"), description="RabbitMQ host")
-    port: int = Field(default=int(os.getenv("EVENTBUS_PORT", "5672")), description="RabbitMQ port")
-    username: str = Field(default=os.getenv("EVENTBUS_USERNAME", "guest"), description="RabbitMQ username")
-    password: str = Field(default=os.getenv("EVENTBUS_PASSWORD", "guest"), description="RabbitMQ password")
+    rabbitmq_host: str = Field(
+        default=os.getenv("EVENTBUS_HOST", "localhost"), description="RabbitMQ host"
+    )
+    rabbitmq_port: int = Field(
+        default=int(os.getenv("EVENTBUS_PORT", "5672")), description="RabbitMQ port"
+    )
+    rabbitmq_username: str = Field(
+        default=os.getenv("EVENTBUS_USERNAME", "guest"), description="RabbitMQ username"
+    )
+    rabbitmq_password: str = Field(
+        default=os.getenv("EVENTBUS_PASSWORD", "guest"), description="RabbitMQ password"
+    )
     virtual_host: str = Field(default="/", description="RabbitMQ virtual host")
     exchange: str = Field(default="mc_event_bus", description="RabbitMQ exchange")
     queue: str = Field(default="Danmaku", description="RabbitMQ queue")
 
 
 class RedisConfig(BaseSettings):
-    host: str = Field(default=os.getenv("REDIS_HOST", "localhost"), description="Redis host")
-    port: int = Field(default=int(os.getenv("REDIS_PORT", "6379")), description="Redis port")
-    password: Optional[str] = Field(default=os.getenv("REDIS_PASSWORD", None), description="Redis password")
-    ssl: bool = Field(default=bool(os.getenv("REDIS_SSL", "false").lower() == "true"), description="Use SSL for Redis")
+    redis_host: str = Field(
+        default=os.getenv("REDIS_HOST", "localhost"), description="Redis host"
+    )
+    redis_port: int = Field(
+        default=int(os.getenv("REDIS_PORT", "6379")), description="Redis port"
+    )
+    redis_password: Optional[str] = Field(
+        default=os.getenv("REDIS_PASSWORD", None), description="Redis password"
+    )
+    ssl: bool = Field(default=False, description="Use SSL for Redis")
     ssl_ca_certs: str = Field(
-        default=os.getenv("SSL_CERT_FILE", ""), description="Path to SSL CA certificates"
+        default=os.getenv("SSL_CERT_FILE", ""),
+        description="Path to SSL CA certificates",
     )
 
 
@@ -106,7 +119,9 @@ class Settings(BaseSettings):
         default="local", description="Environment to run the server in"
     )
     version: str = Field(default="0.0.1", description="Version of the server")
-    port: int = Field(default=8000, description="Port to run the server on")
+    port: int = Field(
+        default=int(os.getenv("PORT", "8000")), description="Port to run the server on"
+    )
     databases: DatabaseConfig = Field(
         default=DatabaseConfig(
             postgres=PostgreSQLConfig(
@@ -115,7 +130,7 @@ class Settings(BaseSettings):
                 username=os.getenv("DYDANMAKUDB_USERNAME", "postgres"),
                 password=os.getenv("DYDANMAKUDB_PASSWORD", ""),
                 database=os.getenv("DYDANMAKUDB_DATABASENAME", "dydanmakudb"),
-                dbschema="dydanmaku"
+                dbschema="dydanmaku",
             ),
         ),
         description="Database configuration",

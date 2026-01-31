@@ -1,14 +1,15 @@
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from redis.asyncio import Redis
 from app.core import settings
+from loguru import logger
 
 
 class CacheSession:
     def __init__(self):
-        self.host = settings.cache.host
-        self.port = settings.cache.port
-        self.password = settings.cache.password
+        self.host = settings.cache.redis_host
+        self.port = settings.cache.redis_port
+        self.password = settings.cache.redis_password
         self.ssl = settings.cache.ssl
         self.ssl_ca_certs = settings.cache.ssl_ca_certs
 

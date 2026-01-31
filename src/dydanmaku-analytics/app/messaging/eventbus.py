@@ -29,11 +29,11 @@ class EventBus(IEventBus):
     def _create_connection(self):
         try:
             credentials = pika.PlainCredentials(
-                settings.messaging.username, settings.messaging.password
+                settings.messaging.rabbitmq_username, settings.messaging.rabbitmq_password
             )
             parameters = pika.ConnectionParameters(
-                host=settings.messaging.host,
-                port=settings.messaging.port,
+                host=settings.messaging.rabbitmq_host,
+                port=settings.messaging.rabbitmq_port,
                 virtual_host=settings.messaging.virtual_host,
                 credentials=credentials,
                 heartbeat=600,
