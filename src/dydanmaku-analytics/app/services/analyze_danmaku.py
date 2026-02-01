@@ -28,6 +28,21 @@ class DanmakuAnalyzer:
         self.notifier = notifier
         self.cache_session = cache_session
 
+    @staticmethod
+    def _generate_cache_key(
+        key_prefix: str,
+        start_time: datetime,
+        end_time: datetime,
+        room_id: Optional[int],
+    ) -> str:
+        """
+        Generate a consistent cache key following the same format as the C# version
+        """
+        date_format = "%Y_%m_%d_%H_%M_%S"
+        room_id_str = str(room_id) if room_id is not None else "All"
+        cache_key = f"{key_prefix}:{start_time.strftime(date_format)}:{end_time.strftime(date_format)}:{room_id_str}"
+        return cache_key
+
     async def precompute_analyses(
         self,
         start_time: datetime,
@@ -76,10 +91,9 @@ class DanmakuAnalyzer:
         if room_id is not None and room_id < 0:
             raise ValueError("room_id must be a positive integer")
 
-        safe_start_time = start_time.isoformat().replace(":", "_").replace(".", "_")
-        safe_end_time = end_time.isoformat().replace(":", "_").replace(".", "_")
-
-        analysis_cache_key = f"danmaku_analysis:{safe_start_time}:{safe_end_time}:"
+        analysis_cache_key = self._generate_cache_key(
+            "danmaku_analysis", start_time, end_time, room_id
+        )
 
         danmaku_stmt = select(Danmaku.content).where(
             and_(
@@ -99,9 +113,7 @@ class DanmakuAnalyzer:
         if room_id:
             analysis_stmt = analysis_stmt.where(DanmakuAnalysis.room_id == room_id)
             danmaku_stmt = danmaku_stmt.where(Danmaku.room_id == room_id)
-            analysis_cache_key = f"{analysis_cache_key}{room_id}"
-        else:
-            analysis_cache_key = f"{analysis_cache_key}all"
+        # No need to append room_id to analysis_cache_key since it's already handled by _generate_cache_key
 
         async with self.cache_session.get_cache() as cache:
             cached_analysis = await cache.get(analysis_cache_key)

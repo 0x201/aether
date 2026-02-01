@@ -193,14 +193,6 @@ class ScheduledDanmakuAnalyzer:
         )
 
         try:
-            # precompute analyses for overall statistics
-            await self.analyzer.precompute_analyses(
-                start_time=start_time,
-                end_time=end_time,
-                room_id=None,
-                period_type=period_type,
-            )
-            # precompute analyses for all rooms
             await self.analyzer.precompute_for_all_rooms(
                 period_type, start_time, end_time
             )

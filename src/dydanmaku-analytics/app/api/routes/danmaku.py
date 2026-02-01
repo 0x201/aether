@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from app.deps import DanmakuAnalyzerDep
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Body, HTTPException
 from dependency_injector.wiring import inject
 from app.dataclass import PeriodType
 
@@ -36,13 +36,13 @@ def convert_to_utc(dt_str: str) -> datetime:
 @inject
 async def generate_analysis(
     analyzer: DanmakuAnalyzerDep,
-    start_time: str = Query(
+    start_time: str = Body(
         ..., description="Start time in ISO 8601 format (e.g., 2026-01-11T10:00:00Z)"
     ),
-    end_time: str = Query(
+    end_time: str = Body(
         ..., description="End time in ISO 8601 format (e.g., 2026-01-11T10:00:00Z)"
     ),
-    room_id: Optional[int] = Query(None, description="Filter by room ID"),
+    room_id: Optional[int] = Body(None, description="Filter by room ID"),
 ):
     if not start_time or not end_time:
         raise HTTPException(
