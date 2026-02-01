@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import datetime
-import random
 import re
 
 from enum import Enum
@@ -227,7 +226,6 @@ class NPPAGameAuditCrawler:
         self.suffix = settings.nppa.suffix
         self.playwright = None
         self.browser = None
-        self.random_number = random.randint(1, 1000_000)
         self.nppa_repository = nppa_repository
 
     async def run(self, mode: int = 0) -> None:
@@ -250,10 +248,7 @@ class NPPAGameAuditCrawler:
         """Initialize the browser instance"""
         if self.browser is None:
             self.playwright = await async_playwright().start()
-            if self.random_number % 2 == 0:
-                self.browser = await self.playwright.chromium.launch()
-            else:
-                self.browser = await self.playwright.firefox.launch()
+            self.browser = await self.playwright.chromium.launch()
 
     async def _close_browser(self):
         """Close the browser instance"""
