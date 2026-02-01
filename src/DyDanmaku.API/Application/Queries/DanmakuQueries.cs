@@ -8,8 +8,7 @@ public class DanmakuQueries(
     public async Task<Result<IReadOnlyList<WordFrequency>>> GetAnalysisData(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<WordFrequency> wordFrequencies = [];
-        var roomIdStr = request.RoomId.HasValue ? request.RoomId.ToString() : "All";
-        var cacheKey = $"danmaku_analysis:{request.StartTime:yyyyMMddTHHmmssZ}:{request.EndTime:yyyyMMddTHHmmssZ}:{roomIdStr}";
+        var cacheKey =GenerateCacheKey("danmaku_analysis", request.StartTime, request.EndTime, request.RoomId);
         var cacheValue = await cache.GetDatabase().StringGetAsync(cacheKey);
 
         if (cacheValue.HasValue)
@@ -140,38 +139,10 @@ public class DanmakuQueries(
         var res = PagedListResult<RoomDto>.Success(RoomMapping.MapToDtos(rooms), totalCount);
         return res;
     }
-
-    static List<WordFrequency> ParseFrequenciesFromNestedArray(string frequenciesJson, int? topN)
-    {
-        using var jsonDoc = JsonDocument.Parse(frequenciesJson);
-        var jsonArray = jsonDoc.RootElement;
-
-        if (jsonArray.ValueKind != JsonValueKind.Array)
-            return [];
-        var count = topN.GetValueOrDefault(20);
-        var result = new List<WordFrequency>(count);
-
-        foreach (var item in jsonArray.EnumerateArray().Take(count))
-        {
-            if (item.GetArrayLength() >= 2)
-            {
-                var word = item[0].GetString() ?? string.Empty;
-                var wordCount = item[1].GetInt32();
-
-                result.Add(new WordFrequency
-                {
-                    Word = word,
-                    Count = wordCount
-                });
-            }
-        }
-        return result;
-    }
-
+    
     public async Task<Result<DanmakuStats>> GetDanmakuStats(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default)
     {
-        var roomIdStr = request.RoomId.HasValue ? request.RoomId.Value.ToString() : "all";
-        var cacheKey = $"danmaku-stats:{request.StartTime:yyyyMMddTHHmmssZ}:{request.EndTime:yyyyMMddTHHmmssZ}:{roomIdStr}";
+        var cacheKey = GenerateCacheKey("danmaku_stats", request.StartTime, request.EndTime, request.RoomId);
 
         var cacheValue = await cache.GetDatabase().StringGetAsync(cacheKey);
 
@@ -287,7 +258,7 @@ public class DanmakuQueries(
     {
         var job = await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
-        
+
         var dto = job is null ? null : new CaptureJobDto(
             job.Id,
             job.RoomId,
@@ -302,5 +273,40 @@ public class DanmakuQueries(
             return Result<CaptureJobDto>.Failure(HttpStatusCode.NotFound, "No active job found", null);
         }
         return Result<CaptureJobDto>.Success(dto);
+    }
+
+    static List<WordFrequency> ParseFrequenciesFromNestedArray(string frequenciesJson, int? topN)
+    {
+        using var jsonDoc = JsonDocument.Parse(frequenciesJson);
+        var jsonArray = jsonDoc.RootElement;
+
+        if (jsonArray.ValueKind != JsonValueKind.Array)
+            return [];
+        var count = topN.GetValueOrDefault(20);
+        var result = new List<WordFrequency>(count);
+
+        foreach (var item in jsonArray.EnumerateArray().Take(count))
+        {
+            if (item.GetArrayLength() >= 2)
+            {
+                var word = item[0].GetString() ?? string.Empty;
+                var wordCount = item[1].GetInt32();
+
+                result.Add(new WordFrequency
+                {
+                    Word = word,
+                    Count = wordCount
+                });
+            }
+        }
+        return result;
+    }
+
+    static string GenerateCacheKey(string keyPrefix, DateTimeOffset? startDateTime, DateTimeOffset? endDateTime, int? roomId)
+    {
+        var dateFormat = "yyyy_MM_dd_HH_mm_ss";
+        var roomIdStr = roomId.HasValue ? roomId.ToString() : "All";
+        var cacheKey = $"{keyPrefix}:{startDateTime?.ToString(dateFormat)}:{endDateTime?.ToString(dateFormat)}:{roomIdStr}";
+        return cacheKey;
     }
 }
