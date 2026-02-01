@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.deps import DanmakuAnalyzerDep, CacheSessionDep
+from app.deps import DanmakuAnalyzerDep
 from fastapi import APIRouter, HTTPException, Query
 from dependency_injector.wiring import inject
+from app.dataclass import PeriodType
 
 from .timed_route import TimedRoute
 
@@ -54,22 +55,18 @@ async def generate_analysis(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
 
-    await analyzer.generate_analysis(
-        top_n=100,
-        start_time=start_dt,
-        end_time=end_dt,
-        room_id=room_id,
-    )
+    if room_id:
+        await analyzer.precompute_analyses(
+            period_type=PeriodType.HOURLY,
+            start_time=start_dt,
+            end_time=end_dt,
+            room_id=room_id,
+        )
+    else:
+        await analyzer.precompute_for_all_rooms(
+            period_type=PeriodType.HOURLY,
+            start_time=start_dt,
+            end_time=end_dt,
+        )
 
     return {"message": "Analysis generated"}
-
-
-@router.get("/analysis/cache")
-@inject
-async def cached_analyses(
-    cache_session: CacheSessionDep,
-):
-    async with cache_session.get_cache() as cache:
-        await cache.set("fastapi-test-key", "hello from fastapi")
-
-    return {"message": "Cache set"}

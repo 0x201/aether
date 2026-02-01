@@ -5,8 +5,8 @@ Data analysis module for Douyu danmu
 import json
 import time
 from collections import Counter
-from datetime import datetime, timedelta
-from typing import LiteralString, Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 import jieba3
 from app.cache import CacheSession
@@ -36,13 +36,17 @@ class DanmakuAnalyzer:
         period_type: Optional[PeriodType] = None,
     ):
         """Precompute word frequency and wordcloud data for a time range in a single entry"""
+
+        if start_time > end_time:
+            raise ValueError("start_time must be before end_time")
+
         # Generate both word frequency and wordcloud data
         await self.generate_analysis(
             start_time=start_time,
             end_time=end_time,
             top_n=100,
             room_id=room_id,
-            perid_type=period_type,
+            period_type=period_type,
         )
 
         logger.info(
@@ -55,7 +59,7 @@ class DanmakuAnalyzer:
         end_time: datetime,
         top_n: int = 100,
         room_id: Optional[int] = None,
-        perid_type: Optional[PeriodType] = None,
+        period_type: Optional[PeriodType] = None,
     ) -> None:
         if top_n <= 0:
             raise ValueError("top_n must be a positive integer")
@@ -66,9 +70,16 @@ class DanmakuAnalyzer:
         if self.cache_session is None:
             raise ValueError("Cache session is required for analysis")
 
-        analysis_cache_key = (
-            f"danmaku_analysis:{start_time.isoformat()}:{end_time.isoformat()}:"
-        )
+        if start_time > end_time:
+            raise ValueError("start_time must be before end_time")
+
+        if room_id is not None and room_id < 0:
+            raise ValueError("room_id must be a positive integer")
+
+        safe_start_time = start_time.isoformat().replace(":", "_").replace(".", "_")
+        safe_end_time = end_time.isoformat().replace(":", "_").replace(".", "_")
+
+        analysis_cache_key = f"danmaku_analysis:{safe_start_time}:{safe_end_time}:"
 
         danmaku_stmt = select(Danmaku.content).where(
             and_(
@@ -138,7 +149,7 @@ class DanmakuAnalyzer:
                 start_date=danmaku_analysis.start_time.isoformat(),
                 end_date=danmaku_analysis.end_time.isoformat(),
                 period_type=(
-                    perid_type.value if perid_type else PeriodType.REALTIME.value
+                    period_type.value if period_type else PeriodType.REALTIME.value
                 ),
                 frequencies_count=(
                     len(danmaku_analysis.frequencies)
@@ -147,6 +158,41 @@ class DanmakuAnalyzer:
                 ),
                 completed_at=danmaku_analysis.created_at.isoformat(),
             )
+
+    async def precompute_for_all_rooms(
+        self,
+        period_type: PeriodType,
+        start_time: datetime,
+        end_time: datetime,
+    ) -> None:
+        # Precompute for overview statistics
+        await self.precompute_analyses(
+            start_time=start_time,
+            end_time=end_time,
+            period_type=period_type,
+        )
+        stmt = (
+            select(Danmaku.room_id)
+            .where(
+                Danmaku.created_at >= datetime.now(timezone.utc) - timedelta(hours=24),
+                Danmaku.room_id.isnot(None),
+            )
+            .distinct()
+        )
+        with self.session_factory.get_session() as session:
+            recent_rooms = session.execute(stmt).scalars().all()
+
+        for room_result in recent_rooms:
+            room_id = room_result
+            try:
+                await self.precompute_analyses(
+                    start_time=start_time,
+                    end_time=end_time,
+                    room_id=room_id,
+                    period_type=period_type,
+                )
+            except Exception as e:
+                logger.error(f"Error precomputing analyses for room {room_id}: {e}")
 
     async def _set_analysis_cache(self, key: str, danmaku_analysis: DanmakuAnalysis):
         async with self.cache_session.get_cache() as cache:
@@ -170,7 +216,7 @@ class DanmakuAnalyzer:
         start_time: datetime,
         end_time: datetime,
         top_n: int,
-        text: LiteralString,
+        text: str,
     ) -> DanmakuAnalysis:
         tokenizer = jieba3.jieba3()
         start = time.perf_counter()

@@ -193,48 +193,17 @@ class ScheduledDanmakuAnalyzer:
         )
 
         try:
+            # precompute analyses for overall statistics
             await self.analyzer.precompute_analyses(
                 start_time=start_time,
                 end_time=end_time,
                 room_id=None,
                 period_type=period_type,
             )
-
-            await self._precompute_for_all_rooms(period_type, start_time, end_time)
+            # precompute analyses for all rooms
+            await self.analyzer.precompute_for_all_rooms(
+                period_type, start_time, end_time
+            )
 
         except Exception as e:
             logger.error(f"Error during scheduled precomputation: {e}")
-
-    async def _precompute_for_all_rooms(
-        self,
-        period_type: PeriodType,
-        start_time: datetime,
-        end_time: datetime,
-    ):
-        """Precompute analyses for all rooms individually"""
-
-        # Get all unique room IDs that had activity in the last 24 hours
-        stmt = (
-            select(Danmaku.room_id)
-            .where(
-                Danmaku.created_at >= datetime.now(timezone.utc) - timedelta(hours=24),
-                Danmaku.room_id.isnot(None),
-            )
-            .distinct()
-        )
-        with self.session_factory.get_session() as session:
-            recent_rooms = session.execute(stmt).scalars().all()
-
-        for room_result in recent_rooms:
-            room_id = room_result
-            try:
-                await self.analyzer.precompute_analyses(
-                    start_time=start_time,
-                    end_time=end_time,
-                    room_id=room_id,
-                    period_type=period_type,
-                )
-
-                logger.info(f"Precomputed analyses for room {room_id}")
-            except Exception as e:
-                logger.error(f"Error precomputing analyses for room {room_id}: {e}")
