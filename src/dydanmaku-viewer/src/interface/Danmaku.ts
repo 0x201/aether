@@ -10,3 +10,8 @@ export interface Danmaku {
   roomName?: string;
   createdAt: string;
 }
+
+export interface Room {
+  roomId: number;
+  anchorName: string;
+}

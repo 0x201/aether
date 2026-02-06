@@ -57,8 +57,3 @@ export interface DashboardActions {
   setDateRange: (range: DateRange) => void;
   refreshData: () => void;
 }
-
-export interface Room {
-  roomId: number;
-  anchorName: string;
-}

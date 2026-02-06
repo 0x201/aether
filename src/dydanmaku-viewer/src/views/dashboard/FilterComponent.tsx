@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DatePicker, Select, Row, Col } from 'antd';
 import type { Dayjs } from 'dayjs';
-import type { Room } from './type';
+import type { Room } from '@/src/interface/Danmaku';
 
 const { RangePicker } = DatePicker;
 

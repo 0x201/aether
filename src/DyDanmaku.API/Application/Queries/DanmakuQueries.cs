@@ -129,12 +129,20 @@ public class DanmakuQueries(
                 .WhereIf(!string.IsNullOrEmpty(request.RoomName), d => d.RoomName!.Contains(request.RoomName!))
                 .WhereIf(request.RoomId.HasValue, d => d.RoomId == request.RoomId);
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        if (!string.IsNullOrEmpty(request.Sorter))
+        {
+            query = query.OrderBy(request.Sorter);
+        }
+        else
+        {
+            query = query.OrderByDescending(x => x.RoomId);
+        }
 
         var rooms = await query
-            .OrderByDescending(x => x.RoomId)
             .PagedBy(request.Page, request.PageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var res = PagedListResult<RoomDto>.Success(RoomMapping.MapToDtos(rooms), totalCount);
         return res;

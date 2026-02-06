@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import config from '@/src/config';
-import type { DateRange, DanmakuStatsResponse, DashboardData, WordFreqResponse, Room } from './type';
+import type { DateRange, DanmakuStatsResponse, DashboardData, WordFreqResponse } from './type';
+import type { Room } from '@/src/interface/Danmaku';
 import dayjs from 'dayjs';
 
 const { apiBaseUrl, apiVersion } = config;
@@ -117,6 +118,8 @@ export const useDashboardData = (defaultHours: number = 1) => {
       if (search) {
         queryParams.append('search', search);
       }
+
+      queryParams.append('sorter', 'id asc');
       const endpoint = `${baseUrl}/rooms?${queryParams}`;
 
       const response = await fetch(endpoint);

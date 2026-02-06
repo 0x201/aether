@@ -13,6 +13,8 @@ import {
   Pagination,
   Select,
   type SelectProps,
+  Spin,
+  Empty,
 } from 'antd';
 import {
   PlayCircleOutlined,
@@ -24,11 +26,13 @@ import type { CaptureJob, CaptureJobList } from './type';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import "./CaptureView.css"
 import { buildSorter } from '@/src/util';
+import type { Room } from '@/src/interface/Danmaku';
 
 
 const { Title } = Typography;
-const { apiBaseUrl, apiVersion } = config;
+const { apiVersion } = config;
 const captureEndpoint = `/api/${apiVersion}/danmakus/capture`;
+const roomEndpoint = `/api/${apiVersion}/danmakus/rooms`;
 
 // Status mapping configuration
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
@@ -59,6 +63,39 @@ const CaptureView: React.FC = () => {
   const [isCaptureSuccess, setIsCaptureSuccess] = useState<boolean>(false);
   const [sort, setSort] = useState<string | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
+  const [roomOptions, setRoomOptions] = useState<{ value: string, label: string }[]>([]);
+  const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
+
+  const fetchRooms = useCallback(async () => {
+    setLoadingRooms(true);
+    try {
+      const response = await fetch(`${roomEndpoint}?page=1&pageSize=100&sorter=id asc`);
+      if (response.ok) {
+        const data = await response.json();
+        const options = data.data.map((room: Room) => ({
+          value: room.roomId.toString(),
+          label: `${room.anchorName} (房间ID: ${room.roomId})`
+        }));
+        setRoomOptions(options);
+      } else {
+        messageApi.error('获取房间列表失败');
+      }
+    } catch (error) {
+      console.error('获取房间列表时发生错误:', error);
+      messageApi.error('获取房间列表时发生错误');
+    } finally {
+      setLoadingRooms(false);
+    }
+  }, [messageApi, roomEndpoint]);
+
+  const openStartModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setRoomId('');
+  };
 
   const fetchJobs = useCallback(async (page: number = 1, pageSize: number = 10, sorter: string | null) => {
     setLoading(true);
@@ -86,7 +123,8 @@ const CaptureView: React.FC = () => {
 
   useEffect(() => {
     fetchJobs(currentPage, pageSize, sort);
-  }, [currentPage, pageSize, sort, fetchJobs]);
+    fetchRooms();
+  }, [currentPage, pageSize, sort, fetchJobs, fetchRooms]);
 
   const handlePageChange = (page: number, limit?: number) => {
     setCurrentPage(page);
@@ -235,15 +273,6 @@ const CaptureView: React.FC = () => {
     setSort(sortString);
   };
 
-  const openStartModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setIsModalVisible(false);
-    setRoomId('');
-  };
-
   return (
     <div className='capture-container'>
       {contextHolder}
@@ -312,12 +341,33 @@ const CaptureView: React.FC = () => {
           <Form.Item
             label="房间ID"
             required
-            rules={[{ required: true, message: '请输入房间URL' }]}
+            rules={[{ required: true, message: '请输入房间ID' }]}
           >
-            <Input
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              placeholder="请输入斗鱼房间ID，例如: 123456"
+            <Select
+              showSearch={{
+                filterOption: (input, option) =>
+                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase()) ||
+                  (option?.value ?? '').toString().toLowerCase().includes(input.toLowerCase())
+              }}
+              placeholder="请选择或输入房间ID，例如: 123456"
+              onChange={(value) => setRoomId(value)}
+              options={roomOptions}
+              loading={loadingRooms}
+              notFoundContent={loadingRooms ? <Spin size="small" /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无数据" />}
+              popupRender={(menu) => (
+                <>
+                  {menu}
+                  <div style={{ padding: '8px', borderTop: '1px solid #f0f0f0' }}>
+                    <span>或手动输入房间ID:</span>
+                    <Input
+                      value={roomId}
+                      onChange={(e) => setRoomId(e.target.value)}
+                      placeholder="手动输入房间ID，例如: 123456"
+                      style={{ marginTop: '4px' }}
+                    />
+                  </div>
+                </>
+              )}
             />
           </Form.Item>
 
@@ -326,10 +376,29 @@ const CaptureView: React.FC = () => {
             required
           >
             <Select
-              mode="tags"
-              options={durationOptions}
-              onChange={(v: string) => setCaptureDuration(Number(v))}
+              showSearch={{
+                filterOption: (input, option) =>
+                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase()) ||
+                  (option?.value ?? '').toString().toLowerCase().includes(input.toLowerCase())
+              }}
               placeholder="请选择或输入捕获时长(秒)，默认3600秒(1小时)"
+              onChange={(v: string) => setCaptureDuration(Number(v))}
+              options={durationOptions}
+              popupRender={(menu) => (
+                <>
+                  {menu}
+                  <div style={{ padding: '8px', borderTop: '1px solid #f0f0f0' }}>
+                    <span>或手动输入时长(秒):</span>
+                    <Input
+                      type="number"
+                      min="1"
+                      onChange={(e) => setCaptureDuration(Number(e.target.value))}
+                      placeholder="手动输入捕获时长(秒)，例如: 7200"
+                      style={{ marginTop: '4px' }}
+                    />
+                  </div>
+                </>
+              )}
             />
           </Form.Item>
         </Form>
