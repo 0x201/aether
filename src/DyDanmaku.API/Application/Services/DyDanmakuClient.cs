@@ -47,9 +47,6 @@ public class DyDanmakuClient(
             StartHeartbeat();
 
             await combinedCts.Token.WhenCanceled();
-
-            logger.LogInformation("Danmaku capture completed for room [{RoomId}] due to timeout", RoomId);
-            await captureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed, combinedCts.Token);
         }
         catch (OperationCanceledException)
         {

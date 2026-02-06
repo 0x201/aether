@@ -7,7 +7,8 @@ public class DanmakuCaptureService(
     IConfiguration configuration,
     ILogger<DanmakuCaptureService> logger) : IDanmakuCaptureService
 {
-    private readonly ConcurrentDictionary<int, string> _activeTasks = [];
+    private int? _currentRoomId;
+    private string? _currentTaskId;
     private Action<int>? _onCaptureCompleted;
 
     public void SetCleanupCallback(Action<int> onCaptureCompleted)
@@ -17,32 +18,31 @@ public class DanmakuCaptureService(
 
     public async Task StartAsync(int roomId, int duration = 3600)
     {
-        var taskId = $"capture_{roomId}";
-
-        if (_activeTasks.ContainsKey(roomId))
+        if (_currentRoomId.HasValue)
         {
             logger.LogWarning("A capture job for room [{RoomId}] is already running", roomId);
             return;
         }
 
-        await UpdateRoomInfo(roomId);
+        var taskId = $"capture_{roomId}";
+        _currentRoomId = roomId;
+        _currentTaskId = taskId;
 
-        using var scope = serviceProvider.CreateScope();
-        var scopedCaptureJobService = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
-        await scopedCaptureJobService.CreateJobAsync(roomId, duration);
+        await UpdateRoomInfo(roomId);
 
         logger.LogInformation("Starting danmaku capture for [{RoomId}] - Duration: {Duration}s", roomId, duration);
 
-        var added = await memoryTaskScheduler.AddTaskAsync(taskId, async (ct) =>
+        var added = await memoryTaskScheduler.AddTaskAsync(taskId, async (cts) =>
         {
-            var clientPool = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<DyDanmakuClientPool>();
+            var scope = serviceProvider.CreateScope();
+            var clientPool = scope.ServiceProvider.GetRequiredService<DyDanmakuClientPool>();
 
             DyDanmakuClient scopedClient = await clientPool.RentAsync();
-            var innerCaptureJobService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<ICaptureJobRepository>();
+            var innerCaptureJobService = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
 
             try
             {
-                await scopedClient.StartAsync(roomId, duration, ct);
+                await scopedClient.StartAsync(roomId, duration, cts);
 
                 await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed);
                 logger.LogInformation("Danmaku capture for room [{RoomId}] completed normally", roomId);
@@ -68,41 +68,39 @@ public class DanmakuCaptureService(
                     scopedClient?.Dispose();
                 }
 
-                _activeTasks.TryRemove(roomId, out _);
+                if (_currentRoomId == roomId)
+                {
+                    Reset();
+                }
 
                 _onCaptureCompleted?.Invoke(roomId);
             }
         });
 
-        if (added)
+        if (!added)
         {
-            _activeTasks[roomId] = taskId;
-        }
-    }
-
-    public async Task StopAsync(int roomId)
-    {
-        if (!_activeTasks.TryGetValue(roomId, out var taskId))
-        {
-            logger.LogWarning("No active capture job found for room [{RoomId}]", roomId);
+            logger.LogError("Failed to add task to scheduler for room [{RoomId}]", roomId);
+            Reset();
             return;
         }
+        using var scope = serviceProvider.CreateScope();
+        var scopedCaptureJobService = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
+        await scopedCaptureJobService.CreateJobAsync(roomId, duration);
+    }
 
-        logger.LogInformation("Stopping danmaku capture for room [{RoomId}] with taskId [{TaskId}]", roomId, taskId);
-
-        await memoryTaskScheduler.CancelTaskAsync(taskId);
+    private void Reset()
+    {
+        _currentTaskId = null;
+        _currentRoomId = null;
     }
 
     public async Task StopAsync()
     {
-        logger.LogInformation("Stopping all danmaku capture jobs");
-
-        foreach (var roomId in _activeTasks.Keys.ToList())
+        if (_currentTaskId != null && _currentRoomId.HasValue)
         {
-            if (_activeTasks.TryGetValue(roomId, out var taskId))
-            {
-                await memoryTaskScheduler.CancelTaskAsync(taskId);
-            }
+            logger.LogInformation("Stopping danmaku capture for room [{RoomId}]", _currentRoomId);
+
+            await memoryTaskScheduler.CancelTaskAsync(_currentTaskId);
         }
     }
 

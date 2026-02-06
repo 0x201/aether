@@ -5,43 +5,65 @@ public class CaptureJobManager(
     ILogger<CaptureJobManager> logger) : BackgroundService, ICaptureJobManager
 {
     private readonly ConcurrentDictionary<int, ActiveCaptureJob> _activeJobs = [];
-    private readonly Channel<(int roomId, int? duration, TaskCompletionSource<bool> tcs)> _startRequests =
-        Channel.CreateBounded<(int roomId, int? duration, TaskCompletionSource<bool> tcs)>(100);
-    private readonly Channel<(int roomId, int? duration, TaskCompletionSource<bool> tcs)> _stopRequests =
-        Channel.CreateBounded<(int roomId, int? duration, TaskCompletionSource<bool> tcs)>(100);
+    private enum RequestType
+    {
+        Start,
+        Stop
+    }
 
+    private readonly Channel<(RequestType type, int roomId, int? duration, TaskCompletionSource<bool> tcs)> _requests =
+        Channel.CreateBounded<(RequestType type, int roomId, int? duration, TaskCompletionSource<bool> tcs)>(100);
+    
     public async Task<bool> StartAsync(int roomId, int? duration, CancellationToken cancellationToken = default)
     {
         var tcs = new TaskCompletionSource<bool>();
-        await _startRequests.Writer.WriteAsync((roomId, duration, tcs), cancellationToken);
+        await _requests.Writer.WriteAsync((RequestType.Start, roomId, duration, tcs), cancellationToken);
         return await tcs.Task;
     }
 
     public async Task<bool> StopAsync(int roomId, CancellationToken cancellationToken = default)
     {
         var tcs = new TaskCompletionSource<bool>();
-        await _stopRequests.Writer.WriteAsync((roomId, null, tcs), cancellationToken);
+        await _requests.Writer.WriteAsync((RequestType.Stop, roomId, null, tcs), cancellationToken);
         return await tcs.Task;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var startTask = ProcessStartRequests(stoppingToken);
+        var processTask = ProcessRequests(stoppingToken);
 
-        var stopTask = ProcessStopRequests(stoppingToken);
-
-        await Task.WhenAll(startTask, stopTask);
+        try
+        {
+            await processTask;
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal shutdown, no error logging
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unhandled exception occurred while processing danmaku capture job requests");
+        }
     }
 
-    private async Task ProcessStartRequests(CancellationToken stoppingToken)
+    private async Task ProcessRequests(CancellationToken stoppingToken)
     {
         try
         {
-            await foreach (var (roomId, duration, tcs) in _startRequests.Reader.ReadAllAsync(stoppingToken))
+            await foreach (var (type, roomId, duration, tcs) in _requests.Reader.ReadAllAsync(stoppingToken))
             {
                 try
                 {
-                    var result = await ProcessStartRequestInternal(roomId, duration, stoppingToken);
+                    bool result = false;
+                    switch (type)
+                    {
+                        case RequestType.Start:
+                            result = await ProcessStartRequestInternal(roomId, duration, stoppingToken);
+                            break;
+                        case RequestType.Stop:
+                            result = await ProcessStopRequestInternal(roomId, stoppingToken);
+                            break;
+                    }
                     tcs.SetResult(result);
                 }
                 catch (Exception ex)
@@ -50,34 +72,21 @@ public class CaptureJobManager(
                 }
             }
         }
-        catch (OperationCanceledException) { }
-
-    }
-
-    private async Task ProcessStopRequests(CancellationToken stoppingToken)
-    {
-        try
+        catch (OperationCanceledException)
         {
-            await foreach (var (roomId, _, tcs) in _stopRequests.Reader.ReadAllAsync(stoppingToken))
-            {
-                try
-                {
-                    var result = await ProcessStopRequestInternal(roomId, stoppingToken);
-                    tcs.SetResult(result);
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            }
+            logger.LogTrace("Request processor was cancelled");
         }
-        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while processing requests");
+        }
     }
 
     private async Task<bool> ProcessStartRequestInternal(int roomId, int? duration, CancellationToken cancellationToken)
     {
         if (_activeJobs.ContainsKey(roomId))
         {
+            logger.LogInformation("Room {RoomId} already has an active job, cannot start duplicate", roomId);
             return false;
         }
 
@@ -87,17 +96,11 @@ public class CaptureJobManager(
         var existingJob = await jobRepository.GetActiveJobByRoomIdAsync(roomId, cancellationToken);
         if (existingJob is not null)
         {
+            logger.LogInformation("An active job for room {RoomId} already exists in the database, cannot start a new job", roomId);
             return false;
         }
 
-        var taskScope = serviceProvider.CreateScope();
-        var service = new DanmakuCaptureService(
-            taskScope.ServiceProvider.GetRequiredService<IServiceProvider>(),
-            taskScope.ServiceProvider.GetRequiredService<IMemoryTaskScheduler>(),
-            taskScope.ServiceProvider.GetRequiredService<IHttpClientFactory>(),
-            taskScope.ServiceProvider.GetRequiredService<IConfiguration>(),
-            taskScope.ServiceProvider.GetRequiredService<ILogger<DanmakuCaptureService>>()
-        );
+        var service = CreateDanmakuCaptureService();
 
         service.SetCleanupCallback(OnCaptureCompleted);
 
@@ -105,11 +108,27 @@ public class CaptureJobManager(
         if (jobRecord is null)
         {
             logger.LogError("Failed to create job record for room {RoomId}", roomId);
-            taskScope.Dispose();
             return false;
         }
 
-        await service.StartAsync(roomId, duration.GetValueOrDefault(3600));
+        try
+        {
+            await service.StartAsync(roomId, duration.GetValueOrDefault(3600));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to start danmaku capture service for room {RoomId}", roomId);
+            // If startup fails, attempt to update the job status to failed
+            try
+            {
+                await jobRepository.UpdateJobStatusAsync(roomId, JobStatus.Failed, cancellationToken);
+            }
+            catch (Exception repoEx)
+            {
+                logger.LogError(repoEx, "Error updating job status to failed for room {RoomId}", roomId);
+            }
+            return false;
+        }
 
         var activeJob = new ActiveCaptureJob
         {
@@ -120,52 +139,51 @@ public class CaptureJobManager(
 
         _activeJobs.TryAdd(roomId, activeJob);
 
-        logger.LogInformation("Started capture for room {RoomId}", roomId);
+        logger.LogInformation("Started danmaku capture for room {RoomId}", roomId);
         return true;
     }
 
     private async Task<bool> ProcessStopRequestInternal(int roomId, CancellationToken cancellationToken)
     {
-        bool wasRunning = false;
-
         if (_activeJobs.TryGetValue(roomId, out var activeJob))
         {
-            await activeJob.Service.StopAsync();
-            _activeJobs.TryRemove(roomId, out _);
-            wasRunning = true;
-        }
-
-        using var scope = serviceProvider.CreateScope();
-        var jobRepository = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
-
-        var activeJobInDb = await jobRepository.GetActiveJobByRoomIdAsync(roomId, cancellationToken);
-
-        if (activeJobInDb is not null)
-        {
-            await jobRepository.UpdateJobStatusAsync(roomId, JobStatus.Cancelled, cancellationToken);
-
-            logger.LogInformation("Stopped capture for room {RoomId}, updated DB status to {Status}", roomId, JobStatus.Cancelled);
+            try
+            {
+                await activeJob.Service.StopAsync();
+                logger.LogInformation("Successfully stopped danmaku capture service for room {RoomId}", roomId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error stopping danmaku capture service for room {RoomId}", roomId);
+                return false;
+            }
         }
         else
         {
-            if (wasRunning)
-            {
-                logger.LogWarning("Stopped capture for room {RoomId}, job was active in memory but already completed in database", roomId);
-            }
-            else
-            {
-                logger.LogWarning("Attempted to stop capture for room {RoomId}, but no active job found in memory or database", roomId);
-            }
+            logger.LogWarning("No active job found in memory for room {RoomId}", roomId);
+            return false;
         }
+    }
 
-        return wasRunning;
+    private IDanmakuCaptureService CreateDanmakuCaptureService()
+    {
+        var taskScope = serviceProvider.CreateScope();
+        var service = new DanmakuCaptureService(
+            taskScope.ServiceProvider.GetRequiredService<IServiceProvider>(),
+            taskScope.ServiceProvider.GetRequiredService<IMemoryTaskScheduler>(),
+            taskScope.ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+            taskScope.ServiceProvider.GetRequiredService<IConfiguration>(),
+            taskScope.ServiceProvider.GetRequiredService<ILogger<DanmakuCaptureService>>()
+        );
+        return service;
     }
 
     private void OnCaptureCompleted(int roomId)
     {
         if (_activeJobs.TryRemove(roomId, out var _))
         {
-            logger.LogInformation("Removed completed capture job from memory for room {RoomId}", roomId);
+            logger.LogInformation("Completed danmaku capture task for room {RoomId} removed from memory", roomId);
         }
     }
 
@@ -173,22 +191,12 @@ public class CaptureJobManager(
     {
         try
         {
-            if (!_startRequests.Writer.TryComplete())
+            if (!_requests.Writer.TryComplete())
             {
-                _startRequests.Writer.Complete();
+                _requests.Writer.Complete();
             }
         }
-        catch (InvalidOperationException){}
-
-        try
-        {
-            if (!_stopRequests.Writer.TryComplete())
-            {
-                _stopRequests.Writer.Complete();
-            }
-        }
-        catch (InvalidOperationException) {}
-
+        catch (InvalidOperationException) { }
         base.Dispose();
     }
 }
