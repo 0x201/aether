@@ -24,7 +24,7 @@ public class CreateOrderCommandHandler(
             cardHolderName: "",
             cardExpiration: DateTime.Now);
 
-        logger.LogInformation("Creating Order - Order: {@Order}", order);
+        logger.ZLogInformation($"Creating Order - Order: {order}");
 
         orderRepository.Add(order);
 

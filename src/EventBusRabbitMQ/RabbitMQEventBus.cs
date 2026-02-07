@@ -36,14 +36,14 @@ public sealed class RabbitMQEventBus(
 
         if (logger.IsEnabled(LogLevel.Trace))
         {
-            logger.LogTrace("Creating RabbitMQ channel to publish event: {EventId} ({EventName})", @event.Id, routingKey);
+            logger.ZLogTrace($"Creating RabbitMQ channel to publish event: {@event.Id} ({routingKey})");
         }
 
         using var channel = await _rabbitMQConnection?.CreateChannelAsync(cancellationToken: cancellationToken) ?? throw new InvalidOperationException("RabbitMQ connection is not open");
 
         if (logger.IsEnabled(LogLevel.Trace))
         {
-            logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
+            logger.ZLogTrace($"Declaring RabbitMQ exchange to publish event: {@event.Id}");
         }
 
         await channel.ExchangeDeclareAsync(exchange: ExchangeName, type: "direct", cancellationToken: cancellationToken);
@@ -89,7 +89,7 @@ public sealed class RabbitMQEventBus(
 
             if (logger.IsEnabled(LogLevel.Trace))
             {
-                logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
+                logger.ZLogTrace($"Publishing event to RabbitMQ: {@event.Id}");
             }
 
             try
@@ -169,7 +169,7 @@ public sealed class RabbitMQEventBus(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Error Processing message \"{Message}\"", message);
+            logger.ZLogWarning($"Error Processing message \"{message}\"");
 
             activity.SetExceptionTags(ex);
         }
@@ -184,14 +184,14 @@ public sealed class RabbitMQEventBus(
     {
         if (logger.IsEnabled(LogLevel.Trace))
         {
-            logger.LogTrace("Processing RabbitMQ event: {EventName}", eventName);
+            logger.ZLogTrace($"Processing RabbitMQ event: {eventName}");
         }
 
         await using var scope = serviceProvider.CreateAsyncScope();
 
         if (!_subscriptionInfo.EventTypes.TryGetValue(eventName, out var eventType))
         {
-            logger.LogWarning("Unable to resolve event type for event name {EventName}", eventName);
+            logger.ZLogWarning($"Unable to resolve event type for event name {eventName}");
             return;
         }
 
@@ -231,7 +231,7 @@ public sealed class RabbitMQEventBus(
         {
             try
             {
-                logger.LogInformation("Starting RabbitMQ connection on a background thread");
+                logger.ZLogInformation($"Starting RabbitMQ connection on a background thread");
 
                 _rabbitMQConnection = serviceProvider.GetRequiredService<IConnection>();
                 if (!_rabbitMQConnection.IsOpen)
@@ -241,14 +241,14 @@ public sealed class RabbitMQEventBus(
 
                 if (logger.IsEnabled(LogLevel.Trace))
                 {
-                    logger.LogTrace("Creating RabbitMQ consumer channel");
+                    logger.ZLogTrace($"Creating RabbitMQ consumer channel");
                 }
 
                 _consumerChannel = await _rabbitMQConnection.CreateChannelAsync();
 
                 _consumerChannel.CallbackExceptionAsync += (sender, ea) =>
                 {
-                    logger.LogWarning(ea.Exception, "Error with RabbitMQ consumer channel");
+                    logger.ZLogWarning($"Error with RabbitMQ consumer channel. Exception: {ea.Exception}");
                     return Task.CompletedTask;
                 };
 
@@ -263,7 +263,7 @@ public sealed class RabbitMQEventBus(
 
                 if (logger.IsEnabled(LogLevel.Trace))
                 {
-                    logger.LogTrace("Starting RabbitMQ basic consume");
+                    logger.ZLogTrace($"Starting RabbitMQ basic consume");
                 }
 
                 var consumer = new AsyncEventingBasicConsumer(_consumerChannel);
@@ -285,7 +285,7 @@ public sealed class RabbitMQEventBus(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error starting RabbitMQ connection");
+                logger.ZLogError($"Error starting RabbitMQ connection. Exception: {ex}");
             }
         },
         TaskCreationOptions.LongRunning);

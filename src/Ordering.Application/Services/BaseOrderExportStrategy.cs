@@ -10,29 +10,28 @@ public abstract class BaseOrderFileExportStrategy<T>(ILogger logger, params File
 
             if (!FileIoUtils.ValidateExportContext<FileExportContext<OrderDto>, OrderDto>(context))
             {
-                logger.LogWarning("Invalid export context provided for {FileType}", context.FileType);
+                logger.ZLogWarning($"Invalid export context provided for {context.FileType}");
                 return Result.Failure([$"Invalid export context for {context.FileType}"]);
             }
 
             if (context.DataToExport.Count == 0)
             {
-                logger.LogInformation("No order to export for {FileType}", context.FileType);
+                logger.ZLogInformation($"No order to export for {context.FileType}");
                 return Result.Success();
             }
 
             await PerformExportAsync(context, cancellationToken);
-            logger.LogInformation("Successfully exported {Count} orders to {OutputPath}",
-                context.DataToExport.Count, context.OutputPath);
+            logger.ZLogInformation($"Successfully exported {context.DataToExport.Count} orders to {context.OutputPath}");
             return Result.Success();
         }
         catch (OperationCanceledException)
         {
-            logger.LogError("Export {FileType} operation  was cancelled.", context.FileType);
+            logger.ZLogError($"Export {context.OutputPath} operation  was cancelled.");
             return Result.Failure([$"Export {context.FileType} operation  was cancelled."]);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while exporting orders to {OutputPath}.", context.OutputPath);
+            logger.ZLogError($"An error occurred while exporting orders to {context.OutputPath}. Exception: {ex}");
             return HandleExportException(ex, context);
         }
     }

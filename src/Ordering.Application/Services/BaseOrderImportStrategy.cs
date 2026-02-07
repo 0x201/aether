@@ -1,6 +1,6 @@
 ﻿namespace ModernCSharp.Ordering.Application.Services;
 
-public abstract class BaseOrderFileImportStrategy(ILogger logger, params FileType[] fileTypes) 
+public abstract class BaseOrderFileImportStrategy(ILogger logger, params FileType[] fileTypes)
     : FileImportStrategyBase<OrderDto>(fileTypes)
 {
     public override async Task<ImportResult<OrderDto>> ImportAsync(IFileImportContext context, CancellationToken cancellationToken = default)
@@ -11,23 +11,22 @@ public abstract class BaseOrderFileImportStrategy(ILogger logger, params FileTyp
 
             if (!FileIoUtils.ValidateImportContext<FileImportContext>(context))
             {
-                logger.LogWarning("Invalid import context provided for {FileType}", context.FileType);
+                logger.ZLogWarning($"Invalid import context provided for {context.FileType}");
                 return ImportResult<OrderDto>.Failure([$"Invalid import context for {context.FileType}"]);
             }
 
             var orders = await PerformImportAsync(context, cancellationToken);
-            logger.LogInformation("Successfully imported {Count} orders from {InputPath}",
-                orders.Count, context.InputPath);
+            logger.ZLogInformation($"Successfully imported {orders.Count} orders from {context.InputPath}");
             return ImportResult<OrderDto>.Success(orders);
         }
         catch (OperationCanceledException)
         {
-            logger.LogError("Import {FileType} operation  was cancelled.", context.FileType);
+            logger.ZLogError($"Import {context.FileType} operation  was cancelled.");
             return ImportResult<OrderDto>.Failure([$"Import {context.FileType} operation was cancelled."]);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while importing orders from {OutputPath}.", context.InputPath);
+            logger.ZLogError($"An error occurred while importing orders from {context.InputPath}. Exception: {ex}");
             return HandleImportException(ex, context);
         }
     }

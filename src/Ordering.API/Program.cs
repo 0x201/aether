@@ -1,7 +1,14 @@
 ﻿using ModernCSharp.Ordering.API;
 using ModernCSharp.ServiceDefaults;
+using ZLogger;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddZLoggerConsole(options =>
+{
+    options.UseJsonFormatter();
+});
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();

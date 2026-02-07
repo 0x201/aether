@@ -6,3 +6,4 @@ global using ModernCSharp.EventBus.Events;
 global using ModernCSharp.Ordering.Application.Queries;
 global using ModernCSharp.Ordering.Infrastructure;
 global using ModernCSharp.Ordering.OrderProcessor.Events;
+global using ZLogger;

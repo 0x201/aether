@@ -18,15 +18,15 @@ public class OrderWorker(
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
-            logger.LogDebug("GracePeriodManagerService is starting.");
-            stoppingToken.Register(() => logger.LogDebug("GracePeriodManagerService background task is stopping."));
+            logger.ZLogDebug($"GracePeriodManagerService is starting.");
+            stoppingToken.Register(() => logger.ZLogDebug($"GracePeriodManagerService background task is stopping."));
         }
 
         while (!stoppingToken.IsCancellationRequested)
         {
             if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogDebug("GracePeriodManagerService background task is doing background work.");
+                logger.ZLogDebug($"GracePeriodManagerService background task is doing background work.");
             }
 
             await CheckConfirmedGracePeriodOrders();
@@ -36,7 +36,7 @@ public class OrderWorker(
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
-            logger.LogDebug("GracePeriodManagerService background task is stopping.");
+            logger.ZLogDebug($"GracePeriodManagerService background task is stopping.");
         }
     }
 
@@ -44,7 +44,7 @@ public class OrderWorker(
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {
-            logger.LogDebug("Checking confirmed grace period orders");
+            logger.ZLogDebug($"Checking confirmed grace period orders");
         }
 
         var orderIds = await GetConfirmedGracePeriodOrders();
@@ -53,8 +53,7 @@ public class OrderWorker(
         {
             var confirmGracePeriodEvent = new GracePeriodConfirmedIntegrationEvent(orderId);
 
-            logger.LogInformation("Publishing integration event: {IntegrationEventId} - ({@IntegrationEvent})",
-                confirmGracePeriodEvent.Id, confirmGracePeriodEvent);
+            logger.ZLogInformation($"Publishing integration event: {confirmGracePeriodEvent.Id} - ({confirmGracePeriodEvent})");
 
             await eventBus.PublishAsync(confirmGracePeriodEvent);
         }

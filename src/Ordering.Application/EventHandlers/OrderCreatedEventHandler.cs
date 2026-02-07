@@ -3,7 +3,7 @@ public class OrderCreatedEventHandler(ILogger<OrderCreatedEventHandler> logger) 
 {
     public Task Handle(OrderCreatedEvent notification, CancellationToken cancellationToken)
     {
-        logger.LogInformation("MC Domain Event: {DomainEvent}", notification.GetType().Name);
+        logger.ZLogInformation($"MC Domain Event: {notification.GetType().Name}");
 
         return Task.CompletedTask;
     }

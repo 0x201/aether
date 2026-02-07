@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using ZLogger;
 
 namespace Microsoft.AspNetCore.Hosting;
 
@@ -39,7 +40,7 @@ internal static class MigrateDbContextExtensions
 
         try
         {
-            logger.LogInformation("Migrating database associated with context {DbContextName}", typeof(TContext).Name);
+            logger.ZLogInformation($"Migrating database associated with context {typeof(TContext).Name}");
 
             var strategy = context.Database.CreateExecutionStrategy();
 
@@ -47,7 +48,7 @@ internal static class MigrateDbContextExtensions
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while migrating the database used on context {DbContextName}", typeof(TContext).Name);
+            logger.ZLogError($"An error occurred while migrating the database used on context {typeof(TContext).Name}. Exception: {ex}");
 
             activity?.SetExceptionTags(ex);
 
