@@ -42,20 +42,25 @@ public class DanmakuCaptureService(
 
             try
             {
-                await scopedClient.StartAsync(roomId, duration, cts);
+                var completionCts = new CancellationTokenSource();
+                var captureTask = scopedClient.StartAsync(roomId, duration, completionCts.Token);
+                var completed = await Task.WhenAny(captureTask, Task.Delay(Timeout.InfiniteTimeSpan, cts));
 
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed, cts);
-                logger.ZLogInformation($"Danmaku capture for room [{roomId}] completed normally");
-            }
-            catch (OperationCanceledException)
-            {
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Cancelled, cts);
-                logger.ZLogInformation($"Danmaku capture for room [{roomId}] was cancelled");
+                if (completed == captureTask)
+                {
+                    await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed);
+                    logger.ZLogInformation($"Danmaku capture for room [{roomId}] completed normally");
+                }
+                else
+                {
+                    await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Cancelled);
+                    logger.ZLogInformation($"Danmaku capture for room [{roomId}] was cancelled");
+                }
             }
             catch (Exception ex)
             {
                 logger.ZLogError($"An error occurred during danmaku capture for room [{roomId}]. Exception: {ex}");
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Failed, cts);
+                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Failed);
             }
             finally
             {
@@ -72,6 +77,7 @@ public class DanmakuCaptureService(
                 {
                     Reset();
                 }
+                scope.Dispose();
 
                 _onCaptureCompleted?.Invoke(roomId);
             }
@@ -96,7 +102,7 @@ public class DanmakuCaptureService(
 
     public async Task StopAsync()
     {
-        if (_currentTaskId != null && _currentRoomId.HasValue)
+        if (_currentTaskId is not null && _currentRoomId.HasValue)
         {
             logger.ZLogInformation($"Stopping danmaku capture for room [{_currentRoomId}]");
 

@@ -118,15 +118,7 @@ public class CaptureJobManager(
         catch (Exception ex)
         {
             logger.ZLogError($"Failed to start danmaku capture service for room {roomId}. Expcetion: {ex}");
-            // If startup fails, attempt to update the job status to failed
-            try
-            {
-                await jobRepository.UpdateJobStatusAsync(roomId, JobStatus.Failed, cancellationToken);
-            }
-            catch (Exception repoEx)
-            {
-                logger.ZLogError($"An error occurred while updating job status to failed for room {roomId}. Exception: {repoEx}");
-            }
+            await jobRepository.UpdateJobStatusAsync(roomId, JobStatus.Failed, cancellationToken);
             return false;
         }
 
