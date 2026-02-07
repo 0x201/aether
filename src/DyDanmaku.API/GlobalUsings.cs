@@ -36,3 +36,4 @@ global using ModernCSharp.Shared;
 global using ModernCSharp.Shared.Models;
 global using Scalar.AspNetCore;
 global using StackExchange.Redis;
+global using ZLogger;

@@ -1,5 +1,17 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddZLoggerConsole(options => 
+{
+    options.UseJsonFormatter(formatter =>
+    {
+        // formatter.IncludeProperties = IncludeProperties.Timestamp 
+        //     | IncludeProperties.LogLevel 
+        //     | IncludeProperties.Message 
+        //     | IncludeProperties.ParameterKeyValues;
+    });
+});
+
 builder.AddServiceDefaults();
 builder.AddApplicationService();
 builder.Services.AddSignalR();

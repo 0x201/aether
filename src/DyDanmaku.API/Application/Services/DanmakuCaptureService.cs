@@ -20,7 +20,7 @@ public class DanmakuCaptureService(
     {
         if (_currentRoomId.HasValue)
         {
-            logger.LogWarning("A capture job for room [{RoomId}] is already running", roomId);
+            logger.ZLogWarning($"A capture job for room [{roomId}] is already running");
             return;
         }
 
@@ -30,7 +30,7 @@ public class DanmakuCaptureService(
 
         await UpdateRoomInfo(roomId);
 
-        logger.LogInformation("Starting danmaku capture for [{RoomId}] - Duration: {Duration}s", roomId, duration);
+        logger.ZLogInformation($"Starting danmaku capture for [{roomId}] - Duration: {duration}s");
 
         var added = await memoryTaskScheduler.AddTaskAsync(taskId, async (cts) =>
         {
@@ -44,18 +44,18 @@ public class DanmakuCaptureService(
             {
                 await scopedClient.StartAsync(roomId, duration, cts);
 
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed);
-                logger.LogInformation("Danmaku capture for room [{RoomId}] completed normally", roomId);
+                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed, cts);
+                logger.ZLogInformation($"Danmaku capture for room [{roomId}] completed normally");
             }
             catch (OperationCanceledException)
             {
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Cancelled);
-                logger.LogInformation("Danmaku capture for room [{RoomId}] was cancelled", roomId);
+                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Cancelled, cts);
+                logger.ZLogInformation($"Danmaku capture for room [{roomId}] was cancelled");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred during danmaku capture for room [{RoomId}]", roomId);
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Failed);
+                logger.ZLogError($"An error occurred during danmaku capture for room [{roomId}]. Exception: {ex}");
+                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Failed, cts);
             }
             finally
             {
@@ -79,7 +79,7 @@ public class DanmakuCaptureService(
 
         if (!added)
         {
-            logger.LogError("Failed to add task to scheduler for room [{RoomId}]", roomId);
+            logger.ZLogError($"Failed to add task to scheduler for room [{roomId}]");
             Reset();
             return;
         }
@@ -98,7 +98,7 @@ public class DanmakuCaptureService(
     {
         if (_currentTaskId != null && _currentRoomId.HasValue)
         {
-            logger.LogInformation("Stopping danmaku capture for room [{RoomId}]", _currentRoomId);
+            logger.ZLogInformation($"Stopping danmaku capture for room [{_currentRoomId}]");
 
             await memoryTaskScheduler.CancelTaskAsync(_currentTaskId);
         }
@@ -114,14 +114,15 @@ public class DanmakuCaptureService(
             var roomUserInfo = await GetAnchorInfo(roomId);
             if (roomUserInfo is not null)
             {
+                var roomName = roomUserInfo.Data?.AnchorInfo?.Nickname ?? "Unknown";
                 dbContext.Rooms.Add(new Room
                 {
                     RoomId = roomId,
-                    RoomName = roomUserInfo.Data?.AnchorInfo?.Nickname ?? "Unknown",
+                    RoomName = roomName,
                     CreatedAt = DateTimeOffset.UtcNow
                 });
                 await dbContext.SaveChangesAsync();
-                logger.LogInformation("Added new room [{RoomId}] to database", roomId);
+                logger.ZLogInformation($"Added new room [{roomName}({roomId})] to database");
             }
         }
     }
@@ -130,15 +131,21 @@ public class DanmakuCaptureService(
     {
         var url = $"{configuration.GetSection("Douyu:Apis:RoomUserInfoEndpoint").Get<string>()}{roomId}";
         var client = httpClientFactory.CreateClient();
-        var response = await client.GetAsync(url);
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var roomUserInfoDto = JsonSerializer.Deserialize<RoomUserInfoDto>(content);
-            return roomUserInfoDto;
-        }
 
-        logger.LogWarning("Error getting anchor info for room {RoomId}", roomId);
+        try
+        {
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var roomUserInfoDto = JsonSerializer.Deserialize<RoomUserInfoDto>(content);
+                return roomUserInfoDto;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.ZLogError($"An error occurred while getting room info for room {roomId}. Exception: {ex}");
+        }
         return null;
     }
 }

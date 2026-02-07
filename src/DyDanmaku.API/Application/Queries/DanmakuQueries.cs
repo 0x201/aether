@@ -40,11 +40,11 @@ public class DanmakuQueries(
             }
             catch (JsonException ex)
             {
-                logger.LogError(ex, "Error deserializing word frequencies");
+                logger.ZLogError($"An error occurred while deserializing word frequencies. Exception: {ex}");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error parsing word frequencies");
+                logger.ZLogError($"An error occurred while parsing word frequencies. Exception: {ex}");
             }
         }
 

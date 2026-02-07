@@ -8,7 +8,7 @@ public class CaptureJobMonitoringService(
     private const string GracePeriodTimeSection = "Douyu:GracePeriodTime";
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("CaptureJobMonitoringService started");
+        logger.ZLogInformation($"CaptureJobMonitoringService started");
 
         var gracePeriodTime = configuration.GetSection(GracePeriodTimeSection).Get<int>();
 
@@ -32,7 +32,7 @@ public class CaptureJobMonitoringService(
         foreach (var job in expiredJobs)
         {
             await jobManager.StopAsync(job.RoomId);
-            logger.LogInformation("Stopped expired capture job for room {RoomId}", job.RoomId);
+            logger.ZLogInformation($"Stopped expired capture job for room {job.RoomId}");
         }
     }
 }

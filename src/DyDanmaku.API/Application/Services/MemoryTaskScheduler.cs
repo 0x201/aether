@@ -9,14 +9,14 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
     {
         if (_runningTasks.ContainsKey(taskId))
         {
-            logger.LogWarning("Task with ID [{TaskId}] already exists", taskId);
+            logger.ZLogWarning($"Task with ID [{taskId}] already exists");
             return false;
         }
 
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         if (!_cancellationTokenSources.TryAdd(taskId, cts))
         {
-            logger.LogError("Failed to add cancellation token source for task [{TaskId}]", taskId);
+            logger.ZLogError($"Failed to add cancellation token source for task [{taskId}]");
             return false;
         }
 
@@ -28,11 +28,11 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
             }
             catch (OperationCanceledException)
             {
-                logger.LogInformation("Task [{TaskId}] was cancelled", taskId);
+                logger.ZLogInformation($"Task [{taskId}] was cancelled");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred in task [{TaskId}]", taskId);
+                logger.ZLogError($"An error occurred in task [{taskId}]. Exception: {ex}");
             }
             finally
             {
@@ -47,7 +47,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
             return false;
         }
 
-        logger.LogInformation("Task [{TaskId}] started successfully", taskId);
+        logger.ZLogInformation($"Task [{taskId}] started successfully");
         return true;
     }
 
@@ -55,7 +55,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
     {
         if (!_runningTasks.ContainsKey(taskId))
         {
-            logger.LogWarning("Task [{TaskId}] does not exist", taskId);
+            logger.ZLogWarning($"Task [{taskId}] does not exist in the running tasks");
             return false;
         }
 
@@ -73,7 +73,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
         }
 
         CleanupTask(taskId);
-        logger.LogInformation("Task [{TaskId}] removed successfully", taskId);
+        logger.ZLogInformation($"Task [{taskId}] removed successfully");
         return true;
     }
 
@@ -87,11 +87,11 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
         if (_cancellationTokenSources.TryGetValue(taskId, out var cts))
         {
             cts.Cancel();
-            logger.LogInformation("Cancellation requested for task [{TaskId}]", taskId);
+            logger.ZLogInformation($"Cancellation requested for task [{taskId}]");
             return true;
         }
 
-        logger.LogWarning("No cancellation token found for task [{TaskId}]", taskId);
+        logger.ZLogWarning($"No cancellation token found for task [{taskId}]");
         return false;
     }
 
@@ -120,7 +120,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
             CleanupTask(taskId);
         }
 
-        logger.LogInformation("All tasks cancelled");
+        logger.ZLogInformation($"All tasks cancelled successfully");
     }
 
     private void CleanupTask(string taskId)

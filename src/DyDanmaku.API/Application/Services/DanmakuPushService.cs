@@ -37,7 +37,7 @@ public class DanmakuPushService(
 
             if (newDanmakus.Count > 0)
             {
-                logger.LogInformation("Room: {RoomId} found {Count} new danmaku", roomId, newDanmakus.Count);
+                logger.ZLogInformation($"Room: {roomId} found {newDanmakus.Count} new danmaku");
 
                 // Filter out already sent danmakus using the _sentDanmakuIds set
                 var danmakuDtos = newDanmakus
@@ -78,7 +78,7 @@ public class DanmakuPushService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while pushing danmaku for room: {RoomId}", roomId);
+            logger.ZLogError($"An error occurred while pushing danmaku for room: {roomId}. Exception: {ex}");
         }
     }
 
@@ -89,7 +89,7 @@ public class DanmakuPushService(
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Danmaku Pushing service started");
+        logger.ZLogInformation($"Danmaku Pushing service started");
         return Task.CompletedTask;
     }
 
@@ -106,13 +106,13 @@ public class DanmakuPushService(
         _roomTimers[roomId] = timer;
         _lastPushTime[roomId] = DateTimeOffset.UtcNow.AddSeconds(-10);
 
-        logger.LogInformation("Started pushing danmaku for room: {RoomId}", roomId);
+        logger.ZLogInformation($"Started pushing danmaku for room: {roomId}");
 
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Danmaku Push service ended");
+        logger.ZLogInformation($"Danmaku Push service ended");
 
         foreach (var timer in _roomTimers.Values)
         {
@@ -134,7 +134,7 @@ public class DanmakuPushService(
             _roomTimers.Remove(roomId);
             _lastPushTime.Remove(roomId);
 
-            logger.LogInformation("Stopped pushing danmaku for room: {RoomId}", roomId);
+            logger.ZLogInformation($"Stopped pushing danmaku for room: {roomId}");
         }
     }
 }

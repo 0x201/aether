@@ -11,7 +11,7 @@ public class StartCaptureJobHandler(
 
         if (!success)
         {
-            logger.LogWarning("A capture is already in progress for room {RoomId}", request.RoomId);
+            logger.ZLogWarning($"A capture is already in progress for room {request.RoomId}");
             return Result<RoomDto>.Failure(HttpStatusCode.Conflict, "A capture is already in progress for this room", null);
         }
 

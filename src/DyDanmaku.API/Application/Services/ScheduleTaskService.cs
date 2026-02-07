@@ -17,7 +17,7 @@ public class ScheduleTaskService(
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("ScheduleTaskService started");
+        logger.ZLogInformation($"ScheduleTaskService started");
         
         // Schedule the first run
         ScheduleNextRun();
@@ -32,7 +32,7 @@ public class ScheduleTaskService(
             // Expected when the service is stopping
         }
         
-        logger.LogInformation("ScheduleTaskService stopped");
+        logger.ZLogInformation($"ScheduleTaskService stopped");
     }
 
     private void ScheduleNextRun()
@@ -42,7 +42,7 @@ public class ScheduleTaskService(
         
         if (scheduledTasks is null || scheduledTasks.Length == 0)
         {
-            logger.LogInformation("No scheduled capture tasks configured");
+            logger.ZLogInformation($"No scheduled capture tasks configured");
             _timer?.Dispose();
             _timer = new Timer(async _ => await TriggerCaptureJobs(), null, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
             return;
@@ -51,7 +51,7 @@ public class ScheduleTaskService(
         var nextRunTime = FindNextRunTime(now, scheduledTasks);
         var delay = nextRunTime - now;
 
-        logger.LogInformation("Scheduled task checker. Scheduling next run at {ScheduledTime}", nextRunTime);
+        logger.ZLogInformation($"Scheduled task checker. Scheduling next run at {nextRunTime}");
 
         _timer?.Dispose();
         _timer = new Timer(async _ => await TriggerCaptureJobs(), null, delay, Timeout.InfiniteTimeSpan);
@@ -100,7 +100,7 @@ public class ScheduleTaskService(
         }
         else
         {
-            logger.LogWarning("Invalid time format: {TimeString}. Using default 10:00", timeString);
+            logger.ZLogWarning($"Invalid time format: {timeString}. Using default 10:00");
             return new TimeSpan(10, 0, 0);
         }
     }
@@ -109,14 +109,14 @@ public class ScheduleTaskService(
     {
         try
         {
-            logger.LogInformation("Checking for scheduled capture jobs");
+            logger.ZLogInformation($"Checking for scheduled capture jobs");
             
             var now = DateTimeOffset.UtcNow.ToLocalTime();
             var scheduledTasks = configuration.GetSection(ScheduledCaptureSection).Get<ScheduledCaptureConfig[]>();
             
             if (scheduledTasks is null || scheduledTasks.Length == 0)
             {
-                logger.LogInformation("No scheduled capture tasks configured");
+                logger.ZLogInformation($"No scheduled capture tasks configured");
                 ScheduleNextRun();
                 return;
             }
@@ -129,7 +129,7 @@ public class ScheduleTaskService(
 
                 if (Math.Abs((now - taskDateTime).TotalMinutes) < 5)
                 {
-                    logger.LogInformation("Starting scheduled capture for room {RoomId} at {StartTime}", task.RoomId, task.StartTime);
+                    logger.ZLogInformation($"Starting scheduled capture for room {task.RoomId} at {task.StartTime}");
                     
                     bool started;
                     using (var scope = serviceScopeFactory.CreateScope())
@@ -140,11 +140,11 @@ public class ScheduleTaskService(
                     
                     if (started)
                     {
-                        logger.LogInformation("Successfully started scheduled capture for room {RoomId} with duration {Duration}s", task.RoomId, task.Duration);
+                        logger.ZLogInformation($"Successfully started scheduled capture for room {task.RoomId} with duration {task.Duration}s");
                     }
                     else
                     {
-                        logger.LogWarning("Failed to start scheduled capture for room {RoomId}, possibly already running", task.RoomId);
+                        logger.ZLogWarning($"Failed to start scheduled capture for room {task.RoomId}, possibly already running");
                     }
                 }
             }
@@ -153,7 +153,7 @@ public class ScheduleTaskService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error occurred while checking scheduled capture jobs");
+            logger.ZLogError($"An error occurred while checking scheduled capture jobs. Exception: {ex}");
             
             ScheduleNextRun();
         }

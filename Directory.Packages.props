@@ -112,5 +112,6 @@
     <PackageVersion Include="Respawn" Version="6.2.1" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.12.27" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.1" />
+    <PackageVersion Include="ZLogger" Version="2.5.10" />
   </ItemGroup>
 </Project>

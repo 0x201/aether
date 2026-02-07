@@ -2,7 +2,6 @@ namespace DyDanmaku.API.Application.Services;
 
 public class DyDanmakuClient(
     ILogger<DyDanmakuClient> logger,
-    ICaptureJobRepository captureJobService,
     IConfiguration configuration,
     IServiceProvider serviceProvider) : IDisposable
 {
@@ -26,7 +25,7 @@ public class DyDanmakuClient(
         _roomId = roomId;
         int port = 8500 + Random.Shared.Next(1, 6);
         _serverUrl = $"{SERVERPREFIX}:{port}/";
-        logger.LogInformation("Connecting [{Url}]...", _serverUrl);
+        logger.ZLogInformation($"Connecting [{_serverUrl}]...");
         _isConnected = false;
 
         using var durationCts = new CancellationTokenSource(TimeSpan.FromSeconds(durationInSeconds));
@@ -50,11 +49,11 @@ public class DyDanmakuClient(
         }
         catch (OperationCanceledException)
         {
-            logger.LogInformation("Danmaku capture cancelled for room [{RoomId}]", RoomId);
+            logger.ZLogInformation($"Danmaku capture cancelled for room [{RoomId}]");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to connect: [{ServerUrl}]", _serverUrl);
+            logger.ZLogError($"Failed to connect: [{_serverUrl}]. Exception: {ex}");
             throw;
         }
         finally
@@ -77,10 +76,10 @@ public class DyDanmakuClient(
             }
             catch (WebSocketException)
             {
-                logger.LogWarning("WebSocket already in invalid state: {State}", _client?.State);
+                logger.ZLogWarning($"WebSocket already in invalid state: {_client?.State}");
             }
         }
-        logger.LogInformation("Stopped capture for room {RoomId}", RoomId);
+        logger.ZLogInformation($"Stopped capture for room {RoomId}", RoomId);
 
         _heartbeatTimer?.Dispose();
         _flushTimer?.Dispose();
@@ -109,7 +108,7 @@ public class DyDanmakuClient(
             // ignored
         }
 
-        logger.LogDebug("DyDanmakuClient has been reset");
+        logger.LogDebug($"DyDanmakuClient has been reset");
     }
 
     private async Task ReceiveLoop(CancellationToken cancellationToken = default)
@@ -160,7 +159,7 @@ public class DyDanmakuClient(
                     else if (result.MessageType == WebSocketMessageType.Close)
                     {
                         _isConnected = false;
-                        logger.LogInformation("WebSocket connection closed by remote party for room [{RoomId}]", RoomId);
+                        logger.ZLogInformation($"WebSocket connection closed by remote party for room [{RoomId}]");
 
                         if (!cancellationToken.IsCancellationRequested && !_isStopping)
                         {
@@ -172,11 +171,11 @@ public class DyDanmakuClient(
         }
         catch (OperationCanceledException)
         {
-            logger.LogInformation("ReceiveLoop cancelled for room [{RoomId}]", RoomId);
+            logger.ZLogInformation($"ReceiveLoop cancelled for room [{RoomId}]");
         }
         catch (WebSocketException ex) when (ex.Message.Contains("closed the WebSocket connection"))
         {
-            logger.LogInformation("WebSocket connection terminated by remote party for room [{RoomId}]: {Message}", RoomId, ex.Message);
+            logger.ZLogInformation($"WebSocket connection terminated by remote party for room [{RoomId}]: {ex.Message}");
             _isConnected = false;
             if (!cancellationToken.IsCancellationRequested && !_isStopping)
             {
@@ -185,7 +184,7 @@ public class DyDanmakuClient(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred in ReceiveLoop for room [{RoomId}]: {Message}", RoomId, ex.Message);
+            logger.ZLogError($"An error occurred in ReceiveLoop for room [{RoomId}]. Exception: {ex}");
             if (!cancellationToken.IsCancellationRequested && !_isStopping)
             {
                 await ReconnectAsync(cancellationToken);
@@ -195,7 +194,7 @@ public class DyDanmakuClient(
 
     private async Task<bool> ReconnectAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Attempting to reconnect for room [{RoomId}]...", RoomId);
+        logger.ZLogInformation($"Attempting to reconnect for room [{RoomId}]...");
 
         _heartbeatTimer?.Dispose();
         _heartbeatTimer = null;
@@ -218,12 +217,12 @@ public class DyDanmakuClient(
 
             StartHeartbeat();
 
-            logger.LogInformation("Reconnected successfully for room [{RoomId}]", RoomId);
+            logger.ZLogInformation($"Reconnected successfully for room [{RoomId}]");
             return true;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to reconnect for room [{RoomId}], retrying in 5 seconds...", RoomId);
+            logger.ZLogError($"Failed to reconnect for room [{RoomId}], retrying in 5 seconds... Exception: {ex}");
             try
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
@@ -253,7 +252,7 @@ public class DyDanmakuClient(
             }
             catch (WebSocketException)
             {
-                logger.LogWarning("WebSocket already in invalid state during cleanup: {State}", _client?.State);
+                logger.ZLogWarning($"WebSocket already in invalid state during cleanup: {_client?.State}");
             }
         }
 
@@ -337,7 +336,7 @@ public class DyDanmakuClient(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while processing message for: [{ServerUrl}]", _serverUrl);
+            logger.ZLogError($"An error occurred while processing message for: [{_serverUrl}]. Exception: {ex}");
         }
     }
 
@@ -369,11 +368,11 @@ public class DyDanmakuClient(
                 using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
                 await dbContext.Danmakus.AddRangeAsync(danmakusToSave);
                 var savedRows = await dbContext.SaveChangesAsync();
-                logger.LogInformation("Saved [{SavedRows}] chat message(s) to database for room [{RoomId}]", savedRows, RoomId);
+                logger.ZLogInformation($"Saved [{savedRows}] chat message(s) to database for room [{RoomId}]");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to save danmaku to database.");
+                logger.ZLogError($"Failed to save danmaku to database. Exception: {ex}");
             }
         }
     }
@@ -535,7 +534,7 @@ public class DyDanmakuClient(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while formatting message from: [{ServerUrl}]", _serverUrl);
+            logger.ZLogError($"An error occurred while formatting message from: [{_serverUrl}]. Exception: {ex}");
             return null;
         }
     }
@@ -607,7 +606,7 @@ public class DyDanmakuClientPool : IAsyncDisposable
             return existingClient;
         }
         var newClient = CreateClient();
-        _logger.LogDebug("Created new DanmakuClient (pool was empty)");
+        _logger.LogDebug($"Created new DanmakuClient (pool was empty)");
         return newClient;
     }
 
@@ -617,11 +616,11 @@ public class DyDanmakuClientPool : IAsyncDisposable
 
         if (_pool.Writer.TryWrite(client))
         {
-            _logger.LogDebug("Returned DanmakuClient to pool");
+            _logger.LogDebug($"Returned DanmakuClient to pool");
         }
         else
         {
-            _logger.LogDebug("Pool full, disposing DanmakuClient");
+            _logger.LogDebug($"Pool full, disposing DanmakuClient");
             client.Dispose();
         }
     }
@@ -631,7 +630,6 @@ public class DyDanmakuClientPool : IAsyncDisposable
         var scope = _serviceProvider.CreateScope();
         return new DyDanmakuClient(
             scope.ServiceProvider.GetRequiredService<ILogger<DyDanmakuClient>>(),
-            scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>(),
             scope.ServiceProvider.GetRequiredService<IConfiguration>(),
             scope.ServiceProvider
         );

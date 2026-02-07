@@ -24,6 +24,7 @@
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="System.Linq.Dynamic.Core" />
     <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" />
+    <PackageReference Include="ZLogger" />
   </ItemGroup>
 
   <ItemGroup>

@@ -42,7 +42,7 @@ public class CaptureJobManager(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception occurred while processing danmaku capture job requests");
+            logger.ZLogError($"Unhandled exception occurred while processing danmaku capture job requests. Exception: {ex}");
         }
     }
 
@@ -74,11 +74,11 @@ public class CaptureJobManager(
         }
         catch (OperationCanceledException)
         {
-            logger.LogTrace("Request processor was cancelled");
+            logger.ZLogTrace($"Request processor was cancelled");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error occurred while processing requests");
+            logger.ZLogError($"An error occurred while processing requests. Exception: {ex}");
         }
     }
 
@@ -86,7 +86,7 @@ public class CaptureJobManager(
     {
         if (_activeJobs.ContainsKey(roomId))
         {
-            logger.LogInformation("Room {RoomId} already has an active job, cannot start duplicate", roomId);
+            logger.ZLogInformation($"Room {roomId} already has an active job, cannot start duplicate");
             return false;
         }
 
@@ -96,7 +96,7 @@ public class CaptureJobManager(
         var existingJob = await jobRepository.GetActiveJobByRoomIdAsync(roomId, cancellationToken);
         if (existingJob is not null)
         {
-            logger.LogInformation("An active job for room {RoomId} already exists in the database, cannot start a new job", roomId);
+            logger.ZLogInformation($"An active job for room {roomId} already exists in the database, cannot start a new job");
             return false;
         }
 
@@ -107,7 +107,7 @@ public class CaptureJobManager(
         var jobRecord = await jobRepository.CreateJobAsync(roomId, duration.GetValueOrDefault(3600), cancellationToken);
         if (jobRecord is null)
         {
-            logger.LogError("Failed to create job record for room {RoomId}", roomId);
+            logger.ZLogError($"Failed to create job record for room {roomId}");
             return false;
         }
 
@@ -117,7 +117,7 @@ public class CaptureJobManager(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to start danmaku capture service for room {RoomId}", roomId);
+            logger.ZLogError($"Failed to start danmaku capture service for room {roomId}. Expcetion: {ex}");
             // If startup fails, attempt to update the job status to failed
             try
             {
@@ -125,7 +125,7 @@ public class CaptureJobManager(
             }
             catch (Exception repoEx)
             {
-                logger.LogError(repoEx, "Error updating job status to failed for room {RoomId}", roomId);
+                logger.ZLogError($"An error occurred while updating job status to failed for room {roomId}. Exception: {repoEx}");
             }
             return false;
         }
@@ -139,29 +139,29 @@ public class CaptureJobManager(
 
         _activeJobs.TryAdd(roomId, activeJob);
 
-        logger.LogInformation("Started danmaku capture for room {RoomId}", roomId);
+        logger.ZLogInformation($"Started danmaku capture for room [{roomId}]");
         return true;
     }
 
-    private async Task<bool> ProcessStopRequestInternal(int roomId, CancellationToken cancellationToken)
+    private async Task<bool> ProcessStopRequestInternal(int roomId, CancellationToken cancellationToken = default)
     {
         if (_activeJobs.TryGetValue(roomId, out var activeJob))
         {
             try
             {
                 await activeJob.Service.StopAsync();
-                logger.LogInformation("Successfully stopped danmaku capture service for room {RoomId}", roomId);
+                logger.ZLogInformation($"Successfully stopped danmaku capture service for room [{roomId}]");
                 return true;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error stopping danmaku capture service for room {RoomId}", roomId);
+                logger.ZLogError($"An error occurred while stopping danmaku capture service for room [{roomId}]. Exception: {ex}");
                 return false;
             }
         }
         else
         {
-            logger.LogWarning("No active job found in memory for room {RoomId}", roomId);
+            logger.ZLogWarning($"No active job found in memory for room [{roomId}]");
             return false;
         }
     }
@@ -183,7 +183,7 @@ public class CaptureJobManager(
     {
         if (_activeJobs.TryRemove(roomId, out var _))
         {
-            logger.LogInformation("Completed danmaku capture task for room {RoomId} removed from memory", roomId);
+            logger.ZLogInformation($"Completed danmaku capture task for room [{roomId}] and removed from memory");
         }
     }
 

@@ -8,7 +8,7 @@ public class DyDanmakuHub(
 
     public async Task JoinRoom(int roomId)
     {
-        logger.LogInformation("Room Id: {RoomId}", roomId);
+        logger.ZLogInformation($"Room Id: {roomId}");
         var connectionId = Context.ConnectionId;
         var groupName = GetRoomGroupName(roomId);
 
@@ -16,7 +16,7 @@ public class DyDanmakuHub(
 
         await Groups.AddToGroupAsync(connectionId, groupName);
 
-        logger.LogInformation("User {ConnectionId} joined room: {RoomId}", connectionId, roomId);
+        logger.ZLogInformation($"User {connectionId} joined room: {roomId}");
 
         await Clients.Caller.SendAsync("RoomJoined", roomId);
 
@@ -32,7 +32,7 @@ public class DyDanmakuHub(
 
         await Groups.RemoveFromGroupAsync(connectionId, groupName);
 
-        logger.LogInformation("User {ConnectionId} left room: {roomId}", connectionId, roomId);
+        logger.ZLogInformation($"User {connectionId} left room: {roomId}");
 
         await Clients.Caller.SendAsync("RoomLeft", roomId);
 
