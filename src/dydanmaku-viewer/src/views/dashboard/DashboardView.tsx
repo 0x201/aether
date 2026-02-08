@@ -22,24 +22,6 @@ const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 
-const CustomTooltip = React.memo(({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const tooltipContent = payload[0]?.payload?.tooltipContent;
-
-    if (!tooltipContent || typeof tooltipContent !== 'string') {
-      return null;
-    }
-
-    return (
-      <div>
-        <p>{tooltipContent}</p>
-      </div>
-    );
-  }
-
-  return null;
-});
-
 const Dashboard: React.FC = () => {
   const { data, actions } = useDashboardData();
   const {
@@ -61,20 +43,13 @@ const Dashboard: React.FC = () => {
     setLoadingRooms(true);
     try {
       const { data } = await fetchRooms(1, 20, search);
-      const noRoomOption: Room = { roomId: -1, anchorName: '全部房间' }; // 使用 -1 作为特殊值代替 null
+      const noRoomOption: Room = { roomId: -1, anchorName: '全部房间' };
       setAllRooms([noRoomOption, ...data]);
     } catch (err) {
       console.error('加载房间列表失败:', err);
     } finally {
       setLoadingRooms(false);
     }
-  };
-
-  const staticsColors = {
-    totalCount: '#8884d8',
-    uniqueUsers: '#82ca9d',
-    topUsers: '#ffc658',
-    topRooms: '#ff7e5f',
   };
 
   useEffect(() => {
@@ -123,7 +98,7 @@ const Dashboard: React.FC = () => {
       data={data.stats?.hourlyDistributions}
       transformFunction={transformHourlyData}
       title="弹幕时段分布图"
-      color="#8884d8"
+      color="var(--chart-color-hourly)"
       loading={loading}
     />
   ), [data.stats?.hourlyDistributions, loading]);
@@ -133,7 +108,7 @@ const Dashboard: React.FC = () => {
       data={data.stats?.topUsers}
       transformFunction={transformUserData}
       title="Top 用户弹幕数"
-      color="#82ca9d"
+      color="var(--chart-color-users)"
       loading={loading}
     />
   ), [data.stats?.topUsers, loading]);
@@ -143,7 +118,7 @@ const Dashboard: React.FC = () => {
       data={data.stats?.topRooms}
       transformFunction={transformRoomData}
       title="Top 房间弹幕数"
-      color="#ffc658"
+      color="var(--chart-color-rooms)"
       loading={loading}
     />
   ), [data.stats?.topRooms, loading]);
@@ -153,7 +128,7 @@ const Dashboard: React.FC = () => {
       data={data.wordFreqs}
       transformFunction={transformWordFreqData}
       title="词频统计"
-      color="#ff7e5f"
+      color="var(--chart-color-word-freq)"
       loading={loading}
     />
   ), [data.wordFreqs, loading]);
@@ -208,41 +183,45 @@ const Dashboard: React.FC = () => {
           <>
             {/* Stats Cards */}
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card styles={{ root: { backgroundColor: staticsColors.totalCount } }}>
-                <Statistic
-                  title="弹幕总数"
-                  value={stats.totalCount}
-                  styles={{ content: { color: '#3f8600' } }}
-                />
+              <Card className="stat-card-total-count">
+                <div className="statistic-total-count">
+                  <Statistic
+                    title="弹幕总数"
+                    value={stats.totalCount}
+                  />
+                </div>
               </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card styles={{ root: { backgroundColor: staticsColors.uniqueUsers } }}>
-                <Statistic
-                  title="用户数"
-                  value={stats.uniqueUsers}
-                  styles={{ content: { color: '#3f8600' } }}
-                />
+              <Card className="stat-card-unique-users">
+                <div className="statistic-unique-users">
+                  <Statistic
+                    title="用户数"
+                    value={stats.uniqueUsers}
+                  />
+                </div>
               </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card styles={{ root: { backgroundColor: staticsColors.topUsers } }}>
-                <Statistic
-                  title="最活跃用户"
-                  value={stats.topUsers.length > 0 ? stats.topUsers[0].count : 'N/A'}
-                  prefix={stats.topUsers.length > 0 && stats.topUsers[0].userName ? `@${stats.topUsers[0].userName}` : 'N/A'}
-                  styles={{ content: { color: '#3f8600' } }}
-                />
+              <Card className="stat-card-top-users">
+                <div className="statistic-top-users">
+                  <Statistic
+                    title="最活跃用户"
+                    value={stats.topUsers.length > 0 ? stats.topUsers[0].count : 'N/A'}
+                    prefix={stats.topUsers.length > 0 && stats.topUsers[0].userName ? `@${stats.topUsers[0].userName}` : 'N/A'}
+                  />
+                </div>
               </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card styles={{ root: { backgroundColor: staticsColors.topRooms } }}>
-                <Statistic
-                  title="最活跃直播间"
-                  value={stats.topRooms.length > 0 ? stats.topRooms[0].count : 'N/A'}
-                  prefix={stats.topRooms.length > 0 && stats.topRooms[0].roomName ? `@${stats.topRooms[0].roomName}` : 'N/A'}
-                  styles={{ content: { color: '#3f8600' } }}
-                />
+              <Card className="stat-card-top-rooms">
+                <div className="statistic-top-rooms">
+                  <Statistic
+                    title="最活跃直播间"
+                    value={stats.topRooms.length > 0 ? stats.topRooms[0].count : 'N/A'}
+                    prefix={stats.topRooms.length > 0 && stats.topRooms[0].roomName ? `@${stats.topRooms[0].roomName}` : 'N/A'}
+                  />
+                </div>
               </Card>
             </Col>
           </>
@@ -328,7 +307,7 @@ const ChartComponent = React.memo(({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 12 }} />
               <YAxis />
-              <Tooltip content={CustomTooltip} contentStyle={{ color: color }} />
+              <Tooltip contentStyle={{ color: color }} />
               <Legend verticalAlign="top" layout="horizontal" />
               <Bar dataKey="value" name="弹幕数量" fill={color} />
             </ReBarChart>
