@@ -16,7 +16,10 @@ export const lightTheme: ThemeConfig = {
       siderBg: '#ffffff',
     },
   },
-
+  cssVar: {
+    prefix: "ant",
+    key: 'light',
+  },
   algorithm: defaultAlgorithm,
 };
 
@@ -27,5 +30,16 @@ export const darkTheme: ThemeConfig = {
       headerBg: 'rgb(20, 20, 20)',
     }
   },
+  cssVar: {
+    prefix: "ant",
+    key: 'dark',
+  },
   algorithm: darkAlgorithm,
+}
+
+export type ThemeMode = 'light' | 'dark' | 'auto';
+
+export const getSystemTheme = (): 'light' | 'dark' => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return isDark ? 'dark' : 'light';
 }

@@ -5,6 +5,11 @@
   border-bottom: 1px solid rgba(5, 5, 5, 0.06);
 }
 
+.ant-layout-header {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
 .logo {
   width: 60px;
   height: 80%;
@@ -31,10 +36,11 @@
 
 .header-right {
   display: flex;
-  justify-content: end;
-  align-items: end;
-  gap: 16px;
+  flex-direction: row;
   flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
 }
 
 .sider-container {
