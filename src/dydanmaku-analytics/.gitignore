@@ -13,3 +13,6 @@ wheels/
 local.yaml
 
 logs/
+
+*.lock
+*-lock.yaml
