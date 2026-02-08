@@ -4,9 +4,11 @@ import { useCallback } from "react";
 import type { DanmakuSearchParams } from "./type";
 import type { PaginationData } from "@/src/interface/PaginationData";
 import type { MessageInstance } from "antd/es/message/interface";
+import type { Room } from "@/src/interface/Danmaku";
 
-const { apiBaseUrl, apiVersion } = config;
+const { apiVersion } = config;
 const baseUrl = `/api/${apiVersion}/danmakus`;
+const roomEndpoint = `${baseUrl}/rooms`;
 
 export const useDanmakuApi = (messageApi: MessageInstance) => {
   const fetchDanmakuList = useCallback(async (
@@ -42,6 +44,33 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
     } catch (error) {
       console.error('Failed to fetch danmaku list:', error);
       messageApi.error('获取弹幕列表失败');
+      throw error;
+    }
+  }, []);
+
+  const fetchRooms = useCallback(async (page: number = 1, pageSize: number = 100, search?: string): Promise<PaginationData<Room>> => {
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', page.toString());
+      queryParams.append('pageSize', pageSize.toString());
+      queryParams.append('sorter', 'id asc');
+
+      if (search) {
+        queryParams.append('search', search);
+      }
+
+      const endpoint = `${roomEndpoint}?${queryParams.toString()}`;
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        throw new Error(`获取房间列表失败: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Failed to fetch rooms:', error);
+      messageApi.error('获取房间列表失败');
       throw error;
     }
   }, []);
@@ -95,6 +124,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
 
   return {
     fetchDanmakuList,
+    fetchRooms,
     deleteDanmaku,
     updateDanmaku
   };

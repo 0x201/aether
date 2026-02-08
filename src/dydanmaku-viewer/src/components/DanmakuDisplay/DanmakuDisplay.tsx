@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import './DanmakuDisplay.style.css';
 import type { DanmakuDisplayProps } from './type';
 
-const DanmuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProps) => {
+const DanmakuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProps) => {
   const { danmakuList, autoScroll = true } = props;
   const SCROLL_THRESHOLD = 10;
 
@@ -99,4 +99,4 @@ const DanmuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProps)
   );
 };
 
-export default DanmuDisplay;
+export default DanmakuDisplay;

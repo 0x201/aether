@@ -1,11 +1,8 @@
 import { DashboardOutlined, TableOutlined, UserOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { Menu, type MenuProps } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
+import type { AppNavigationProps } from "./type";
 
-interface AppNavigationProps {
-  mode?: 'horizontal' | 'inline';
-  theme?: 'light' | 'dark';
-}
 
 const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) => {
   const navigate = useNavigate();

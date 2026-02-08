@@ -38,7 +38,7 @@ const roomEndpoint = `/api/${apiVersion}/danmakus/rooms`;
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
   Running: { color: 'blue', text: '运行中' },
   Completed: { color: 'green', text: '已完成' },
-  Cancelled: { color: 'orange', text: '已停止' },
+  Cancelled: { color: 'orange', text: '已取消' },
   Failed: { color: 'orange', text: '已失败' },
   Terminated: { color: 'red', text: '已终止' },
 };
@@ -114,7 +114,7 @@ const CaptureView: React.FC = () => {
         messageApi.error('获取任务列表失败');
       }
     } catch (error) {
-      console.error('获取任务列表时发生错误:', error);
+      console.error('An error occurred while fetching task list:', error);
       messageApi.error('获取任务列表时发生错误');
     } finally {
       setLoading(false);

@@ -16,17 +16,17 @@ import {
   Collapse,
   type CollapseProps,
   Typography,
-  DatePicker
+  DatePicker,
 } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import './DanmakuMgt.css';
-import type { Danmaku } from '@/src/interface/Danmaku';
-import type { DanmakuSearchParams } from './type';
+import type { Danmaku, Room } from '@/src/interface/Danmaku';
+import type { DanmakuSearchParams, RoomValue } from './type';
 import { useDanmakuApi } from './useDanmakuApi';
 import { buildSorter } from '@/src/util';
+import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect';
 
 const { Title } = Typography;
-
 const DanmakuMgt: React.FC = () => {
   const [danmakuList, setDanmakuList] = useState<Danmaku[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,7 +65,28 @@ const DanmakuMgt: React.FC = () => {
     roomId: '',
   });
 
-  const { fetchDanmakuList, deleteDanmaku, updateDanmaku } = useDanmakuApi(messageApi);
+  const { fetchDanmakuList, deleteDanmaku, updateDanmaku, fetchRooms: apiFetchRooms } = useDanmakuApi(messageApi);
+
+  const fetchRoomOptions = useCallback(async (page: number = 1, pageSize: number = 10, search?: string): Promise<{ data: RoomValue[], total: number }> => {
+    try {
+      const response = await apiFetchRooms(page, pageSize, search);
+
+      return {
+        data: response.data.map((room: Room) => ({
+          label: `${room.anchorName} (房间ID: ${room.roomId})`,
+          value: room.roomId.toString()
+        })),
+        total: response.total
+      };
+    } catch (error) {
+      console.error('Failed to fetch rooms:', error);
+      messageApi.error('获取房间列表失败');
+      return {
+        data: [],
+        total: 0
+      };
+    }
+  }, [apiFetchRooms, messageApi]);
 
   const loadDanmakuList = useCallback(async () => {
     setLoading(true);
@@ -102,7 +123,7 @@ const DanmakuMgt: React.FC = () => {
       const searchParamsWithTime: DanmakuSearchParams = {
         userName: values.userName || undefined,
         content: values.content || undefined,
-        roomId: values.roomId || undefined,
+        roomId: values.roomId?.value || undefined, // Extract value from selected option
         startTime: values.timeRange && values.timeRange[0] ? values.timeRange[0].toISOString() : undefined,
         endTime: values.timeRange && values.timeRange[1] ? values.timeRange[1].toISOString() : undefined,
       };
@@ -143,7 +164,7 @@ const DanmakuMgt: React.FC = () => {
           setIsModalVisible(false);
           form.resetFields();
           setEditingDanmaku(null);
-          loadDanmakuList(); // 重新加载列表
+          loadDanmakuList();
         }
       }
     } catch (error) {
@@ -374,7 +395,17 @@ const DanmakuMgt: React.FC = () => {
             </Col>
             <Col xs={24} sm={12} md={3} lg={3} xl={4}>
               <Form.Item name="roomId" label="房间ID">
-                <Input placeholder="精确匹配" />
+                <InfiniteRefreshSelect<RoomValue>
+                  fetchOptions={fetchRoomOptions}
+                  placeholder="请输入房间ID或主播名"
+                  debounceTimeout={300}
+                  pageSize={10}
+                  optionRender={(option: any) => (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      {option.data.label}
+                    </div>
+                  )}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6} lg={6} xl={6}>
@@ -398,7 +429,7 @@ const DanmakuMgt: React.FC = () => {
           </Row>
         </Form>
     }
-  ], [handleSearch, handleResetSearch, searchForm]);
+  ], [handleSearch, handleResetSearch, searchForm, fetchRoomOptions]);
 
   return (
     <div className="danmaku-mgt">

@@ -5,3 +5,9 @@ export interface DanmakuSearchParams extends SortedRequest, TimeRangeRequest {
     content?: string;
     roomId?: string;
 }
+
+
+export interface RoomValue {
+  label: string;
+  value: string;
+}

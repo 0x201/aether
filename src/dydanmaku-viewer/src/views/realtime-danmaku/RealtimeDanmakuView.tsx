@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { Button, Input, Card, Space, message } from 'antd';
-import DanmakuDisplay from '@/src/components/DanmakuDisplay';
+import { DanmakuDisplay } from '@/src/components/DanmakuDisplay';
 import type { Danmaku } from '@/src/interface/Danmaku';
 import "./RealtimeDanmakuView.css";
 
