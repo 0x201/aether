@@ -6,6 +6,7 @@ export interface CaptureJob {
   startTime: string;
   endTime: string | null;
   createdAt: string;
+  roomName: string;
 }
 
 export interface CaptureJobList {

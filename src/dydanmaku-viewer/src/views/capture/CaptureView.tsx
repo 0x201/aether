@@ -208,6 +208,12 @@ const CaptureView: React.FC = () => {
       sorter: { multiple: 2 },
     },
     {
+      title: '房间名称',
+      dataIndex: 'roomName',
+      key: 'roomName',
+      sorter: { multiple: 3 },
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
@@ -215,7 +221,7 @@ const CaptureView: React.FC = () => {
         const statusInfo = STATUS_CONFIG[status] || { color: 'default', text: status };
         return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
       },
-      sorter: { multiple: 3 },
+      sorter: { multiple: 4 },
     },
     {
       title: '持续时间(秒)',
@@ -232,7 +238,7 @@ const CaptureView: React.FC = () => {
       dataIndex: 'endTime',
       key: 'endTime',
       render: (text: string | null) => text ? text : 'N/A',
-      sorter: { multiple: 4 },
+      sorter: { multiple: 5 },
     },
     {
       title: '创建时间',

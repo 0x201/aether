@@ -54,8 +54,11 @@ public class DanmakuQueries(
 
     public async Task<PagedListResult<CaptureJobDto>> GetPagedCaptureJobs(CaptureJobRequest request, CancellationToken cancellationToken = default)
     {
-        var query = dbContext.CaptureJobs
-                .AsNoTracking();
+        var query = dbContext.CaptureJobs.AsNoTracking()
+            .Join(dbContext.Rooms.AsNoTracking(),
+            (job) => job.RoomId,
+            (room) => room.RoomId,
+            (job, room) => new { job, room });
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -65,14 +68,14 @@ public class DanmakuQueries(
         }
         else
         {
-            query = query.OrderByDescending(x => x.Id);
+            query = query.OrderByDescending(x => x.job.Id);
         }
 
         var jobs = await query
             .PagedBy(request.Page, request.PageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
-        var res = PagedListResult<CaptureJobDto>.Success(CaptureJobMapping.MapToDtos(jobs), totalCount);
+        var res = PagedListResult<CaptureJobDto>.Success(CaptureJobMapping.MapToDtos(jobs.Select(j => (j.job, j.room)).ToList()), totalCount);
         return res;
     }
 

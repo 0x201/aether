@@ -7,5 +7,6 @@ public record CaptureJobDto(
     string Status,
     string StartTime,
     string? EndTime,
-    string CreatedAt
+    string CreatedAt,
+    string? RoomName = null
 );
