@@ -2,6 +2,12 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddZLoggerConsole(options =>
+{
+    options.UseJsonFormatter();
+});
+
 builder.Services.AddProblemDetails();
 
 builder.AddServiceDefaults();
