@@ -1,7 +1,8 @@
-from sqlalchemy import String, DateTime, Index, Integer
-from sqlalchemy.orm import Mapped, mapped_column
-from typing import Optional
 from datetime import datetime, timezone
+from typing import Optional
+
+from sqlalchemy import DateTime, Index, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
 

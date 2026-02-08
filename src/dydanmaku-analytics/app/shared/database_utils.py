@@ -1,6 +1,7 @@
-from typing import Any, Optional, TypeVar, Generic, Tuple
-from sqlalchemy import Select, asc, desc
+from typing import Any, Generic, Optional, Tuple, TypeVar
+
 from loguru import logger
+from sqlalchemy import Select, asc, desc
 
 T = TypeVar("T")
 

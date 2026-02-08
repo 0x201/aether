@@ -1,15 +1,16 @@
 from typing import List, Optional, Tuple
+
 from sqlalchemy import select, update
-from .session_factory import SessionFactory
 
 from .common import get_generic_paged_data
 from .nppa_models import (
-    GameAudit,
-    NetworkGameAudit,
     EGameAudit,
     GameAlterationAudit,
+    GameAudit,
     GameRevocationAudit,
+    NetworkGameAudit,
 )
+from .session_factory import SessionFactory
 
 
 class NPPARepository:

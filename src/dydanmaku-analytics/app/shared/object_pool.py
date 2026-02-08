@@ -1,9 +1,9 @@
+import threading
 import time
 from collections import deque
 from dataclasses import dataclass
-from typing import TypeVar, Optional, Generic, Callable
-import threading
 from statistics import mean
+from typing import Callable, Generic, Optional, TypeVar
 
 T = TypeVar("T")
 

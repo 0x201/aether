@@ -1,10 +1,12 @@
 from typing import Annotated
 
+from dependency_injector.wiring import Provide
+from fastapi import Depends
+
+from app.cache import CacheSession
 from app.database import DanmakuRepository, NPPARepository
 from app.services import DanmakuAnalyzer
-from app.cache import CacheSession
-from fastapi import Depends
-from dependency_injector.wiring import Provide
+
 from .container import Container
 
 DanmakuAnalyzerDep = Annotated[
@@ -16,6 +18,4 @@ DanmakuRepositoryDep = Annotated[
 NPPARepositoryDep = Annotated[
     NPPARepository, Depends(Provide[Container.nppa_repository])
 ]
-CacheSessionDep = Annotated[
-    CacheSession, Depends(Provide[Container.cache_session])
-]
+CacheSessionDep = Annotated[CacheSession, Depends(Provide[Container.cache_session])]

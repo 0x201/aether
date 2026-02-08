@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.deps import DanmakuAnalyzerDep
-from fastapi import APIRouter, Body, HTTPException
 from dependency_injector.wiring import inject
+from fastapi import APIRouter, Body, HTTPException
+
 from app.dataclass import PeriodType
+from app.deps import DanmakuAnalyzerDep
 
 from .timed_route import TimedRoute
 

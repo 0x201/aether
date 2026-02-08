@@ -1,8 +1,9 @@
-﻿import coverage
-import pytest
-import sys
-import datetime
+﻿import datetime
 import os
+import sys
+
+import coverage
+import pytest
 
 
 def run_tests_with_coverage():

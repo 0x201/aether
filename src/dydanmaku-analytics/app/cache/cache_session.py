@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+
 from redis.asyncio import Redis
+
 from app.core import settings
-from loguru import logger
 
 
 class CacheSession:

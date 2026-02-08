@@ -1,5 +1,5 @@
-from .scheduled_nppa_crawler import ScheduledNPPACrawler
 from .scheduled_danmaku_analyzer import ScheduledDanmakuAnalyzer
+from .scheduled_nppa_crawler import ScheduledNPPACrawler
 
 __all__ = ["ScheduledNPPACrawler", "ScheduledDanmakuAnalyzer"]
 

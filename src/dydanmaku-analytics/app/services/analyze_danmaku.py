@@ -1,7 +1,3 @@
-"""
-Data analysis module for Douyu danmu
-"""
-
 import json
 import time
 from collections import Counter
@@ -9,12 +5,14 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import jieba3
+from loguru import logger
+from sqlalchemy import and_, select
+
 from app.cache import CacheSession
 from app.database import Danmaku, DanmakuAnalysis, SessionFactory
 from app.dataclass import PeriodType
+
 from .analytics_notification import AnalyticsNotification
-from sqlalchemy import and_, select
-from loguru import logger
 
 
 class DanmakuAnalyzer:
@@ -36,7 +34,7 @@ class DanmakuAnalyzer:
         room_id: Optional[int],
     ) -> str:
         """
-        Generate a consistent cache key following the same format as the C# version
+        Generate a consistent cache key following the specific format
         """
         date_format = "%Y_%m_%d_%H_%M_%S"
         room_id_str = str(room_id) if room_id is not None else "All"

@@ -1,5 +1,5 @@
-from enum import Enum
 import os
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -76,11 +76,22 @@ class SqliteConfig(BaseModel):
 
 class PostgreSQLConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    host: str = Field(os.getenv("DYDANMAKUDB_HOST", "localhost"), description="Database host address")
-    port: Optional[int] = Field(int(os.getenv("DYDANMAKUDB_PORT", "5432")), description="Database server port")
-    username: Optional[str] = Field(os.getenv("DYDANMAKUDB_USERNAME", "postgres"), description="Database username")
-    password: Optional[str] = Field(os.getenv("DYDANMAKUDB_PASSWORD", ""), description="Database password")
-    database: str = Field(os.getenv("DYDANMAKUDB_DATABASENAME", "dydanmakudb"), description="Database name")
+    host: str = Field(
+        os.getenv("DYDANMAKUDB_HOST", "localhost"), description="Database host address"
+    )
+    port: Optional[int] = Field(
+        int(os.getenv("DYDANMAKUDB_PORT", "5432")), description="Database server port"
+    )
+    username: Optional[str] = Field(
+        os.getenv("DYDANMAKUDB_USERNAME", "postgres"), description="Database username"
+    )
+    password: Optional[str] = Field(
+        os.getenv("DYDANMAKUDB_PASSWORD", ""), description="Database password"
+    )
+    database: str = Field(
+        os.getenv("DYDANMAKUDB_DATABASENAME", "dydanmakudb"),
+        description="Database name",
+    )
     dbschema: Optional[str] = Field(None, description="Database schema")
 
     @field_validator("host")

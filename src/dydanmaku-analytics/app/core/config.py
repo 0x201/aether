@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import List, Literal, Optional, Type
 
-
+from loguru import logger
 from pydantic import Field
 from pydantic_settings import (
     BaseSettings,
@@ -11,8 +11,8 @@ from pydantic_settings import (
     SettingsConfigDict,
     YamlConfigSettingsSource,
 )
+
 from .model import DatabaseConfig, PostgreSQLConfig, SqliteConfig
-from loguru import logger
 
 
 def determine_environment(env: Optional[str | Path]) -> str:

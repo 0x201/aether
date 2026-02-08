@@ -1,4 +1,5 @@
-from sqlalchemy import select, asc, desc
+from sqlalchemy import asc, desc, select
+
 from app.common.database_utils import DatabaseUtils
 from app.database.models import Danmaku, Room
 

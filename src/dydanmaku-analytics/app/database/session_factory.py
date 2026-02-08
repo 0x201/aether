@@ -2,14 +2,13 @@ import os
 from contextlib import contextmanager
 from typing import Iterator, Optional, Union
 
-from app.core.config import settings
-from app.core.model import DatabaseConfig, DatabaseType
-
+from loguru import logger
 from sqlalchemy import URL, Engine, create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, sessionmaker, scoped_session
+from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-from loguru import logger
+from app.core.config import settings
+from app.core.model import DatabaseConfig, DatabaseType
 
 
 class MSSQLSession:
@@ -305,7 +304,9 @@ class PostgreSQLSession:
                 pool_pre_ping=self.pool_pre_ping,
                 pool_recycle=self.pool_recycle,
                 future=True,
-                connect_args={"options": f"-csearch_path={self.dbschema or "dydanmaku"}"},
+                connect_args={
+                    "options": f"-csearch_path={self.dbschema or "dydanmaku"}"
+                },
             )
 
             self.session_local = scoped_session(

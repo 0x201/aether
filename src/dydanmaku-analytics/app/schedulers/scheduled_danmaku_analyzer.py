@@ -2,20 +2,19 @@
 Scheduled analyzer service for precomputing word frequency and wordcloud data
 """
 
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from abc import ABC, abstractmethod
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from loguru import logger
 from sqlalchemy import select
 
 from app.database import Danmaku, SessionFactory
-from app.services import DanmakuAnalyzer
-from app.messaging import EventBus
 from app.dataclass import PeriodType
-
-
-from loguru import logger
+from app.messaging import EventBus
+from app.services import DanmakuAnalyzer
 
 
 class TimeRangeStrategy(ABC):

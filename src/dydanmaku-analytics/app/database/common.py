@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional, Tuple, Type
+
 from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.orm import Session
 

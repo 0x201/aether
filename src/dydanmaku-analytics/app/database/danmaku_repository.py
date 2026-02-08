@@ -7,8 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.dataclass.danmaku_model import CaptureJobStatus
 from app.shared import DatabaseUtils
-from .session_factory import SessionFactory
+
 from .danmaku_models import CaptureJob, Danmaku, Room
+from .session_factory import SessionFactory
 
 
 class DanmakuRepository:

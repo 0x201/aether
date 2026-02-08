@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
 import datetime
 import re
-
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Dict, List
 from urllib.parse import urljoin
@@ -9,15 +8,15 @@ from urllib.parse import urljoin
 from loguru import logger
 from playwright.async_api import async_playwright
 
+from app.core.config import settings
 from app.database import (
     EGameAudit,
-    GameRevocationAudit,
     GameAlterationAudit,
-    NetworkGameAudit,
     GameAudit,
+    GameRevocationAudit,
+    NetworkGameAudit,
+    NPPARepository,
 )
-from app.core.config import settings
-from app.database import NPPARepository
 
 
 class NPPAGameAuditType(Enum):
@@ -832,7 +831,6 @@ class NPPAGameAuditCrawler:
                 logger.info(
                     f"Saved total {len(non_alteration_audits)} game audits to database"
                 )
-
 
     async def _get_all_game_audits(self) -> None:
         """Get full game audits and save to database"""

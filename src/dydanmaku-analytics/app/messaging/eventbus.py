@@ -1,10 +1,12 @@
-from contextlib import contextmanager
 import json
+import threading
+from contextlib import contextmanager
 from typing import Any, Callable, Dict, Protocol
+
 import pika
 from loguru import logger
+
 from app.core.config import settings
-import threading
 
 
 class IEventBus(Protocol):
@@ -29,7 +31,8 @@ class EventBus(IEventBus):
     def _create_connection(self):
         try:
             credentials = pika.PlainCredentials(
-                settings.messaging.rabbitmq_username, settings.messaging.rabbitmq_password
+                settings.messaging.rabbitmq_username,
+                settings.messaging.rabbitmq_password,
             )
             parameters = pika.ConnectionParameters(
                 host=settings.messaging.rabbitmq_host,

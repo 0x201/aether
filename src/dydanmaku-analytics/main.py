@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -8,12 +8,12 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
-from scalar_fastapi import get_scalar_api_reference, Theme
+from scalar_fastapi import Theme, get_scalar_api_reference
 
 from app.api import api_router
 from app.core import settings
-from app.schedulers import start_scheduled_tasks, stop_scheduled_tasks, set_container
 from app.deps import Container
+from app.schedulers import set_container, start_scheduled_tasks, stop_scheduled_tasks
 
 
 class InterceptHandler(logging.Handler):

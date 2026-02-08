@@ -1,13 +1,14 @@
 from typing import List, Optional
-from fastapi import APIRouter, Query
-from dependency_injector.wiring import inject
 
-from .timed_route import TimedRoute
-from app.dataclass.common import PagedResult
+from dependency_injector.wiring import inject
+from fastapi import APIRouter, Query
+
 from app.database import GameAudit, NetworkGameAudit
 from app.dataclass import GameAuditDto, NetworkGameAuditDto
-
+from app.dataclass.common import PagedResult
 from app.deps import NPPARepositoryDep
+
+from .timed_route import TimedRoute
 
 router = APIRouter(route_class=TimedRoute)
 
