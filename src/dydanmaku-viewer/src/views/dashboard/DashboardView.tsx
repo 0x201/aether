@@ -13,7 +13,8 @@ import {
 } from 'recharts';
 import { colormapOptions } from '@/src/components/Wordcloud/type';
 import { useDashboardData } from './useDashboardData';
-import type { HourlyDistribution, Room, TopRoom, TopUser, WordFreq } from './type';
+import type { HourlyDistribution, TopRoom, TopUser, WordFreq } from './type';
+import type { Room } from '@/src/interface/Danmaku';
 import './Dashboard.css';
 import type { Dayjs } from 'dayjs';
 
@@ -67,6 +68,13 @@ const Dashboard: React.FC = () => {
     } finally {
       setLoadingRooms(false);
     }
+  };
+
+  const staticsColors = {
+    totalCount: '#8884d8',
+    uniqueUsers: '#82ca9d',
+    topUsers: '#ffc658',
+    topRooms: '#ff7e5f',
   };
 
   useEffect(() => {
@@ -200,7 +208,7 @@ const Dashboard: React.FC = () => {
           <>
             {/* Stats Cards */}
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card>
+              <Card styles={{ root: { backgroundColor: staticsColors.totalCount } }}>
                 <Statistic
                   title="弹幕总数"
                   value={stats.totalCount}
@@ -209,7 +217,7 @@ const Dashboard: React.FC = () => {
               </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card>
+              <Card styles={{ root: { backgroundColor: staticsColors.uniqueUsers } }}>
                 <Statistic
                   title="用户数"
                   value={stats.uniqueUsers}
@@ -218,7 +226,7 @@ const Dashboard: React.FC = () => {
               </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card>
+              <Card styles={{ root: { backgroundColor: staticsColors.topUsers } }}>
                 <Statistic
                   title="最活跃用户"
                   value={stats.topUsers.length > 0 ? stats.topUsers[0].count : 'N/A'}
@@ -228,7 +236,7 @@ const Dashboard: React.FC = () => {
               </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={6} xl={6}>
-              <Card>
+              <Card styles={{ root: { backgroundColor: staticsColors.topRooms } }}>
                 <Statistic
                   title="最活跃直播间"
                   value={stats.topRooms.length > 0 ? stats.topRooms[0].count : 'N/A'}
