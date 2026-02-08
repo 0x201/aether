@@ -74,7 +74,7 @@ class EventBus(IEventBus):
             bool: True if the message was published successfully, False otherwise.
         """
         with self.get_connection() as conn:
-            connection, channel = conn["connection"], conn["channel"]
+            channel = conn["channel"]
 
             if not channel:
                 logger.error("Cannot publish: no channel available")
