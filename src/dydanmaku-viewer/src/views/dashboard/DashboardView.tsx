@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Card, Row, Col, Statistic, Spin, DatePicker, Typography, message, Select } from 'antd';
 import WordCloud from '@/src/components/Wordcloud';
 import {
-  BarChart as ReBarChart,
+  BarChart,
   Bar,
   XAxis,
   YAxis,
@@ -100,6 +100,7 @@ const Dashboard: React.FC = () => {
       title="弹幕时段分布图"
       color="var(--chart-color-hourly)"
       loading={loading}
+      angle={0}
     />
   ), [data.stats?.hourlyDistributions, loading]);
 
@@ -110,6 +111,7 @@ const Dashboard: React.FC = () => {
       title="Top 用户弹幕数"
       color="var(--chart-color-users)"
       loading={loading}
+      angle={-45}
     />
   ), [data.stats?.topUsers, loading]);
 
@@ -120,6 +122,7 @@ const Dashboard: React.FC = () => {
       title="Top 房间弹幕数"
       color="var(--chart-color-rooms)"
       loading={loading}
+      angle={-45}
     />
   ), [data.stats?.topRooms, loading]);
 
@@ -130,6 +133,7 @@ const Dashboard: React.FC = () => {
       title="词频统计"
       color="var(--chart-color-word-freq)"
       loading={loading}
+      angle={-45}
     />
   ), [data.wordFreqs, loading]);
 
@@ -285,32 +289,42 @@ const ChartComponent = React.memo(({
   transformFunction,
   title,
   color,
-  loading
+  loading,
+  angle,
 }: {
   data: any;
   transformFunction: (data: any) => any;
   title: string;
   color: string;
   loading: boolean;
+  angle?: number;
 }) => {
   const transformedData = transformFunction(data || []);
 
   return (
     <Card title={title} style={{ height: '100%' }}>
-      <div style={{ height: 400 }}>
+      <div style={{ height: 500, width: '100%' }}>
         {!loading && data && data.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300} minHeight={300} debounce={150}>
-            <ReBarChart
+          <ResponsiveContainer width="100%" height="100%" debounce={150}>
+            <BarChart
               data={transformedData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+              barSize={60}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 12 }} />
+              <XAxis 
+                dataKey="name"
+                angle={angle}
+                textAnchor="end"
+                tickMargin={25}
+                height={100}
+                interval={0}
+                tick={{ fontSize: 12 }}
+              />
               <YAxis />
               <Tooltip contentStyle={{ color: color }} />
               <Legend verticalAlign="top" layout="horizontal" />
               <Bar dataKey="value" name="弹幕数量" fill={color} />
-            </ReBarChart>
+            </BarChart>
           </ResponsiveContainer>
         ) : (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
