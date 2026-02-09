@@ -128,14 +128,14 @@ const Dashboard: React.FC = () => {
 
   const WordFreqChart = useMemo(() => (
     <ChartComponent
-      data={data.wordFreqs}
+      data={data.wordFreqs?.slice(0, 20)}
       transformFunction={transformWordFreqData}
       title="词频统计Top20"
       color="var(--chart-color-word-freq)"
       loading={loading}
       angle={-45}
     />
-  ), [data.wordFreqs?.slice(0, 20), loading]);
+  ), [data.wordFreqs, loading]);
 
   return (
     <div className="dashboard-container">
