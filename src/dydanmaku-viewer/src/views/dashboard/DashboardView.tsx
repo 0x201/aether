@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
     <ChartComponent
       data={data.stats?.topUsers}
       transformFunction={transformUserData}
-      title="Top 用户弹幕数"
+      title="Top 10 用户弹幕数"
       color="var(--chart-color-users)"
       loading={loading}
       angle={-45}
@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
     <ChartComponent
       data={data.stats?.topRooms}
       transformFunction={transformRoomData}
-      title="Top 房间弹幕数"
+      title="Top 10 房间弹幕数"
       color="var(--chart-color-rooms)"
       loading={loading}
       angle={-45}
@@ -130,12 +130,12 @@ const Dashboard: React.FC = () => {
     <ChartComponent
       data={data.wordFreqs}
       transformFunction={transformWordFreqData}
-      title="词频统计"
+      title="词频统计Top20"
       color="var(--chart-color-word-freq)"
       loading={loading}
       angle={-45}
     />
-  ), [data.wordFreqs, loading]);
+  ), [data.wordFreqs?.slice(0, 20), loading]);
 
   return (
     <div className="dashboard-container">
