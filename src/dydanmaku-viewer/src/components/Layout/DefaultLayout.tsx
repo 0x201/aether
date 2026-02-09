@@ -13,7 +13,7 @@ import AppNavigation from './AppNavigation';
 import './DefaultLayout.css';
 import FloatButton from 'antd/es/float-button';
 import ThemeSwitch from '../ThemeToggle/ThemeSwitch';
-import NotificationDropdown from '../NotificationDropdown';
+import MessageBox from '../MessageBox';
 
 const DefaultLayout: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
@@ -30,7 +30,7 @@ const DefaultLayout: React.FC = () => {
                         <AppNavigation mode="horizontal" />
                     </div>
                     <div className="header-right">
-                        <NotificationDropdown />
+                        <MessageBox />
                         <AnimatedThemeSwitch />
                         <ThemeSwitch />
                     </div>

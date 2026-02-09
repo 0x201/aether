@@ -4,24 +4,25 @@ import type { MenuProps } from 'antd';
 import { BellOutlined, ClearOutlined } from '@ant-design/icons';
 import { useMessageContext } from '@/src/contexts/MessageContext';
 import dayjs from 'dayjs';
+import type { AnalyticsMessage } from '../interface/Message';
 
-const NotificationDropdown: React.FC = () => {
-  const { notifications, unreadCount, markAsRead, clearAll } = useMessageContext();
+const MessageBox: React.FC = () => {
+  const { messages, unreadCount, markAsRead, clearAll } = useMessageContext();
 
-  const menuItems: MenuProps['items'] = notifications.length > 0
-    ? notifications.map((notification, index) => ({
-        key: `notification-${index}`,
+  const menuItems: MenuProps['items'] = messages.length > 0
+    ? (messages as AnalyticsMessage[]).map((message, index) => ({
+        key: `message-${index}`,
         label: (
           <div style={{ width: '300px' }}>
-            <div><strong>房间: {notification.roomId}</strong></div>
-            <div>统计周期: {notification.periodType}</div>
-            <div>开始时间：{notification.startDate}</div>
-            <div>结束时间：{notification.endDate}</div>
-            <div>词频数: {notification.frequenciesCount}</div>
-            <div>时间: {dayjs(notification.completedAt).format('YYYY-MM-DD HH:mm:ss')}</div>
+            <div><strong>房间: {message.roomId}</strong></div>
+            <div>统计周期: {message.periodType}</div>
+            <div>开始时间：{message.startDate}</div>
+            <div>结束时间：{message.endDate}</div>
+            <div>词频数: {message.frequenciesCount}</div>
+            <div>时间: {dayjs(message.completedAt).format('YYYY-MM-DD HH:mm:ss')}</div>
           </div>
         ),
-        onClick: () => markAsRead(notification.id)
+        onClick: () => markAsRead(message.id)
       }))
     : [{
         key: 'empty',
@@ -52,4 +53,4 @@ const NotificationDropdown: React.FC = () => {
   );
 };
 
-export default NotificationDropdown;
+export default MessageBox;
