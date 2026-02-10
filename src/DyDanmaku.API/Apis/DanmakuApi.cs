@@ -20,7 +20,6 @@
         .Produces<Result<RoomDto>>(StatusCodes.Status200OK)
         .Produces<Result>(StatusCodes.Status409Conflict)
         .Produces<Result>(StatusCodes.Status400BadRequest)
-        .Produces<Result>(StatusCodes.Status400BadRequest)
         .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
 
         api.MapPost("/capture/stop", StopCaptureAsync)
@@ -87,8 +86,8 @@
         .Produces<Result>(StatusCodes.Status400BadRequest)
         .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
 
-        api.MapGet("/active-job/", GetActiveJobAsync)
-        .WithName("AttiveJob")
+        api.MapGet("/active-job", GetActiveJobAsync)
+        .WithName("ActiveJob")
         .WithDescription("Returns active job")
         .WithSummary("Active capture job")
         .Produces<Result<CaptureJobDto>>(StatusCodes.Status200OK)
