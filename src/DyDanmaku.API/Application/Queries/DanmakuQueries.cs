@@ -205,7 +205,7 @@ public class DanmakuQueries(
             .GroupBy(x => x.ToLocalTime().Hour)
             .Select(x => new HourlyDistribution
             {
-                Hour = x.Key.ToString(),
+                Hour = x.Key,
                 Count = x.Count()
             })
             .OrderBy(x => x.Hour)

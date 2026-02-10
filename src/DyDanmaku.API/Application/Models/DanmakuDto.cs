@@ -36,7 +36,7 @@ public record TopRoom
 
 public record HourlyDistribution
 {
-    public string Hour { get; set; } = string.Empty;
+    public int Hour { get; set; }
     public int Count { get; set; }
 }
 
