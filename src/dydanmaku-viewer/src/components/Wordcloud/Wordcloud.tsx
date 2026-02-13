@@ -19,7 +19,7 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
         height = 600,
         colormap = 'viridis',
         customColor,
-        rotation = () => (~~(Math.random() * 6) - 3) * 30,
+        rotation: rotationProp,
         fontFamily = 'Impact',
         spiral = 'archimedean',
         onWordClick,
@@ -78,6 +78,22 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
         }));
     }, [words, minFontSize, maxFontSize]);
 
+    // Deterministic rotation function based on word text (stable across renders)
+    const rotationFn = useMemo(() => {
+        if (typeof rotationProp === 'function') return rotationProp;
+
+        return (d: any, i: number) => {
+            const s = (d && d.text) ? String(d.text) : String(i);
+            let h = 0;
+            for (let j = 0; j < s.length; j++) {
+                h = (h << 5) - h + s.charCodeAt(j);
+                h |= 0;
+            }
+            const r = Math.abs(h) % 6; // 0..5
+            return (r - 3) * 30;
+        };
+    }, [rotationProp]);
+
     useEffect(() => {
         if (!processedWords.length || !svgRef.current || !containerRef.current) return;
 
@@ -87,7 +103,7 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
             .size([width, height])
             .words(processedWords)
             .padding(5)
-            .rotate(rotation)
+            .rotate(rotationFn)
             .font(fontFamily)
             .fontSize((d: any) => d.size)
             .spiral(spiral)
@@ -104,7 +120,7 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
                 d3.select(svgRef.current).selectAll('*').remove();
             }
         };
-    }, [processedWords, width, height, rotation, fontFamily, spiral]);
+    }, [processedWords, width, height, rotationFn, fontFamily, spiral]);
 
     useEffect(() => {
         if (!layoutReady || !layoutWordsRef.current.length || !svgRef.current) return;
