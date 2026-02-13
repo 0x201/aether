@@ -4,12 +4,10 @@ Scheduled analyzer service for precomputing word frequency and wordcloud data
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
-from enum import Enum
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
-from sqlalchemy import select
 
 from app.database import Danmaku, SessionFactory
 from app.dataclass import PeriodType
