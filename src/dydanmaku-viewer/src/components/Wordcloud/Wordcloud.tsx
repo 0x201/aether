@@ -152,7 +152,7 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
             .style('font-weight', 'bold')
             .attr('text-anchor', 'middle')
             .attr('transform', (d: Word) =>
-                `translate(${d.x},${d.y})rotate(${d.rotate})`
+                `translate(${d.x},${d.y}) rotate(${d.rotate})`
             )
             .text((d: Word) => d.text as string)
             .attr('class', 'word-cloud-word')
@@ -162,10 +162,12 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
                 const element = d3.select(this);
                 element
                     .style('opacity', 0.8)
-                    .style('transform', `translate(${d.x},${d.y}) rotate(${d.rotate}) scale(1.2)`)
-                    .style('cursor', 'pointer');
+                    .style('cursor', 'pointer')
+                    .transition().duration(150)
+                    .attr('transform', `translate(${d.x},${d.y}) rotate(${d.rotate}) scale(1.2)`);
 
                 if (showTooltip) {
+                    element.select('title').remove();
                     element.append('title').text(`${d.text}: ${d.size}`);
                 }
 
@@ -178,7 +180,8 @@ const WordCloud: React.FC<WordCloudProps> = (prop: WordCloudProps) => {
                 const t = colorScale(d.size as number);
                 element
                     .style('opacity', 1)
-                    .style('transform', `translate(${d.x},${d.y})rotate(${d.rotate})scale(1)`)
+                    .transition().duration(150)
+                    .attr('transform', `translate(${d.x},${d.y}) rotate(${d.rotate}) scale(1)`)
                     .style('fill', colormapFunction(t));
 
                 if (onWordHover) {
