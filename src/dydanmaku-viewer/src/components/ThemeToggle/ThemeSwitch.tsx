@@ -3,9 +3,10 @@ import { Button, Dropdown, Space } from 'antd';
 import type { MenuProps } from 'antd';
 import { 
   SunOutlined, 
-  MoonOutlined, 
-  DesktopOutlined,
-  CheckOutlined 
+  MoonOutlined,
+  CheckOutlined, 
+  SyncOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import { useTheme } from '@/src/contexts/ThemeContext';
 
@@ -44,14 +45,14 @@ const ThemeSwitch: React.FC = () => {
           {themeMode === 'auto' && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),
-      icon: <DesktopOutlined />,
+      icon: <SyncOutlined />,
       onClick: () => setThemeMode('auto'),
     },
   ];
 
   const getThemeIcon = () => {
     if (themeMode === 'auto') {
-      return <DesktopOutlined />;
+      return <SettingOutlined />;
     }
     return currentTheme === 'dark' ? <MoonOutlined /> : <SunOutlined />;
   };
