@@ -2,11 +2,11 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>13.1.0</AspireVersion>
+    <AspireVersion>13.1.1</AspireVersion>
     <AspnetVersion>10.0.2</AspnetVersion>
     <ApiVersioningVersion>8.1.1</ApiVersioningVersion>
-    <MSTestVersion>4.0.2</MSTestVersion>
-    <FluentUIVersion>4.13.2</FluentUIVersion>
+    <MSTestVersion>4.1.0</MSTestVersion>
+    <FluentUIVersion>4.14.0</FluentUIVersion>
     <CommunityToolkitWinUIVersion>8.2.251219</CommunityToolkitWinUIVersion>
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
   </PropertyGroup>
@@ -17,7 +17,6 @@
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Python" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="$(AspireVersion)" />
@@ -75,7 +74,7 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />
     <!--Testing-->
-    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="coverlet.collector" Version="8.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="MSTest" Version="$(MSTestVersion)" />
     <PackageVersion Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
@@ -110,7 +109,7 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.27" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.41" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.1" />
     <PackageVersion Include="ZLogger" Version="2.5.10" />
   </ItemGroup>

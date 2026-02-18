@@ -12,27 +12,29 @@ var rabbitmqDataPath = Path.Combine(dataMountPath, "rabbitmq");
 var keycloakDataPath = Path.Combine(dataMountPath, "keycloak");
 
 var redis = builder.AddRedis("redis", port: 6379)
+    .WithDataBindMount(redisDataPath)
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithBindMount(redisDataPath, "/data")
     .WithContainerName("redis");
 
 var rabbitmq = builder.AddRabbitMQ("eventbus", port: 5672)
+    .WithDataBindMount(rabbitmqDataPath)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithManagementPlugin(port: 15672)
-    .WithBindMount(rabbitmqDataPath, "/var/lib/rabbitmq")
     .WithContainerName("eventbus");
 
 var postgres = builder.AddPostgres("postgres", port: 5432)
+    //.WithDataBindMount(postgresDataPath)
+    .WithBindMount(Path.GetFullPath(postgresDataPath), "/var/lib/postgresql")
     .WithImageTag("latest")
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithBindMount(Path.GetFullPath(postgresDataPath), "/var/lib/postgresql")
     .WithContainerName("postgres");
 
 var keycloak = builder.AddKeycloak("keycloak", port: 8080)
+    .WithDataBindMount(keycloakDataPath)
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithBindMount(keycloakDataPath, "/opt/keycloak/data")
     .WithRealmImport("./realm.json")
-    .WithContainerName("keycloak");
+    .WithContainerName("keycloak")
+    .WithOtlpExporter();
 
 var bookstoredb = postgres.AddDatabase("bookstoredb");
 var orderingdb = postgres.AddDatabase("orderingdb");
@@ -65,7 +67,7 @@ var webApp = builder.AddProject<Projects.ModernCSharp_WebApp>("webapp")
     .WithReference(orderingApi)
     .WithReference(rabbitmq).WaitFor(rabbitmq);
 
-var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api", "start:dev")
+var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api", "start")
     .WithPnpm()
     .WithHttpEndpoint(port: 3011, env: "PORT")
     .WithExternalHttpEndpoints()

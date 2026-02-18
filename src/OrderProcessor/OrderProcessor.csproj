@@ -12,7 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="ZLogger" />
+		<PackageReference Include="ZLogger" />
 	</ItemGroup>
 
 	<ItemGroup>
