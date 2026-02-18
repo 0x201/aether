@@ -244,6 +244,7 @@ const CaptureView: React.FC = () => {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
+      sorter: { multiple: 6 },
     },
     {
       title: '操作',

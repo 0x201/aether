@@ -8,7 +8,7 @@ public class DanmakuQueries(
     public async Task<Result<IReadOnlyList<WordFrequency>>> GetAnalysisData(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<WordFrequency> wordFrequencies = [];
-        var cacheKey =GenerateCacheKey("danmaku_analysis", request.StartTime, request.EndTime, request.RoomId);
+        var cacheKey = GenerateCacheKey("danmaku_analysis", request.StartTime, request.EndTime, request.RoomId);
         var cacheValue = await cache.GetDatabase().StringGetAsync(cacheKey);
 
         if (cacheValue.HasValue)
@@ -64,7 +64,8 @@ public class DanmakuQueries(
 
         if (!string.IsNullOrEmpty(request.Sorter))
         {
-            query = query.OrderBy(request.Sorter);
+            var dynamicSortExpression = AdjustSortExpressionForJoinedQuery(request.Sorter);
+            query = query.OrderBy(dynamicSortExpression);
         }
         else
         {
@@ -150,7 +151,7 @@ public class DanmakuQueries(
         var res = PagedListResult<RoomDto>.Success(RoomMapping.MapToDtos(rooms), totalCount);
         return res;
     }
-    
+
     public async Task<Result<DanmakuStats>> GetDanmakuStats(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default)
     {
         var cacheKey = GenerateCacheKey("danmaku_stats", request.StartTime, request.EndTime, request.RoomId);
@@ -319,5 +320,26 @@ public class DanmakuQueries(
         var roomIdStr = roomId.HasValue ? roomId.ToString() : "All";
         var cacheKey = $"{keyPrefix}:{startDateTime?.ToString(dateFormat)}:{endDateTime?.ToString(dateFormat)}:{roomIdStr}";
         return cacheKey;
+    }
+
+    private static string AdjustSortExpressionForJoinedQuery(string sortExpression)
+    {
+        var parts = sortExpression.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var field = parts[0];
+        var direction = parts.Length > 1 ? parts[1] : "asc";
+
+        var mappedField = field.ToLower() switch
+        {
+            "id" => "job.Id",
+            "roomid" => "job.RoomId",
+            "status" => "job.Status",
+            "endtime" => "job.EndTime",
+            "createdat" => "job.CreatedAt",
+            "roomname" => "room.RoomName",
+
+            _ => $"job.{field}",
+        };
+
+        return $"{mappedField} {direction}";
     }
 }
