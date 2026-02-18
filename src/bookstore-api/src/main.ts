@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { KeycloakConfig } from './config/config.interface';
 
 function useSwaggerModule(app: INestApplication, configService: ConfigService) {
   const openApi = new DocumentBuilder()
@@ -20,6 +21,7 @@ function useSwaggerModule(app: INestApplication, configService: ConfigService) {
     .build();
 
   const document = SwaggerModule.createDocument(app, openApi);
+  const keycloakConfig = configService.get<KeycloakConfig>('keycloak');
 
   app.use(
     '/scalar',
@@ -29,15 +31,17 @@ function useSwaggerModule(app: INestApplication, configService: ConfigService) {
       hideClientButton: true,
       content: document,
       authentication: {
-        preferredSecurityScheme: 'oauth2',
+        preferredSecurityScheme: 'oauth2AuthorizationCode',
         securitySchemes: {
-          oauth2: {
+          oauth2AuthorizationCode: {
             flows: {
               authorizationCode: {
-                'x-scalar-client-id': `${configService.get<string>('keycloak.clientId')}`,
-                clientSecret: `${configService.get<string>('keycloak.clientSecret')}`,
-                authorizationUrl: `${configService.get<string>('keycloak.authServerUrl')}/realms/${configService.get<string>('keycloak.realm')}/protocol/openid-connect/auth`,
-                tokenUrl: `${configService.get<string>('keycloak.authServerUrl')}/realms/${configService.get<string>('keycloak.realm')}/protocol/openid-connect/token`,
+                'x-scalar-client-id': keycloakConfig.clientId,
+                clientSecret: keycloakConfig.clientSecret,
+                authorizationUrl: `${keycloakConfig.authServerUrl}/realms/${keycloakConfig.realm}/protocol/openid-connect/auth`,
+                tokenUrl: `${keycloakConfig.authServerUrl}/realms/${keycloakConfig.realm}/protocol/openid-connect/token`,
+                scopes: keycloakConfig.scopes,
+                'x-usePkce': 'no',
               },
             },
           }

@@ -59,7 +59,15 @@ export default () => {
     OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS,
     OTEL_EXPORTER_OTLP_PROTOCOL: process.env.OTEL_EXPORTER_OTLP_PROTOCOL,
     OTEL_SERVICE_NAME: process.env.OTEL_SERVICE_NAME,
+  }
 
+  config.keycloak = {
+    ...config.keycloak,
+    realm: process.env.KEYCLOAK_REALM || config.keycloak.realm,
+    authServerUrl: process.env.KEYCLOAK_HTTP || process.env.KEYCLOAK_HTTPS || config.keycloak.authServerUrl,
+    clientId: process.env.KEYCLOAK_CLIENT_ID || config.keycloak.clientId,
+    clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || config.keycloak.clientSecret,
+    scopes: config.keycloak.scopes,
   }
 
   return config;

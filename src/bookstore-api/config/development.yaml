@@ -1,4 +1,5 @@
 NODE_ENV: Development
+APP_VERSION: "0.0.1"
 HTTP_PORT: 3000
 
 database:
@@ -12,7 +13,12 @@ keycloak:
   realm: moderncsharp
   authServerUrl: http://localhost:8080
   clientId: bookstoreapi
-  clientSecret: Ody6pEuqq3oSPJ7OaiwdZi6FN5AeljvN
+  clientSecret:
+  scopes:
+    profile: "User profile information"
+    email: "User email address"
+    openid: "OpenID Connect scope"
+    roles: "User roles"
 
 cache:
   db: 0

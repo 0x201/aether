@@ -21,13 +21,14 @@ import { OtelConfig } from '../../config/config.interface';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class TracingService implements OnModuleInit, OnApplicationShutdown {
-  private readonly logger = new Logger(TracingService.name);
+export class TelemetryService implements OnModuleInit, OnApplicationShutdown {
+  private readonly logger = new Logger(TelemetryService.name);
   private sdk: NodeSDK;
   private readonly otelConfig: OtelConfig;
 
   constructor(private configService: ConfigService) {
     this.otelConfig = this.configService.get<OtelConfig>('otel');
+    const appVersion = this.configService.get<string>('APP_VERSION')
 
     this.logger.log(
       `Initializing OpenTelemetry with OTLP endpoint: ${this.otelConfig.OTEL_EXPORTER_OTLP_ENDPOINT}`,
@@ -37,9 +38,11 @@ export class TracingService implements OnModuleInit, OnApplicationShutdown {
     this.sdk = new NodeSDK({
       resource: resourceFromAttributes({
         [ATTR_SERVICE_NAME]: this.otelConfig.OTEL_SERVICE_NAME,
-        [ATTR_SERVICE_VERSION]: '0.1.0',
+        [ATTR_SERVICE_VERSION]: appVersion,
       }),
-      logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter()),
+      logRecordProcessor: new SimpleLogRecordProcessor(new OTLPLogExporter({
+        url: this.otelConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+      })),
       traceExporter: new OTLPTraceExporter({
         url: this.otelConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
       }),
@@ -53,6 +56,12 @@ export class TracingService implements OnModuleInit, OnApplicationShutdown {
         getNodeAutoInstrumentations({
           '@opentelemetry/instrumentation-fs': {
             enabled: false,
+          },
+          '@opentelemetry/instrumentation-pg': {
+            enabled: true,
+          },
+          '@opentelemetry/instrumentation-generic-pool': {
+            enabled: true,
           },
         }),
         new GrpcInstrumentation(),

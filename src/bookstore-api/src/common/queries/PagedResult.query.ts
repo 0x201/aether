@@ -41,11 +41,11 @@ class PagedSortedAndFilteredResultQuery {
   order: string | null = 'asc';
   @ApiProperty({
     description: 'The page index',
-    minimum: 0,
-    default: 0,
+    minimum: 1,
+    default: 1,
     type: Number,
   })
-  page: number = 0;
+  page: number = 1;
   @ApiPropertyOptional()
   sorting: string | null = 'id';
 }

@@ -20,7 +20,24 @@ export interface MessagingConfig {
     routingKey: string;
 }
 
+export interface KeycloakConfig {
+    realm: string;
+    authServerUrl: string;
+    clientId: string;
+    clientSecret: string;
+    scopes?: Record<string, string>;
+}
+
+export interface OtelConfig {
+    OTEL_EXPORTER_OTLP_ENDPOINT: string;
+    OTEL_EXPORTER_OTLP_HEADERS: string;
+    OTEL_EXPORTER_OTLP_PROTOCOL: string;
+    OTEL_SERVICE_NAME: string;
+}
+
+
 export interface AppConfig {
+    APP_VERSION: string;
     database: {
         type: string;
         username: string;
@@ -36,21 +53,7 @@ export interface AppConfig {
         options: {}
     },
     otel: OtelConfig,
-    keycloak: {
-        realm: string;
-        authServerUrl: string;
-        clientId: string;
-        clientSecret: string;
-        scopes: string[];
-    };
+    keycloak: KeycloakConfig;
     cache: CacheConfig,
     messaging: MessagingConfig,
 }
-
-export interface OtelConfig {
-    OTEL_EXPORTER_OTLP_ENDPOINT: string;
-    OTEL_EXPORTER_OTLP_HEADERS: string;
-    OTEL_EXPORTER_OTLP_PROTOCOL: string;
-    OTEL_SERVICE_NAME: string;
-}
-
