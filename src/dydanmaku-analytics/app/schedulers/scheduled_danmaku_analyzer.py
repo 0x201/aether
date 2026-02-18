@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
 
-from app.database import Danmaku, SessionFactory
+from app.database import SessionFactory
 from app.dataclass import PeriodType
 from app.messaging import EventBus
 from app.services import DanmakuAnalyzer
@@ -101,7 +101,6 @@ class TimeRangeStrategyFactory:
 
 
 class ScheduledDanmakuAnalyzer:
-
     def __init__(
         self,
         session_factory: SessionFactory,

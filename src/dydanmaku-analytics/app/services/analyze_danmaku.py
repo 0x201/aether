@@ -231,7 +231,7 @@ class DanmakuAnalyzer:
         tokenizer = jieba3.jieba3()
         start = time.perf_counter()
         words = tokenizer.cut_text(text)
-        logger.info(f"Tokenizing text for room {room_id or "All"}")
+        logger.info(f"Tokenizing text for room {room_id or 'All'}")
         logger.info(f"Total text length: {len(text)}")
 
         stop_words = {

@@ -185,7 +185,6 @@ class DanmakuRepository:
             bool: True if deleted successfully, False otherwise
         """
         with self.session_factory.get_transaction() as transaction:
-
             # First check if the record exists before attempting deletion
             existing = transaction.execute(
                 select(Danmaku).where(Danmaku.id == id)

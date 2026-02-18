@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 from app.core.config import settings
-from app.core.model import DatabaseConfig, DatabaseType
+from app.core.model import DatabaseConfig
 
 
 class MSSQLSession:
@@ -305,7 +305,7 @@ class PostgreSQLSession:
                 pool_recycle=self.pool_recycle,
                 future=True,
                 connect_args={
-                    "options": f"-csearch_path={self.dbschema or "dydanmaku"}"
+                    "options": f"-csearch_path={self.dbschema or 'dydanmaku'}"
                 },
             )
 

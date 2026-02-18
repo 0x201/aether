@@ -12,7 +12,7 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-from .model import DatabaseConfig, PostgreSQLConfig, SqliteConfig
+from .model import DatabaseConfig, PostgreSQLConfig
 
 
 def determine_environment(env: Optional[str | Path]) -> str:
@@ -144,6 +144,14 @@ class Settings(BaseSettings):
         default=RabbitMQConfig(), description="RabbitMQ configuration"
     )
     cache: RedisConfig = Field(default=RedisConfig(), description="Redis configuration")
+    otel_exporter_otlp_endpoint: str = Field(
+        default=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", ""),
+        description="OTLP endpoint for OpenTelemetry",
+    )
+    otel_service_name: str = Field(
+        default=os.getenv("OTEL_SERVICE_NAME", "dydanmakuanalytics"),
+        description="Service name for OpenTelemetry",
+    )
 
     @classmethod
     def settings_customise_sources(
