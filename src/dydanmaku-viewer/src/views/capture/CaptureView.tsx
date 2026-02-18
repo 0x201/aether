@@ -356,7 +356,9 @@ const CaptureView: React.FC = () => {
                   (option?.value ?? '').toString().toLowerCase().includes(input.toLowerCase())
               }}
               placeholder="请选择或输入房间ID，例如: 123456"
+              value={roomId || undefined}
               onChange={(value) => setRoomId(value)}
+              onSelect={(value) => setRoomId(value)}
               options={roomOptions}
               loading={loadingRooms}
               notFoundContent={loadingRooms ? <Spin size="small" /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无数据" />}
@@ -368,6 +370,10 @@ const CaptureView: React.FC = () => {
                     <Input
                       value={roomId}
                       onChange={(e) => setRoomId(e.target.value)}
+                      onPressEnter={(e) => {
+                        setRoomId((e.target as HTMLInputElement).value);
+                        setTimeout(() => document.activeElement instanceof HTMLElement && document.activeElement.blur(), 0);
+                      }}
                       placeholder="手动输入房间ID，例如: 123456"
                       style={{ marginTop: '4px' }}
                     />
@@ -388,6 +394,7 @@ const CaptureView: React.FC = () => {
                   (option?.value ?? '').toString().toLowerCase().includes(input.toLowerCase())
               }}
               placeholder="请选择或输入捕获时长(秒)，默认3600秒(1小时)"
+              value={captureDuration.toString() || undefined}
               onChange={(v: string) => setCaptureDuration(Number(v))}
               options={durationOptions}
               popupRender={(menu) => (
@@ -396,9 +403,13 @@ const CaptureView: React.FC = () => {
                   <div style={{ padding: '8px', borderTop: '1px solid #f0f0f0' }}>
                     <span>或手动输入时长(秒):</span>
                     <Input
-                      type="number"
                       min="1"
-                      onChange={(e) => setCaptureDuration(Number(e.target.value))}
+                      value={captureDuration}
+                      onChange={(e) => setCaptureDuration(Number((e.target as HTMLInputElement).value))}
+                      onPressEnter={(e) => {
+                        setCaptureDuration(Number((e.target as HTMLInputElement).value));
+                        setTimeout(() => document.activeElement instanceof HTMLElement && document.activeElement.blur(), 0);
+                      }}
                       placeholder="手动输入捕获时长(秒)，例如: 7200"
                       style={{ marginTop: '4px' }}
                     />
