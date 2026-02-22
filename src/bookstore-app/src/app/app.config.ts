@@ -34,6 +34,7 @@ export function jwtOptionsFactory(configService: ConfigService) {
 
 function getUrlCondition(configService: ConfigService): IncludeBearerTokenCondition {
   const apiEndpoint = configService.getApiEndpoint();
+  console.log('apiEndpoint', apiEndpoint);
   return createInterceptorCondition<IncludeBearerTokenCondition>({
     urlPattern: /^(apiEndpoint)(\/.*)?$/i,
     bearerPrefix: 'Bearer',
@@ -68,7 +69,10 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
-     { provide: JWT_OPTIONS, useFactory: jwtOptionsFactory, deps: [ConfigService] },
+    { 
+      provide: JWT_OPTIONS, 
+      useFactory: jwtOptionsFactory, 
+      deps: [ConfigService] },
     JwtHelperService,
     provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
     provideNativeDateAdapter(),

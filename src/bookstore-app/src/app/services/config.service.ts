@@ -11,6 +11,6 @@ export class ConfigService {
     }
 
     getApiEndpoint(): string {
-        return this.config.BOOKSTORE_API_URL || 'http://localhost:3011';
+        return this.config.BOOKSTOREAPI_HTTP || 'http://localhost:3011';
     }
 }

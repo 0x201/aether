@@ -82,7 +82,6 @@ export class UsersService {
 
   loadUserMenus(): Observable<Menu[]> {
     const userId = this.getCurrentUserId() || this.getCurrentUsername();
-    console.log('User ID:', userId);
     if (userId) {
       this.menusService.getUserMenus().subscribe({
         next: (result) => {
