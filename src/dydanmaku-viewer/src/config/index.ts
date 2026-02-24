@@ -1,5 +1,4 @@
 export interface AppConfig {
-    dvApiBaseUrl: string;
     apiBaseUrl: string;
     apiVersion: string;
 }
@@ -10,7 +9,6 @@ class ConfigLoader {
     constructor() {
         // Use Vite's environment variables with fallbacks
         this.config = {
-            dvApiBaseUrl: import.meta.env.VITE_DV_API_URL,
             apiBaseUrl: import.meta.env.VITE_API_URL,
             apiVersion: import.meta.env.VITE_API_VERSION
         };

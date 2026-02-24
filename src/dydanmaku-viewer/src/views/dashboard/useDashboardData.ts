@@ -4,7 +4,7 @@ import type { DateRange, DanmakuStatsResponse, DashboardData, WordFreqResponse }
 import type { Room } from '@/src/interface/Danmaku';
 import dayjs from 'dayjs';
 
-const { apiBaseUrl, apiVersion } = config;
+const { apiVersion } = config;
 const baseUrl = `/api/${apiVersion}/danmakus`;
 
 export const useDashboardData = (defaultHours: number = 1) => {
@@ -139,7 +139,7 @@ export const useDashboardData = (defaultHours: number = 1) => {
         total: 0
       };
     }
-  }, [apiBaseUrl, apiVersion]);
+  }, [apiVersion]);
 
   // Function to trigger data refresh
   const refreshData = useCallback(() => {

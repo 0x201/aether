@@ -308,7 +308,7 @@ const ChartComponent = React.memo(({
           <ResponsiveContainer width="100%" height="100%" debounce={150}>
             <BarChart
               data={transformedData}
-              barSize={60}
+              barSize={30}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 

@@ -12,7 +12,7 @@ import { useTheme } from '@/src/contexts/ThemeContext';
 
 
 const ThemeSwitch: React.FC = () => {
-  const { themeMode, setThemeMode, currentTheme } = useTheme();
+  const { themeMode, setThemeMode } = useTheme();
 
   const items: MenuProps['items'] = [
     {
@@ -50,18 +50,11 @@ const ThemeSwitch: React.FC = () => {
     },
   ];
 
-  const getThemeIcon = () => {
-    if (themeMode === 'auto') {
-      return <SettingOutlined />;
-    }
-    return currentTheme === 'dark' ? <MoonOutlined /> : <SunOutlined />;
-  };
-
   return (
     <Dropdown menu={{ items }} placement="bottomRight" trigger={['hover']}>
       <Button
         type="text"
-        icon={getThemeIcon()}
+        icon={<SettingOutlined />}
         style={{
           width: 40,
           height: 40,
