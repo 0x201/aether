@@ -25,6 +25,7 @@ import type { DanmakuSearchParams, RoomValue } from './type';
 import { useDanmakuApi } from './useDanmakuApi';
 import { buildSorter } from '@/src/util';
 import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect';
+import CopyableText from '@/src/components/CopyableText';
 
 const { Title } = Typography;
 const DanmakuMgt: React.FC = () => {
@@ -193,29 +194,7 @@ const DanmakuMgt: React.FC = () => {
       key: 'userId',
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
       render: (text) => (
-        <Typography.Text
-          style={{ cursor: 'pointer' }}
-          onCopy={(e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(text).then(() => {
-              messageApi.success('已复制');
-            }).catch(err => {
-              console.error('复制失败:', err);
-              messageApi.error('复制失败');
-            });
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigator.clipboard.writeText(text).then(() => {
-              messageApi.success('已复制');
-            }).catch(err => {
-              console.error('复制失败:', err);
-              messageApi.error('复制失败');
-            });
-          }}
-        >
-          {text}
-        </Typography.Text>
+        <CopyableText text={text} />
       ),
     },
     {
@@ -224,29 +203,7 @@ const DanmakuMgt: React.FC = () => {
       key: 'userName',
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
       render: (text) => (
-        <Typography.Text
-          style={{ cursor: 'pointer' }}
-          onCopy={(e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(text).then(() => {
-              messageApi.success('已复制');
-            }).catch(err => {
-              console.error('复制失败:', err);
-              messageApi.error('复制失败');
-            });
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigator.clipboard.writeText(text).then(() => {
-              messageApi.success('已复制');
-            }).catch(err => {
-              console.error('复制失败:', err);
-              messageApi.error('复制失败');
-            });
-          }}
-        >
-          {text}
-        </Typography.Text>
+        <CopyableText text={text} />
       ),
     },
     {
@@ -254,37 +211,9 @@ const DanmakuMgt: React.FC = () => {
       dataIndex: 'content',
       key: 'content',
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
-      render: (text) => (
-        <Typography.Text
-          style={{
-            cursor: 'pointer',
-            maxWidth: '300px',
-            display: 'inline-block',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}
-          onCopy={(e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(text).then(() => {
-              messageApi.success('已复制');
-            }).catch(err => {
-              console.error('复制失败:', err);
-              messageApi.error('复制失败');
-            });
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigator.clipboard.writeText(text).then(() => {
-              messageApi.success('已复制');
-            }).catch(err => {
-              console.error('复制失败:', err);
-              messageApi.error('复制失败');
-            });
-          }}
-        >
-          {text}
-        </Typography.Text>
+      ellipsis: true,
+      render: (text: string) => (
+        <CopyableText text={text} tooltip={text} />
       ),
     },
     {
