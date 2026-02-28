@@ -1,3 +1,5 @@
+import type { DataResponse, PaginationResponse } from "@/src/interface/Response";
+
 export interface CaptureJob {
   id: number;
   roomId: number;
@@ -9,9 +11,20 @@ export interface CaptureJob {
   roomName: string;
 }
 
-export interface CaptureJobList {
-  data: CaptureJob[];
-  total: number;
-  page: number;
-  limit: number;
+export interface StartCaptureRequest {
+  roomId: number;
+  duration: number;
 }
+
+export interface StartCaptureRes  {
+  roomId: number;
+  anchorName: string;
+}
+
+export interface StartCaptureResponse extends DataResponse<StartCaptureRes> {}
+
+export interface StopCaptureRequest {
+  roomId: number;
+}
+
+export interface CaptureJobPagedResponse extends PaginationResponse<CaptureJob> {}

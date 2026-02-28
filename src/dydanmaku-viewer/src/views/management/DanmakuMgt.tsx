@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Table,
   Button,
@@ -20,101 +20,25 @@ import {
 } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import './DanmakuMgt.css';
-import type { Danmaku, Room } from '@/src/interface/Danmaku';
+import type { Danmaku } from '@/src/interface/Danmaku';
 import type { DanmakuSearchParams, RoomValue } from './type';
-import { useDanmakuApi } from './useDanmakuApi';
+import { useDanmakuManagement } from './hooks/useDanmakuManagement';
 import { buildSorter } from '@/src/util';
 import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect';
 import CopyableText from '@/src/components/CopyableText';
 
 const { Title } = Typography;
+
 const DanmakuMgt: React.FC = () => {
-  const [danmakuList, setDanmakuList] = useState<Danmaku[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [editingDanmaku, setEditingDanmaku] = useState<Danmaku | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [total, setTotal] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
   const [searchForm] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const [sorter, setSorter] = useState<string | null>(null);
 
-  const medalLevelColors = useMemo(() => ({
-    0: 'var(--fan-medal-0-level)',
-    1: 'var(--fan-medal-1-level)',
-    2: 'var(--fan-medal-2-level)',
-    3: 'var(--fan-medal-3-level)',
-    4: 'var(--fan-medal-4-level)',
-    5: 'var(--fan-medal-5-level)',
-  }), []);
-
-  const userLevelColors = useMemo(() => ({
-    0: 'var(--user-level-0)',
-    1: 'var(--user-level-1)',
-    2: 'var(--user-level-2)',
-    3: 'var(--user-level-3)',
-    4: 'var(--user-level-4)',
-    5: 'var(--user-level-5)',
-    6: 'var(--user-level-6)',
-  }), []);
-
-  const [searchParams, setSearchParams] = useState<DanmakuSearchParams>({
-    userName: '',
-    content: '',
-    roomId: '',
-  });
-
-  const { fetchDanmakuList, deleteDanmaku, updateDanmaku, fetchRooms: apiFetchRooms } = useDanmakuApi(messageApi);
-
-  const fetchRoomOptions = useCallback(async (page: number = 1, pageSize: number = 10, search?: string): Promise<{ data: RoomValue[], total: number }> => {
-    try {
-      const response = await apiFetchRooms(page, pageSize, search);
-
-      return {
-        data: response.data.map((room: Room) => ({
-          label: `${room.anchorName} (房间ID: ${room.roomId})`,
-          value: room.roomId.toString()
-        })),
-        total: response.total
-      };
-    } catch (error) {
-      console.error('Failed to fetch rooms:', error);
-      messageApi.error('获取房间列表失败');
-      return {
-        data: [],
-        total: 0
-      };
-    }
-  }, [apiFetchRooms, messageApi]);
-
-  const loadDanmakuList = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchDanmakuList(currentPage, pageSize, sorter, searchParams);
-      setDanmakuList(data.data);
-      setTotal(data.total);
-      setCurrentPage(currentPage);
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDanmakuList, currentPage, pageSize, sorter, searchParams]);
-
-  useEffect(() => {
-    loadDanmakuList();
-  }, [loadDanmakuList]);
-
-  const handlePageChange = (page: number, limit?: number) => {
-    setCurrentPage(page);
-    if (limit && limit !== pageSize) {
-      setPageSize(limit);
-    }
-  };
+  const { state, actions } = useDanmakuManagement({ messageApi });
 
   const handleTableChange: TableProps<Danmaku>['onChange'] = (_pagination, _filters, sorter, _extra) => {
     const sortString = buildSorter(sorter);
-    setSorter(sortString);
+    actions.setSorter(sortString);
   };
 
   const handleSearch = useCallback(async () => {
@@ -129,43 +53,32 @@ const DanmakuMgt: React.FC = () => {
         endTime: values.timeRange && values.timeRange[1] ? values.timeRange[1].toISOString() : undefined,
       };
 
-      setSearchParams(searchParamsWithTime);
-      setCurrentPage(1);
+      actions.handleSearch(searchParamsWithTime);
     } catch (error) {
       console.error('Search validation failed:', error);
     }
-  }, [searchForm, setSearchParams]);
+  }, [searchForm, actions]);
 
   const handleResetSearch = useCallback(() => {
     searchForm.resetFields();
-    setSearchParams({
-      userName: undefined,
-      content: undefined,
-      roomId: undefined,
-      startTime: undefined,
-      endTime: undefined
-    });
-    setCurrentPage(1);
-  }, [searchForm, setSearchParams]);
+    actions.handleResetSearch();
+  }, [searchForm, actions]);
 
   const handleDelete = useCallback(async (id: string) => {
-    const success = await deleteDanmaku(id);
-    if (success) {
-      loadDanmakuList();
-    }
-  }, [deleteDanmaku, loadDanmakuList]);
+    const success = await actions.handleDelete(id);
+    return success;
+  }, [actions]);
 
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
 
-      if (editingDanmaku) {
-        const success = await updateDanmaku(editingDanmaku.id, values);
+      if (state.editingDanmaku) {
+        const success = await actions.handleUpdate(state.editingDanmaku.id, values);
         if (success) {
-          setIsModalVisible(false);
+          actions.setIsModalVisible(false);
           form.resetFields();
-          setEditingDanmaku(null);
-          loadDanmakuList();
+          actions.setEditingDanmaku(null);
         }
       }
     } catch (error) {
@@ -175,9 +88,9 @@ const DanmakuMgt: React.FC = () => {
   };
 
   const handleModalCancel = () => {
-    setIsModalVisible(false);
+    actions.setIsModalVisible(false);
     form.resetFields();
-    setEditingDanmaku(null);
+    actions.setEditingDanmaku(null);
   };
 
   const columns: ColumnsType<Danmaku> = useMemo(() => [
@@ -223,7 +136,7 @@ const DanmakuMgt: React.FC = () => {
       render: (_, record) => (
         record.fanMedalName && record.fanMedalLevel
           ? <Tag
-            color={medalLevelColors[(Math.floor(record.fanMedalLevel / 10)) as keyof typeof medalLevelColors]}
+            color={state.medalLevelColors[(Math.floor(record.fanMedalLevel / 10)) as keyof typeof state.medalLevelColors]}
             variant='solid'
           >
             {record.fanMedalName}
@@ -240,7 +153,7 @@ const DanmakuMgt: React.FC = () => {
       render: (_, record) => (
         record.fanMedalLevel
           ? <Tag
-            color={medalLevelColors[(Math.floor(record.fanMedalLevel / 10)) as keyof typeof medalLevelColors]}
+            color={state.medalLevelColors[(Math.floor(record.fanMedalLevel / 10)) as keyof typeof state.medalLevelColors]}
             variant='solid'
           >
             {record.fanMedalLevel}
@@ -257,7 +170,7 @@ const DanmakuMgt: React.FC = () => {
       render: (_, record) => (
         record.userLevel
           ? <Tag
-            color={userLevelColors[(Math.floor(record.userLevel / 10)) as keyof typeof userLevelColors]}
+            color={state.userLevelColors[(Math.floor(record.userLevel / 10)) as keyof typeof state.userLevelColors]}
             variant='solid'
           >
             {record.userLevel}
@@ -303,7 +216,7 @@ const DanmakuMgt: React.FC = () => {
       ),
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
-  ], [medalLevelColors, userLevelColors, handleDelete]);
+  ], [state.medalLevelColors, state.userLevelColors, handleDelete]);
 
   const collapsedItems: CollapseProps['items'] = useMemo(() => [
     {
@@ -325,7 +238,7 @@ const DanmakuMgt: React.FC = () => {
             <Col xs={24} sm={12} md={3} lg={3} xl={4}>
               <Form.Item name="roomId" label="房间ID">
                 <InfiniteRefreshSelect<RoomValue>
-                  fetchOptions={fetchRoomOptions}
+                  fetchOptions={actions.fetchRoomOptions}
                   placeholder="请输入房间ID或主播名"
                   debounceTimeout={300}
                   pageSize={10}
@@ -358,7 +271,7 @@ const DanmakuMgt: React.FC = () => {
           </Row>
         </Form>
     }
-  ], [handleSearch, handleResetSearch, searchForm, fetchRoomOptions]);
+  ], [handleSearch, handleResetSearch, searchForm, actions.fetchRoomOptions]);
 
   return (
     <div className="danmaku-mgt">
@@ -369,20 +282,20 @@ const DanmakuMgt: React.FC = () => {
       <Collapse items={collapsedItems} defaultActiveKey={['1']} style={{ marginBottom: 12 }} />
       <Table
         columns={columns}
-        dataSource={danmakuList}
-        loading={loading}
+        dataSource={state.danmakuList}
+        loading={state.loading}
         rowKey="id"
         pagination={false}
         onChange={handleTableChange}
       />
       <div className='pagination-container'>
         <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={total}
-          onChange={handlePageChange}
+          current={state.currentPage}
+          pageSize={state.pageSize}
+          total={state.total}
+          onChange={actions.handlePageChange}
           showSizeChanger
-          onShowSizeChange={(current, size) => handlePageChange(current, size)}
+          onShowSizeChange={(current, size) => actions.handlePageChange(current, size)}
           showTotal={(total) => `共 ${total} 条记录`}
           pageSizeOptions={[5, 10, 15, 20]}
           showQuickJumper
@@ -390,8 +303,8 @@ const DanmakuMgt: React.FC = () => {
       </div>
 
       <Modal
-        title={editingDanmaku ? "编辑弹幕" : "创建弹幕"}
-        open={isModalVisible}
+        title={state.editingDanmaku ? "编辑弹幕" : "创建弹幕"}
+        open={state.isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
         okText="确定"

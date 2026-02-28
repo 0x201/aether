@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   Table,
@@ -15,26 +15,20 @@ import {
   type SelectProps,
   Spin,
   Empty,
+  type TableProps,
+  type TablePaginationConfig,
 } from 'antd';
 import {
   PlayCircleOutlined,
   StopOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import config from '@/src/config';
-import type { CaptureJob, CaptureJobList } from './type';
-import type { ColumnsType, TableProps } from 'antd/es/table';
 import "./CaptureView.css"
 import { buildSorter } from '@/src/util';
-import type { Room } from '@/src/interface/Danmaku';
+import { useCaptureManagement } from './hooks/useCaptureManagement';
+import type { CaptureJob } from './type';
+import type { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface';
 
-
-const { Title } = Typography;
-const { apiVersion } = config;
-const captureEndpoint = `/api/${apiVersion}/danmakus/capture`;
-const roomEndpoint = `/api/${apiVersion}/danmakus/rooms`;
-
-// Status mapping configuration
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
   Running: { color: 'blue', text: '运行中' },
   Completed: { color: 'green', text: '已完成' },
@@ -50,43 +44,13 @@ for (let i = 0; i < 12; i++) {
 }
 
 const CaptureView: React.FC = () => {
-  const [jobs, setJobs] = useState<CaptureJob[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [roomId, setRoomId] = useState<string>('');
   const [captureDuration, setCaptureDuration] = useState<number>(3600);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [captureStartRes, setCaptureStartRes] = useState<string>("")
-  const [isCaptureSuccess, setIsCaptureSuccess] = useState<boolean>(false);
-  const [sort, setSort] = useState<string | null>(null);
-  const [messageApi, contextHolder] = message.useMessage();
-  const [roomOptions, setRoomOptions] = useState<{ value: string, label: string }[]>([]);
-  const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
+  const [form] = Form.useForm();
 
-  const fetchRooms = useCallback(async () => {
-    setLoadingRooms(true);
-    try {
-      const response = await fetch(`${roomEndpoint}?page=1&pageSize=100&sorter=id asc`);
-      if (response.ok) {
-        const data = await response.json();
-        const options = data.data.map((room: Room) => ({
-          value: room.roomId.toString(),
-          label: `${room.anchorName} (房间ID: ${room.roomId})`
-        }));
-        setRoomOptions(options);
-      } else {
-        messageApi.error('获取房间列表失败');
-      }
-    } catch (error) {
-      console.error('获取房间列表时发生错误:', error);
-      messageApi.error('获取房间列表时发生错误');
-    } finally {
-      setLoadingRooms(false);
-    }
-  }, [messageApi, roomEndpoint]);
+  const { state, actions } = useCaptureManagement({ messageApi });
 
   const openStartModal = () => {
     setIsModalVisible(true);
@@ -97,111 +61,27 @@ const CaptureView: React.FC = () => {
     setRoomId('');
   };
 
-  const fetchJobs = useCallback(async (page: number = 1, pageSize: number = 10, sorter: string | null) => {
-    setLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      queryParams.append('page', page.toString());
-      queryParams.append('pageSize', pageSize.toString());
-
-      if (sorter) {
-        queryParams.append('sorter', sorter);
-      }
-
-      console.log('Fetching jobs with params:', queryParams.toString());
-
-      const endpoint = `${captureEndpoint}/jobs?${queryParams.toString()}`;
-      const response = await fetch(endpoint);
-      if (response.ok) {
-        const data: CaptureJobList = await response.json();
-        setJobs(data.data);
-        setTotal(data.total);
-        setCurrentPage(page)
-      } else {
-        messageApi.error('获取任务列表失败');
-      }
-    } catch (error) {
-      console.error('An error occurred while fetching task list:', error);
-      messageApi.error('获取任务列表时发生错误');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchJobs(currentPage, pageSize, sort);
-    fetchRooms();
-  }, [currentPage, pageSize, sort, fetchJobs, fetchRooms]);
-
-  const handlePageChange = (page: number, limit?: number) => {
-    setCurrentPage(page);
-    if (limit && limit !== pageSize) {
-      setPageSize(limit);
-    }
+  const handleTableChange = (
+    _pagination: TablePaginationConfig, 
+    _filters: Record<string, FilterValue | null>, 
+    _sorter: SorterResult<CaptureJob> | SorterResult<CaptureJob>[], 
+    _extra: TableCurrentDataSource<CaptureJob>) => {
+    const sortString = buildSorter(_sorter);
+    actions.setSort(sortString);
   };
 
-  const startCapture = async () => {
+  const handleStartCapture = async () => {
     if (!roomId) {
       messageApi.error('请输入房间ID');
       return;
     }
 
-    try {
-      const response = await fetch(`${captureEndpoint}/start`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          roomId: Number(roomId),
-          duration: captureDuration
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        messageApi.success(`捕获任务已启动，房间ID: ${result.data.roomId}`);
-        setIsModalVisible(false);
-        setRoomId('');
-        setCaptureStartRes(`开始捕获直播间 -> 主播: ${result.data.anchorName}`)
-        setIsCaptureSuccess(true)
-        await fetchJobs(currentPage, pageSize, sort);
-      } else {
-        const errorData = await response.json();
-        messageApi.error(errorData.detail || '启动捕获任务失败');
-      }
-    } catch (error) {
-      console.error('启动捕获任务时发生错误:', error);
-      messageApi.error('启动捕获任务时发生错误');
-    }
+    await actions.startCapture(roomId, captureDuration);
+    setIsModalVisible(false);
+    setRoomId('');
   };
 
-  const stopCapture = async (roomId: number) => {
-    try {
-      const response = await fetch(`${captureEndpoint}/stop`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          roomId: roomId
-        }),
-      });
-
-      if (response.ok) {
-        messageApi.success('停止捕获任务成功');
-        await fetchJobs(currentPage, pageSize, sort);
-      } else {
-        const errorData = await response.json();
-        messageApi.error(errorData.detail || '停止捕获任务失败');
-      }
-    } catch (error) {
-      console.error('停止捕获任务时发生错误:', error);
-      messageApi.error('停止捕获任务时发生错误');
-    }
-  };
-
-  const columns: ColumnsType<CaptureJob> = [
+  const columns: TableProps<CaptureJob>['columns'] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -256,14 +136,14 @@ const CaptureView: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      render: (_, record: CaptureJob) => (
+      render: (_: any, record: any) => (
         <Space size="middle">
           {record.status === 'Running' && (
             <Button
               type="primary"
               danger
               icon={<StopOutlined />}
-              onClick={() => stopCapture(record.roomId)}
+              onClick={() => actions.stopCapture(record.roomId)}
             >
               停止
             </Button>
@@ -282,18 +162,13 @@ const CaptureView: React.FC = () => {
     },
   ];
 
-  const handleTableChange: TableProps<CaptureJob>["onChange"] = (_pagination, _filters, sorter, _extra) => {
-    const sortString = buildSorter(sorter);
-    setSort(sortString);
-  };
-
   return (
     <div className='capture-container'>
       {contextHolder}
-      <Title level={4}>
+      <Typography.Title level={4}>
         弹幕捕获任务管理
-      </Title>
-      {isCaptureSuccess && <Alert closable description={captureStartRes} style={{ marginBottom: 24 }} />}
+      </Typography.Title>
+      {state.isCaptureSuccess && <Alert closable description={state.captureStartRes} style={{ marginBottom: 24 }} />}
 
       <Space style={{ margin: "20px 0" }}>
         <Button
@@ -305,29 +180,29 @@ const CaptureView: React.FC = () => {
         </Button>
         <Button
           icon={<ReloadOutlined />}
-          onClick={() => fetchJobs(currentPage, pageSize, sort)}
-          loading={loading}
+          onClick={() => actions.fetchJobs(state.currentPage, state.pageSize, state.sort)}
+          loading={state.loading}
         >
           刷新
         </Button>
       </Space>
 
       <Table
-        dataSource={jobs}
+        dataSource={state.jobs}
         columns={columns}
         rowKey="id"
-        loading={loading}
+        loading={state.loading}
         pagination={false}
         onChange={handleTableChange}
       />
       <div className='pagination-container'>
         <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={total}
-          onChange={handlePageChange}
+          current={state.currentPage}
+          pageSize={state.pageSize}
+          total={state.total}
+          onChange={actions.handlePageChange}
           showSizeChanger
-          onShowSizeChange={(current, size) => handlePageChange(current, size)}
+          onShowSizeChange={(current, size) => actions.handlePageChange(current, size)}
           showTotal={(total) => `共 ${total} 条记录`}
           pageSizeOptions={[5, 10, 15, 20]}
           showQuickJumper
@@ -345,7 +220,7 @@ const CaptureView: React.FC = () => {
           <Button
             key="submit"
             type="primary"
-            onClick={startCapture}
+            onClick={handleStartCapture}
           >
             启动
           </Button>,
@@ -367,9 +242,9 @@ const CaptureView: React.FC = () => {
               value={roomId || undefined}
               onChange={(value) => setRoomId(value)}
               onSelect={(value) => setRoomId(value)}
-              options={roomOptions}
-              loading={loadingRooms}
-              notFoundContent={loadingRooms ? <Spin size="small" /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无数据" />}
+              options={state.roomOptions}
+              loading={state.loadingRooms}
+              notFoundContent={state.loadingRooms ? <Spin size="small" /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无数据" />}
               popupRender={(menu) => (
                 <>
                   {menu}

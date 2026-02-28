@@ -1,4 +1,5 @@
-import type { SortedRequest, TimeRangeRequest } from "@/src/interface/PaginationData";
+import type { SortedRequest, TimeRangeRequest } from "@/src/interface/Request";
+
 
 export interface DanmakuSearchParams extends SortedRequest, TimeRangeRequest {
     userName?: string;
