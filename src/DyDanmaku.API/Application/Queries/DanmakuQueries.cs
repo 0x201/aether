@@ -1,3 +1,5 @@
+using ModernCSharp.Shared.Utils;
+
 namespace DyDanmaku.API.Application.Queries;
 
 public class DanmakuQueries(
@@ -64,7 +66,7 @@ public class DanmakuQueries(
 
         if (!string.IsNullOrEmpty(request.Sorter))
         {
-            var dynamicSortExpression = AdjustSortExpressionForJoinedQuery(request.Sorter);
+            var dynamicSortExpression = MapSorterForCaptureJob(request.Sorter);
             query = query.OrderBy(dynamicSortExpression);
         }
         else
@@ -76,7 +78,7 @@ public class DanmakuQueries(
             .PagedBy(request.Page, request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var res = PagedListResult<CaptureJobDto>.Success(CaptureJobMapping.MapToDtos(jobs.Select(j => (j.job, j.room)).ToList()), totalCount);
+        var res = PagedListResult<CaptureJobDto>.Success(CaptureJobMapping.MapToDtos([..jobs.Select(j => (j.job, j.room))]), totalCount);
         return res;
     }
 
@@ -93,36 +95,25 @@ public class DanmakuQueries(
                     dbContext.Rooms.AsNoTracking(),
                     d => d.RoomId,
                     r => r.RoomId,
-                    (d, r) => new DanmakuWithRoom
-                    {
-                        Id = d.Id,
-                        UserId = d.UserId,
-                        UserName = d.UserName,
-                        Content = d.Content,
-                        FanMedalName = d.FanMedalName,
-                        FanMedalLevel = d.FanMedalLevel,
-                        UserLevel = d.UserLevel,
-                        CreatedAt = d.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
-                        RoomId = d.RoomId,
-                        RoomName = r.RoomName
-                    });
+                    (danmaku, room) => new { danmaku, room });
 
         var totalCount = await query.CountAsync(cancellationToken);
 
         if (!string.IsNullOrEmpty(request.Sorter))
         {
-            query = query.OrderBy(request.Sorter);
+            var dynamicSortExpression = MapSorterForDanmaku(request.Sorter);
+            query = query.OrderBy(dynamicSortExpression);
         }
         else
         {
-            query = query.OrderByDescending(x => x.Id);
+            query = query.OrderByDescending(x => x.danmaku.Id);
         }
 
         var danmakus = await query
             .PagedBy(request.Page, request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var res = PagedListResult<DanmakuWithRoom>.Success(danmakus, totalCount);
+        var res = PagedListResult<DanmakuWithRoom>.Success(DanmakuMapping.MapToWithRoomDtos([.. danmakus.Select(d => (d.danmaku, d.room))]), totalCount);
         return res;
     }
 
@@ -191,7 +182,7 @@ public class DanmakuQueries(
                 Count = x.Count()
             })
             .OrderByDescending(x => x.Count)
-            .Take(10)
+            .Take(request.TopN.GetValueOrDefault(20))
             .ToListAsync(cancellationToken);
 
         var danmakusForHourlyDistribution = await dbContext.Danmakus
@@ -235,7 +226,7 @@ public class DanmakuQueries(
                 }
             )
             .OrderByDescending(x => x.Count)
-            .Take(10)
+            .Take(request.TopN.GetValueOrDefault(20))
             .ToListAsync(cancellationToken);
 
         var stats = new DanmakuStats
@@ -322,24 +313,37 @@ public class DanmakuQueries(
         return cacheKey;
     }
 
-    private static string AdjustSortExpressionForJoinedQuery(string sortExpression)
+    private static string MapSorterForCaptureJob(string sortExpression)
     {
-        var parts = sortExpression.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var field = parts[0];
-        var direction = parts.Length > 1 ? parts[1] : "asc";
-
-        var mappedField = field.ToLower() switch
+        var fieldMappings = new Dictionary<string, string>
         {
-            "id" => "job.Id",
-            "roomid" => "job.RoomId",
-            "status" => "job.Status",
-            "endtime" => "job.EndTime",
-            "createdat" => "job.CreatedAt",
-            "roomname" => "room.RoomName",
-
-            _ => $"job.{field}",
+            { "id", "job.Id" },
+            { "roomid", "job.RoomId" },
+            { "status", "job.Status" },
+            { "starttime", "job.StartTime" },
+            { "endtime", "job.EndTime" },
+            { "duration", "job.Duration" },
+            { "createdat", "job.CreatedAt" },
+            { "roomname", "room.RoomName" }
         };
 
-        return $"{mappedField} {direction}";
+        return SortingHelper.ProcessSortExpression(sortExpression, fieldMappings);
+    }
+
+    private static string MapSorterForDanmaku(string sortExpression)
+    {
+        var fieldMappings = new Dictionary<string, string>
+        {
+            {"id", "danmaku.Id"},
+            {"username", "danmaku.UserName"},
+            {"content", "danmaku.Content"},
+            {"fanmedalname", "danmaku.FanMedalName"},
+            {"fanmedallevel", "danmaku.FanMedalLevel"},
+            {"userlevel", "danmaku.UserLevel"},
+            {"roomname", "room.RoomName"},
+            {"createdat", "danmaku.CreatedAt"},
+        };
+
+        return SortingHelper.ProcessSortExpression(sortExpression, fieldMappings);
     }
 }

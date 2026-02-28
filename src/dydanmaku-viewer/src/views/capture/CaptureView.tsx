@@ -100,10 +100,17 @@ const CaptureView: React.FC = () => {
   const fetchJobs = useCallback(async (page: number = 1, pageSize: number = 10, sorter: string | null) => {
     setLoading(true);
     try {
-      let endpoint = `${captureEndpoint}/jobs?page=${page}&pageSize=${pageSize}`;
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', page.toString());
+      queryParams.append('pageSize', pageSize.toString());
+
       if (sorter) {
-        endpoint = `${endpoint}&sorter=${sorter}`
+        queryParams.append('sorter', sorter);
       }
+
+      console.log('Fetching jobs with params:', queryParams.toString());
+
+      const endpoint = `${captureEndpoint}/jobs?${queryParams.toString()}`;
       const response = await fetch(endpoint);
       if (response.ok) {
         const data: CaptureJobList = await response.json();

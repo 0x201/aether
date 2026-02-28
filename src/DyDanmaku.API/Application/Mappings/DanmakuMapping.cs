@@ -37,6 +37,29 @@ public class DanmakuMapping
         };
     }
 
+    public static DanmakuWithRoom MapToWithRoomDto((Danmaku danmaku, Room room) danmakuWithRoom)
+    {
+        var (danmaku, room) = danmakuWithRoom;
+        return new DanmakuWithRoom
+        {
+            Id = danmaku.Id,
+            UserId = danmaku.UserId ?? string.Empty,
+            UserName = danmaku.UserName ?? string.Empty,
+            Content = danmaku.Content ?? string.Empty,
+            FanMedalName = danmaku.FanMedalName,
+            FanMedalLevel = danmaku.FanMedalLevel,
+            UserLevel = danmaku.UserLevel,
+            RoomId = danmaku.RoomId,
+            CreatedAt = danmaku.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
+            RoomName = room.RoomName
+        };
+    }
+
+    public static List<DanmakuWithRoom> MapToWithRoomDtos(List<(Danmaku danmaku, Room room)> danmakusWithRooms)
+    {
+        return [.. danmakusWithRooms.Select(MapToWithRoomDto)];
+    }
+
     public static List<DanmakuDto> MapToDtos(List<Danmaku> danmakus)
     {
         return [.. danmakus.Select(MapToDto)];
