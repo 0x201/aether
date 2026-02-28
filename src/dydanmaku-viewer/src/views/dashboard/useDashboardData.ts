@@ -94,13 +94,13 @@ export const useDashboardData = (defaultHours: number = 1) => {
 
   const fetchAllData = useCallback(async (range: DateRange = {}, roomId: number | null = null) => {
     const { startTime, endTime } = range;
-    
+
     const baseParams: Record<string, string> = {};
     if (startTime) baseParams.startTime = startTime;
     if (endTime) baseParams.endTime = endTime;
     if (roomId !== null && roomId !== -1) baseParams.roomId = roomId.toString();
 
-    fetchStatsData(baseParams);
+    fetchStatsData({ topN: '20', ...baseParams });
 
     fetchWordFrequencyData({
       topN: '100',
@@ -114,7 +114,7 @@ export const useDashboardData = (defaultHours: number = 1) => {
       const queryParams = new URLSearchParams();
       queryParams.append('page', page.toString());
       queryParams.append('pageSize', pageSize.toString());
-      
+
       if (search) {
         queryParams.append('search', search);
       }
@@ -127,7 +127,7 @@ export const useDashboardData = (defaultHours: number = 1) => {
         throw new Error(`Failed to fetch rooms`);
       }
       const result = await response.json();
-      
+
       return {
         data: result.data || [],
         total: result.total || 0
@@ -216,10 +216,10 @@ export const useDashboardData = (defaultHours: number = 1) => {
 
   return {
     data: { ...data, error: data.error },
-    actions: { 
-      setDateRange, 
-      refreshData, 
-      handleRoomChange, 
+    actions: {
+      setDateRange,
+      refreshData,
+      handleRoomChange,
       fetchRooms,
       selectedRoomId
     }

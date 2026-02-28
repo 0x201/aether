@@ -43,7 +43,7 @@ const HomeView: React.FC = () => {
 
   const techStack = [
     '后端：Asp.NET Core Web API + EntityFrameworkCore + PostgreSQL + SignalR',
-    '前端：React 19+ + TypeScript + Ant Design + Vite',
+    '前端：React 19 + TypeScript + Ant Design + Vite',
     '实时通信：ASP.NET Core SignalR (WebSocket/Server-Sent Events)',
     '数据处理：FastAPI + APScheduler + Jieba3 (词频分析)',
     '任务调度：内存任务调度器 + 定时任务服务',

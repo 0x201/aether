@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
     <ChartComponent
       data={data.stats?.topUsers}
       transformFunction={transformUserData}
-      title="Top 10 用户弹幕数"
+      title="Top 20 用户弹幕数"
       color="var(--chart-color-users)"
       loading={loading}
       angle={-45}
@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
     <ChartComponent
       data={data.stats?.topRooms}
       transformFunction={transformRoomData}
-      title="Top 10 房间弹幕数"
+      title="Top 20 房间弹幕数"
       color="var(--chart-color-rooms)"
       loading={loading}
       angle={-45}
