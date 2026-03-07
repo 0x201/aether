@@ -1,1 +1,1 @@
-export { default } from './DanmakuMgt';
+export { default } from './DanmakuMgt'

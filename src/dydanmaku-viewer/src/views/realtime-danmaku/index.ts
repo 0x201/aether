@@ -1,1 +1,1 @@
-export { default } from './RealtimeDanmakuView';
+export { default } from './RealtimeDanmakuView'

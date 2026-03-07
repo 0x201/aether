@@ -1,7 +1,7 @@
 .danmaku-display-container {
-  min-height: 200px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  flex: 1;
+    min-height: 200px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex: 1;
 }

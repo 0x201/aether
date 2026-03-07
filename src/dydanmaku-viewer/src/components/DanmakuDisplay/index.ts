@@ -1,7 +1,7 @@
-import DanmakuDisplay from './DanmakuDisplay';
-import type { DanmakuDisplayProps } from './type';
+import DanmakuDisplay from './DanmakuDisplay'
+import type { DanmakuDisplayProps } from './type'
 
-export { DanmakuDisplay };
-export type { DanmakuDisplayProps };
+export { DanmakuDisplay }
+export type { DanmakuDisplayProps }
 
-export default DanmakuDisplay;
+export default DanmakuDisplay

@@ -1,5 +1,5 @@
-import AnimatedThemeSwitch from "./AnimatedThemeSwitch";
+import AnimatedThemeSwitch from './AnimatedThemeSwitch'
 
-export { AnimatedThemeSwitch };
+export { AnimatedThemeSwitch }
 
-export default AnimatedThemeSwitch;
+export default AnimatedThemeSwitch

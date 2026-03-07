@@ -1,13 +1,13 @@
 export interface PaginationRequest {
-    page: number;
-    pageSize: number;
+    page: number
+    pageSize: number
 }
 
 export interface SortedRequest {
-    sorter?: string;
+    sorter?: string
 }
 
 export interface TimeRangeRequest {
-    startTime?: string;
-    endTime?: string;
+    startTime?: string
+    endTime?: string
 }

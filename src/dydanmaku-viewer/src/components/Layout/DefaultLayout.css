@@ -1,56 +1,56 @@
 .header-layout {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(5, 5, 5, 0.06);
 }
 
 .ant-layout-header {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
 }
 
 .logo {
-  width: 60px;
-  height: 80%;
+    width: 60px;
+    height: 80%;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
 }
 
 .header-left h1 {
-  margin: 0 16px 0 0;
-  color: #1677ff;
-  font-size: 18px;
+    margin: 0 16px 0 0;
+    color: #1677ff;
+    font-size: 18px;
 }
 
 .header-center {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
 }
 
 .header-right {
-  display: flex;
-  flex-direction: row;
-  flex: 0 0 auto;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 auto;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
 }
 
 .sider-container {
-  padding: 0;
-  border-right: 1px solid rgba(5, 5, 5, 0.06);
+    padding: 0;
+    border-right: 1px solid rgba(5, 5, 5, 0.06);
 }
 
 .content-container {
-  flex: 1;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-gutter: stable;
+    flex: 1;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
 }

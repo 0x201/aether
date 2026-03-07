@@ -1,7 +1,7 @@
-import DanmakuChart from "./DanmakuChart";
-import type { DanmakuChartProps, TransformedDataItem } from "./type";
+import DanmakuChart from './DanmakuChart'
+import type { DanmakuChartProps, TransformedDataItem } from './type'
 
-export { DanmakuChart };
-export type { DanmakuChartProps, TransformedDataItem };
+export { DanmakuChart }
+export type { DanmakuChartProps, TransformedDataItem }
 
-export default DanmakuChart;
+export default DanmakuChart

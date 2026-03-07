@@ -1,1 +1,1 @@
-export { default } from './CaptureView';
+export { default } from './CaptureView'

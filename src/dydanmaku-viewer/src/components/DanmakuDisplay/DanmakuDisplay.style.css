@@ -86,7 +86,7 @@ li {
     word-wrap: break-word;
     margin: var(--danmaku-spacing-sm) 0;
     font-size: var(--danmaku-font-size-md);
-    letter-spacing: .2px;
+    letter-spacing: 0.2px;
     text-align: left;
 }
 
@@ -118,39 +118,39 @@ li {
 }
 
 /* User Level Colors */
-.user-level[data-level="0"] {
+.user-level[data-level='0'] {
     background-color: var(--user-level-0);
 }
 
-.user-level[data-level="1"] {
+.user-level[data-level='1'] {
     background-color: var(--user-level-1);
 }
 
-.user-level[data-level="2"] {
+.user-level[data-level='2'] {
     background-color: var(--user-level-2);
 }
 
-.user-level[data-level="3"] {
+.user-level[data-level='3'] {
     background-color: var(--user-level-3);
 }
 
-.user-level[data-level="4"] {
+.user-level[data-level='4'] {
     background-color: var(--user-level-4);
 }
 
-.user-level[data-level="5"] {
+.user-level[data-level='5'] {
     background-color: var(--user-level-5);
 }
 
-.user-level[data-level="6"] {
+.user-level[data-level='6'] {
     background-color: var(--user-level-6);
 }
 
-.user-level[data-level="7"] {
+.user-level[data-level='7'] {
     background-color: var(--user-level-7);
 }
 
-.user-level[data-level="8"] {
+.user-level[data-level='8'] {
     background-color: var(--user-level-8);
 }
 
@@ -182,51 +182,51 @@ li {
 }
 
 /* Fan Medal Colors */
-.fan-medal-container[data-level="0"] .fan-medal-level {
+.fan-medal-container[data-level='0'] .fan-medal-level {
     background-color: var(--fan-medal-0-level);
 }
 
-.fan-medal-container[data-level="0"] .fan-medal-name {
+.fan-medal-container[data-level='0'] .fan-medal-name {
     background-color: var(--fan-medal-0-name);
 }
 
-.fan-medal-container[data-level="1"] .fan-medal-level {
+.fan-medal-container[data-level='1'] .fan-medal-level {
     background-color: var(--fan-medal-1-level);
 }
 
-.fan-medal-container[data-level="1"] .fan-medal-name {
+.fan-medal-container[data-level='1'] .fan-medal-name {
     background-color: var(--fan-medal-1-name);
 }
 
-.fan-medal-container[data-level="2"] .fan-medal-level {
+.fan-medal-container[data-level='2'] .fan-medal-level {
     background-color: var(--fan-medal-2-level);
 }
 
-.fan-medal-container[data-level="2"] .fan-medal-name {
+.fan-medal-container[data-level='2'] .fan-medal-name {
     background-color: var(--fan-medal-2-name);
 }
 
-.fan-medal-container[data-level="3"] .fan-medal-level {
+.fan-medal-container[data-level='3'] .fan-medal-level {
     background-color: var(--fan-medal-3-level);
 }
 
-.fan-medal-container[data-level="3"] .fan-medal-name {
+.fan-medal-container[data-level='3'] .fan-medal-name {
     background-color: var(--fan-medal-3-name);
 }
 
-.fan-medal-container[data-level="4"] .fan-medal-level {
+.fan-medal-container[data-level='4'] .fan-medal-level {
     background-color: var(--fan-medal-4-level);
 }
 
-.fan-medal-container[data-level="4"] .fan-medal-name {
+.fan-medal-container[data-level='4'] .fan-medal-name {
     background-color: var(--fan-medal-4-name);
 }
 
-.fan-medal-container[data-level="5"] .fan-medal-level {
+.fan-medal-container[data-level='5'] .fan-medal-level {
     background-color: var(--fan-medal-5-level);
 }
 
-.fan-medal-container[data-level="5"] .fan-medal-name {
+.fan-medal-container[data-level='5'] .fan-medal-name {
     background-color: var(--fan-medal-5-name);
 }
 
