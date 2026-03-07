@@ -1,89 +1,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, Row, Col, Statistic, Spin, DatePicker, Typography, message, Select } from 'antd';
 import WordCloud from '@/src/components/Wordcloud';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
 import { colormapOptions } from '@/src/components/Wordcloud/type';
 import { useDashboardData } from './useDashboardData';
 import type { HourlyDistribution, TopRoom, TopUser, WordFreq } from './type';
 import type { Room } from '@/src/interface/Danmaku';
 import './Dashboard.css';
 import type { Dayjs } from 'dayjs';
+import { DanmakuChart, type TransformedDataItem } from '@/src/components/DanmakuChart';
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
-
-interface ChartComponentProps {
-  data: any[];
-  transformFunction: (data: any[]) => any[];
-  title: string;
-  color: string;
-  loading: boolean;
-  angle?: number;
-}
-
-interface TransformedDataItem {
-  name: string;
-  value: number;
-  tooltipContent?: string;
-}
-
-const ChartComponent: React.FC<ChartComponentProps> = React.memo(({
-  data,
-  transformFunction,
-  title,
-  color,
-  loading,
-  angle = 0,
-}) => {
-  const transformedData = useMemo(() => transformFunction(data || []), [data, transformFunction]);
-
-  return (
-    <Card title={title} style={{ height: '100%' }}>
-      <div style={{ height: 500, width: '100%' }}>
-        {!loading && data && data.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%" debounce={150}>
-            <BarChart
-              data={transformedData}
-              barSize={30}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="name"
-                angle={angle}
-                textAnchor="end"
-                tickMargin={25}
-                height={100}
-                interval={0}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis />
-              <Tooltip 
-                formatter={(value) => [value, '弹幕数量']}
-                labelFormatter={() => ''}
-              />
-              <Legend verticalAlign="top" layout="horizontal" />
-              <Bar dataKey="value" name="弹幕数量" fill={color} />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            {loading && <Spin size="large" />}
-            {!loading && (!data || data.length === 0) && <p>暂无数据</p>}
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-});
 
 const Dashboard: React.FC = () => {
   const { data, actions } = useDashboardData();
@@ -119,7 +46,7 @@ const Dashboard: React.FC = () => {
     loadRooms();
   }, [loadRooms]);
 
-  const handleDateChange = useCallback((dates: (Dayjs | null)[] | null, _dateStrings: string[]) => {
+  const handleDateChange = useCallback((dates: (Dayjs | null)[] | null) => {
     if (dates && dates[0] && dates[1]) {
       const startTime = dates[0].toISOString();
       const endTime = dates[1].toISOString();
@@ -186,7 +113,7 @@ const Dashboard: React.FC = () => {
 
   const chartComponents = useMemo(() => ({
     hourlyDistribution: (
-      <ChartComponent
+      <DanmakuChart
         key="hourly-distribution"
         data={stats?.hourlyDistributions || []}
         transformFunction={transformHourlyData}
@@ -197,7 +124,7 @@ const Dashboard: React.FC = () => {
       />
     ),
     topUsers: (
-      <ChartComponent
+      <DanmakuChart
         key="top-users"
         data={stats?.topUsers || []}
         transformFunction={transformUserData}
@@ -208,7 +135,7 @@ const Dashboard: React.FC = () => {
       />
     ),
     topRooms: (
-      <ChartComponent
+      <DanmakuChart
         key="top-rooms"
         data={stats?.topRooms || []}
         transformFunction={transformRoomData}
@@ -219,7 +146,7 @@ const Dashboard: React.FC = () => {
       />
     ),
     wordFreq: (
-      <ChartComponent
+      <DanmakuChart
         key="word-freq"
         data={wordFreqs?.slice(0, 20) || []}
         transformFunction={transformWordFreqData}

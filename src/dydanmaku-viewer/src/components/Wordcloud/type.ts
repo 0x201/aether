@@ -37,3 +37,8 @@ export interface WordCloudProps {
     /** Maximum font size */
     maxFontSize?: number;
 }
+
+export interface WordItem {
+    text: string;
+    size: number;
+}

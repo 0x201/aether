@@ -27,7 +27,7 @@ import "./CaptureView.css"
 import { buildSorter } from '@/src/util';
 import { useCaptureManagement } from './hooks/useCaptureManagement';
 import type { CaptureJob } from './type';
-import type { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface';
+import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
   Running: { color: 'blue', text: '运行中' },
@@ -65,7 +65,7 @@ const CaptureView: React.FC = () => {
     _pagination: TablePaginationConfig, 
     _filters: Record<string, FilterValue | null>, 
     _sorter: SorterResult<CaptureJob> | SorterResult<CaptureJob>[], 
-    _extra: TableCurrentDataSource<CaptureJob>) => {
+    ) => {
     const sortString = buildSorter(_sorter);
     actions.setSort(sortString);
   };
