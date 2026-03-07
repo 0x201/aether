@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import {
   Select,
   Spin,
@@ -7,16 +7,18 @@ import { debounce } from 'lodash';
 import type { InfiniteRefreshSelectProps } from './type';
 
 
+type BaseOptionType = {
+  key?: string | number;
+  label: React.ReactNode;
+  value: string | number;
+}
+
 const InfiniteRefreshSelect = <
-  ValueType extends {
-    key?: string | number;
-    label: React.ReactNode;
-    value: string | number;
-  } = any,
+  ValueType extends BaseOptionType = any,
 >({
   fetchOptions,
   debounceTimeout = 300,
-  optionRender,
+  itemRender,
   pageSize = 20,
   ...props
 }: InfiniteRefreshSelectProps<ValueType>) => {
@@ -25,9 +27,10 @@ const InfiniteRefreshSelect = <
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const fetchRef = useRef(0);
 
-  // Reset pagination when search term changes
+  const fetchRef = useRef(0);
+  const loadingRef = useRef(false);
+
   const resetPagination = useCallback((search: string) => {
     setSearchTerm(search);
     setPage(1);
@@ -35,96 +38,123 @@ const InfiniteRefreshSelect = <
     setHasMore(true);
   }, []);
 
-  // Handle scroll to load more options
-  const handlePopupScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const { target } = e;
-    if (target instanceof HTMLDivElement) {
-      // Check if we've scrolled near the bottom
-      const { scrollTop, clientHeight, scrollHeight } = target;
-      if (scrollHeight - scrollTop <= clientHeight + 10 && !fetching && hasMore) {
-        setPage(prev => prev + 1); // Load next page
-      }
-    }
-  }, [fetching, hasMore]);
+  const loadOptions = useCallback(
+    async (pageNum: number, search: string) => {
+      if (loadingRef.current) return;
 
-  // Memoize the fetcher with debounce
-  const debouncedFetcher = useMemo(() => {
-    const loadOptions = (pageNum: number, value: string) => {
-      fetchRef.current += 1;
-      const fetchId = fetchRef.current;
+      const currentFetchId = ++fetchRef.current;
+      loadingRef.current = true;
       setFetching(true);
 
-      fetchOptions(pageNum, pageSize, value).then(({ data, total }) => {
-        if (fetchId !== fetchRef.current) {
-          // for fetch callback order
-          return;
+      try {
+        const { data, total } = await fetchOptions(pageNum, pageSize, search);
+        if (currentFetchId === fetchRef.current) {
+          setOptions(prev => {
+            const next = pageNum === 1 ? data : [...prev, ...data];
+            setHasMore(next.length < total);
+            return next;
+          });
         }
-
-        // Append new options to existing options when loading more pages
-        if (pageNum === 1) {
-          setOptions(data);
-        } else {
-          setOptions(prev => [...prev, ...data]);
-        }
-
-        // Check if we have loaded all data
-        setHasMore(options.length + data.length < total);
-        setFetching(false);
-      }).catch(() => {
-        if (fetchId === fetchRef.current) {
+      } catch (error) {
+        console.error('Failed to fetch options:', error);
+      } finally {
+        if (currentFetchId === fetchRef.current) {
           setFetching(false);
+          loadingRef.current = false;
         }
-      });
-    };
-
-    return {
-      debouncedLoad: debounce((pageNum: number, value: string) => {
-        loadOptions(pageNum, value);
-      }, debounceTimeout),
-      load: (value: string, pageNum: number) => {
-        loadOptions(pageNum, value);
       }
-    };
-  }, [fetchOptions, debounceTimeout, pageSize, options.length]);
+    }, [fetchOptions, pageSize]);
 
-  // Handle search input
-  const handleSearch = useCallback((value: string) => {
-    if (searchTerm !== value) {
-      resetPagination(value);
-      debouncedFetcher.debouncedLoad(1, value);
-    } else if (value === searchTerm && page > 1 && hasMore) {
-      // If we're loading more pages for the same search term
-      debouncedFetcher.debouncedLoad(page, value);
-    }
-  }, [searchTerm, resetPagination, debouncedFetcher, page, hasMore]);
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((search: string) => {
+        loadOptions(1, search);
+      }, debounceTimeout),
+    [loadOptions, debounceTimeout],
+  );
 
-  // Effect to trigger loading when page changes
-  useMemo(() => {
-    if (searchTerm && page > 1 && hasMore) {
-      debouncedFetcher.load(searchTerm, page);
-    }
-  }, [searchTerm, page, hasMore, debouncedFetcher]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
-      debouncedFetcher.debouncedLoad.cancel?.();
+      debouncedSearch.cancel();
     };
-  }, [debouncedFetcher]);
+  }, [debouncedSearch]);
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      debouncedSearch.cancel();
+      resetPagination(value);
+      debouncedSearch(value);
+    },
+    [debouncedSearch, resetPagination],
+  );
+
+  const handlePopupScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const { target } = e;
+      if (!(target instanceof HTMLDivElement)) return;
+
+      const { scrollTop, clientHeight, scrollHeight } = target;
+      if (
+        scrollHeight - scrollTop <= clientHeight + 10 &&
+        !loadingRef.current &&
+        hasMore
+      ) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    [hasMore],
+  );
+
+  useEffect(() => {
+    if (loadingRef.current) return;
+
+    if (page === 1 && options.length === 0) {
+      loadOptions(1, searchTerm);
+    } else if (page > 1 && hasMore) {
+      loadOptions(page, searchTerm);
+    }
+  }, [page, searchTerm, hasMore, options.length, loadOptions]);
+
+  const selectOptions = useMemo(
+    () =>
+      options.map((opt) => ({
+        ...opt,
+        label: itemRender ? itemRender(opt) : opt.label,
+      })),
+    [options, itemRender],
+  );
+
+  const popupRender = useCallback(
+    (menu: React.ReactElement) => (
+      <>
+        {menu}
+        {fetching && page > 1 && (
+          <div style={{ padding: 8, textAlign: 'center' }}>
+            <Spin size="small" />
+          </div>
+        )}
+      </>
+    ),
+    [fetching, page],
+  );
 
   return (
     <Select
       labelInValue
       showSearch={{
         filterOption: false,
-        onSearch: handleSearch,
+        onSearch: handleSearch
       }}
       onPopupScroll={handlePopupScroll}
-      notFoundContent={fetching && page === 1 ? <Spin size="small" /> : "No results found"}
-      {...props}
-      options={options}
-      optionRender={optionRender}
+      notFoundContent={
+        fetching && page === 1 ? <Spin size="small" /> : 'No results found'
+      }
       loading={fetching && page === 1}
-    />
+      popupRender={popupRender}
+      options={selectOptions}
+      {...props}
+    >
+    </Select>
   );
 };
 
