@@ -1,20 +1,8 @@
-import React, { createContext, useState, useEffect, type ReactNode, useContext } from 'react';
+import React, { useState, useEffect, type ReactNode, useMemo, useCallback } from 'react';
 import { HubConnection, HubConnectionBuilder, HttpTransportType, HubConnectionState } from '@microsoft/signalr';
 import type { Message, AnalyticsMessage, DanmakuMessage, SystemMessage } from '../interface/Message';
+import { MessageContext, type MessageContextType } from './useMessage';
 
-interface MessageContextType {
-  messages: Message[];
-  unreadCount: number;
-  connection: HubConnection | null;
-  isConnected: boolean;
-  connect: () => Promise<void>;
-  disconnect: () => Promise<void>;
-  markAsRead: (id: string) => void;
-  clearAll: () => void;
-  sendCommand: (command: string, data?: any) => Promise<void>;
-}
-
-const MessageContext = createContext<MessageContextType | undefined>(undefined);
 
 export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -168,39 +156,9 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         console.log('Message context SignalR connection started');
 
         startHeartbeat(hubConnection);
-      } catch (err: any) {
+      } catch (error) {
         if (!isMountedRef.current) return;
-
-        console.error('Message context SignalR connection error: ', err);
-
-        if (err.message && (
-          err.message.includes('negotiation') ||
-          err.message.includes('Network Error') ||
-          err.message.includes('timeout') ||
-          err.message.includes('ECONNREFUSED')
-        )) {
-          console.warn('Connection failed due to network issue, will attempt to retry...');
-
-          if (reconnectAttempts < maxRetries) {
-            setReconnectAttempts(prev => prev + 1);
-            retryTimeout = setTimeout(() => {
-              if (isMountedRef.current) {
-                console.log(`Network error, retrying... (${reconnectAttempts + 1}/${maxRetries})`);
-                startConnection();
-              }
-            }, 5000);
-          }
-        } else {
-          if (reconnectAttempts < maxRetries) {
-            setReconnectAttempts(prev => prev + 1);
-            retryTimeout = setTimeout(() => {
-              if (isMountedRef.current) {
-                console.log(`Connection failed, retrying... (${reconnectAttempts + 1}/${maxRetries})`);
-                startConnection();
-              }
-            }, 5000);
-          }
-        }
+        console.error('Message context SignalR connection error: ', error);
       }
     };
 
@@ -226,9 +184,9 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         });
       }
     };
-  }, []);
+  }, [connection, reconnectAttempts]);
 
-  const connect = async () => {
+  const connect = useCallback(async () => {
     if (!isMountedRef.current) return;
 
     if (connection && connection.state === HubConnectionState.Disconnected) {
@@ -260,9 +218,9 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         console.error('Failed to restart connection:', err);
       }
     }
-  };
+  }, [connection]);
 
-  const disconnect = async () => {
+  const disconnect = useCallback(async () => {
     if (!isMountedRef.current) return;
 
     if (connection) {
@@ -282,58 +240,58 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         console.error('Error stopping connection:', err);
       }
     }
-  };
+  }, [connection]);
 
-  const markAsRead = (id: string) => {
+  const markAsRead = useCallback((id: string) => {
     if (!isMountedRef.current) return;
     setMessages(prev => prev.filter(notification => notification.id !== id));
     setUnreadCount(prev => Math.max(0, prev - 1));
-  };
+  }, []);
 
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     if (!isMountedRef.current) return;
     setMessages([]);
     setUnreadCount(0);
-  };
+  }, []);
 
-  const sendCommand = async (command: string, data?: any) => {
-    if (connection && connection.state === HubConnectionState.Connected) {
-      try {
-        await connection.invoke(command, data);
-        console.log(`Command sent: ${command}`, data);
-      } catch (error) {
-        console.error(`Error sending command ${command}:`, error);
-        throw error;
+  const sendCommand = useCallback(
+    async (command: string, data?: unknown) => {
+      if (connection && connection.state === HubConnectionState.Connected) {
+        try {
+          await connection.invoke(command, data);
+          console.log(`Command sent: ${command}`, data);
+        } catch (error) {
+          console.error(`Error sending command ${command}:`, error);
+          throw error;
+        }
+      } else {
+        console.warn('Cannot send command, connection not established');
+        throw new Error('Connection not established');
       }
-    } else {
-      console.warn('Cannot send command, connection not established');
-      throw new Error('Connection not established');
-    }
-  };
+    }, [connection]);
+
+  const contextValue = useMemo<MessageContextType>(
+    () => ({
+
+      messages,
+      unreadCount,
+      connection,
+      isConnected,
+      connect,
+      disconnect,
+      markAsRead,
+      clearAll,
+      sendCommand
+    }),
+    [messages, unreadCount, connection, isConnected, connect, disconnect, markAsRead, clearAll, sendCommand]
+  );
 
   return (
     <MessageContext.Provider
-      value={{
-        messages: messages,
-        unreadCount,
-        connection,
-        isConnected,
-        connect,
-        disconnect,
-        markAsRead,
-        clearAll,
-        sendCommand
-      }}
+      value={contextValue}
     >
       {children}
     </MessageContext.Provider>
   );
 };
 
-export const useMessageContext = (): MessageContextType => {
-  const context = useContext(MessageContext);
-  if (context === undefined) {
-    throw new Error('useMessageContext must be used within a MessageProvider');
-  }
-  return context;
-};

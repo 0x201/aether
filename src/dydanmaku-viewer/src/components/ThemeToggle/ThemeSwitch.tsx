@@ -8,7 +8,7 @@ import {
   SyncOutlined,
   SettingOutlined
 } from '@ant-design/icons';
-import { useTheme } from '@/src/contexts/ThemeContext';
+import { useTheme } from '@/src/contexts/useTheme';
 
 
 const ThemeSwitch: React.FC = () => {

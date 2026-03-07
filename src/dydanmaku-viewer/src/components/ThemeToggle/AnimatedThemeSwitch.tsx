@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useTheme } from '@/src/contexts/ThemeContext';
+import { useTheme } from '@/src/contexts/useTheme';
 import './AnimatedThemeSwitch.css';
 
 const AnimatedThemeSwitch: React.FC = () => {

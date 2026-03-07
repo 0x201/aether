@@ -2,7 +2,7 @@ import React from 'react';
 import { Badge, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, ClearOutlined } from '@ant-design/icons';
-import { useMessageContext } from '@/src/contexts/MessageContext';
+import { useMessageContext } from '@/src/contexts/useMessage';
 import dayjs from 'dayjs';
 import type { AnalyticsMessage } from '../interface/Message';
 

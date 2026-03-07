@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@/src/contexts/ThemeContext';
+import { ThemeProvider } from '@/src/contexts/ThemeProvider';
 import Layout, { Content, Header } from 'antd/es/layout/layout';
 import React, { useState } from 'react';
 import Sider from 'antd/es/layout/Sider';

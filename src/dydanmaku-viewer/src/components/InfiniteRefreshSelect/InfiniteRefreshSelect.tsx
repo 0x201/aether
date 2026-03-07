@@ -14,7 +14,7 @@ type BaseOptionType = {
 }
 
 const InfiniteRefreshSelect = <
-  ValueType extends BaseOptionType = any,
+  ValueType extends BaseOptionType = BaseOptionType,
 >({
   fetchOptions,
   debounceTimeout = 300,
