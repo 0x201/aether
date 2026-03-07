@@ -136,7 +136,7 @@ const CaptureView: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: any) => (
+      render: (_, record: CaptureJob) => (
         <Space size="middle">
           {record.status === 'Running' && (
             <Button

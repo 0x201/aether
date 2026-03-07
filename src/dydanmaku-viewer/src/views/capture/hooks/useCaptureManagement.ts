@@ -70,7 +70,7 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
     } catch (error) {
       console.error('启动捕获任务失败:', error);
     }
-  }, [service, currentPage, pageSize, sort, messageApi]);
+  }, [service, currentPage, pageSize, sort, messageApi, fetchJobs]);
 
   const stopCapture = useCallback(async (roomId: number) => {
     try {
@@ -79,14 +79,14 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
     } catch (error) {
       console.error('停止捕获任务失败:', error);
     }
-  }, [service, currentPage, pageSize, sort]);
+  }, [service, currentPage, pageSize, sort, fetchJobs]);
 
   const handlePageChange = useCallback((page: number, limit?: number) => {
     setCurrentPage(page);
     if (limit && limit !== pageSize) {
       setPageSize(limit);
     }
-  }, []);
+  }, [pageSize]);
 
   useEffect(() => {
     fetchJobs(currentPage, pageSize, sort);

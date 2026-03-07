@@ -21,10 +21,10 @@ export interface StartCaptureRes  {
   anchorName: string;
 }
 
-export interface StartCaptureResponse extends DataResponse<StartCaptureRes> {}
+export type StartCaptureResponse = DataResponse<StartCaptureRes>
 
 export interface StopCaptureRequest {
   roomId: number;
 }
 
-export interface CaptureJobPagedResponse extends PaginationResponse<CaptureJob> {}
+export type CaptureJobPagedResponse = PaginationResponse<CaptureJob>

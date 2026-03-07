@@ -139,7 +139,7 @@ export const useDashboardData = (defaultHours: number = 1) => {
         total: 0
       };
     }
-  }, [apiVersion]);
+  }, []);
 
   // Function to trigger data refresh
   const refreshData = useCallback(() => {

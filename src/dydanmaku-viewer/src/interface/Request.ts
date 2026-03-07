@@ -1,3 +1,8 @@
+export interface PaginationRequest {
+    page: number;
+    pageSize: number;
+}
+
 export interface SortedRequest {
     sorter?: string;
 }

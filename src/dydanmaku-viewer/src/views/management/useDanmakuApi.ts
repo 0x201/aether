@@ -2,9 +2,9 @@ import config from "@/src/config";
 import type { Danmaku } from "@/src/interface/Danmaku";
 import { useCallback } from "react";
 import type { DanmakuSearchParams } from "./type";
-import type { PaginationData } from "@/src/interface/PaginationData";
 import type { MessageInstance } from "antd/es/message/interface";
 import type { Room } from "@/src/interface/Danmaku";
+import type { PaginationResponse } from "@/src/interface/Response";
 
 const { apiVersion } = config;
 const baseUrl = `/api/${apiVersion}/danmakus`;
@@ -16,7 +16,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
     pageSize: number = 20,
     sorter: string | null = null,
     searchParams: DanmakuSearchParams | null = null
-  ): Promise<PaginationData<Danmaku>> => {
+  ): Promise<PaginationResponse<Danmaku>> => {
     try {
       const queryParams = new URLSearchParams();
       queryParams.append('page', page.toString());
@@ -46,9 +46,9 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
       messageApi.error('获取弹幕列表失败');
       throw error;
     }
-  }, []);
+  }, [messageApi]);
 
-  const fetchRooms = useCallback(async (page: number = 1, pageSize: number = 100, search?: string): Promise<PaginationData<Room>> => {
+  const fetchRooms = useCallback(async (page: number = 1, pageSize: number = 100, search?: string): Promise<PaginationResponse<Room>> => {
     try {
       const queryParams = new URLSearchParams();
       queryParams.append('page', page.toString());
@@ -73,7 +73,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
       messageApi.error('获取房间列表失败');
       throw error;
     }
-  }, []);
+  }, [messageApi]);
 
   const deleteDanmaku = useCallback(async (id: string): Promise<boolean> => {
     try {
@@ -94,7 +94,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
       messageApi.error('删除失败');
       return false;
     }
-  }, []);
+  }, [messageApi]);
 
   const updateDanmaku = useCallback(async (id: string, data: Partial<Danmaku>): Promise<boolean> => {
     try {
@@ -120,7 +120,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
       messageApi.error('更新失败');
       return false;
     }
-  }, []);
+  }, [messageApi]);
 
   return {
     fetchDanmakuList,

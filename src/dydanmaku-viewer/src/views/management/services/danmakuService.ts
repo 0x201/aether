@@ -10,9 +10,6 @@ const baseUrl = `/api/${apiVersion}/danmakus`;
 
 export interface DanmakuService {
   fetchDanmakuList: (
-    page: number,
-    pageSize: number,
-    sorter: string | null,
     searchParams: DanmakuSearchParams | null
   ) => Promise<PaginationResponse<Danmaku>>;
   fetchRooms: (page: number, pageSize: number, search?: string) => Promise<PaginationResponse<Room>>;
@@ -23,19 +20,11 @@ export interface DanmakuService {
 export const createDanmakuService = (messageApi: MessageInstance): DanmakuService => {
   return {
     fetchDanmakuList: async (
-      page: number,
-      pageSize: number,
-      sorter: string | null,
       searchParams: DanmakuSearchParams | null
     ): Promise<PaginationResponse<Danmaku>> => {
       try {
         const queryParams = new URLSearchParams();
-        queryParams.append('page', page.toString());
-        queryParams.append('pageSize', pageSize.toString());
 
-        if (sorter) {
-          queryParams.append('sorter', sorter);
-        }
         if (searchParams) {
           Object.entries(searchParams).forEach(([key, value]) => {
             if (value !== '' && value !== undefined && value !== null) {

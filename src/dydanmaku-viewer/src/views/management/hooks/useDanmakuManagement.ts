@@ -20,6 +20,8 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
   const [sorter, setSorter] = useState<string | null>(null);
 
   const [searchParams, setSearchParams] = useState<DanmakuSearchParams>({
+    page: 1,
+    pageSize: 10,
     userName: '',
     content: '',
     roomId: '',
@@ -46,7 +48,8 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
     6: 'var(--user-level-6)',
   }), []);
 
-  const fetchRoomOptions = useCallback(async (page: number = 1, pageSize: number = 10, search?: string): Promise<{ data: RoomValue[], total: number }> => {
+  const fetchRoomOptions = useCallback(
+    async (page: number = 1, pageSize: number = 10, search?: string): Promise<{ data: RoomValue[], total: number }> => {
     try {
       const response = await service.fetchRooms(page, pageSize, search);
 
@@ -70,10 +73,16 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
   const loadDanmakuList = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await service.fetchDanmakuList(currentPage, pageSize, sorter, searchParams);
+      const paramsWithPagination = {
+        ...searchParams,
+        page: currentPage,
+        pageSize: pageSize,
+        ...(sorter ? { sorter } : {})
+      };
+      
+      const data = await service.fetchDanmakuList(paramsWithPagination);
       setDanmakuList(data.data);
       setTotal(data.total);
-      setCurrentPage(currentPage);
     } finally {
       setLoading(false);
     }
@@ -88,7 +97,7 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
     if (limit && limit !== pageSize) {
       setPageSize(limit);
     }
-  }, []);
+  }, [pageSize]);
 
   const handleSearch = useCallback((newSearchParams: DanmakuSearchParams) => {
     setSearchParams(newSearchParams);
@@ -97,6 +106,8 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
 
   const handleResetSearch = useCallback(() => {
     setSearchParams({
+      page: 1,
+      pageSize: 10,
       userName: undefined,
       content: undefined,
       roomId: undefined,

@@ -36,7 +36,7 @@ const DanmakuMgt: React.FC = () => {
 
   const { state, actions } = useDanmakuManagement({ messageApi });
 
-  const handleTableChange: TableProps<Danmaku>['onChange'] = (_pagination, _filters, sorter, _extra) => {
+  const handleTableChange: TableProps<Danmaku>['onChange'] = (_pagination, _filters, sorter) => {
     const sortString = buildSorter(sorter);
     actions.setSorter(sortString);
   };
@@ -46,6 +46,8 @@ const DanmakuMgt: React.FC = () => {
       const values = await searchForm.validateFields();
 
       const searchParamsWithTime: DanmakuSearchParams = {
+        page: 1,
+        pageSize: 10,
         userName: values.userName || undefined,
         content: values.content || undefined,
         roomId: values.roomId?.value || undefined, // Extract value from selected option
@@ -216,7 +218,7 @@ const DanmakuMgt: React.FC = () => {
       ),
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
-  ], [state.medalLevelColors, state.userLevelColors, handleDelete]);
+  ], [state, handleDelete]);
 
   const collapsedItems: CollapseProps['items'] = useMemo(() => [
     {
@@ -242,9 +244,9 @@ const DanmakuMgt: React.FC = () => {
                   placeholder="请输入房间ID或主播名"
                   debounceTimeout={300}
                   pageSize={10}
-                  optionRender={(option: any) => (
+                  optionRender={(option) => (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      {option.data.label}
+                      {option.label}
                     </div>
                   )}
                 />
