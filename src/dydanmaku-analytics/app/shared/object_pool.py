@@ -27,8 +27,9 @@ class ObjectPool(Generic[T]):
     def __init__(
         self,
         factory: Callable[[], T],
-        size: int = 100,
+        size: int = 16,
         reset_func: Optional[Callable[[T], None]] = None,
+        prepopulate: bool = False,
     ):
         self.pool: deque[T] = deque()
         self.factory = factory
@@ -43,10 +44,11 @@ class ObjectPool(Generic[T]):
         self.lock = threading.RLock()
 
         # Pre-populate the pool
-        for _ in range(size):
-            obj = self.factory()
-            self.stats.total_created += 1
-            self.pool.append(obj)
+        if prepopulate:
+            for _ in range(size):
+                obj = self.factory()
+                self.stats.total_created += 1
+                self.pool.append(obj)
 
         self.stats.peak_pool_size = size
         self.stats.average_pool_size = size
@@ -73,10 +75,6 @@ class ObjectPool(Generic[T]):
         # Reset object using custom reset function if provided
         if self.reset_func:
             self.reset_func(obj)
-        elif hasattr(obj, "__dict__"):
-            # Default reset for objects with attributes
-            for key in obj.__dict__:
-                setattr(obj, key, None)
 
         with self.lock:
             if len(self.pool) < self.size:
@@ -90,15 +88,16 @@ class ObjectPool(Generic[T]):
     def _update_pool_stats(self):
         """Update pool statistics"""
         current_size = len(self.pool)
+
+        if len(self.pool_sizes_history) >= 1000:
+            self.pool_sizes_history.pop(0)
         self.pool_sizes_history.append(current_size)
 
         if current_size > self.stats.peak_pool_size:
             self.stats.peak_pool_size = current_size
 
         if self.pool_sizes_history:
-            self.stats.average_pool_size = mean(
-                self.pool_sizes_history[-100:]
-            )  # Average of last 100 measurements
+            self.stats.average_pool_size = mean(self.pool_sizes_history)
 
     def get_stats(self) -> ObjectPoolStats:
         """Get current pool statistics"""
@@ -119,3 +118,14 @@ class ObjectPool(Generic[T]):
         with self.lock:
             self.stats = ObjectPoolStats()
             self.pool_sizes_history.clear()
+
+    def close(self):
+        """Close the pool and clear all objects"""
+        with self.lock:
+            self.pool.clear()
+            self.pool_sizes_history.clear()
+
+    def current_size(self) -> int:
+        """Get the current number of objects in the pool"""
+        with self.lock:
+            return len(self.pool)

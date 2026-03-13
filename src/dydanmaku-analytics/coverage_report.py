@@ -8,7 +8,7 @@ import pytest
 
 def run_tests_with_coverage():
     cov = coverage.Coverage(
-        source=["./src"],
+        source=["./app"],
         omit=["test/*", "*/__pycache__/*", "*/venv/*", "*/env/*", "*/virtualenv/*"],
         config_file=True,
     )

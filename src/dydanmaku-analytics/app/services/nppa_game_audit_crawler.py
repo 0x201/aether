@@ -29,7 +29,7 @@ class NPPAGameAuditType(Enum):
 
 class GameAuditParsingStrategy(ABC):
     @abstractmethod
-    async def parse(self, crawler: NPPAGameAuditCrawler, url: str) -> List[Any]:
+    async def parse(self, crawler: "NPPAGameAuditCrawler", url: str) -> List[Any]:
         """
         Parse the given URL and return a list of audit data
 
@@ -66,7 +66,7 @@ class GameAuditParsingStrategy(ABC):
 
 class DomesticNetworkGameParsingStrategy(GameAuditParsingStrategy):
     async def parse(
-        self, crawler: NPPAGameAuditCrawler, url: str
+        self, crawler: "NPPAGameAuditCrawler", url: str
     ) -> List[NetworkGameAudit]:
         network_game_audits = await crawler._parse_network_game_audits(
             url, NPPAGameAuditType.DOMESTIC_NETWORK_GAME_AUDIT.value
@@ -83,7 +83,7 @@ class DomesticNetworkGameParsingStrategy(GameAuditParsingStrategy):
 
 class ForeignNetworkGameParsingStrategy(GameAuditParsingStrategy):
     async def parse(
-        self, crawler: NPPAGameAuditCrawler, url: str
+        self, crawler: "NPPAGameAuditCrawler", url: str
     ) -> List[NetworkGameAudit]:
         network_game_audits = await crawler._parse_network_game_audits(
             url, NPPAGameAuditType.FOREIGN_NETWOKR_GAME_AUDIT.value
@@ -100,7 +100,7 @@ class ForeignNetworkGameParsingStrategy(GameAuditParsingStrategy):
 
 class GameAlterationParsingStrategy(GameAuditParsingStrategy):
     async def parse(
-        self, crawler: NPPAGameAuditCrawler, url: str
+        self, crawler: "NPPAGameAuditCrawler", url: str
     ) -> List[GameAlterationAudit]:
         game_alteration_audits = await crawler._parse_game_alteration_audits(url)
         game_alteration_audits.reverse()
@@ -115,7 +115,7 @@ class GameAlterationParsingStrategy(GameAuditParsingStrategy):
 
 class GameRevocationParsingStrategy(GameAuditParsingStrategy):
     async def parse(
-        self, crawler: NPPAGameAuditCrawler, url: str
+        self, crawler: "NPPAGameAuditCrawler", url: str
     ) -> List[GameRevocationAudit]:
         game_revocation_audits = await crawler._parse_game_revocation_audits(url)
         game_revocation_audits.reverse()
@@ -129,7 +129,9 @@ class GameRevocationParsingStrategy(GameAuditParsingStrategy):
 
 
 class EGameParsingStrategy(GameAuditParsingStrategy):
-    async def parse(self, crawler: NPPAGameAuditCrawler, url: str) -> List[EGameAudit]:
+    async def parse(
+        self, crawler: "NPPAGameAuditCrawler", url: str
+    ) -> List[EGameAudit]:
         egame_audits = await crawler._parse_egame_audits(url)
         egame_audits.reverse()
         return egame_audits

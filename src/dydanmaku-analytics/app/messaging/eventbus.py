@@ -1,3 +1,5 @@
+from pika.adapters.blocking_connection import BlockingChannel
+from _thread import lock
 import json
 import threading
 from contextlib import contextmanager
@@ -25,14 +27,14 @@ class EventBus(IEventBus):
     """
 
     def __init__(self, exchange_name: str = "mc_event_bus"):
-        self.exchange_name = exchange_name
-        self._lock = threading.Lock()
+        self.exchange_name: str = exchange_name
+        self._lock: lock = threading.Lock()
 
     def _create_connection(self):
         try:
             credentials = pika.PlainCredentials(
-                settings.messaging.rabbitmq_username,
-                settings.messaging.rabbitmq_password,
+                username=settings.messaging.rabbitmq_username,
+                password=settings.messaging.rabbitmq_password,
             )
             parameters = pika.ConnectionParameters(
                 host=settings.messaging.rabbitmq_host,
@@ -43,7 +45,7 @@ class EventBus(IEventBus):
                 blocked_connection_timeout=300,
             )
             connection = pika.BlockingConnection(parameters)
-            channel = connection.channel()
+            channel: BlockingChannel = connection.channel()
 
             channel.exchange_declare(
                 exchange=self.exchange_name,
@@ -81,7 +83,7 @@ class EventBus(IEventBus):
                 return False
 
             try:
-                body = json.dumps(event_data, ensure_ascii=False)
+                body: str = json.dumps(obj=event_data, ensure_ascii=False)
                 properties = pika.BasicProperties(
                     delivery_mode=2,
                     headers={"traceparent": f"{event_type_name}"},
