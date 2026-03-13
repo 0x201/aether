@@ -1,9 +1,9 @@
 .danmaku-mgt {
-    padding: 0 12px;
+  padding: 0 12px;
 }
 
 .pagination-container {
-    margin-top: 24px;
-    display: flex;
-    justify-content: flex-end;
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
 }

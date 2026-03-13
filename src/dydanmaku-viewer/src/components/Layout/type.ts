@@ -1,4 +1,4 @@
 export interface AppNavigationProps {
-    mode?: 'horizontal' | 'inline'
-    theme?: 'light' | 'dark'
+  mode?: 'horizontal' | 'inline'
+  theme?: 'light' | 'dark'
 }

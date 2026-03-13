@@ -16,59 +16,50 @@ import ThemeSwitch from '../ThemeToggle/ThemeSwitch'
 import MessageBox from '../MessageBox'
 
 const DefaultLayout: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
 
-    return (
-        <ThemeProvider>
-            <Layout>
-                <Header className="header-layout">
-                    <div className="header-left">
-                        <div className="logo" />
-                        <h1>斗鱼弹幕系统</h1>
-                    </div>
-                    <div className="header-center">
-                        <AppNavigation mode="horizontal" />
-                    </div>
-                    <div className="header-right">
-                        <MessageBox />
-                        <AnimatedThemeSwitch />
-                        <ThemeSwitch />
-                    </div>
-                </Header>
+  return (
+    <ThemeProvider>
+      <Layout>
+        <Header className="header-layout">
+          <div className="header-left">
+            <div className="logo" />
+            <h1>斗鱼弹幕系统</h1>
+          </div>
+          <div className="header-center">
+            <AppNavigation mode="horizontal" />
+          </div>
+          <div className="header-right">
+            <MessageBox />
+            <AnimatedThemeSwitch />
+            <ThemeSwitch />
+          </div>
+        </Header>
 
-                <Layout style={{ marginTop: 12 }}>
-                    <Sider
-                        collapsed={collapsed}
-                        collapsible
-                        onCollapse={(value) => setCollapsed(value)}
-                        collapsedWidth="60"
-                        className="sider-container"
-                    >
-                        <AppNavigation mode="inline" />
-                    </Sider>
-                    <Content className="content-container">
-                        <Routes>
-                            <Route path="/" element={<HomeView />} />
-                            <Route
-                                path="/dashboard"
-                                element={<DashboardView />}
-                            />
-                            <Route path="/capture" element={<CaptureView />} />
-                            <Route
-                                path="/management"
-                                element={<DanmakuManagementView />}
-                            />
-                            <Route
-                                path="/realtime-danmaku"
-                                element={<RealtimeDanmakuView />}
-                            />
-                        </Routes>
-                        <FloatButton.BackTop />
-                    </Content>
-                </Layout>
-            </Layout>
-        </ThemeProvider>
-    )
+        <Layout style={{ marginTop: 12 }}>
+          <Sider
+            collapsed={collapsed}
+            collapsible
+            onCollapse={(value) => setCollapsed(value)}
+            collapsedWidth="60"
+            className="sider-container"
+          >
+            <AppNavigation mode="inline" />
+          </Sider>
+          <Content className="content-container">
+            <Routes>
+              <Route path="/" element={<HomeView />} />
+              <Route path="/dashboard" element={<DashboardView />} />
+              <Route path="/capture" element={<CaptureView />} />
+              <Route path="/management" element={<DanmakuManagementView />} />
+              <Route path="/realtime-danmaku" element={<RealtimeDanmakuView />} />
+            </Routes>
+            <FloatButton.BackTop />
+          </Content>
+        </Layout>
+      </Layout>
+    </ThemeProvider>
+  )
 }
 
 export default DefaultLayout

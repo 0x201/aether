@@ -1,52 +1,59 @@
 {
-    "name": "dydanmu-viewer",
-    "private": true,
-    "version": "0.0.1",
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build",
-        "lint": "eslint .",
-        "preview": "vite preview",
-        "format": "prettier --write ."
-    },
-    "dependencies": {
-        "@ant-design/icons": "^6.1.0",
-        "@microsoft/signalr": "^10.0.0",
-        "antd": "^6.3.1",
-        "d3": "^7.9.0",
-        "d3-cloud": "^1.2.9",
-        "d3-scale-chromatic": "^3.1.0",
-        "dayjs": "^1.11.19",
-        "lodash": "^4.17.23",
-        "react": "^19.2.4",
-        "react-dom": "^19.2.4",
-        "react-router-dom": "^7.13.1",
-        "recharts": "^3.8.0"
-    },
-    "devDependencies": {
-        "@eslint/js": "^10.0.1",
-        "@types/d3": "^7.4.3",
-        "@types/d3-cloud": "^1.2.9",
-        "@types/d3-scale-chromatic": "^3.1.0",
-        "@types/lodash": "^4.17.24",
-        "@types/node": "^25.3.5",
-        "@types/react": "^19.2.14",
-        "@types/react-dom": "^19.2.3",
-        "@vitejs/plugin-react": "^5.1.4",
-        "eslint": "^10.0.3",
-        "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-react-hooks": "^7.0.1",
-        "eslint-plugin-react-refresh": "^0.5.2",
-        "globals": "^17.4.0",
-        "prettier": "^3.8.1",
-        "typescript": "~5.9.3",
-        "typescript-eslint": "^8.56.1",
-        "vite": "npm:rolldown-vite@latest"
-    },
-    "pnpm": {
-        "overrides": {
-            "vite": "npm:rolldown-vite@latest"
-        }
+  "name": "dydanmu-viewer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "preview": "vite preview",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@microsoft/signalr": "^10.0.0",
+    "antd": "^6.3.1",
+    "d3": "^7.9.0",
+    "d3-cloud": "^1.2.9",
+    "d3-scale-chromatic": "^3.1.0",
+    "dayjs": "^1.11.19",
+    "lodash": "^4.17.23",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1",
+    "recharts": "^3.8.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.2",
+    "@types/d3": "^7.4.3",
+    "@types/d3-cloud": "^1.2.9",
+    "@types/d3-scale-chromatic": "^3.1.0",
+    "@types/lodash": "^4.17.24",
+    "@types/node": "^25.3.5",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "eslint": "^10.0.3",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "jsdom": "^22.1.0",
+    "oxfmt": "^0.36.0",
+    "oxlint": "^1.51.0",
+    "playwright": "^1.58.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "npm:rolldown-vite@latest",
+    "vitest": "^4.0.18"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:rolldown-vite@latest"
     }
+  }
 }

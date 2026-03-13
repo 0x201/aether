@@ -4,42 +4,42 @@ import { theme } from 'antd'
 const { darkAlgorithm, defaultAlgorithm } = theme
 
 export const lightTheme: ThemeConfig = {
-    token: {},
+  token: {},
 
-    components: {
-        Layout: {
-            headerBg: '#ffffff',
-            headerColor: '#ffffff',
-            bodyBg: '#ffffff',
-            footerBg: '#f5f5f5',
-            //footerBg: '#ffffff',
-            siderBg: '#ffffff',
-        },
+  components: {
+    Layout: {
+      headerBg: '#ffffff',
+      headerColor: '#ffffff',
+      bodyBg: '#ffffff',
+      footerBg: '#f5f5f5',
+      //footerBg: '#ffffff',
+      siderBg: '#ffffff',
     },
-    cssVar: {
-        prefix: 'ant',
-        key: 'light',
-    },
-    algorithm: defaultAlgorithm,
+  },
+  cssVar: {
+    prefix: 'ant',
+    key: 'light',
+  },
+  algorithm: defaultAlgorithm,
 }
 
 export const darkTheme: ThemeConfig = {
-    token: {},
-    components: {
-        Layout: {
-            headerBg: 'rgb(20, 20, 20)',
-        },
+  token: {},
+  components: {
+    Layout: {
+      headerBg: 'rgb(20, 20, 20)',
     },
-    cssVar: {
-        prefix: 'ant',
-        key: 'dark',
-    },
-    algorithm: darkAlgorithm,
+  },
+  cssVar: {
+    prefix: 'ant',
+    key: 'dark',
+  },
+  algorithm: darkAlgorithm,
 }
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
 
 export const getSystemTheme = (): 'light' | 'dark' => {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    return isDark ? 'dark' : 'light'
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  return isDark ? 'dark' : 'light'
 }

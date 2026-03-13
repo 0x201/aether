@@ -1,5 +1,5 @@
-import MessageBox from "./MessageBox";
+import MessageBox from './MessageBox'
 
 export { MessageBox }
 
-export default MessageBox;
+export default MessageBox

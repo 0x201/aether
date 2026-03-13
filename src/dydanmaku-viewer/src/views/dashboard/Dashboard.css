@@ -1,80 +1,80 @@
 .dashboard-container {
-    --card-bg-total-count: #8884d8;
-    --card-bg-unique-users: #82ca9d;
-    --card-bg-top-users: #ffc658;
-    --card-bg-top-rooms: #ff7e5f;
+  --card-bg-total-count: #8884d8;
+  --card-bg-unique-users: #82ca9d;
+  --card-bg-top-users: #ffc658;
+  --card-bg-top-rooms: #ff7e5f;
 
-    --stat-title-total-count: #1a1a66;
-    --stat-content-total-count: #1a1a66;
-    --stat-title-unique-users: #0a4d38;
-    --stat-content-unique-users: #0a4d38;
-    --stat-title-top-users: #4a351a;
-    --stat-content-top-users: #33220f;
-    --stat-title-top-rooms: #5d291f;
-    --stat-content-top-rooms: #4a1e15;
+  --stat-title-total-count: #1a1a66;
+  --stat-content-total-count: #1a1a66;
+  --stat-title-unique-users: #0a4d38;
+  --stat-content-unique-users: #0a4d38;
+  --stat-title-top-users: #4a351a;
+  --stat-content-top-users: #33220f;
+  --stat-title-top-rooms: #5d291f;
+  --stat-content-top-rooms: #4a1e15;
 
-    --chart-color-hourly: #8884d8;
-    --chart-color-users: #82ca9d;
-    --chart-color-rooms: #ffc658;
-    --chart-color-word-freq: #ff7e5f;
+  --chart-color-hourly: #8884d8;
+  --chart-color-users: #82ca9d;
+  --chart-color-rooms: #ffc658;
+  --chart-color-word-freq: #ff7e5f;
 }
 
 .dashboard-container {
-    position: relative;
-    padding: 16px;
+  position: relative;
+  padding: 16px;
 }
 
 .dashboard-chart-container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .stat-card-total-count {
-    background-color: var(--card-bg-total-count);
+  background-color: var(--card-bg-total-count);
 }
 
 .stat-card-unique-users {
-    background-color: var(--card-bg-unique-users);
+  background-color: var(--card-bg-unique-users);
 }
 
 .stat-card-top-users {
-    background-color: var(--card-bg-top-users);
+  background-color: var(--card-bg-top-users);
 }
 
 .stat-card-top-rooms {
-    background-color: var(--card-bg-top-rooms);
+  background-color: var(--card-bg-top-rooms);
 }
 
 .statistic-total-count .ant-statistic-title {
-    color: var(--stat-title-total-count) !important;
+  color: var(--stat-title-total-count) !important;
 }
 
 .statistic-total-count .ant-statistic-content {
-    color: var(--stat-content-total-count);
+  color: var(--stat-content-total-count);
 }
 
 .statistic-unique-users .ant-statistic-title {
-    color: var(--stat-title-unique-users) !important;
+  color: var(--stat-title-unique-users) !important;
 }
 
 .statistic-unique-users .ant-statistic-content {
-    color: var(--stat-content-unique-users);
+  color: var(--stat-content-unique-users);
 }
 
 .statistic-top-users .ant-statistic-title {
-    color: var(--stat-title-top-users) !important;
+  color: var(--stat-title-top-users) !important;
 }
 
 .statistic-top-users .ant-statistic-content {
-    color: var(--stat-content-top-users);
+  color: var(--stat-content-top-users);
 }
 
 .statistic-top-rooms .ant-statistic-title {
-    color: var(--stat-title-top-rooms) !important;
+  color: var(--stat-title-top-rooms) !important;
 }
 
 .statistic-top-rooms .ant-statistic-content {
-    color: var(--stat-content-top-rooms);
+  color: var(--stat-content-top-rooms);
 }
