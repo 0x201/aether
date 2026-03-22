@@ -100,7 +100,7 @@ const HomeView: React.FC = () => {
 
           <Col xs={24} md={10}>
             <Row gutter={[12, 12]}>
-          {features.map((item, index) => (
+              {features.map((item, index) => (
                 <Col xs={12} key={index}>
                   <Card hoverable variant="borderless" className="glass-card feature-card">
                     <div className="feature-card-container">
@@ -109,11 +109,11 @@ const HomeView: React.FC = () => {
                         <div className="feature-title">{item.title}</div>
                         <div className="feature-description">{item.description}</div>
                       </div>
-                  </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
           </Col>
         </Row>
       </Card>
