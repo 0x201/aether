@@ -1,0 +1,94 @@
+.project-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  flex-flow: column;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 24px;
+}
+
+.project-capabilities > div {
+  padding: 10px;
+  border-radius: 8px;
+  flex: 1 1 auto;
+  min-width: 250px;
+}
+
+.capability-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.capability-tag {
+  margin-right: 8px;
+}
+
+.instructions {
+  font-size: 12px;
+}
+
+.instructions > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.homeview-header-card {
+  padding: 24px;
+  margin-bottom: 18px;
+}
+
+.homeview-content-card {
+  padding: 20px;
+}
+
+.homeview-title {
+  color: var(--brand);
+  margin-bottom: 8px;
+}
+
+.homeview-description {
+  font-size: 16px;
+}
+
+.homeview-cta-buttons {
+  margin-top: 12px;
+}
+
+.feature-card-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feature-icon {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.feature-title {
+  font-weight: 600;
+}
+
+.feature-description {
+  font-size: 12px;
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.feature-card {
+  padding: 12px;
+}
+
+.tech-stack-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tech-stack-icon {
+  margin-right: 8px;
+}

@@ -1,12 +1,16 @@
 import React from 'react'
-import './App.css'
 import { DefaultLayout } from '@/src/components/Layout'
 import { MessageProvider } from './contexts/MessageContext'
+import { ThemeProvider } from './contexts/ThemeProvider'
+import './App.css'
+
 const App: React.FC = () => {
   return (
-    <MessageProvider>
-      <DefaultLayout />
-    </MessageProvider>
+    <ThemeProvider>
+      <MessageProvider>
+        <DefaultLayout />
+      </MessageProvider>
+    </ThemeProvider>
   )
 }
 

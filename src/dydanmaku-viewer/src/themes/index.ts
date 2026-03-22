@@ -1,45 +1,71 @@
-import type { ThemeConfig } from 'antd'
-import { theme } from 'antd'
+import type { ThemeConfig } from "antd";
+import { theme } from "antd";
 
-const { darkAlgorithm, defaultAlgorithm } = theme
+const { darkAlgorithm, defaultAlgorithm, compactAlgorithm } = theme;
 
 export const lightTheme: ThemeConfig = {
-  token: {},
+  token: {
+    colorPrimary: "#52c41a",
+    colorInfo: "#1677ff",
+    borderRadius: 8,
+    wireframe: false,
+  },
 
   components: {
     Layout: {
-      headerBg: '#ffffff',
-      headerColor: '#ffffff',
-      bodyBg: '#ffffff',
-      footerBg: '#f5f5f5',
+      headerBg: "#ffffff",
+      headerColor: "#ffffff",
+      bodyBg: "#ffffff",
+      footerBg: "#f5f5f5",
       //footerBg: '#ffffff',
-      siderBg: '#ffffff',
+      siderBg: "#ffffff",
+    },
+    Card: {
+      borderRadiusLG: 12,
+      paddingLG: 24,
+    },
+    Table: {
+      cellPaddingBlockSM: 12,
+      cellPaddingInlineSM: 8,
+      cellPaddingBlockMD: 16,
+      cellPaddingInlineMD: 12,
     },
   },
   cssVar: {
-    prefix: 'ant',
-    key: 'light',
+    prefix: "ant",
+    key: "light",
   },
-  algorithm: defaultAlgorithm,
-}
+  algorithm: [defaultAlgorithm, compactAlgorithm],
+};
 
 export const darkTheme: ThemeConfig = {
-  token: {},
+  token: {
+    colorPrimary: "#73d13d",
+    colorInfo: "#69c0ff",
+    borderRadius: 8,
+    wireframe: false,
+  },
   components: {
     Layout: {
-      headerBg: 'rgb(20, 20, 20)',
+      headerBg: "rgba(29, 30, 41, 0.9)",
+    },
+    Table: {
+      cellPaddingBlockSM: 12,
+      cellPaddingInlineSM: 8,
+      cellPaddingBlockMD: 16,
+      cellPaddingInlineMD: 12,
     },
   },
   cssVar: {
-    prefix: 'ant',
-    key: 'dark',
+    prefix: "ant",
+    key: "dark",
   },
-  algorithm: darkAlgorithm,
-}
+  algorithm: [darkAlgorithm, compactAlgorithm],
+};
 
-export type ThemeMode = 'light' | 'dark' | 'auto'
+export type ThemeMode = "light" | "dark" | "auto";
 
-export const getSystemTheme = (): 'light' | 'dark' => {
-  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  return isDark ? 'dark' : 'light'
-}
+export const getSystemTheme = (): "light" | "dark" => {
+  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return isDark ? "dark" : "light";
+};

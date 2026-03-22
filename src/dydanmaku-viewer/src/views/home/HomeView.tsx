@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Typography, Steps, Divider, Tag, Row, Col, Flex } from 'antd'
+import { Card, Typography, Steps, Divider, Tag, Row, Col, Button, Space } from 'antd'
 import {
   BulbOutlined,
   CodeOutlined,
@@ -8,6 +8,7 @@ import {
   CloudDownloadOutlined,
   HeatMapOutlined,
 } from '@ant-design/icons'
+import './HomeView.css'
 
 const { Title, Paragraph } = Typography
 
@@ -20,7 +21,7 @@ const HomeView: React.FC = () => {
     },
     {
       title: '弹幕管理',
-      description: '查看、编辑和删除已捕获的弹幕数据',
+      description: '提供丰富功能的弹幕管理表格，可以查看、编辑和删除已捕获的弹幕数据',
       icon: <BulbOutlined />,
     },
     {
@@ -30,12 +31,12 @@ const HomeView: React.FC = () => {
     },
     {
       title: '词频分析',
-      description: '分析弹幕中的高频词汇，支持自动生成词云图',
+      description: '分析弹幕中的高频词汇，支持自动生成词频统计和词云图',
       icon: <CloudDownloadOutlined />,
     },
     {
       title: '可视化图表',
-      description: '生成弹幕时间分布、最活跃用户Top10、词频Top20等图表',
+      description: '生成弹幕时间分布、最活跃用户Top20、词频Top20等图表',
       icon: <HeatMapOutlined />,
     },
     {
@@ -65,93 +66,79 @@ const HomeView: React.FC = () => {
     '多层架构设计，支持高并发和可扩展性',
   ]
 
+  const instructionSteps = [
+    { title: '弹幕捕获', content: '在"弹幕捕获"页面输入斗鱼房间URL开始捕获' },
+    { title: '弹幕管理', content: '在"弹幕管理"页面查看和管理已捕获的弹幕' },
+    { title: '数据概览', content: '在"数据仪表板"页面查看统计分析和可视化图表' },
+    { title: '实时弹幕', content: '使用"实时弹幕"页面查看实时推送的弹幕' },
+    { title: '自定义日期', content: '使用日期选择器自定义数据查询范围' },
+  ]
+
   return (
     <div className="homeview-container">
-      <Card>
-        <Row justify="center" style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <Col span={24}>
-            <Title level={1} style={{ color: '#1890ff' }}>
-              斗鱼弹幕分析系统 (DyDanmaku)
+      <div className="app-hero-bg" />
+
+      <Card className="glass-card homeview-header-card">
+        <Row align="middle" gutter={[24, 24]}>
+          <Col xs={24} md={14}>
+            <Title level={1} className="homeview-title">
+              斗鱼弹幕分析系统
             </Title>
-            <Paragraph type="secondary" style={{ fontSize: '16px' }}>
-              基于 .NET 微服务架构的斗鱼直播弹幕捕获、分析与可视化系统
+            <Paragraph type="secondary" className="homeview-description">
+              实时捕获、分析并可视化斗鱼直播弹幕，面向数据运营、内容分析与研究人员。
             </Paragraph>
+
+            <Space size="middle" className="homeview-cta-buttons">
+              <Button type="primary" size="large" href="/realtime-danmaku">
+                查看实时弹幕
+              </Button>
+              <Button size="large" href="/dashboard">
+                浏览数据仪表板
+              </Button>
+            </Space>
           </Col>
-        </Row>
 
-        <Divider orientation="horizontal">项目简介</Divider>
-        <Paragraph style={{ lineHeight: '1.8' }}>
-          DyDanmaku
-          是一个完整的斗鱼直播弹幕数据处理系统，采用现代化的微服务架构设计。系统包含弹幕捕获、数据存储、
-          分析处理和可视化展示等功能模块。通过 WebSocket 协议实时捕获弹幕数据，使用 SignalR
-          实现实时推送，
-          结合后台数据分析服务，为用户提供全面的弹幕数据洞察。目标用户包括直播内容分析人员、主播运营团队、
-          数据研究人员等需要对直播互动行为进行深入洞察的用户。系统解决了斗鱼直播间弹幕数据难以获取、
-          缺乏结构化存储与可视化分析的问题，提供了一站式的弹幕监控与数据分析解决方案。
-        </Paragraph>
-
-        <Divider orientation="horizontal">核心功能</Divider>
-        <Row gutter={[16, 16]}>
+          <Col xs={24} md={10}>
+            <Row gutter={[12, 12]}>
           {features.map((item, index) => (
-            <Col xs={24} sm={12} md={8} key={index}>
-              <Card
-                hoverable
-                style={{ height: '100%', textAlign: 'center' }}
-                cover={
-                  <div
-                    style={{
-                      fontSize: '32px',
-                      margin: '16px 0',
-                    }}
-                  >
-                    {item.icon}
+                <Col xs={12} key={index}>
+                  <Card hoverable variant="borderless" className="glass-card feature-card">
+                    <div className="feature-card-container">
+                      <div className="feature-icon">{item.icon}</div>
+                      <div>
+                        <div className="feature-title">{item.title}</div>
+                        <div className="feature-description">{item.description}</div>
+                      </div>
                   </div>
-                }
-              >
-                <Card.Meta title={item.title} description={item.description} />
               </Card>
             </Col>
           ))}
         </Row>
+          </Col>
+        </Row>
+      </Card>
 
+      <Card className="glass-card homeview-content-card">
         <Divider orientation="horizontal">系统能力</Divider>
-        <Flex vertical align="flex-start" justify="flex-start">
+        <div className="project-capabilities">
           {projectCapabilities.map((item, index) => (
-            <div key={index} style={{ padding: 10 }}>
-              <Tag color="blue" style={{ marginRight: 8 }}>
+            <div key={index} className="capability-item">
+              <Tag color="blue" className="capability-tag">
                 {index + 1}
               </Tag>
               {item}
             </div>
           ))}
-        </Flex>
+        </div>
 
         <Divider orientation="horizontal">使用说明</Divider>
-        <Steps
-          orientation="vertical"
-          size="small"
-          current={-1}
-          items={[
-            { title: '在"弹幕捕获"页面输入斗鱼房间URL开始捕获' },
-            { title: '在"弹幕管理"页面查看和管理已捕获的弹幕' },
-            { title: '在"数据仪表板"页面查看统计分析和可视化图表' },
-            { title: '使用"实时弹幕"页面查看实时推送的弹幕' },
-            { title: '使用日期选择器自定义数据查询范围' },
-          ]}
-        />
+        <Steps orientation="vertical" className="homeview-steps" items={instructionSteps} />
 
         <Divider orientation="horizontal">技术架构</Divider>
-        <div>
+        <div className="instructions">
           {techStack.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '12px',
-              }}
-            >
-              <CodeOutlined style={{ marginRight: '8px', color: '#52c41a' }} />
+            <div key={index} className="tech-stack-item">
+              <CodeOutlined className="tech-stack-icon" />
               <span>{item}</span>
             </div>
           ))}

@@ -10,8 +10,14 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  type RenderableText,
+  type TooltipValueType,
 } from 'recharts'
 import type { DanmakuChartProps } from './type'
+
+const danmakuFormatter = (val: RenderableText | TooltipValueType): string => {
+  return `${val}`
+}
 
 const DanmakuChart = <T,>({
   data,
@@ -40,13 +46,7 @@ const DanmakuChart = <T,>({
                 tick={{ fontSize: 12 }}
               />
               <YAxis />
-              <Tooltip
-                formatter={(value: unknown, _name, _props) => {
-                  const numValue = typeof value === 'number' ? value : 0
-                  return [numValue, '弹幕数量']
-                }}
-                labelFormatter={() => ''}
-              />
+              <Tooltip formatter={danmakuFormatter} />
               <Legend verticalAlign="top" layout="horizontal" />
               <Bar dataKey="value" name="弹幕数量" fill={color} />
             </BarChart>

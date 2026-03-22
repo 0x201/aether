@@ -1,8 +1,9 @@
 import {
   DashboardOutlined,
   TableOutlined,
-  UserOutlined,
+  HomeOutlined,
   VideoCameraOutlined,
+  FireOutlined,
 } from '@ant-design/icons'
 import { Menu, type MenuProps } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -16,12 +17,12 @@ const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) 
 
   const items: MenuProps['items'] = [
     {
-      label: '系统首页',
-      icon: <UserOutlined />,
+      label: '首页',
+      icon: <HomeOutlined />,
       key: '/',
     },
     {
-      label: '仪表盘',
+      label: '数据概览',
       icon: <DashboardOutlined />,
       key: '/dashboard',
     },
@@ -37,7 +38,7 @@ const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) 
     },
     {
       label: '实时弹幕',
-      icon: <VideoCameraOutlined />,
+      icon: <FireOutlined />,
       key: '/realtime-danmaku',
     },
   ]
@@ -58,6 +59,8 @@ const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) 
         height: '100%',
         width: '100%',
         border: 0,
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
       }}
     />
   )

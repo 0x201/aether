@@ -2,7 +2,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+  border-bottom: none;
+  background: transparent;
+  padding: 12px 24px;
+  backdrop-filter: blur(10px) saturate(120%);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .ant-layout-header {
@@ -11,20 +18,36 @@
 }
 
 .logo {
-  width: 60px;
-  height: 80%;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4361ee, #3a0ca3);
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+  transition: all 0.3s ease;
+  margin-left: 1rem;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(67, 97, 238, 0.35);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  flex: 0 0 auto;
+  gap: 16px;
 }
 
 .header-left h1 {
-  margin: 0 16px 0 0;
-  color: #1677ff;
-  font-size: 18px;
+  margin: 0;
+  background: linear-gradient(90deg, #4361ee, #7209b7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
 .header-center {
@@ -32,6 +55,7 @@
   min-width: 0;
   display: flex;
   justify-content: center;
+  margin: 0, 1rem;
 }
 
 .header-right {
@@ -45,7 +69,9 @@
 
 .sider-container {
   padding: 0;
-  border-right: 1px solid rgba(5, 5, 5, 0.06);
+  border-right: 1px solid transparent;
+  background: transparent;
+  backdrop-filter: blur(10px);
 }
 
 .content-container {
@@ -53,4 +79,6 @@
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  padding: 24px;
+  background: transparent;
 }

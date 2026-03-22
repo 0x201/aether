@@ -35,10 +35,10 @@ const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
 
 const durationOptions: SelectProps['options'] = []
 
-for (let i = 0; i < 12; i++) {
+for (let i = 1; i <= 12; i++) {
   durationOptions.push({
-    value: (3600 * (i + 1)).toString(),
-    label: `${i + 1}小时`,
+    value: (3600 * i).toString(),
+    label: `${i}小时`,
   })
 }
 
@@ -58,6 +58,7 @@ const CaptureView: React.FC = () => {
   const closeModal = () => {
     setIsModalVisible(false)
     setRoomId('')
+    form.resetFields()
   }
 
   const handleTableChange = (
@@ -75,9 +76,14 @@ const CaptureView: React.FC = () => {
       return
     }
 
-    await actions.startCapture(roomId, captureDuration)
-    setIsModalVisible(false)
-    setRoomId('')
+    try {
+      await actions.startCapture(roomId, captureDuration)
+      messageApi.success('开始捕获弹幕')
+      closeModal()
+    } catch (error) {
+      console.error('Failed to start capture:', error)
+      messageApi.error('启动捕获失败')
+    }
   }
 
   const columns: TableProps<CaptureJob>['columns'] = [
@@ -164,6 +170,7 @@ const CaptureView: React.FC = () => {
     <div className="capture-container">
       {contextHolder}
       <Typography.Title level={4}>弹幕捕获任务管理</Typography.Title>
+      <Typography.Paragraph>管理你的弹幕捕获任务，监控捕获进度和状态。</Typography.Paragraph>
       {state.isCaptureSuccess && (
         <Alert closable description={state.captureStartRes} style={{ marginBottom: 24 }} />
       )}
@@ -204,17 +211,12 @@ const CaptureView: React.FC = () => {
       </div>
 
       <Modal
-        title="启动新捕获任务"
+        title="新建弹幕捕获任务"
         open={isModalVisible}
         onCancel={closeModal}
-        footer={[
-          <Button key="back" onClick={closeModal}>
-            取消
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleStartCapture}>
-            启动
-          </Button>,
-        ]}
+        onOk={handleStartCapture}
+        okText="开始捕获"
+        cancelText="取消"
       >
         <Form form={form} layout="vertical">
           <Form.Item label="房间ID" required rules={[{ required: true, message: '请输入房间ID' }]}>
