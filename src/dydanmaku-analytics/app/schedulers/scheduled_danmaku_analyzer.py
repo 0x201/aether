@@ -1,8 +1,6 @@
 """
 Scheduled analyzer service for precomputing word frequency and wordcloud data
 """
-from apscheduler.executors.pool import ThreadPoolExecutor
-from apscheduler.jobstores.memory import MemoryJobStore
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
@@ -109,22 +107,7 @@ class ScheduledDanmakuAnalyzer:
         danmaku_analyzer: DanmakuAnalyzer,
         event_bus: EventBus,
     ):
-        jobstores = {
-            'default': MemoryJobStore()
-        }
-        executors = {
-            'default': ThreadPoolExecutor(20),
-        }
-        job_defaults = {
-            'coalesce': False,
-            'max_instances': 1,
-            'misfire_grace_time': 30
-        }
-        self.scheduler = AsyncIOScheduler(
-            jobstores=jobstores,
-            executors=executors,
-            job_defaults=job_defaults,
-        )
+        self.scheduler = AsyncIOScheduler()
         self.session_factory = session_factory
         self.analyzer = danmaku_analyzer
         self.event_bus = event_bus
@@ -191,11 +174,7 @@ class ScheduledDanmakuAnalyzer:
 
     def stop(self):
         """Stop the scheduled analyzer"""
-        try:
-            if self.scheduler.running:
-                self.scheduler.shutdown(wait=True)
-        except Exception as e:
-            logger.error(f"Error shutting down scheduler: {e}")
+        self.scheduler.shutdown()
         logger.info("Scheduled analyzer stopped")
 
     async def _precompute_analyses(self, period_type: PeriodType = PeriodType.HOURLY):
