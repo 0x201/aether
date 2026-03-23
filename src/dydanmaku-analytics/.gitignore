@@ -16,3 +16,5 @@ logs/
 
 *.lock
 *-lock.yaml
+
+coverage_reports/

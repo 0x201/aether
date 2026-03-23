@@ -56,18 +56,24 @@ async def generate_analysis(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
 
-    if room_id:
-        await analyzer.precompute_analyses(
-            period_type=PeriodType.HOURLY,
-            start_time=start_dt,
-            end_time=end_dt,
-            room_id=room_id,
-        )
-    else:
-        await analyzer.precompute_for_all_rooms(
-            period_type=PeriodType.HOURLY,
-            start_time=start_dt,
-            end_time=end_dt,
-        )
+    try:
+        if room_id:
+            await analyzer.precompute_analyses(
+                period_type=PeriodType.HOURLY,
+                start_time=start_dt,
+                end_time=end_dt,
+                room_id=room_id,
+            )
+        else:
+            await analyzer.precompute_for_all_rooms(
+                period_type=PeriodType.HOURLY,
+                start_time=start_dt,
+                end_time=end_dt,
+            )
 
-    return {"message": "Analysis generated"}
+        return {"message": "Analysis generated"}
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error during analysis: {str(e)}")

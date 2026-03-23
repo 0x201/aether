@@ -75,7 +75,7 @@ class DanmakuRepository:
                 stmt = select(func.count()).select_from(Danmaku)
                 count = session.execute(stmt).scalar()
                 return count if count is not None else 0
-            except SQLAlchemyError as e:
+            except Exception as e:
                 logger.error(f"Database error getting danmaku count: {e}")
                 return 0
 
@@ -86,7 +86,7 @@ class DanmakuRepository:
                 stmt = select(Danmaku).order_by(Danmaku.created_at.desc()).limit(limit)
                 result = session.execute(stmt).scalars().all()
                 return list(result)
-            except SQLAlchemyError as e:
+            except Exception as e:
                 logger.error(f"Database error getting recent danmaku: {e}")
                 return []
 
@@ -441,13 +441,13 @@ class DanmakuRepository:
 
     def get_running_capture_job(self, room_id: int) -> Optional[CaptureJob]:
         """
-        Get a running capture job by its room ID
+        Get a running capture job for a specific room
 
         Args:
-            room_id: Room ID of the job to retrieve
+            room_id: Room ID to search for
 
         Returns:
-            Optional[CaptureJob]: The capture job record, or None if not found
+            CaptureJob if found, None otherwise
         """
         with self.session_factory.get_session() as session:
             try:
@@ -459,7 +459,7 @@ class DanmakuRepository:
                 )
                 result = session.execute(stmt).scalar_one_or_none()
                 return result
-            except SQLAlchemyError as e:
+            except Exception as e:
                 logger.error(f"Database error getting capture job: {e}")
                 return None
 
