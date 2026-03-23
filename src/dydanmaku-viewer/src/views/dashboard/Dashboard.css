@@ -48,7 +48,7 @@
 }
 
 .statistic-total-count .ant-statistic-title {
-  color: var(--stat-title-total-count) !important;
+  color: var(--stat-title-total-count);
 }
 
 .statistic-total-count .ant-statistic-content {
@@ -56,7 +56,7 @@
 }
 
 .statistic-unique-users .ant-statistic-title {
-  color: var(--stat-title-unique-users) !important;
+  color: var(--stat-title-unique-users);
 }
 
 .statistic-unique-users .ant-statistic-content {
@@ -64,7 +64,7 @@
 }
 
 .statistic-top-users .ant-statistic-title {
-  color: var(--stat-title-top-users) !important;
+  color: var(--stat-title-top-users);
 }
 
 .statistic-top-users .ant-statistic-content {
@@ -72,7 +72,7 @@
 }
 
 .statistic-top-rooms .ant-statistic-title {
-  color: var(--stat-title-top-rooms) !important;
+  color: var(--stat-title-top-rooms);
 }
 
 .statistic-top-rooms .ant-statistic-content {

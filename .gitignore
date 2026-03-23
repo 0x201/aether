@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /ModernCSharp.Web/wwwroot/lib/
+
+.pytest_cache/
