@@ -67,7 +67,7 @@ var webApp = builder.AddProject<Projects.ModernCSharp_WebApp>("webapp")
     .WithReference(orderingApi)
     .WithReference(rabbitmq).WaitFor(rabbitmq);
 
-var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api", "start")
+var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../../../bookstore-api", "start")
     .WithPnpm()
     .WithHttpEndpoint(port: 3011, env: "PORT")
     .WithExternalHttpEndpoints()
@@ -79,14 +79,14 @@ var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../bookstore-api",
 var bookstoreApiHttpEndpoint = bookStoreApi.GetEndpoint("http");
 bookStoreApi.WithUrl($"{bookstoreApiHttpEndpoint}/scalar", "Book Store API Scalar Reference");
 
-builder.AddJavaScriptApp("bookstoreapp", @"../bookstore-app", "start")
+builder.AddJavaScriptApp("bookstoreapp", @"../../../bookstore-app", "start")
     .WithPnpm()
     .WithHttpEndpoint(port: 3012, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../dydanmaku-analytics", "main.py")
+var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../../../dydanmaku-analytics", "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
@@ -96,7 +96,7 @@ var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../dydanmaku-a
 
 danmakuanalytics.WithUrl($"{danmakuanalytics.GetEndpoint("http")}/scalar", "Douyu Danmaku Analytics API Docs");
 
-builder.AddJavaScriptApp("danmakuviewer", @"../dydanmaku-viewer")
+builder.AddJavaScriptApp("danmakuviewer", @"../../../dydanmaku-viewer")
     .WithPnpm()
     .WithHttpEndpoint(port: 3015, env: "PORT")
     .WithReference(dydanmakuApi)

@@ -361,7 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-
-/ModernCSharp.Web/wwwroot/lib/
-
-.pytest_cache/
