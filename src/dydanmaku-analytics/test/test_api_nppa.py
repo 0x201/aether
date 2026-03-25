@@ -157,7 +157,7 @@ class TestNPPAAPI:
             response = client.get(game_audit_url, params={"page": 1, "pageSize": 10})
             # If we reach this point, the server didn't crash completely
             assert response.status_code == 500
-        except Exception as e:
+        except Exception:
             # If the exception propagates, that's also an acceptable outcome for error handling tests
             # It indicates that the error was not handled gracefully by the API
             pass

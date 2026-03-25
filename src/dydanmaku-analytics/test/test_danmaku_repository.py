@@ -1,7 +1,6 @@
 import pytest
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from app.database.danmaku_repository import DanmakuRepository
-from app.database.danmaku_models import Danmaku, Room, CaptureJob
 from app.dataclass.danmaku_model import CaptureJobStatus
 
 
