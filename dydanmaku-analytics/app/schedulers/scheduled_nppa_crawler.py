@@ -15,7 +15,7 @@ class ScheduledNPPACrawler:
 
     def start(self):
         """Start the scheduled analyzer"""
-        # Schedule daily NPPA cralwer to run at 00:10 every day
+        # Schedule daily NPPA crawler to run at 00:10 every day
         self.scheduler.add_job(
             self._execute_daily_check,
             CronTrigger(hour=0, minute=2),

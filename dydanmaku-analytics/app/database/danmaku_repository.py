@@ -50,22 +50,22 @@ class DanmakuRepository:
             transaction.add(danmaku)
             return True
 
-    def insert_danmaku_batch(self, danmu_list: List[Danmaku]) -> int:
+    def insert_danmaku_batch(self, danmaku_list: List[Danmaku]) -> int:
         """
         Insert a batch of danmaku into the database
 
         Args:
-            danmu_list: List of tuples containing danmaku data in the order:
+            danmaku_list: List of tuples containing danmaku data in the order:
                         (user_id, user_name, content, fan_medal_name, fan_medal_level, user_level, room_id)
 
         Returns:
             int: Number of rows inserted
         """
-        if not danmu_list:
+        if not danmaku_list:
             return 0
         with self.session_factory.get_transaction() as transaction:
-            inserted_count = len(danmu_list)
-            transaction.add_all(danmu_list)
+            inserted_count = len(danmaku_list)
+            transaction.add_all(danmaku_list)
             return inserted_count
 
     def get_danmaku_count(self) -> int:
@@ -202,7 +202,7 @@ class DanmakuRepository:
         Get a specific danmaku by its id
 
         Returns:
-            Danmu: Danmu object if found, None otherwise
+            Danmaku: Danmaku object if found, None otherwise
         """
         with self.session_factory.get_session() as session:
             try:
@@ -220,7 +220,7 @@ class DanmakuRepository:
         Get all danmaku with pagination and room names
 
         Returns:
-            List[Tuple[Danmu, str]]: List of tuples containing (danmaku, room_name)
+            List[Tuple[Danmaku, str]]: List of tuples containing (danmaku, room_name)
         """
         with self.session_factory.get_session() as session:
             try:

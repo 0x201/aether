@@ -1,22 +1,42 @@
 from typing import List, Optional
 
 from dependency_injector.wiring import inject
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Body
 
 from app.database import GameAudit, NetworkGameAudit
 from app.dataclass import GameAuditDto, NetworkGameAuditDto
 from app.dataclass.common import PagedResult
-from app.deps import NPPARepositoryDep
+from app.deps import NPPARepositoryDep, NPPAGameAuditCrawlerDep
 
 from .timed_route import TimedRoute
 
 router = APIRouter(route_class=TimedRoute)
 
 
+@router.post(
+    "/trigger-nppa-crawler",
+    description="Trigger NPPA crawler manually with specified mode",
+    summary="Trigger NPPA crawler manually",
+)
+@inject
+async def trigger_nppa_crawler(
+    crawler: NPPAGameAuditCrawlerDep,
+    mode: int = Body(0, description="0 for incremental data, 1 for full data", embed=True)
+):
+    """
+    Manually trigger the NPPA crawler to run immediately
+    """
+    try:
+        await crawler.run(mode=mode)
+        return {"message": f"NPPA crawler executed successfully with mode {mode}", "success": True}
+    except Exception as e:
+        return {"message": f"Error executing NPPA crawler: {str(e)}", "success": False}
+
+
 @router.get(
     "/network-game-audits",
-    description="Get NPPA netwrok game audits with pagination and filtering",
-    summary="Get NPPA netwrok game audits with pagination and filtering",
+    description="Get NPPA network game audits with pagination and filtering",
+    summary="Get NPPA network game audits with pagination and filtering",
 )
 @inject
 async def get_nppa_network_game_audits(
@@ -31,11 +51,11 @@ async def get_nppa_network_game_audits(
         None, description="End time in ISO 8601 format (e.g., 2026-01-11T10:00:00Z)"
     ),
 ):
-    network_game_audits, total_cout = nppa_repo.get_paged_network_game_audits(
+    network_game_audits, total_count = nppa_repo.get_paged_network_game_audits(
         page, pageSize, name, startTime, endTime
     )
     return PagedResult(
-        data=_map_network_game_audits(network_game_audits), totalCount=total_cout
+        data=_map_network_game_audits(network_game_audits), totalCount=total_count
     )
 
 
@@ -57,10 +77,10 @@ async def get_nppa_game_audits(
         None, description="End time in ISO 8601 format (e.g., 2026-01-11T10:00:00Z)"
     ),
 ):
-    game_audits, total_cout = nppa_repo.get_paged_game_audits(
+    game_audits, total_count = nppa_repo.get_paged_game_audits(
         page, pageSize, name, startTime, endTime
     )
-    return PagedResult(data=_map_game_audits(game_audits), totalCount=total_cout)
+    return PagedResult(data=_map_game_audits(game_audits), totalCount=total_count)
 
 
 def _map_game_audit(audit: GameAudit) -> GameAuditDto:

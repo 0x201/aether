@@ -5,7 +5,7 @@ from fastapi import Depends
 
 from app.cache import CacheSession
 from app.database import DanmakuRepository, NPPARepository
-from app.services import DanmakuAnalyzer
+from app.services import DanmakuAnalyzer, NPPAGameAuditCrawler
 
 from .container import Container
 
@@ -17,5 +17,8 @@ DanmakuRepositoryDep = Annotated[
 ]
 NPPARepositoryDep = Annotated[
     NPPARepository, Depends(Provide[Container.nppa_repository])
+]
+NPPAGameAuditCrawlerDep = Annotated[
+    NPPAGameAuditCrawler, Depends(Provide[Container.nppa_crawler])
 ]
 CacheSessionDep = Annotated[CacheSession, Depends(Provide[Container.cache_session])]
