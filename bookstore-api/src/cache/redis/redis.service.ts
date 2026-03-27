@@ -70,7 +70,11 @@ export class RedisService implements OnModuleDestroy {
 
     async set(key: string, value: string, ttl?: number): Promise<void> {
         const client = this.getClient();
-        ttl ? await client.setex(key, ttl, value) : await client.set(key, value);
+        if (ttl) {
+            await client.setex(key, ttl, value);
+        } else {
+            await client.set(key, value);
+        }
     }
 
     async get(key: string): Promise<string | null> {
