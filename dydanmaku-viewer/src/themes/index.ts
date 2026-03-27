@@ -17,7 +17,6 @@ export const lightTheme: ThemeConfig = {
       headerColor: "#ffffff",
       bodyBg: "#ffffff",
       footerBg: "#f5f5f5",
-      //footerBg: '#ffffff',
       siderBg: "#ffffff",
     },
     Card: {
@@ -54,9 +53,6 @@ export const darkTheme: ThemeConfig = {
       cellPaddingInlineSM: 8,
       cellPaddingBlockMD: 16,
       cellPaddingInlineMD: 12,
-    },
-    Tooltip: {
-      colorBgContainer: "#3e3d3d",
     },
   },
   cssVar: {
