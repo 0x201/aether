@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { catchError, Observable, retry, tap, throwError } from 'rxjs';
 import { CreateOrUpdateMenuCommand, Menu } from '../models/menu.model';
 import { PagedResult } from '../models/paged-result.model';
 import { ApiState } from '../models/api-state';
@@ -11,38 +11,33 @@ import { ApiState } from '../models/api-state';
 export class MenusService {
   private baseUrl = '/api/menus';
 
-  private menusState = new BehaviorSubject<ApiState<Menu[]>>(
-    {
-      data: null,
-      loading: false,
-      error: null,
-      timestamp: Date.now()
-    }
-  );
+  private menusState: WritableSignal<ApiState<Menu[]>> = signal<ApiState<Menu[]>>({
+    data: [],
+    loading: false,
+    error: null,
+    timestamp: 0
+  });
 
-  public menusState$ = this.menusState.asObservable();
+  public menusState$ = this.menusState.asReadonly();
 
-  private menuDetailState = new BehaviorSubject<ApiState<Menu>>(
-    {
-      data: null,
-      loading: false,
-      error: null,
-      timestamp: Date.now()
-    }
-  );
+  private menuDetailState: WritableSignal<ApiState<Menu>> = signal<ApiState<Menu>>({
+    data: null,
+    loading: false,
+    error: null,
+    timestamp: 0
+  });
 
   private http: HttpClient = inject(HttpClient);
 
-  public menuDetailState$ = this.menuDetailState.asObservable();
+  public menuDetailState$ = this.menuDetailState.asReadonly();
 
   constructor() { }
 
   getMenus(page: number = 0, pageSize: number = 10): Observable<PagedResult<Menu>> {
     this.updateMenusState({ loading: true, error: null });
-    const params = {
-      page: page,
-      pageSize: pageSize
-    };
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
 
     return this.http.get<PagedResult<Menu>>(this.baseUrl, { params })
       .pipe(
@@ -66,9 +61,9 @@ export class MenusService {
     this.updateMenuDetailState({ loading: true, error: null });
     return this.http.get<Menu>(`${this.baseUrl}/${id}`)
       .pipe(
-        tap(book => {
+        tap(menu => {
           this.updateMenuDetailState({
-            data: book,
+            data: menu,
             loading: false,
             timestamp: Date.now()
           });
@@ -116,27 +111,28 @@ export class MenusService {
       );
   }
 
-  refreshMenus(): void {
-    if (!this.menusState.value.loading) {
-      this.getMenus().subscribe();
-    }
-  }
-
-  private updateMenusState(updates: Partial<ApiState<Menu[]>>) {
-    this.menusState.next({ ...this.menusState.value, ...updates });
-  }
-
-  private updateMenuDetailState(updates: Partial<ApiState<Menu>>) {
-    this.menuDetailState.next({ ...this.menuDetailState.value, ...updates });
-  }
-
   private getErrorMessage(error: any): string {
-    if (error.status === 0) {
-      return 'Network error: Please check your internet connection';
-    } else if (error.status === 404) {
-      return 'Resource not found';
-    } else {
-      return error.message || 'An unexpected error occurred';
+    if (error.error instanceof ErrorEvent) {
+      return error.error.message;
     }
+    return error.error?.message || error.message || 'Unknown error occurred';
+  }
+
+  private updateMenusState(newState: Partial<ApiState<Menu[]>>): void {
+    this.menusState.update(current => ({
+      ...current,
+      ...newState
+    }));
+  }
+
+  private updateMenuDetailState(newState: Partial<ApiState<Menu>>): void {
+    this.menuDetailState.update(current => ({
+      ...current,
+      ...newState
+    }));
+  }
+
+  private refreshMenus(): void {
+    // 重新获取菜单列表的逻辑
   }
 }

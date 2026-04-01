@@ -1,13 +1,12 @@
-@let state = booksService.bookDetailState$ | async;
+@let state = booksService.bookDetailState$;
 
-
-@if (state?.loading) {
+@if (state().loading) {
 <div class="spinner-container">
   <mat-spinner></mat-spinner>
 </div>
 }
 
-@if (state?.error && !state?.loading) {
+@if (state().error && !state().loading) {
 <mat-card>
   <mat-card-content>
     <h2>Book Not Found</h2>
@@ -19,7 +18,7 @@
   </mat-card-content>
 </mat-card>
 }
-@if (state?.data && !state?.loading) {
+@if (state().data && !state().loading) {
 <button mat-raised-button color="primary" (click)="goBack()">
   <mat-icon>arrow_back</mat-icon>
   Back to Books
@@ -27,16 +26,16 @@
 
 <mat-card class="book-detail-card">
   <mat-card-header>
-    <mat-card-title>{{ state?.data?.title }}</mat-card-title>
-    <mat-card-subtitle>ISBN: {{ state?.data?.isbn }}</mat-card-subtitle>
+    <mat-card-title>{{ state().data?.title }}</mat-card-title>
+    <mat-card-subtitle>ISBN: {{ state().data?.isbn }}</mat-card-subtitle>
   </mat-card-header>
 
   <mat-card-content>
     <div class="book-details">
-      <p><strong>Price:</strong> ${{ state?.data?.price }}</p>
-      <p><strong>Published Date:</strong> {{ state?.data?.publishDate }}</p>
+      <p><strong>Price:</strong> ${{ state().data?.price }}</p>
+      <p><strong>Published Date:</strong> {{ state().data?.publishDate }}</p>
       <p><strong>Description:</strong></p>
-      <p>{{ state?.data?.description }}</p>
+      <p>{{ state().data?.description }}</p>
     </div>
   </mat-card-content>
 

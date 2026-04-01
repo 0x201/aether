@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
+import { catchError, Observable, retry, tap, throwError } from 'rxjs';
 import { Book } from '../models/book.model';
 import { ApiState } from '../models/api-state'
 import { PagedResult } from '../models/paged-result.model';
@@ -11,23 +11,23 @@ import { PagedResult } from '../models/paged-result.model';
 export class BooksService {
   private baseUrl = '/api/books';
 
-  private booksState = new BehaviorSubject<ApiState<Book[]>>({
+  private booksState: WritableSignal<ApiState<Book[]>> = signal<ApiState<Book[]>>({
     data: [],
     loading: false,
     error: null,
     timestamp: 0
   });
 
-  public booksState$ = this.booksState.asObservable();
+  public booksState$ = this.booksState.asReadonly();
 
-  private bookDetailState = new BehaviorSubject<ApiState<Book>>({
+  private bookDetailState: WritableSignal<ApiState<Book>> = signal<ApiState<Book>>({
     data: null,
     loading: false,
     error: null,
     timestamp: 0
   });
 
-  public bookDetailState$ = this.bookDetailState.asObservable();
+  public bookDetailState$ = this.bookDetailState.asReadonly();
 
   private http: HttpClient = inject(HttpClient);
 
@@ -102,35 +102,37 @@ export class BooksService {
 
   deleteBook(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`)
-    .pipe(
-      tap(() => {
-        this.refreshBooks();
-      }),
-      catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
-    );
-  }
-
-  refreshBooks(): void {
-    if (!this.booksState.value.loading) {
-      this.getBooks().subscribe();
-    }
-  }
-
-  private updateBooksState(updates: Partial<ApiState<Book[]>>) {
-    this.booksState.next({ ...this.booksState.value, ...updates });
-  }
-
-  private updateBookDetailState(updates: Partial<ApiState<Book>>) {
-    this.bookDetailState.next({ ...this.bookDetailState.value, ...updates });
+      .pipe(
+        tap(() => {
+          this.refreshBooks();
+        }),
+        catchError(error => throwError(() => new Error(this.getErrorMessage(error))))
+      );
   }
 
   private getErrorMessage(error: any): string {
-    if (error.status === 0) {
-      return 'Network error: Please check your internet connection';
-    } else if (error.status === 404) {
-      return 'Resource not found';
-    } else {
-      return error.message || 'An unexpected error occurred';
+    if (error.error instanceof ErrorEvent) {
+      return error.error.message;
     }
+    return error.error?.message || error.message || 'Unknown error occurred';
+  }
+
+  private updateBooksState(newState: Partial<ApiState<Book[]>>): void {
+    this.booksState.update(current => ({
+      ...current,
+      ...newState
+    }));
+  }
+
+  private updateBookDetailState(newState: Partial<ApiState<Book>>): void {
+    this.bookDetailState.update(current => ({
+      ...current,
+      ...newState
+    }));
+  }
+
+  public refreshBooks(): void {
+    // 重新获取书籍列表的逻辑，可以根据实际需求实现
+    // 例如：调用 getBooks 方法或设置状态为需要刷新
   }
 }

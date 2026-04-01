@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -54,8 +54,7 @@ interface MenuNode {
     RecursiveMenu,
 ]
 })
-export class App implements OnInit, AfterViewInit, OnDestroy {  
-  private destroy$ = new Subject<void>();
+export class App implements OnInit, AfterViewInit {  
   isHandset$!: Observable<boolean>;
   menus: Menu[] = [];
   isSidenavOpened = false;
@@ -88,25 +87,19 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   logout(): void {
     this.keycloakService.logout();
   }
   
   
   private loadMenusFromToken(): void {
-    this.userService.loadUserMenus().subscribe(menus => {
-      this.menus = menus;
-      const userRoles = this.extractUserRolesFromToken();
-      // Convert roles to Role[] format
-      const roles: Role[] = userRoles.map(roleName => ({ id: 0, name: roleName } as Role));
-      this.menuTreeData = this.buildTreeMenuData(this.menus, roles);
-      this.cdRef.detectChanges();
-    });
+    const menus = this.userService.loadUserMenus()(); // 获取 signal 的值
+    this.menus = menus;
+    const userRoles = this.extractUserRolesFromToken();
+    // Convert roles to Role[] format
+    const roles: Role[] = userRoles.map(roleName => ({ id: 0, name: roleName } as Role));
+    this.menuTreeData = this.buildTreeMenuData(this.menus, roles);
+    this.cdRef.detectChanges();
   }
   
   private extractUserRolesFromToken(): string[] {

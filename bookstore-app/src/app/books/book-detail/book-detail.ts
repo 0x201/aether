@@ -1,17 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BooksService } from '../../services/books.service';
-import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from "@angular/core";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatCardModule } from "@angular/material/card";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { BooksService } from "../../services/books.service";
+import { AsyncPipe } from "@angular/common";
 
 @Component({
-  selector: 'app-book-detail',
-  templateUrl: './book-detail.html',
-  styleUrl: './book-detail.scss',
+  selector: "app-book-detail",
+  templateUrl: "./book-detail.html",
+  styleUrl: "./book-detail.scss",
   standalone: true,
   imports: [
     RouterModule,
@@ -20,22 +20,20 @@ import { AsyncPipe } from '@angular/common';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    AsyncPipe
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDetailComponent implements OnInit {
-  booksService = inject(BooksService)
+  booksService = inject(BooksService);
   bookId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
-  ) {
-  }
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
+    const idParam = this.route.snapshot.paramMap.get("id");
     if (idParam) {
       this.bookId = +idParam;
       this.loadBook();
@@ -49,7 +47,7 @@ export class BookDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/books']);
+    this.router.navigate(["/books"]);
   }
 
   addToCart(): void {

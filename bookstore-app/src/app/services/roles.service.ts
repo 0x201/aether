@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, retry, tap, throwError } from 'rxjs';
+import { catchError, Observable, retry, tap, throwError } from 'rxjs';
 import { Role } from '../models/role.model';
 import { PagedQuery, PagedResult } from '../models/paged-result.model';
 import { ApiState } from '../models/api-state';
@@ -11,23 +11,23 @@ import { ApiState } from '../models/api-state';
 export class RolesService {
   private apiUrl = '/api/roles';
 
-  private rolesState = new BehaviorSubject<ApiState<Role[]>>({
+  private rolesState: WritableSignal<ApiState<Role[]>> = signal<ApiState<Role[]>>({
     data: [],
     loading: false,
     error: null,
     timestamp: 0
   });
 
-  public rolesState$ = this.rolesState.asObservable();
+  public rolesState$ = this.rolesState.asReadonly();
 
-  private roleDetailState = new BehaviorSubject<ApiState<Role>>({
+  private roleDetailState: WritableSignal<ApiState<Role>> = signal<ApiState<Role>>({
     data: null,
     loading: false,
     error: null,
     timestamp: 0
   });
 
-  public roleDetailState$ = this.roleDetailState.asObservable();
+  public roleDetailState$ = this.roleDetailState.asReadonly();
   private http: HttpClient = inject(HttpClient);
 
   constructor() { }
@@ -38,14 +38,14 @@ export class RolesService {
 
   getRoles(query: PagedQuery): Observable<PagedResult<Role>> {
     this.updateRolesState({ loading: true, error: null });
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set('page', query.page * query.pageSize)
       .set('pageSize', query.pageSize);
     if (query.filter) {
-      params.set('filter', query.filter);
+      params = params.set('filter', query.filter);
     }
     if (query.sorting) {
-      params.set('sorting', query.sorting);
+      params = params.set('sorting', query.sorting);
     }
     return this.http.get<PagedResult<Role>>(this.apiUrl, { params })
       .pipe(
@@ -121,37 +121,28 @@ export class RolesService {
       );
   }
 
-  refreshRoles(): void {
-    if (!this.rolesState.value.loading) {
-      const query = {
-        page: 0,
-        pageSize: 10
-      };
-      this.getRoles(query).subscribe();
-    }
-  }
-
-  private updateRolesState(updates: Partial<ApiState<Role[]>>) {
-    this.rolesState.next({
-      ...this.rolesState.value,
-      ...updates
-    });
-  }
-
-  private updateRoleDetailState(updates: Partial<ApiState<Role>>) {
-    this.roleDetailState.next({
-      ...this.roleDetailState.value,
-      ...updates
-    });
-  }
-
   private getErrorMessage(error: any): string {
-    if (error.status === 0) {
-      return 'Network error: Please check your internet connection';
-    } else if (error.status === 404) {
-      return 'Resource not found';
-    } else {
-      return error.message || 'An unexpected error occurred';
+    if (error.error instanceof ErrorEvent) {
+      return error.error.message;
     }
+    return error.error?.message || error.message || 'Unknown error occurred';
+  }
+
+  private updateRolesState(newState: Partial<ApiState<Role[]>>): void {
+    this.rolesState.update(current => ({
+      ...current,
+      ...newState
+    }));
+  }
+
+  private updateRoleDetailState(newState: Partial<ApiState<Role>>): void {
+    this.roleDetailState.update(current => ({
+      ...current,
+      ...newState
+    }));
+  }
+
+  private refreshRoles(): void {
+    // 重新获取角色列表的逻辑
   }
 }

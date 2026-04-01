@@ -30,15 +30,15 @@
 
   <div class="featured-section">
     <h2>Featured Books</h2>
-    @let state = booksService.booksState$ | async;
+    @let state = booksService.booksState$;
 
 
-    @if (state?.loading) {
+    @if (state().loading) {
       <mat-spinner></mat-spinner>
     } 
-    @if (state?.error && !state?.loading) {
+    @if (state().error && !state().loading) {
       <div class="error-message">
-        <p>Error loading books: {{ state?.error }}</p>
+        <p>Error loading books: {{ state().error }}</p>
         <button mat-raised-button color="warn" (click)="loadRandomBooks()">
           <mat-icon>retry</mat-icon>
           Try Again
@@ -46,7 +46,7 @@
       </div>
     }
 
-    @if (state?.data === null && !state?.loading && !state?.error) {
+    @if (state().data === null && !state().loading && !state().error) {
       <p>No featured books available at the moment.</p>
       <button mat-raised-button color="warn" (click)="loadRandomBooks()">
           <mat-icon>refresh</mat-icon>
@@ -54,9 +54,9 @@
         </button>
     }
     
-    @if (state?.data && state?.data!.length > 0 && !state?.loading) {
+    @if (state().data && state().data!.length > 0 && !state().loading) {
     <div class="book-grid">
-      @for (book of state?.data; track book.id) {
+      @for (book of state().data; track book.id) {
       <mat-card class="book-card">
         <mat-card-header>
           <mat-card-title>{{ book.title }}</mat-card-title>
@@ -77,7 +77,7 @@
     </div>
     }
 
-    @if (state?.data && state?.data!.length === 0 && !state?.loading) {
+    @if (state().data && state().data!.length === 0 && !state().loading) {
       <p>No featured books available at the moment.</p>
       <button mat-raised-button color="warn" (click)="loadRandomBooks()">
           <mat-icon>load</mat-icon>

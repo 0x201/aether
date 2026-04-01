@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy, effect, untracked } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,7 +6,6 @@ import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { Book } from '../../models/book.model';
 import { BooksService } from '../../services/books.service';
 import { BookDialogComponent } from './book-dialog';
-import { Subject, takeUntil } from 'rxjs';
 
 // Import Material modules
 import { MatButtonModule } from '@angular/material/button';
@@ -35,8 +34,8 @@ import { MatChipsModule } from '@angular/material/chips';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BookManagementComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+export class BookManagementComponent implements OnInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   
   books: MatTableDataSource<Book> = new MatTableDataSource<Book>([]);
   authors: Author[] = [];
@@ -47,25 +46,31 @@ export class BookManagementComponent implements OnInit, OnDestroy {
   totalBooks = 0;
   snackBarConfig: MatSnackBarConfig = { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' };
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   booksService = inject(BooksService);
   authorsService = inject(AuthorsService);
   dialog = inject(MatDialog);
   snackBar = inject(MatSnackBar);
+
+  // 使用 effect 监听 booksService 中的 signal 状态
+  booksEffect = effect(() => {
+    const state = this.booksService.booksState$();
+    if (state?.data) {
+      untracked(() => {
+        this.books.data = state.data ?? [];
+        if (this.paginator) {
+          this.paginator.length = this.totalBooks;
+        }
+      });
+    }
+  });
 
   ngOnInit(): void {
     this.loadBooks();
     this.loadAuthors();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   loadAuthors(): void {
-    this.authorsService.getAllAuthors().pipe(takeUntil(this.destroy$)).subscribe({
+    this.authorsService.getAllAuthors().subscribe({
       next: (result) => {
         this.authors = result;
       },
@@ -77,17 +82,6 @@ export class BookManagementComponent implements OnInit, OnDestroy {
   }
 
   loadBooks(): void {
-     this.booksService.booksState$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
-        if (state?.data) {
-          this.books.data = state.data;
-          if (this.paginator) {
-            this.paginator.length = this.totalBooks;
-          }
-        }
-      });
-
     this.booksService
       .getBooks(this.currentPage, this.pageSize)
       .subscribe({
@@ -116,9 +110,9 @@ export class BookManagementComponent implements OnInit, OnDestroy {
       data: { book: null, authors: this.authors }
     });
 
-    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
+    dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.booksService.createBook(result.book).pipe(takeUntil(this.destroy$)).subscribe({
+        this.booksService.createBook(result.book).subscribe({
           next: (book) => {
             this.snackBar.open(`Book "${book.title}" created successfully`, 'Close', this.snackBarConfig);
             this.loadBooks();
@@ -138,9 +132,9 @@ export class BookManagementComponent implements OnInit, OnDestroy {
       data: { book: { ...book }, authors: this.authors }
     });
 
-    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
+    dialogRef.afterClosed().subscribe(result => {
       if (result && result.isEditMode) {
-        this.booksService.updateBook(result.id, result.book).pipe(takeUntil(this.destroy$)).subscribe({
+        this.booksService.updateBook(result.id, result.book).subscribe({
           next: () => {
             this.snackBar.open(`Book updated successfully`, 'Close', this.snackBarConfig);
             this.loadBooks();
@@ -156,7 +150,7 @@ export class BookManagementComponent implements OnInit, OnDestroy {
 
   deleteBook(id: number): void {
     if (confirm('Are you sure you want to delete this book?')) {
-      this.booksService.deleteBook(id).pipe(takeUntil(this.destroy$)).subscribe({
+      this.booksService.deleteBook(id).subscribe({
         next: () => {
           this.snackBar.open('Book deleted successfully', 'Close', this.snackBarConfig);
           this.loadBooks();

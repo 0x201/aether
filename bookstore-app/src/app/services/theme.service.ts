@@ -1,5 +1,4 @@
-import { Injectable, Renderer2, RendererFactory2, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, Renderer2, RendererFactory2, inject, signal, WritableSignal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { OverlayContainer } from '@angular/cdk/overlay';
 
@@ -10,8 +9,8 @@ export type Theme = 'indigo-pink' | 'deeppurple-amber' | 'pink-bluegrey' | 'purp
 })
 export class ThemeService {
   private readonly THEME_KEY = 'app-theme';
-  private currentThemeSubject = new BehaviorSubject<Theme>('indigo-pink');
-  public currentTheme$ = this.currentThemeSubject.asObservable();
+  private currentThemeSignal: WritableSignal<Theme> = signal<Theme>('indigo-pink');
+  public currentTheme$ = this.currentThemeSignal.asReadonly();
   private renderer: Renderer2;
   private document: Document = inject(DOCUMENT);
 
@@ -26,14 +25,14 @@ export class ThemeService {
   private loadThemeFromStorage(): void {
     const savedTheme = localStorage.getItem(this.THEME_KEY) as Theme | null;
     if (savedTheme) {
-      this.currentThemeSubject.next(savedTheme);
+      this.currentThemeSignal.set(savedTheme);
       this.applyTheme(savedTheme);
     }
   }
 
   setTheme(theme: Theme): void {
     this.applyTheme(theme);
-    this.currentThemeSubject.next(theme);
+    this.currentThemeSignal.set(theme);
     localStorage.setItem(this.THEME_KEY, theme);
   }
 
@@ -68,6 +67,6 @@ export class ThemeService {
   }
 
   getCurrentTheme(): Theme {
-    return this.currentThemeSubject.value;
+    return this.currentThemeSignal();
   }
 }

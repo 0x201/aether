@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy, effect, untracked } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,7 +16,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { Subject, takeUntil } from 'rxjs';
 import { MatCheckbox } from "@angular/material/checkbox";
 
 @Component({
@@ -38,9 +37,8 @@ import { MatCheckbox } from "@angular/material/checkbox";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserManagementComponent implements OnInit {
-  private destory$ = new Subject<void>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  users: MatTableDataSource<User> = new MatTableDataSource<User>([]);
+  users = new MatTableDataSource<User>();
   roles: Role[] = [];
   displayedColumns: string[] = ['username', 'nickname', 'roles', 'isActive', 'actions'];
   pageSize = 10;
@@ -52,6 +50,18 @@ export class UserManagementComponent implements OnInit {
   snackBar = inject(MatSnackBar);
   dialog: MatDialog = inject(MatDialog);
 
+  // 使用 effect 监听 usersService 中的 signal 状态
+  usersEffect = effect(() => {
+    const state = this.usersService.usersState$();
+    if (state?.data) {
+      untracked(() => {
+        this.users.data = state.data ?? [];
+        if (this.paginator) {
+          this.paginator.length = this.totalUsers;
+        }
+      });
+    }
+  });
 
   ngOnInit(): void {
     this.loadUsers();
@@ -59,17 +69,6 @@ export class UserManagementComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.usersService.usersState$
-      .pipe(takeUntil(this.destory$))
-      .subscribe(state => {
-        if (state?.data) {
-          this.users.data = state.data;
-          if (this.paginator) {
-            this.paginator.length = this.totalUsers;
-          }
-        }
-      });
-
     this.usersService
       .getUsers(this.currentPage, this.pageSize)
       .subscribe({
@@ -77,7 +76,7 @@ export class UserManagementComponent implements OnInit {
           this.users.data = res.data;
           this.totalUsers = res.totalCount;
           if (this.paginator) {
-            this.paginator.length = this.totalUsers;
+            this.paginator.length = res.totalCount;
           }
         },
         error: (error) => {
@@ -89,85 +88,40 @@ export class UserManagementComponent implements OnInit {
 
   loadRoles(): void {
     this.rolesService.getAllRoles().subscribe({
-      next: (roles) => {
-        this.roles = roles;
+      next: (result) => {
+        this.roles = result;
       },
       error: (error) => {
-        this.snackBar.open('Error loading roles', 'Close', this.snackBarConfig);
         console.error('Error loading roles:', error);
+        this.snackBar.open('Error loading roles', 'Close', this.snackBarConfig);
       }
     });
   }
 
   openAddUserDialog(): void {
-    if (this.roles.length === 0) {
-      this.loadRoles();
-    }
     const dialogRef = this.dialog.open(UserDialogComponent, {
-      width: '500px',
+      width: '600px',
       data: { user: null, roles: this.roles }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.createUser(result);
+        this.loadUsers(); // Refresh the user list
       }
     });
   }
 
   openEditUserDialog(user: User): void {
-    if (this.roles.length === 0) {
-      this.loadRoles();
-    }
     const dialogRef = this.dialog.open(UserDialogComponent, {
-      width: '500px',
-      data: { user: { ...user }, roles: this.roles }
+      width: '600px',
+      data: { user, roles: this.roles }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.updateUser(user.id, result);
+        this.loadUsers(); // Refresh the user list
       }
     });
-  }
-
-  createUser(user: Partial<User>): void {
-    this.usersService.createUser(user).subscribe({
-      next: () => {
-        this.snackBar.open('User created successfully', 'Close', this.snackBarConfig);
-        this.loadUsers();
-      },
-      error: (error) => {
-        this.snackBar.open('Error creating user', 'Close', this.snackBarConfig);
-        console.error('Error creating user:', error);
-      }
-    });
-  }
-
-  updateUser(id: number, user: Partial<User>): void {
-    this.usersService.updateUser(id, user).subscribe({
-      next: () => {
-        this.snackBar.open('User updated successfully', 'Close', this.snackBarConfig);
-        this.loadUsers();
-      },
-      error: (error) => {
-        this.snackBar.open('Error updating user', 'Close', this.snackBarConfig);
-        console.error('Error updating user:', error);
-      }
-    });
-  }
-
-  toggleUser(id: number, active: boolean) {
-    this.usersService.updateUser(id, { isActive: active }).subscribe({
-      next: () => {
-        this.snackBar.open('User updated successfully', 'Close', this.snackBarConfig);
-        this.loadUsers();
-      },
-      error: (error) => {
-        this.snackBar.open('Error updating user', 'Close', this.snackBarConfig);
-        console.error('Error updating user:', error);
-      }
-    })
   }
 
   onPageChange(event: PageEvent): void {
@@ -176,18 +130,31 @@ export class UserManagementComponent implements OnInit {
     this.loadUsers();
   }
 
-  deleteUser(user: User): void {
-    if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
-      this.usersService.deleteUser(user.id).subscribe({
+  deleteUser(userId: number): void {
+    if (confirm('Are you sure you want to delete this user?')) {
+      this.usersService.deleteUser(userId).subscribe({
         next: () => {
-          this.snackBar.open('User deleted successfully', 'Close', this.snackBarConfig);
           this.loadUsers();
+          this.snackBar.open('User deleted successfully', 'Close', this.snackBarConfig);
         },
         error: (error) => {
-          this.snackBar.open('Error deleting user', 'Close', this.snackBarConfig);
           console.error('Error deleting user:', error);
+          this.snackBar.open('Error deleting user', 'Close', this.snackBarConfig);
         }
       });
     }
+  }
+
+  toggleUser(userId: number, isActive: boolean): void {
+    this.usersService.updateUserStatus(userId, isActive).subscribe({
+      next: () => {
+        this.loadUsers(); // Refresh the user list
+        this.snackBar.open('User status updated successfully', 'Close', this.snackBarConfig);
+      },
+      error: (error) => {
+        console.error('Error updating user status:', error);
+        this.snackBar.open('Error updating user status', 'Close', this.snackBarConfig);
+      }
+    });
   }
 }

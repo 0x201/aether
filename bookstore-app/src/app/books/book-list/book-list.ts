@@ -1,19 +1,18 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BooksService } from '../../services/books.service';
-import { AsyncPipe } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from "@angular/core";
+import { Router, RouterModule } from "@angular/router";
+import { MatCardModule } from "@angular/material/card";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { BooksService } from "../../services/books.service";
 
 @Component({
-  selector: 'app-book-list',
-  templateUrl: './book-list.html',
-  styleUrl: './book-list.scss',
+  selector: "app-book-list",
+  templateUrl: "./book-list.html",
+  styleUrl: "./book-list.scss",
   standalone: true,
   imports: [
     RouterModule,
@@ -24,18 +23,12 @@ import { AsyncPipe } from '@angular/common';
     MatSnackBarModule,
     MatFormFieldModule,
     MatInputModule,
-    AsyncPipe
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookListComponent implements OnInit {
-
   booksService = inject(BooksService);
-  constructor(
-    private router: Router
-  ) {
-
-  }
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.loadBooks();
@@ -46,6 +39,6 @@ export class BookListComponent implements OnInit {
   }
 
   viewDetails(bookId: number): void {
-    this.router.navigate(['/books', bookId]);
+    this.router.navigate(["/books", bookId]);
   }
 }

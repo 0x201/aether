@@ -9,15 +9,15 @@
   </div>
 </div>
 
-@let state = booksService.booksState$ | async;
+@let state = booksService.booksState$;
 
-@if (state?.loading) {
+@if (state().loading) {
   <div class="spinner-container">
     <mat-spinner></mat-spinner>
   </div>
 } @else {
   <div class="book-grid">
-    @for (book of state?.data; track book.id) {
+    @for (book of state().data; track book.id) {
       <mat-card class="book-card">
         <mat-card-header>
           <mat-card-title>{{ book.title }}</mat-card-title>

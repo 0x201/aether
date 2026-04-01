@@ -1,17 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BooksService } from '../services/books.service';
-import {  MatSnackBarModule } from '@angular/material/snack-bar';
-import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from "@angular/core";
+import { RouterModule, Router } from "@angular/router";
+import { MatCardModule } from "@angular/material/card";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { BooksService } from "../services/books.service";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { AsyncPipe } from "@angular/common";
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.html',
-  styleUrl: './home.scss',
+  selector: "app-home",
+  templateUrl: "./home.html",
+  styleUrl: "./home.scss",
   standalone: true,
   imports: [
     RouterModule,
@@ -20,15 +20,12 @@ import { AsyncPipe } from '@angular/common';
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    AsyncPipe,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
   booksService = inject(BooksService);
-  constructor(
-    private router: Router
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.loadRandomBooks();
@@ -39,6 +36,6 @@ export class HomeComponent implements OnInit {
   }
 
   viewBookDetails(bookId: number): void {
-    this.router.navigate(['/books', bookId]);
+    this.router.navigate(["/books", bookId]);
   }
 }
