@@ -166,10 +166,12 @@ pnpm run start:prod
 ## API Endpoints
 
 ### Authentication
+
 - `POST /auth/signup` - User registration
 - `POST /auth/login` - User login
 
 ### Books
+
 - `GET /books` - Get all books (paginated)
 - `GET /books/:id` - Get a specific book
 - `POST /books` - Create a new book
@@ -177,6 +179,7 @@ pnpm run start:prod
 - `DELETE /books/:id` - Delete a book
 
 ### Authors
+
 - `GET /authors` - Get all authors
 - `GET /authors/:id` - Get a specific author
 - `POST /authors` - Create a new author
@@ -184,12 +187,14 @@ pnpm run start:prod
 - `DELETE /authors/:id` - Delete an author
 
 ### Users
+
 - `GET /users` - Get all users (admin only)
 - `GET /users/:id` - Get a specific user
 - `PUT /users/:id` - Update a user
 - `DELETE /users/:id` - Delete a user
 
 ### Roles
+
 - `GET /roles` - Get all roles
 - `POST /roles` - Create a new role
 

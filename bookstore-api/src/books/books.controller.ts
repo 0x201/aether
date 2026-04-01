@@ -10,13 +10,13 @@ import {
   HttpException,
   HttpStatus,
   Res,
-} from '@nestjs/common';
-import { Result, PagedResult } from '../common/Response/Result';
-import { BooksService } from './books.service';
-import { BookDto } from './dtos/book.dto';
-import { BookQuery } from './queries/book.query';
-import { CreateBookCommand } from './commands/create-book.command';
-import { UpdateBookCommand } from './commands/update-book.command';
+} from '@nestjs/common'
+import { Result, PagedResult } from '../common/Response/Result'
+import { BooksService } from './books.service'
+import { BookDto } from './dtos/book.dto'
+import { BookQuery } from './queries/book.query'
+import { CreateBookCommand } from './commands/create-book.command'
+import { UpdateBookCommand } from './commands/update-book.command'
 import {
   ApiBearerAuth,
   ApiBody,
@@ -24,18 +24,18 @@ import {
   ApiParam,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger';
-import { Roles } from 'src/roles/role.decorator';
-import { RoleEnum } from 'src/roles/role.enum';
-import { Book } from './entities/book.entity';
-import { AuthorDto } from 'src/authors/dtos/author.dto';
-import { Response } from 'express';
+} from '@nestjs/swagger'
+import { Roles } from '@/src/roles/role.decorator'
+import { RoleEnum } from '@/src/roles/role.enum'
+import { Book } from './entities/book.entity'
+import { AuthorDto } from '@/src/authors/dtos/author.dto'
+import { Response } from 'express'
 
 @Controller('books')
 @ApiTags('Books')
 @ApiBearerAuth()
 export class BooksController {
-  constructor(private readonly booksService: BooksService) { }
+  constructor(private readonly booksService: BooksService) {}
 
   @Post()
   @Roles(RoleEnum.Admin)
@@ -46,8 +46,8 @@ export class BooksController {
     description: 'Book created successfully',
   })
   async create(@Body() createBookDto: CreateBookCommand, @Res() res: Response): Promise<void> {
-    const book = await this.booksService.insert(createBookDto);
-    res.status(HttpStatus.CREATED).location(`/api/books/${book.id}`).send();
+    const book = await this.booksService.insert(createBookDto)
+    res.status(HttpStatus.CREATED).location(`/api/books/${book.id}`).send()
   }
 
   @Get()
@@ -58,9 +58,9 @@ export class BooksController {
     type: PagedResult<BookDto>,
   })
   async findBooks(@Query() query: BookQuery): Promise<PagedResult<BookDto>> {
-    const [books, totalCount] = await this.booksService.findBooks(query);
-    const data: BookDto[] = books.map((book) => this.mapBookToBookDto(book));
-    return PagedResult.success(data, totalCount);
+    const [books, totalCount] = await this.booksService.findBooks(query)
+    const data: BookDto[] = books.map((book) => this.mapBookToBookDto(book))
+    return PagedResult.success(data, totalCount)
   }
 
   @Get(':id')
@@ -73,11 +73,11 @@ export class BooksController {
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Book not found' })
   async findOne(@Param('id') id: number): Promise<Result<BookDto>> {
-    const entity = await this.booksService.findOne(id);
+    const entity = await this.booksService.findOne(id)
     if (!entity) {
-      throw new HttpException(`Cannot find the entity with id ${id}`, 404);
+      throw new HttpException(`Cannot find the entity with id ${id}`, 404)
     }
-    return Result.success(this.mapBookToBookDto(entity));
+    return Result.success(this.mapBookToBookDto(entity))
   }
 
   @Roles(RoleEnum.Admin)
@@ -90,11 +90,8 @@ export class BooksController {
     description: 'Book updated successfully',
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Book not found' })
-  async update(
-    @Param('id') id: number,
-    @Body() updateBookDto: UpdateBookCommand,
-  ): Promise<void> {
-    await this.booksService.update(id, updateBookDto);
+  async update(@Param('id') id: number, @Body() updateBookDto: UpdateBookCommand): Promise<void> {
+    await this.booksService.update(id, updateBookDto)
   }
 
   @Roles(RoleEnum.Admin)
@@ -107,26 +104,26 @@ export class BooksController {
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Book not found' })
   async remove(@Param('id') id: number): Promise<void> {
-    return await this.booksService.delete(id);
+    return await this.booksService.delete(id)
   }
 
   private mapBookToBookDto(book: Book): BookDto {
-    const dto = new BookDto();
-    dto.id = book.id;
-    dto.title = book.title;
-    dto.description = book.description;
-    dto.isbn = book.isbn;
-    dto.price = book.price;
-    dto.publishDate = book.publishDate;
-    dto.isActive = book.isActive;
+    const dto = new BookDto()
+    dto.id = book.id
+    dto.title = book.title
+    dto.description = book.description
+    dto.isbn = book.isbn
+    dto.price = book.price
+    dto.publishDate = book.publishDate
+    dto.isActive = book.isActive
     dto.authors = book.bookAuthors.map((bookAuthor) => {
-      const authorDto = new AuthorDto();
-      authorDto.id = bookAuthor.author.id;
-      authorDto.firstName = bookAuthor.author.firstName;
-      authorDto.lastName = bookAuthor.author.lastName;
-      authorDto.isActive = bookAuthor.author.isActive;
-      return authorDto;
-    });
-    return dto;
+      const authorDto = new AuthorDto()
+      authorDto.id = bookAuthor.author.id
+      authorDto.firstName = bookAuthor.author.firstName
+      authorDto.lastName = bookAuthor.author.lastName
+      authorDto.isActive = bookAuthor.author.isActive
+      return authorDto
+    })
+    return dto
   }
 }

@@ -1,18 +1,37 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { RolesController } from './roles.controller';
+import { Test, TestingModule } from '@nestjs/testing'
+import { RolesController } from './roles.controller'
+import { RolesService } from './roles.service'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Role } from './entities/role.entity'
+import { ConfigModule } from '@nestjs/config'
+import { describe, beforeEach, it, expect, vi } from 'vitest'
 
 describe('RolesController', () => {
-  let controller: RolesController;
+  let controller: RolesController
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forFeature([Role])],
       controllers: [RolesController],
-    }).compile();
+      providers: [
+        RolesService,
+        {
+          provide: RolesService,
+          useValue: {
+            create: vi.fn(),
+            findAll: vi.fn(),
+            findOne: vi.fn(),
+            update: vi.fn(),
+            remove: vi.fn(),
+          },
+        },
+      ],
+    }).compile()
 
-    controller = module.get<RolesController>(RolesController);
-  });
+    controller = module.get<RolesController>(RolesController)
+  })
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-});
+    expect(controller).toBeDefined()
+  })
+})

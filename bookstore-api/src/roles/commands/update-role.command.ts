@@ -1,4 +1,4 @@
 export class UpdateRoleCommand {
-  name: string;
-  isActive: boolean;
+  name: string
+  isActive: boolean
 }

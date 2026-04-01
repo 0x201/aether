@@ -1,10 +1,10 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class CreateAuthorCommand {
   @ApiProperty()
-  firstName: string;
+  firstName: string
   @ApiProperty()
-  lastName: string;
+  lastName: string
   @ApiPropertyOptional()
-  isActive?: boolean;
+  isActive?: boolean
 }

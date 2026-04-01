@@ -10,7 +10,7 @@ import {
   HttpStatus,
   Query,
   UseGuards,
-} from '@nestjs/common';
+} from '@nestjs/common'
 import {
   ApiTags,
   ApiOperation,
@@ -18,17 +18,17 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
-} from '@nestjs/swagger';
-import { RolesService } from './roles.service';
-import { CreateRoleCommand } from './commands/create-role.command';
-import { UpdateRoleCommand } from './commands/update-role.command';
-import { Role } from './entities/role.entity';
-import { RoleDto } from './dtos/role.dto';
-import { PagedResult } from 'src/common/response/Result';
-import { RoleQuery } from './queries/role.query';
-import { Roles } from './role.decorator';
-import { RoleEnum } from './role.enum';
-import { RoleGuard } from './role.guard';
+} from '@nestjs/swagger'
+import { RolesService } from './roles.service'
+import { CreateRoleCommand } from './commands/create-role.command'
+import { UpdateRoleCommand } from './commands/update-role.command'
+import { Role } from './entities/role.entity'
+import { RoleDto } from './dtos/role.dto'
+import { PagedResult } from '@/src/common/response/Result'
+import { RoleQuery } from './queries/role.query'
+import { Roles } from './role.decorator'
+import { RoleEnum } from './role.enum'
+import { RoleGuard } from './role.guard'
 
 @UseGuards(RoleGuard)
 @Roles(RoleEnum.Admin)
@@ -46,9 +46,9 @@ export class RolesController {
     type: PagedResult<RoleDto>,
   })
   async findPaginatedList(@Query() query: RoleQuery): Promise<PagedResult<RoleDto>> {
-    const [roles, totalCount] = await this.rolesService.findRoles(query);
-    const data: RoleDto[] = roles.map((role) => Role.mapRoleToRoleDto(role));
-    return new PagedResult<RoleDto>(data, totalCount);
+    const [roles, totalCount] = await this.rolesService.findRoles(query)
+    const data: RoleDto[] = roles.map((role) => Role.mapRoleToRoleDto(role))
+    return new PagedResult<RoleDto>(data, totalCount)
   }
 
   @Get('/all')
@@ -59,8 +59,8 @@ export class RolesController {
     type: PagedResult<RoleDto>,
   })
   async getAllRoles(): Promise<RoleDto[]> {
-    const roles = await this.rolesService.findAllRoles();
-    return roles.map((x) => Role.mapRoleToRoleDto(x));
+    const roles = await this.rolesService.findAllRoles()
+    return roles.map((x) => Role.mapRoleToRoleDto(x))
   }
 
   @Get(':id')
@@ -73,7 +73,7 @@ export class RolesController {
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Role not found' })
   async getRoleById(@Param('id', ParseIntPipe) id: number): Promise<Role> {
-    return this.rolesService.findOne(id);
+    return this.rolesService.findOne(id)
   }
 
   @Post()
@@ -84,10 +84,8 @@ export class RolesController {
     description: 'Role created successfully',
     type: RoleDto,
   })
-  async createRole(
-    @Body() createRoleCommand: CreateRoleCommand,
-  ): Promise<Role> {
-    return this.rolesService.insert(createRoleCommand);
+  async createRole(@Body() createRoleCommand: CreateRoleCommand): Promise<Role> {
+    return this.rolesService.insert(createRoleCommand)
   }
 
   @Put(':id')
@@ -104,7 +102,7 @@ export class RolesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleCommand: UpdateRoleCommand,
   ): Promise<Role> {
-    return this.rolesService.update(id, updateRoleCommand);
+    return this.rolesService.update(id, updateRoleCommand)
   }
 
   @Delete(':id')
@@ -116,6 +114,6 @@ export class RolesController {
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Role not found' })
   async deleteRole(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.rolesService.delete(id);
+    return this.rolesService.delete(id)
   }
 }

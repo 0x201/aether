@@ -1,13 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as KeycloakConnect from 'keycloak-connect';
-import { ConfigService } from '@nestjs/config';
-import { KeycloakConfig } from './keycloak.config';
+import { Injectable, Logger } from '@nestjs/common'
+import KeycloakConnect from 'keycloak-connect'
+import { ConfigService } from '@nestjs/config'
+import { KeycloakConfig } from './keycloak.config'
 
 @Injectable()
 export class KeycloakStrategy {
-  private readonly logger = new Logger(KeycloakStrategy.name);
-  private keycloak: KeycloakConnect.Keycloak;
-  private readonly keycloakConfig: KeycloakConfig;
+  private readonly logger = new Logger(KeycloakStrategy.name)
+  private keycloak: KeycloakConnect.Keycloak
+  private readonly keycloakConfig: KeycloakConfig
 
   constructor(private readonly configService: ConfigService) {
     this.keycloakConfig = {
@@ -18,18 +18,18 @@ export class KeycloakStrategy {
       clientSecret: this.configService.get<string>('keycloak.clientSecret'),
       'ssl-required': 'external',
       'confidential-port': 8080,
-    };
+    }
 
-    this.keycloak = new KeycloakConnect({}, this.keycloakConfig);
+    this.keycloak = new KeycloakConnect({}, this.keycloakConfig)
 
-    this.logger.log('Keycloak strategy initialized', this.keycloakConfig);
+    this.logger.log('Keycloak strategy initialized', this.keycloakConfig)
   }
 
   getKeycloakInstance(): KeycloakConnect.Keycloak {
-    return this.keycloak;
+    return this.keycloak
   }
 
   getKeycloakConfig(): KeycloakConfig {
-    return this.keycloakConfig;
+    return this.keycloakConfig
   }
 }

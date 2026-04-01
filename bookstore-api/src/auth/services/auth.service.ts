@@ -1,23 +1,20 @@
 import {
-  BadRequestException,
-  HttpStatus,
+  //BadRequestException,
+  //HttpStatus,
   Inject,
   Injectable,
   Logger,
-  NotFoundException,
-} from '@nestjs/common';
-import { RolesService } from '../../roles/roles.service';
-import { Request } from 'express';
-import { REQUEST } from '@nestjs/core';
-
+  //NotFoundException,
+} from '@nestjs/common'
+//import { RolesService } from "../../roles/roles.service";
+import { Request } from 'express'
+import { REQUEST } from '@nestjs/core'
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+  private readonly logger = new Logger(AuthService.name)
 
-  constructor(
-    @Inject(REQUEST) private readonly request: Request
-  ) { }
+  constructor(@Inject(REQUEST) private readonly request: Request) {}
 
   // async signup(input: SignUpUserCommand) {
   //   const user = await this.userService.findByUsername(input.username);

@@ -1,10 +1,6 @@
-import {
-  Controller,
-  Get,
-  Request,
-} from '@nestjs/common';
-import { AuthService } from './services/auth.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Request } from '@nestjs/common'
+import { AuthService } from './services/auth.service'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -14,7 +10,7 @@ export class AuthController {
   @Get('profile')
   @ApiBearerAuth()
   getProfile(@Request() req) {
-    return req.user;
+    return req.user
   }
 
   // @AllowAnonymous()

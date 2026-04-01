@@ -1,19 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, QueryRunner, SelectQueryBuilder } from 'typeorm';
-import { Menu } from './entities/menu.entity';
-import { MenuDto } from './dtos/menu.dto';
-import { MenuQuery } from './queries/menu.query';
-import { CreateMenuCommand } from './commands/create-menu.command';
-import { Role } from 'src/roles/entities/role.entity';
-import { RoleMenu } from './entities/role-menu.entity';
-import { UserContextService } from 'src/shared/services/user-context.service';
-import { UpdateMenuCommand } from './commands/update-menu.command';
-import { GenericCrudAuditableService } from 'src/common/services/generic-crud-auditable.service';
-import { DateTimeService } from 'src/shared/services/datetime.service';
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository, DataSource, QueryRunner, SelectQueryBuilder } from 'typeorm'
+import { Menu } from './entities/menu.entity'
+import { MenuDto } from './dtos/menu.dto'
+import { MenuQuery } from './queries/menu.query'
+import { CreateMenuCommand } from './commands/create-menu.command'
+import { Role } from '@/src/roles/entities/role.entity'
+import { RoleMenu } from './entities/role-menu.entity'
+import { UserContextService } from '@/src/shared/services/user-context.service'
+import { UpdateMenuCommand } from './commands/update-menu.command'
+import { GenericCrudAuditableService } from '@/src/common/services/generic-crud-auditable.service'
+import { DateTimeService } from '@/src/shared/services/datetime.service'
 
 @Injectable()
-export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCommand, UpdateMenuCommand> {
+export class MenusService extends GenericCrudAuditableService<
+  Menu,
+  CreateMenuCommand,
+  UpdateMenuCommand
+> {
   protected readonly logger = new Logger(MenusService.name)
   constructor(
     @InjectRepository(Menu)
@@ -22,17 +26,17 @@ export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCo
     protected readonly userContext: UserContextService,
     protected readonly dateTimeService: DateTimeService,
   ) {
-    super(menuRepository, dataSource, userContext, dateTimeService);
+    super(menuRepository, dataSource, userContext, dateTimeService)
   }
 
   protected mapCreateDtoToEntity(command: CreateMenuCommand, entity: Menu): void {
-    entity.name = command.name;
-    entity.title = command.title;
-    entity.route = command.route;
-    entity.icon = command.icon;
-    entity.order = command.order;
-    entity.parentId = command.parentId;
-    entity.isActive = true;
+    entity.name = command.name
+    entity.title = command.title
+    entity.route = command.route
+    entity.icon = command.icon
+    entity.order = command.order
+    entity.parentId = command.parentId
+    entity.isActive = true
   }
 
   protected mapUpdateDtoToEntity(command: UpdateMenuCommand, entity: Menu): void {
@@ -44,57 +48,65 @@ export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCo
       order: command.order ?? entity.order,
       parentId: command.parentId ?? entity.parentId,
       isActive: command.isActive ?? entity.isActive,
-    });
+    })
   }
 
-  protected async afterCreate(queryRunner: QueryRunner, command: CreateMenuCommand, entity: Menu): Promise<void> {
+  protected async afterCreate(
+    queryRunner: QueryRunner,
+    command: CreateMenuCommand,
+    entity: Menu,
+  ): Promise<void> {
     if (command.roles && command.roles.length > 0) {
       const roles: Role[] = await queryRunner.manager
-        .createQueryBuilder(Role, "role")
-        .where("role.id IN (:...roleIds)", { roleIds: command.roles.map(role => role.id) })
-        .getMany();
+        .createQueryBuilder(Role, 'role')
+        .where('role.id IN (:...roleIds)', { roleIds: command.roles.map((role) => role.id) })
+        .getMany()
       const roleMenusToSave: RoleMenu[] = roles.map((role) => {
-        const roleMenu = new RoleMenu();
-        roleMenu.role = role;
-        roleMenu.menu = entity;
-        roleMenu.assignedAt = this.dateTimeService.getNowString();
-        roleMenu.assignedBy = this.userContext.getUsername();
-        return roleMenu;
-      });
+        const roleMenu = new RoleMenu()
+        roleMenu.role = role
+        roleMenu.menu = entity
+        roleMenu.assignedAt = this.dateTimeService.getNowString()
+        roleMenu.assignedBy = this.userContext.getUsername()
+        return roleMenu
+      })
 
-      const savedRoleMenus = await queryRunner.manager.save<RoleMenu>(roleMenusToSave);
-      entity.roleMenus = savedRoleMenus;
+      const savedRoleMenus = await queryRunner.manager.save<RoleMenu>(roleMenusToSave)
+      entity.roleMenus = savedRoleMenus
     }
-    await super.afterCreate(queryRunner, command, entity);
+    await super.afterCreate(queryRunner, command, entity)
   }
 
-  protected async afterUpdate(queryRunner: QueryRunner, command: UpdateMenuCommand, entity: Menu): Promise<void> {
+  protected async afterUpdate(
+    queryRunner: QueryRunner,
+    command: UpdateMenuCommand,
+    entity: Menu,
+  ): Promise<void> {
     if (command.roles) {
       await queryRunner.manager
-        .createQueryBuilder(RoleMenu, "roleMenu")
+        .createQueryBuilder(RoleMenu, 'roleMenu')
         .where('menuId = :menuId', { menuId: entity.id })
         .delete()
-        .execute();
+        .execute()
 
       if (command.roles.length > 0) {
         const roleMenusToAdd = command.roles.map((role) => {
-          const roleMenu = new RoleMenu();
-          roleMenu.menuId = entity.id;
-          roleMenu.roleId = role.id;
-          roleMenu.assignedAt = this.dateTimeService.getNowString();
-          roleMenu.assignedBy = this.userContext.getUsername();
-          return roleMenu;
-        });
-        
-        await queryRunner.manager.save(roleMenusToAdd);
+          const roleMenu = new RoleMenu()
+          roleMenu.menuId = entity.id
+          roleMenu.roleId = role.id
+          roleMenu.assignedAt = this.dateTimeService.getNowString()
+          roleMenu.assignedBy = this.userContext.getUsername()
+          return roleMenu
+        })
+
+        await queryRunner.manager.save(roleMenusToAdd)
       }
     }
-    await super.afterUpdate(queryRunner, command, entity);
+    await super.afterUpdate(queryRunner, command, entity)
   }
 
   async getUserMenus(userRoles: string[]): Promise<Menu[]> {
     if (!userRoles || userRoles.length === 0) {
-      return [];
+      return []
     }
 
     const menus = await this.dataSource
@@ -104,30 +116,31 @@ export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCo
       .where('role.Name IN (:...roleNames)', { roleNames: userRoles })
       .andWhere('menu.IsActive = :isActive', { isActive: true })
       .orderBy('menu.Order', 'ASC')
-      .getMany();
+      .getMany()
 
-    return menus;
+    return menus
   }
 
   private sortMenus(menus: Menu[]): void {
-    menus.sort((a, b) => (a as any).order - (b as any).order);
+    menus.sort((a, b) => (a as any).order - (b as any).order)
     menus.forEach((menu) => {
       if ((menu as any).children && (menu as any).children.length > 0) {
-        this.sortMenus((menu as any).children);
+        this.sortMenus((menu as any).children)
       }
-    });
+    })
   }
 
   async findMenus(query: MenuQuery): Promise<[Menu[], number]> {
-     return this.findPaginated(query, (qb: SelectQueryBuilder<Menu>) => {
-          qb = qb.leftJoinAndSelect("menu.roleMenus", "roleMenu")
-            .leftJoinAndSelect("roleMenu.role", "role")
-    
-          if (query.filter) {
-            qb = qb.andWhere('menu.title like :title', { title: `%${query.filter}%` });
-          }
-          return qb;
-        });
+    return this.findPaginated(query, (qb: SelectQueryBuilder<Menu>) => {
+      qb = qb
+        .leftJoinAndSelect('menu.roleMenus', 'roleMenu')
+        .leftJoinAndSelect('roleMenu.role', 'role')
+
+      if (query.filter) {
+        qb = qb.andWhere('menu.title like :title', { title: `%${query.filter}%` })
+      }
+      return qb
+    })
   }
 
   async getAllMenus(): Promise<MenuDto[]> {
@@ -135,7 +148,7 @@ export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCo
       where: { isActive: true },
       order: { order: 'ASC' },
       relations: ['roles'],
-    });
+    })
 
     return menus.map((menu) => ({
       id: menu.id,
@@ -146,21 +159,21 @@ export class MenusService extends GenericCrudAuditableService<Menu, CreateMenuCo
       route: menu.route,
       title: menu.title,
       isActive: menu.isActive,
-      roles: []
-    }));
+      roles: [],
+    }))
   }
 
   async delete(id: number): Promise<void> {
-    return super.delete(id);
+    return super.delete(id)
   }
 
   async findOne(id: number): Promise<Menu> {
     return super.findOne(id, {
       relations: ['roles'],
-    });
+    })
   }
 
   async count(): Promise<number> {
-    return super.count();
+    return super.count()
   }
 }

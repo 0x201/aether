@@ -1,12 +1,14 @@
-import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { Logger } from '@nestjs/common';
-import { BaseAuditableEntity } from '../BaseAuditableEntity.entity';
-import { GenericCrudBaseService } from './generic-crud-base.service';
+import { DataSource, QueryRunner, Repository } from 'typeorm'
+import { Logger } from '@nestjs/common'
+import { BaseAuditableEntity } from '../BaseAuditableEntity.entity'
+import { GenericCrudBaseService } from './generic-crud-base.service'
 
-export abstract class GenericCrudAuditableService<T extends BaseAuditableEntity, CreateDto, UpdateDto>
-  extends GenericCrudBaseService<T, CreateDto, UpdateDto>
-{
-  protected readonly logger = new Logger(GenericCrudAuditableService.name);
+export abstract class GenericCrudAuditableService<
+  T extends BaseAuditableEntity,
+  CreateDto,
+  UpdateDto,
+> extends GenericCrudBaseService<T, CreateDto, UpdateDto> {
+  protected readonly logger = new Logger(GenericCrudAuditableService.name)
 
   protected constructor(
     protected readonly repository: Repository<T>,
@@ -14,7 +16,7 @@ export abstract class GenericCrudAuditableService<T extends BaseAuditableEntity,
     protected readonly currentUserService: { getUsername(): string },
     protected readonly dateTimeService: { getNowString(): string },
   ) {
-    super(repository, dataSource);
+    super(repository, dataSource)
   }
 
   /**
@@ -22,13 +24,13 @@ export abstract class GenericCrudAuditableService<T extends BaseAuditableEntity,
    * @param entity Entity to set audit fields for
    */
   private setAuditFieldsForCreate(entity: T): void {
-    const currentUser = this.currentUserService.getUsername();
-    const now = this.dateTimeService.getNowString();
-    
-    entity.createdBy = currentUser;
-    entity.createdTime = now;
-    entity.lastModifiedBy = currentUser;
-    entity.lastModifiedTime = now;
+    const currentUser = this.currentUserService.getUsername()
+    const now = this.dateTimeService.getNowString()
+
+    entity.createdBy = currentUser
+    entity.createdTime = now
+    entity.lastModifiedBy = currentUser
+    entity.lastModifiedTime = now
   }
 
   /**
@@ -36,11 +38,11 @@ export abstract class GenericCrudAuditableService<T extends BaseAuditableEntity,
    * @param entity Entity to set audit fields for
    */
   private setAuditFieldsForUpdate(entity: T): void {
-    const currentUser = this.currentUserService.getUsername();
-    const now = this.dateTimeService.getNowString();
-    
-    entity.lastModifiedBy = currentUser;
-    entity.lastModifiedTime = now;
+    const currentUser = this.currentUserService.getUsername()
+    const now = this.dateTimeService.getNowString()
+
+    entity.lastModifiedBy = currentUser
+    entity.lastModifiedTime = now
   }
 
   /**
@@ -48,18 +50,26 @@ export abstract class GenericCrudAuditableService<T extends BaseAuditableEntity,
    * @param command Create DTO
    * @param entity Entity being created
    */
-  protected async beforeCreate(queryRunner: QueryRunner, command: CreateDto, entity: T): Promise<void> {
-    this.setAuditFieldsForCreate(entity);
-    return super.beforeCreate(queryRunner, command, entity);
+  protected async beforeCreate(
+    queryRunner: QueryRunner,
+    command: CreateDto,
+    entity: T,
+  ): Promise<void> {
+    this.setAuditFieldsForCreate(entity)
+    return super.beforeCreate(queryRunner, command, entity)
   }
-  
+
   /**
    * Override beforeUpdate to automatically set audit fields
    * @param command Update DTO
    * @param entity Entity being updated
    */
-  protected async beforeUpdate(queryRunner: QueryRunner, command: UpdateDto, entity: T): Promise<void> {
-    this.setAuditFieldsForUpdate(entity);
-    return super.beforeUpdate(queryRunner, command, entity);
+  protected async beforeUpdate(
+    queryRunner: QueryRunner,
+    command: UpdateDto,
+    entity: T,
+  ): Promise<void> {
+    this.setAuditFieldsForUpdate(entity)
+    return super.beforeUpdate(queryRunner, command, entity)
   }
 }

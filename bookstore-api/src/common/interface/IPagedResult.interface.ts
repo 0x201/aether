@@ -1,36 +1,34 @@
-import { IResult } from "../response/Result";
+import { IResult } from '../response/Result'
 
 interface IFilteredResultQuery {
-  filter: string | null;
+  filter: string | null
 }
 
 interface IHasTotalCount {
-  totalCount: number;
+  totalCount: number
 }
 
 interface ILimitedResultQuery {
-  pageSize: number;
+  pageSize: number
 }
 
 interface IListResult<T> extends IResult<ReadonlyArray<T>> {}
 
 interface IPagedAndSortedResultQuery
-  extends IPagedResultQuery,
-    ILimitedResultQuery,
-    ISortedResultQuery {}
+  extends IPagedResultQuery, ILimitedResultQuery, ISortedResultQuery {}
 
 interface IPagedResultQuery extends ILimitedResultQuery {
-  page: number;
+  page: number
 }
 
 interface ISortedResultQuery {
-  sorting: string | null;
-  order: string | null;
+  sorting: string | null
+  order: string | null
 }
 
 interface ITimeRangedQuery {
-  startDate: string;
-  endDate: string;
+  startDate: string
+  endDate: string
 }
 
 interface IPagedResult<T> extends IListResult<T>, IHasTotalCount {}
@@ -45,4 +43,4 @@ export {
   ISortedResultQuery,
   ITimeRangedQuery,
   IPagedResult,
-};
+}

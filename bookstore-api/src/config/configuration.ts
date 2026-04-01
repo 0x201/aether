@@ -1,30 +1,28 @@
-import { dirname, join, } from 'path';
-import * as yaml from 'js-yaml';
-import { readFileSync } from 'fs';
-import { AppConfig } from './config.interface';
+import { dirname, join } from 'path'
+import * as yaml from 'js-yaml'
+import { readFileSync } from 'fs'
+import { AppConfig } from './config.interface'
 
-const YAML_CONFIG_FILENAME = `${process.env.NODE_ENV}.yaml`;
+const YAML_CONFIG_FILENAME = `${process.env.NODE_ENV}.yaml`
 
 function getRedisSslConfig() {
-  const sslCertDir = process.env.SSL_CERT_DIR;
+  const sslCertDir = process.env.SSL_CERT_DIR
 
   if (!sslCertDir) {
-    throw new Error('SSL_CERT_DIR environment variable is not set');
+    throw new Error('SSL_CERT_DIR environment variable is not set')
   }
-  const sslCertParentPath = dirname(sslCertDir);
-  const certPemPath = join(sslCertParentPath, 'cert.pem');
+  const sslCertParentPath = dirname(sslCertDir)
+  const certPemPath = join(sslCertParentPath, 'cert.pem')
   const sslConfig = {
     ca: certPemPath,
   }
-  return sslConfig;
+  return sslConfig
 }
 
 export default () => {
-  const config = yaml.load(
-    readFileSync(join(__dirname, YAML_CONFIG_FILENAME), "utf8"),
-  ) as AppConfig;
+  const config = yaml.load(readFileSync(join(__dirname, YAML_CONFIG_FILENAME), 'utf8')) as AppConfig
 
-  const sslConfig = getRedisSslConfig();
+  const sslConfig = getRedisSslConfig()
   config.cache = {
     ...config.cache,
     host: process.env.REDIS_HOST,
@@ -33,7 +31,7 @@ export default () => {
     tls: {
       ...config.cache.tls,
       ca: sslConfig.ca,
-    }
+    },
   }
 
   config.database = {
@@ -44,7 +42,7 @@ export default () => {
     password: process.env.BOOKSTOREDB_PASSWORD,
     port: parseInt(process.env.BOOKSTOREDB_PORT),
   }
-  
+
   config.messaging = {
     ...config.messaging,
     host: process.env.EVENTBUS_HOST,
@@ -64,11 +62,12 @@ export default () => {
   config.keycloak = {
     ...config.keycloak,
     realm: process.env.KEYCLOAK_REALM || config.keycloak.realm,
-    authServerUrl: process.env.KEYCLOAK_HTTP || process.env.KEYCLOAK_HTTPS || config.keycloak.authServerUrl,
+    authServerUrl:
+      process.env.KEYCLOAK_HTTP || process.env.KEYCLOAK_HTTPS || config.keycloak.authServerUrl,
     clientId: process.env.KEYCLOAK_CLIENT_ID || config.keycloak.clientId,
     clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || config.keycloak.clientSecret,
     scopes: config.keycloak.scopes,
   }
 
-  return config;
-};
+  return config
+}

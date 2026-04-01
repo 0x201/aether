@@ -1,21 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { CreateBookCommand } from '../books/commands/create-book.command';
-import { BooksService } from '../books/books.service';
-import { AuthorsService } from '../authors/authors.service';
-import { RolesService } from '../roles/roles.service';
-import { MenusService } from '../menus/menus.service';
-import { CreateMenuCommand } from 'src/menus/commands/create-menu.command';
+import { Injectable, Logger } from '@nestjs/common'
+import { CreateBookCommand } from '../books/commands/create-book.command'
+import { BooksService } from '../books/books.service'
+import { AuthorsService } from '../authors/authors.service'
+import { RolesService } from '../roles/roles.service'
+import { MenusService } from '../menus/menus.service'
+import { CreateMenuCommand } from '@/src/menus/commands/create-menu.command'
 
 @Injectable()
 export class DataSeedService {
-  private readonly logger = new Logger(DataSeedService.name);
+  private readonly logger = new Logger(DataSeedService.name)
   private static readonly AUTHORS_TO_SEED = [
     { firstName: 'Stephen', lastName: 'Hawking' },
     { firstName: 'Eric', lastName: 'Matthes' },
     { firstName: 'Alex', lastName: 'Xu' },
     { firstName: 'Nick', lastName: 'Morgan' },
     { firstName: 'Aditya Y', lastName: 'Bhargava' },
-  ];
+  ]
 
   private static readonly BOOKS_TO_SEED: CreateBookCommand[] = [
     {
@@ -47,8 +47,7 @@ export class DataSeedService {
       authors: [{ id: 3, firstName: 'Jane', lastName: 'Doe', isActive: true }],
     },
     {
-      title:
-        'JavaScript Crash Course: A Hands-On, Project-Based Introduction to Programming',
+      title: 'JavaScript Crash Course: A Hands-On, Project-Based Introduction to Programming',
       isbn: '978-1718502260',
       description:
         'A fast-paced, thorough programming introduction that will have you writing your own software and web applications in no time.\\nLike Python Crash Course, this hands-on guide is a must-have for anyone who wants to learn how to code from the ground up—this time using the popular JavaScript programming language.\\nLearn JavaScript—Fast!',
@@ -65,70 +64,70 @@ export class DataSeedService {
       price: 47.49,
       authors: [{ id: 5, firstName: 'J.K.', lastName: 'Rowling', isActive: true }],
     },
-  ];
+  ]
 
   constructor(
     private readonly rolesService: RolesService,
     private readonly booksService: BooksService,
     private readonly authorsService: AuthorsService,
     private readonly menusService: MenusService,
-  ) { }
+  ) {}
 
   private async seedBooksAndAuthors(): Promise<void> {
     try {
       const [authorCount, bookCount] = await Promise.all([
         this.authorsService.count(),
         this.booksService.count(),
-      ]);
+      ])
 
       if (authorCount > 0) {
-        this.logger.log('Author is already setup. Skip seeding');
+        this.logger.log('Author is already setup. Skip seeding')
       } else {
-        this.logger.log('Seeding author data - Start');
-        await this.authorsService.insertMany(DataSeedService.AUTHORS_TO_SEED);
-        this.logger.log('Seeding author data - End');
+        this.logger.log('Seeding author data - Start')
+        await this.authorsService.insertMany(DataSeedService.AUTHORS_TO_SEED)
+        this.logger.log('Seeding author data - End')
       }
 
       if (bookCount > 0) {
-        this.logger.log('Book is already setup, Skip seeding');
+        this.logger.log('Book is already setup, Skip seeding')
       } else {
-        this.logger.log('Seeding book data - Start');
-        await this.booksService.insertMany(DataSeedService.BOOKS_TO_SEED);
-        this.logger.log('Seeding book data - End');
+        this.logger.log('Seeding book data - Start')
+        await this.booksService.insertMany(DataSeedService.BOOKS_TO_SEED)
+        this.logger.log('Seeding book data - End')
       }
     } catch (error) {
-      this.logger.error('Error during seeding:', error);
-      throw error;
+      this.logger.error('Error during seeding:', error)
+      throw error
     }
   }
 
   private async seedRoles() {
-    const roleCount = await this.rolesService.count();
+    const roleCount = await this.rolesService.count()
     if (roleCount > 0) {
-      this.logger.log('Role is already setup, Skip seeding');
+      this.logger.log('Role is already setup, Skip seeding')
     } else {
-      this.logger.log('Seeding role data - Start');
+      this.logger.log('Seeding role data - Start')
       await this.rolesService.insertMany([
         { name: 'admin' },
         { name: 'moderator' },
         { name: 'user' },
-      ]);
-      this.logger.log('Seeding role data - End');
+      ])
+      this.logger.log('Seeding role data - End')
     }
   }
 
   private async seedMenus() {
-    const menuCount = await this.menusService.count();
+    const menuCount = await this.menusService.count()
     if (menuCount > 0) {
-      this.logger.log('Menus are already setup, Skip seeding');
-      return;
+      this.logger.log('Menus are already setup, Skip seeding')
+      return
     }
 
-    this.logger.log('Seeding menu data - Start');
+    this.logger.log('Seeding menu data - Start')
 
-    const roles = await this.rolesService.findAllRoles();
-    const adminRole = roles.find((r) => r.name === 'admin');
-    const userRole = roles.find((r) => r.name === 'user');
+    const roles = await this.rolesService.findAllRoles()
+    const adminRole = roles.find((r) => r.name === 'admin')
+    const userRole = roles.find((r) => r.name === 'user')
 
     const menus: CreateMenuCommand[] = [
       {
@@ -138,7 +137,7 @@ export class DataSeedService {
         route: '/home',
         order: 1,
         parentId: 0,
-        roles: (adminRole && userRole) ? [userRole, adminRole] : [],
+        roles: adminRole && userRole ? [userRole, adminRole] : [],
       },
       {
         name: 'browse_books',
@@ -147,7 +146,7 @@ export class DataSeedService {
         route: '/books',
         order: 2,
         parentId: 0,
-        roles: (adminRole && userRole) ? [userRole, adminRole] : [],
+        roles: adminRole && userRole ? [userRole, adminRole] : [],
       },
       {
         name: 'book_management',
@@ -167,23 +166,23 @@ export class DataSeedService {
         parentId: 0,
         roles: adminRole ? [adminRole] : [],
       },
-    ];
+    ]
 
-    await this.menusService.insertMany(menus);
+    await this.menusService.insertMany(menus)
 
-    this.logger.log('Seeding menu data - End');
+    this.logger.log('Seeding menu data - End')
   }
 
   async seedAsync() {
-    this.logger.log('Starting data seeding...');
+    this.logger.log('Starting data seeding...')
     try {
-      await this.seedBooksAndAuthors();
-      await this.seedRoles();
-      await this.seedMenus();
-      this.logger.log('Data seeding completed successfully.');
+      await this.seedBooksAndAuthors()
+      await this.seedRoles()
+      await this.seedMenus()
+      this.logger.log('Data seeding completed successfully.')
     } catch (error) {
-      this.logger.error('Error during data seeding:', error);
-      throw error;
+      this.logger.error('Error during data seeding:', error)
+      throw error
     }
   }
 }

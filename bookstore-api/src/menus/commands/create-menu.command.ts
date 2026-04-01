@@ -1,19 +1,19 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { RoleDto } from "src/roles/dtos/role.dto";
+import { ApiProperty } from '@nestjs/swagger'
+import { RoleDto } from '@/src/roles/dtos/role.dto'
 
 export class CreateMenuCommand {
   @ApiProperty()
-  name: string;
+  name: string
   @ApiProperty()
-  title: string;
+  title: string
   @ApiProperty()
-  icon: string;
+  icon: string
   @ApiProperty()
-  route: string;
+  route: string
   @ApiProperty()
-  order: number;
+  order: number
   @ApiProperty()
-  parentId: number;
+  parentId: number
   @ApiProperty()
-  roles: RoleDto[];
+  roles: RoleDto[]
 }

@@ -1,19 +1,19 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AuthorDto } from 'src/authors/dtos/author.dto';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { AuthorDto } from '@/src/authors/dtos/author.dto'
 
 export class CreateBookCommand {
   @ApiProperty()
-  title: string;
+  title: string
   @ApiProperty()
-  isbn: string;
+  isbn: string
   @ApiProperty()
-  description: string;
+  description: string
   @ApiProperty()
-  publishDate: string;
+  publishDate: string
   @ApiProperty()
-  price: number;
+  price: number
   @ApiProperty()
-  authors: AuthorDto[];
+  authors: AuthorDto[]
   @ApiPropertyOptional()
-  isActive?: boolean;
+  isActive?: boolean
 }
