@@ -21,14 +21,19 @@ router = APIRouter(route_class=TimedRoute)
 @inject
 async def trigger_nppa_crawler(
     crawler: NPPAGameAuditCrawlerDep,
-    mode: int = Body(0, description="0 for incremental data, 1 for full data", embed=True)
+    mode: int = Body(
+        0, description="0 for incremental data, 1 for full data", embed=True
+    ),
 ):
     """
     Manually trigger the NPPA crawler to run immediately
     """
     try:
         await crawler.run(mode=mode)
-        return {"message": f"NPPA crawler executed successfully with mode {mode}", "success": True}
+        return {
+            "message": f"NPPA crawler executed successfully with mode {mode}",
+            "success": True,
+        }
     except Exception as e:
         return {"message": f"Error executing NPPA crawler: {str(e)}", "success": False}
 

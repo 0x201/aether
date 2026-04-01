@@ -18,7 +18,7 @@ class ScheduledNPPACrawler:
         # Schedule daily NPPA crawler to run at 00:10 every day
         self.scheduler.add_job(
             self._execute_daily_check,
-            CronTrigger(hour=0, minute=2),
+            CronTrigger(hour=0, minute=10),
             id="nppa_daily_check",
             name="NPPA daily check",
             replace_existing=True,
