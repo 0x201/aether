@@ -42,7 +42,7 @@ const DanmakuChart = <T,>({
               <YAxis />
               <Tooltip
                 contentStyle={{
-                  background: "#3e3d3d",
+                  background: '#3e3d3d',
                 }}
               />
               <Legend verticalAlign="top" layout="horizontal" />

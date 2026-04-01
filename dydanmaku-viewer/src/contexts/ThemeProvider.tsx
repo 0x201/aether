@@ -3,7 +3,6 @@ import { ConfigProvider } from 'antd'
 import { lightTheme, darkTheme, type ThemeMode, getSystemTheme } from '@/src/themes'
 import { ThemeContext, type ThemeContextType } from './useTheme'
 
-
 const THEME_STORAGE_KEY = 'dydanmaku-viewer-theme-mode'
 const THEME_MODES: ThemeMode[] = ['light', 'dark', 'auto']
 
@@ -12,6 +11,7 @@ const getStoredThemeMode = (): ThemeMode => {
     const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode
     return storedTheme && THEME_MODES.includes(storedTheme) ? storedTheme : 'auto'
   } catch {
+    console.warn('Error reading theme mode from local storage. Defaulting to auto.')
     return 'auto'
   }
 }
