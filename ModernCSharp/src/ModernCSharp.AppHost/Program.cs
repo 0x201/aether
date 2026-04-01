@@ -102,6 +102,14 @@ builder.AddJavaScriptApp("danmakuviewer", @"../../../dydanmaku-viewer")
     .WithReference(dydanmakuApi)
     .WithExternalHttpEndpoints();
 
+
+var monitorApi = builder.AddGolangApp(
+    name: "monitor-api",
+    workingDirectory: @"../../../monitor-api")
+    .WithHttpEndpoint(port: 3000, env: "PORT");
+
+monitorApi.WithUrl($"{monitorApi.GetEndpoint("http")}/scalar", "Monitor API Docs");
+
 if (OperatingSystem.IsWindows())
 {
     builder.AddProject<Projects.WinFormsApp>("winformsclient")
