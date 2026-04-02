@@ -110,6 +110,13 @@ var goApi = builder.AddGolangApp(
 
 goApi.WithUrl($"{goApi.GetEndpoint("http")}/scalar", "Go API Docs");
 
+var rustApi = builder.AddRustApp(
+    name: "rust-api",
+    workingDirectory: @"../../../rust-api")
+    .WithHttpEndpoint(port: 3001, env: "PORT");
+
+rustApi.WithUrl($"{rustApi.GetEndpoint("http")}/scalar", "Rust API Docs");
+
 if (OperatingSystem.IsWindows())
 {
     builder.AddProject<Projects.WinFormsApp>("winformsclient")

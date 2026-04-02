@@ -25,6 +25,7 @@
     <!--OpenTelemetry-->
     <PackageVersion Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.2.1" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Golang" Version="13.2.1-beta.532" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Rust" Version="13.2.1-beta.532" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />

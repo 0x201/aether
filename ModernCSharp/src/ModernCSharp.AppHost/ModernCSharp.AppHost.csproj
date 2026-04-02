@@ -28,5 +28,6 @@
     <PackageReference Include="Aspire.Hosting.Python" />
     <PackageReference Include="Aspire.Hosting.JavaScript" />
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.Golang" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Rust" />
   </ItemGroup>
 </Project>
