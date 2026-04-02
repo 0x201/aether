@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "monitor-api/docs"
+	_ "go-api/docs"
 	"os"
 
 	"github.com/gofiber/fiber/v3"
