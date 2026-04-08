@@ -19,10 +19,6 @@ export const lightTheme: ThemeConfig = {
       footerBg: '#f5f5f5',
       siderBg: '#ffffff',
     },
-    Card: {
-      borderRadiusLG: 12,
-      paddingLG: 24,
-    },
     Table: {
       cellPaddingBlockSM: 12,
       cellPaddingInlineSM: 8,
