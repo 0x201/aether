@@ -11,7 +11,7 @@ import {
 import './HomeView.css'
 
 const { Title, Paragraph } = Typography
-
+const { Meta } = Card
 const HomeView: React.FC = () => {
   const features = [
     {
@@ -78,7 +78,7 @@ const HomeView: React.FC = () => {
     <div className="homeview-container">
       <div className="app-hero-bg" />
 
-      <Card className="glass-card homeview-header-card">
+      <Card className="homeview-header-card">
         <Row align="middle" gutter={[24, 24]}>
           <Col xs={24} md={14}>
             <Title level={1} className="homeview-title">
@@ -102,14 +102,8 @@ const HomeView: React.FC = () => {
             <Row gutter={[12, 12]}>
               {features.map((item, index) => (
                 <Col xs={12} key={index}>
-                  <Card hoverable variant="borderless" className="glass-card feature-card">
-                    <div className="feature-card-container">
-                      <div className="feature-icon">{item.icon}</div>
-                      <div>
-                        <div className="feature-title">{item.title}</div>
-                        <div className="feature-description">{item.description}</div>
-                      </div>
-                    </div>
+                  <Card hoverable variant="borderless">
+                    <Meta avatar={item.icon} title={item.title} description={item.description} />
                   </Card>
                 </Col>
               ))}
@@ -118,7 +112,7 @@ const HomeView: React.FC = () => {
         </Row>
       </Card>
 
-      <Card className="glass-card homeview-content-card">
+      <Card className="homeview-content-card">
         <Divider orientation="horizontal">系统能力</Divider>
         <div className="project-capabilities">
           {projectCapabilities.map((item, index) => (

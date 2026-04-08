@@ -58,31 +58,6 @@
   margin-top: 12px;
 }
 
-.feature-card-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.feature-icon {
-  font-size: 22px;
-  color: var(--accent);
-}
-
-.feature-title {
-  font-weight: 600;
-}
-
-.feature-description {
-  font-size: 12px;
-  word-break: break-word;
-  white-space: pre-line;
-}
-
-.feature-card {
-  padding: 12px;
-}
-
 .tech-stack-item {
   display: flex;
   align-items: center;
