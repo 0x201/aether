@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react'
-import './DanmakuDisplay.style.css'
+import './DanmakuDisplay.css'
 import type { DanmakuDisplayProps } from './type'
 
 const DanmakuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProps) => {
