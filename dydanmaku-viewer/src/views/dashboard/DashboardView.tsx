@@ -10,6 +10,7 @@ import type { Dayjs } from 'dayjs'
 import { DanmakuChart, type TransformedDataItem } from '@/src/components/DanmakuChart'
 
 const { Title } = Typography
+const { Meta } = Card
 const { RangePicker } = DatePicker
 
 const Dashboard: React.FC = () => {
@@ -130,7 +131,7 @@ const Dashboard: React.FC = () => {
           data={stats?.hourlyDistributions || []}
           transformFunction={transformHourlyData}
           title="弹幕时段分布图"
-          color="var(--chart-color-hourly)"
+          color="var(--total-count-color)"
           loading={loading}
           angle={0}
         />
@@ -141,7 +142,7 @@ const Dashboard: React.FC = () => {
           data={stats?.topUsers || []}
           transformFunction={transformUserData}
           title="Top 20 用户弹幕数"
-          color="var(--chart-color-users)"
+          color="var(--unique-users-color)"
           loading={loading}
           angle={-45}
         />
@@ -152,7 +153,7 @@ const Dashboard: React.FC = () => {
           data={stats?.topRooms || []}
           transformFunction={transformRoomData}
           title="Top 20 房间弹幕数"
-          color="var(--chart-color-rooms)"
+          color="var(--top-users-color)"
           loading={loading}
           angle={-45}
         />
@@ -163,7 +164,7 @@ const Dashboard: React.FC = () => {
           data={wordFreqs?.slice(0, 20) || []}
           transformFunction={transformWordFreqData}
           title="词频统计Top20"
-          color="var(--chart-color-word-freq)"
+          color="var(--top-rooms-color)"
           loading={loading}
           angle={-45}
         />
@@ -188,46 +189,46 @@ const Dashboard: React.FC = () => {
         {/* Stats Cards */}
         <Col xs={24} sm={24} md={12} lg={6} xl={6}>
           <Card className="stat-card-total-count">
-            <div className="statistic-total-count">
-              <Statistic title="弹幕总数" value={stats?.totalCount} />
-            </div>
+            <Meta title="弹幕总数" description={<Statistic value={stats?.totalCount} />} />
           </Card>
         </Col>
         <Col xs={24} sm={24} md={12} lg={6} xl={6}>
           <Card className="stat-card-unique-users">
-            <div className="statistic-unique-users">
-              <Statistic title="用户数" value={stats?.uniqueUsers} />
-            </div>
+            <Meta title="用户数" description={<Statistic value={stats?.uniqueUsers} />} />
           </Card>
         </Col>
         <Col xs={24} sm={24} md={12} lg={6} xl={6}>
           <Card className="stat-card-top-users">
-            <div className="statistic-top-users">
-              <Statistic
-                title="最活跃用户"
-                value={stats?.topUsers.length ? stats.topUsers[0].count : 'N/A'}
-                prefix={
-                  stats?.topUsers.length && stats.topUsers[0].userName
-                    ? `@${stats.topUsers[0].userName}`
-                    : 'N/A'
-                }
-              />
-            </div>
+            <Meta
+              title="最活跃用户"
+              description={
+                <Statistic
+                  value={stats?.topUsers.length ? stats.topUsers[0].count : 'N/A'}
+                  prefix={
+                    stats?.topUsers.length && stats.topUsers[0].userName
+                      ? `@${stats.topUsers[0].userName}`
+                      : 'N/A'
+                  }
+                />
+              }
+            />
           </Card>
         </Col>
         <Col xs={24} sm={24} md={12} lg={6} xl={6}>
           <Card className="stat-card-top-rooms">
-            <div className="statistic-top-rooms">
-              <Statistic
-                title="最活跃直播间"
-                value={stats?.topRooms.length ? stats.topRooms[0].count : 'N/A'}
-                prefix={
-                  stats?.topRooms.length && stats.topRooms[0].roomName
-                    ? `@${stats.topRooms[0].roomName}`
-                    : 'N/A'
-                }
-              />
-            </div>
+            <Meta
+              title="最活跃直播间"
+              description={
+                <Statistic
+                  value={stats?.topRooms.length ? stats.topRooms[0].count : 'N/A'}
+                  prefix={
+                    stats?.topRooms.length && stats.topRooms[0].roomName
+                      ? `@${stats.topRooms[0].roomName}`
+                      : 'N/A'
+                  }
+                />
+              }
+            />
           </Card>
         </Col>
       </>
