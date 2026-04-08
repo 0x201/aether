@@ -12,6 +12,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { DanmakuChartProps } from './type'
+import { useTheme } from '@/src/contexts/useTheme'
 
 const DanmakuChart = <T,>({
   data,
@@ -22,6 +23,8 @@ const DanmakuChart = <T,>({
   angle = 0,
 }: DanmakuChartProps<T>) => {
   const transformedData = useMemo(() => transformFunction(data || []), [data, transformFunction])
+  const theme = useTheme()
+  const bgColor = theme.currentTheme === 'dark' ? '#3e3d3d' : '#fff'
 
   return (
     <Card title={title} style={{ height: '100%' }}>
@@ -40,11 +43,7 @@ const DanmakuChart = <T,>({
                 tick={{ fontSize: 12 }}
               />
               <YAxis />
-              <Tooltip
-                contentStyle={{
-                  background: '#3e3d3d',
-                }}
-              />
+              <Tooltip contentStyle={{ background: bgColor }} />
               <Legend verticalAlign="top" layout="horizontal" />
               <Bar dataKey="value" name="弹幕数量" fill={color} />
             </BarChart>
