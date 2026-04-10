@@ -1,44 +1,6 @@
-.project-capabilities {
-  display: flex;
-  flex-wrap: wrap;
-  flex-flow: column;
-  gap: 12px;
-  font-size: 12px;
-  margin-bottom: 24px;
-}
-
-.project-capabilities > div {
-  padding: 10px;
-  border-radius: 8px;
-  flex: 1 1 auto;
-  min-width: 250px;
-}
-
-.capability-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.capability-tag {
-  margin-right: 8px;
-}
-
-.instructions {
-  font-size: 12px;
-}
-
-.instructions > div {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
 .homeview-header-card {
   padding: 24px;
-  margin-bottom: 18px;
+  margin: 2rem 0;
 }
 
 .homeview-content-card {
@@ -66,4 +28,28 @@
 
 .tech-stack-icon {
   margin-right: 8px;
+}
+
+.ant-card-meta-avatar {
+  text-align: center;
+}
+
+.custom-icon {
+  font-size: 24px;
+  color: #1890ff;
+}
+
+.feature-icon {
+  font-size: 28px;
+  color: #52c41a;
+}
+
+.tech-icon {
+  font-size: 26px;
+  color: #722ed1;
+}
+
+.capability-icon {
+  font-size: 24px;
+  color: #fa8c16;
 }
