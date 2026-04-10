@@ -16,15 +16,6 @@ const configPath = {
 const configFile = readFileSync(configPath.path, 'utf8')
 const config = load(configFile) as AppConfig
 
-config.database = {
-  ...config.database,
-  host: process.env.BOOKSTOREDB_HOST,
-  database: process.env.BOOKSTOREDB_DATABASE,
-  username: process.env.BOOKSTOREDB_USERNAME,
-  password: process.env.BOOKSTOREDB_PASSWORD,
-  port: parseInt(process.env.BOOKSTOREDB_PORT),
-}
-
 const dataSource = new DataSource({
   type: 'postgres',
   host: config.database.host,

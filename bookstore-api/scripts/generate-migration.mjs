@@ -8,7 +8,7 @@ if (!migrationName) {
   process.exit(1)
 }
 
-const migrationDir = '@/src/database/migrations'
+const migrationDir = './src/database/migrations'
 if (!existsSync(migrationDir)) {
   mkdirSync(migrationDir, { recursive: true })
   console.log(`Created directory: ${migrationDir}`)
