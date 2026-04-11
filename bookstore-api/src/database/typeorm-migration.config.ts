@@ -2,31 +2,55 @@ import { load } from 'js-yaml'
 import { DataSource } from 'typeorm'
 import { AppConfig } from '../config/config.interface'
 import { resolve } from 'path'
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 
-const configPath = {
-  path: resolve(
-    __dirname,
-    process.env.NODE_ENV !== 'Production'
-      ? '../../config/development.yaml'
-      : '../../config/production.yaml',
-  ),
+const getEnvironment = (): string => {
+  return process.env.NODE_ENV || process.env.TYPEORM_ENV || process.env.APP_ENV || 'local'
 }
 
-const configFile = readFileSync(configPath.path, 'utf8')
-const config = load(configFile) as AppConfig
+const getEnvFilePath = (): string => {
+  const env = getEnvironment()
+
+  const possiblePaths = [
+    resolve(__dirname, `../../src/config/${env.toLowerCase()}.yaml`),
+    resolve(__dirname, `../../src/config/local.yaml`), // fallback to local
+  ]
+
+  for (const path of possiblePaths) {
+    if (readFileSync && existsSync(path)) {
+      return path
+    }
+  }
+
+  return resolve(__dirname, '../../src/config/local.yaml')
+}
+
+let config: AppConfig
+
+try {
+  const configPath = {
+    path: getEnvFilePath(),
+  }
+
+  const configFile = readFileSync(configPath.path, 'utf8')
+  config = load(configFile) as AppConfig
+} catch (error) {
+  console.error(`Warning: Could not load config file. Using default values. Error: ${error}`)
+  throw error
+}
 
 const dataSource = new DataSource({
   type: 'postgres',
   host: config.database.host,
-  port: config.database.port ?? 1433,
+  port: config.database.port ?? 5432,
   username: config.database.username,
   password: config.database.password,
   database: config.database.database,
   logging: config.database.logging,
-  entities: ['@/src/**/*.entity{.ts,.js}'],
-  migrations: ['@/src/database/migrations/*{.ts,.js}'],
+  entities: ['/**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   synchronize: config.database.synchronize,
   schema: config.database.schema,
 })
+
 export default dataSource

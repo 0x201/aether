@@ -16,8 +16,6 @@ if (!existsSync(migrationDir)) {
 
 try {
   const command = `typeorm-ts-node-commonjs migration:generate -d ./src/database/typeorm-migration.config.ts ./src/database/migrations/${migrationName}`
-  console.log(`Executing: ${command}`)
-
   execSync(command, { stdio: 'inherit' })
   console.log(`Migration "${migrationName}" generated successfully!`)
 } catch (error) {
