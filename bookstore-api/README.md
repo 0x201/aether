@@ -4,21 +4,30 @@ A modern bookstore API built with NestJS, TypeScript, and TypeORM. This API prov
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Database Setup](#database-setup)
-  - [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
-- [Authentication](#authentication)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [License](#license)
+- [Bookstore API](#bookstore-api)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Features](#features)
+  - [Technology Stack](#technology-stack)
+  - [Architecture](#architecture)
+  - [Project Structure](#project-structure)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Database Setup](#database-setup)
+    - [Running the Application](#running-the-application)
+  - [API Endpoints](#api-endpoints)
+    - [Authentication](#authentication)
+    - [Books](#books)
+    - [Authors](#authors)
+    - [Users](#users)
+    - [Roles](#roles)
+  - [Authentication](#authentication-1)
+  - [Testing](#testing)
+  - [Deployment](#deployment)
+    - [Docker](#docker)
+    - [Production Deployment](#production-deployment)
+  - [License](#license)
 
 ## Overview
 
@@ -134,7 +143,7 @@ src/
 
 ```bash
 # Navigate to the bookstore-api directory
-cd src/bookstore-api
+cd bookstore-api
 
 # Install dependencies
 pnpm install
@@ -142,12 +151,37 @@ pnpm install
 
 ### Database Setup
 
+> Note: Update the database configs in yaml file (e.g. `local.yaml`) before migrating the database.
+
 ```bash
 # Run database migrations
-pnpm typeorm migration:run -- -d src/database/typeorm-migration.config.ts
+TYPEORM_ENV=local pnpm run migration:run
+```
 
-# Seed initial data (optional)
-pnpm seed
+New migrations can be generated using the following command:
+
+Bash
+
+```bash
+TYPEORM_ENV=local pnpm run migration:generate -- <migration-name>
+```
+
+PowerShell
+
+```powershell
+$env:TYPEORM_ENV="local"; pnpm run migration:generate -- <migration-name>
+```
+
+Apply migrations:
+
+```bash
+pnpm run migration:run
+```
+
+Revert migrations:
+
+```bash
+pnpm run migration:revert
 ```
 
 ### Running the Application
