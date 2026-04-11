@@ -166,7 +166,7 @@ React-based frontend application for danmaku management and visualization.
 - OpenAPI/Swagger
 
 ### Frontend
-- Angular 20
+- Angular 21
 - React (with Vite)
 - TypeScript
 - AntDesign
