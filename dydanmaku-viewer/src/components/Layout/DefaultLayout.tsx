@@ -32,7 +32,7 @@ const DefaultLayout: React.FC = () => {
         </div>
       </Header>
 
-      <Layout style={{ marginTop: 12 }}>
+      <Layout>
         <Sider
           collapsed={collapsed}
           collapsible
