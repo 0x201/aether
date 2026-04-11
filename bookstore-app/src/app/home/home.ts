@@ -6,7 +6,6 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BooksService } from "../services/books.service";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
-import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: "app-home",
@@ -23,9 +22,9 @@ import { AsyncPipe } from "@angular/common";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements OnInit {
+export class Home implements OnInit {
   booksService = inject(BooksService);
-  constructor(private router: Router) {}
+  router = inject(Router);
 
   ngOnInit(): void {
     this.loadRandomBooks();

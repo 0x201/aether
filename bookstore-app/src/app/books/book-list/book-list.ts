@@ -26,9 +26,9 @@ import { BooksService } from "../../services/books.service";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookListComponent implements OnInit {
+export class BookList implements OnInit {
   booksService = inject(BooksService);
-  constructor(private router: Router) {}
+  router = inject(Router);
 
   ngOnInit(): void {
     this.loadBooks();

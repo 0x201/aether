@@ -5,8 +5,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { BooksService } from "../../services/books.service";
-import { AsyncPipe } from "@angular/common";
+import { BooksService } from "@/app/services/books.service";
 
 @Component({
   selector: "app-book-detail",
@@ -23,14 +22,11 @@ import { AsyncPipe } from "@angular/common";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookDetailComponent implements OnInit {
+export class BookDetail implements OnInit {
   booksService = inject(BooksService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   bookId: number | null = null;
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {}
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get("id");

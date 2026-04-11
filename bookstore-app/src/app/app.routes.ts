@@ -1,21 +1,21 @@
-import { Routes } from '@angular/router';
-import { canActivateAuthRole } from './services/auth/auth.guard';
-import { BooksRoutes } from './books/books.route';
-import { UsersRoutes } from './users/users.route';
-import { MenusRoutes } from './menus/menus.route';
+import { Routes } from "@angular/router";
+import { canActivateAuthRole } from "@/app/services/auth/auth.guard";
+import { BooksRoutes } from "@/app/books/books.route";
+import { UsersRoutes } from "@/app/users/users.route";
+import { MenusRoutes } from "@/app/menus/menus.route";
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: '/home',
-    pathMatch: 'full'
+    path: "",
+    redirectTo: "/home",
+    pathMatch: "full",
   },
   ...BooksRoutes,
   ...UsersRoutes,
   ...MenusRoutes,
   {
-    path: 'home',
-    loadComponent: () => import('./home/home').then(mod => mod.HomeComponent),
-    canActivate: [canActivateAuthRole]
+    path: "home",
+    loadComponent: () => import("./home/home").then((mod) => mod.Home),
+    canActivate: [canActivateAuthRole],
   },
 ];

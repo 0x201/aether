@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatIconModule } from '@angular/material/icon';
-import { Book } from '../../models/book.model';
-import { MatSelectModule } from '@angular/material/select';
-import { Author } from '../../models/author.model';
+import { ChangeDetectionStrategy, Component, inject, Inject, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatButtonModule } from "@angular/material/button";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatNativeDateModule } from "@angular/material/core";
+import { MatIconModule } from "@angular/material/icon";
+import { Book } from "../../models/book.model";
+import { MatSelectModule } from "@angular/material/select";
+import { Author } from "../../models/author.model";
 
 export interface BookFormDialogData {
   book: Book | null;
@@ -17,9 +17,9 @@ export interface BookFormDialogData {
 }
 
 @Component({
-  selector: 'app-book-dialog',
-  templateUrl: './book-dialog.html',
-  styleUrl: './book-dialog.scss',
+  selector: "app-book-dialog",
+  templateUrl: "./book-dialog.html",
+  styleUrl: "./book-dialog.scss",
   standalone: true,
   imports: [
     MatDialogModule,
@@ -30,9 +30,9 @@ export interface BookFormDialogData {
     MatNativeDateModule,
     ReactiveFormsModule,
     MatSelectModule,
-    MatIconModule
+    MatIconModule,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDialogComponent implements OnInit {
   bookForm: FormGroup;
@@ -46,13 +46,13 @@ export class BookDialogComponent implements OnInit {
     }
 
     this.bookForm = this.fb.group({
-      title: ['', Validators.required],
-      isbn: ['', Validators.required],
+      title: ["", Validators.required],
+      isbn: ["", Validators.required],
       price: [0, [Validators.required, Validators.min(0.01)]],
-      publishDate: [''],
-      description: [''],
+      publishDate: [""],
+      description: [""],
       isActive: [true],
-      authors: [[], Validators.required]
+      authors: [[], Validators.required],
     });
   }
 
@@ -60,9 +60,8 @@ export class BookDialogComponent implements OnInit {
     const generalAuthors = this.data.authors || [];
     if (this.data.book?.authors) {
       const authorMap = new Map<number, Author>();
-      console.log("data:", this.data);
-      generalAuthors.forEach(author => authorMap.set(author.id, author));
-      this.data.book.authors.forEach(author => authorMap.set(author.id, author));
+      generalAuthors.forEach((author) => authorMap.set(author.id, author));
+      this.data.book.authors.forEach((author) => authorMap.set(author.id, author));
 
       this.allAuthors = Array.from(authorMap.values());
     } else {
@@ -78,7 +77,7 @@ export class BookDialogComponent implements OnInit {
         publishDate: book.publishDate,
         description: book.description,
         isActive: this.data.book.isActive !== undefined ? this.data.book.isActive : true,
-        authors: this.data.book.authors
+        authors: this.data.book.authors,
       });
     }
   }
