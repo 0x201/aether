@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Aether.Ordering.Infrastructure</RootNamespace>
+		<AssemblyName>Aether.Ordering.Infrastructure</AssemblyName>
+		<Platforms>AnyCPU;x64;x86</Platforms>
+	  <UserSecretsId>844448f4-5960-437e-afe0-f184fde5ec67</UserSecretsId>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
+		<ProjectReference Include="..\IntegrationEventLogEF\IntegrationEventLogEF.csproj" />
+		<ProjectReference Include="..\Aether.Shared\Aether.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="CsvHelper" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+	<PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	  <Folder Include="Services\" />
+	</ItemGroup>
+
+</Project>

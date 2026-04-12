@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <RootNamespace>DyDanmaku.API</RootNamespace>
+    <UserSecretsId>264aac5e-683b-4469-b310-347d57e94c53</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\ActivityExtensions.cs" Link="Extensions\ActivityExtensions.cs" />
+    <Compile Include="..\Shared\MigrateDbContextExtensions.cs" Link="Extensions\MigrateDbContextExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="System.Linq.Dynamic.Core" />
+    <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" />
+    <PackageReference Include="ZLogger" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DyDanmaku.Domain\DyDanmaku.Domain.csproj" />
+    <ProjectReference Include="..\DyDanmaku.Infrastructure\DyDanmaku.Infrastructure.csproj" />
+    <ProjectReference Include="..\Aether.AppDefaults\Aether.AppDefaults.csproj" />
+    <ProjectReference Include="..\Aether.ServiceDefaults\Aether.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Aether.Shared\Aether.Shared.csproj" />
+    <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
+    <ProjectReference Include="..\IntegrationEventLogEF\IntegrationEventLogEF.csproj" />
+  </ItemGroup>
+
+</Project>

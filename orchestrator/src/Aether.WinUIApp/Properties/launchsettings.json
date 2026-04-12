@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "Aether.WinUIApp (Unpackaged)": {
+        "commandName": "Project"
+      },
+      "Aether.WinUIApp (Package)": {
+        "commandName": "MsixPackage"
+      }
+    }
+}

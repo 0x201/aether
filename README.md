@@ -1,10 +1,10 @@
-# ModernCSharp
+# Aether
 
-ModernCSharp is a comprehensive solution showcasing modern C# development practices with a focus on .NET, ASP.NET Core, and various client technologies. This project demonstrates microservices architecture, event-driven systems, desktop applications, and modern web development techniques.
+Aether is a comprehensive solution showcasing modern C# development practices with a focus on .NET, ASP.NET Core, and various client technologies. This project demonstrates microservices architecture, event-driven systems, desktop applications, and modern web development techniques.
 
 ## Table of Contents
 
-- [ModernCSharp](#moderncsharp)
+- [Aether](#aether)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Architecture](#architecture)
@@ -14,14 +14,14 @@ ModernCSharp is a comprehensive solution showcasing modern C# development practi
       - [EventBus / EventBusRabbitMQ](#eventbus--eventbusrabbitmq)
       - [OrderProcessor](#orderprocessor)
     - [Desktop Applications](#desktop-applications)
-      - [ModernCSharp.WPFApp](#moderncsharpwpfapp)
-      - [ModernCSharp.WinUIApp](#moderncsharpwinuiapp)
+      - [Aether.WPFApp](#aetherwpfapp)
+      - [Aether.WinUIApp](#aetherwinuiapp)
       - [WinFormsApp](#winformsapp)
     - [Web Applications](#web-applications)
       - [Angular App (bookstore-app)](#angular-app-bookstore-app)
       - [React/Vue Applications](#reactvue-applications)
     - [Infrastructure](#infrastructure)
-      - [ModernCSharp.AppHost](#moderncsharpapphost)
+      - [Aether.AppHost](#aetherapphost)
       - [IntegrationEventLogEF](#integrationeventlogef)
       - [Shared Libraries](#shared-libraries)
     - [DyDanmaku System](#dydanmaku-system)
@@ -44,7 +44,7 @@ ModernCSharp is a comprehensive solution showcasing modern C# development practi
 
 ## Overview
 
-ModernCSharp is a multi-module solution that demonstrates various modern software development practices using C# and .NET technologies. The project includes microservices, desktop applications (WPF, WinUI, WinForms), web applications (Angular, React, Vue), and supporting infrastructure components.
+Aether is a multi-module solution that demonstrates various modern software development practices using C# and .NET technologies. The project includes microservices, desktop applications (WPF, WinUI, WinForms), web applications (Angular, React, Vue), and supporting infrastructure components.
 
 The solution showcases:
 - Microservices architecture with .NET
@@ -107,10 +107,10 @@ Background service for processing orders and handling related events.
 
 ### Desktop Applications
 
-#### ModernCSharp.WPFApp
+#### Aether.WPFApp
 Modern WPF application demonstrating MVVM pattern and best practices.
 
-#### ModernCSharp.WinUIApp
+#### Aether.WinUIApp
 WinUI 3 application showcasing modern Windows desktop development.
 
 #### WinFormsApp
@@ -126,7 +126,7 @@ Modern frontend applications using React and Vue with Vite tooling.
 
 ### Infrastructure
 
-#### ModernCSharp.AppHost
+#### Aether.AppHost
 Orchestration layer for managing multiple services.
 
 #### IntegrationEventLogEF
@@ -199,7 +199,7 @@ React-based frontend application for danmaku management and visualization.
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd ModernCSharp
+cd Aether
 
 # Restore NuGet packages
 dotnet restore
@@ -215,7 +215,7 @@ dotnet build
 dotnet run --project src/Catalog.API
 
 # Run with AppHost (if configured)
-dotnet run --project src/ModernCSharp.AppHost
+dotnet run --project src/Aether.AppHost
 ```
 
 ### Running Frontend Applications
@@ -235,7 +235,7 @@ pnpm run dev
 ## Project Structure
 
 ```
-ModernCSharp/
+Aether/
 ├── src/
 │   ├── Ordering.API/             # Order processing microservice
 │   │   ├── Ordering.Application/ # Application logic and CQRS
@@ -244,9 +244,9 @@ ModernCSharp/
 │   ├── Identity.API/             # Authentication service
 │   ├── EventBus/                 # Event bus abstraction
 │   ├── EventBusRabbitMQ/         # RabbitMQ implementation
-│   ├── ModernCSharp.AppHost/     # Service orchestration
-│   ├── ModernCSharp.WPFApp/      # WPF desktop application
-│   ├── ModernCSharp.WinUIApp/    # WinUI desktop application
+│   ├── Aether.AppHost/     # Service orchestration
+│   ├── Aether.WPFApp/      # WPF desktop application
+│   ├── Aether.WinUIApp/    # WinUI desktop application
 │   ├── bookstore-app/            # Angular frontend application
 │   └── ...                       # Additional services and applications
 ├── test/

@@ -1,0 +1,118 @@
+<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <AspireVersion>13.1.3</AspireVersion>
+    <AspnetVersion>10.0.5</AspnetVersion>
+    <ApiVersioningVersion>8.1.1</ApiVersioningVersion>
+    <MSTestVersion>4.1.0</MSTestVersion>
+    <FluentUIVersion>4.14.0</FluentUIVersion>
+    <CommunityToolkitWinUIVersion>8.2.251219</CommunityToolkitWinUIVersion>
+    <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--Aspire-->
+    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.2.2-preview.1.26207.2" />
+    <PackageVersion Include="Aspire.Hosting.Docker" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Hosting.Python" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Hosting.Redis" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.2.2" />
+    <PackageVersion Include="Aspire.RabbitMQ.Client" Version="13.2.2" />
+    <!--OpenTelemetry-->
+    <PackageVersion Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.2.2" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Golang" Version="13.2.1-beta.532" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Rust" Version="13.2.1-beta.532" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
+    <!--AspNetCore-->
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.3.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
+    <PackageVersion Include="Azure.Identity" Version="1.13.2" />
+    <!-- Version together with Asp.Versioning -->
+    <PackageVersion Include="Asp.Versioning.Http" Version="$(ApiVersioningVersion)" />
+    <!--<PackageVersion Include="Asp.Versioning.Http.Client" Version="$(ApiVersioningVersion)" />-->
+    <PackageVersion Include="Asp.Versioning.Http.Client" Version="8.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="$(ApiVersioningVersion)" />
+    <!--Microsoft.Extensions.*-->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.2.0" />
+    <!--FluentUI-->
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="$(FluentUIVersion)" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="$(FluentUIVersion)" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="$(FluentUIVersion)" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="$(FluentUIVersion)" />
+    <!--CommunityToolkit-->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <!--EntityFramework & Data-->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <!--Testing-->
+    <PackageVersion Include="coverlet.collector" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageVersion Include="MSTest" Version="$(MSTestVersion)" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
+    <PackageVersion Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
+    <!--WPF-->
+    <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
+    <!--WinUI-->
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
+    <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
+    <PackageVersion Include="WinUIEx" Version="2.9.0" />
+    <!--CommunityToolkit.WinUI-->
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Behaviors" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Helpers" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="$(CommunityToolkitWinUIVersion)" />
+    <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
+    <!--Miscellaneous-->
+    <PackageVersion Include="AutoMapper" Version="15.0.1" />
+    <PackageVersion Include="ClosedXML" Version="0.105.0" />
+    <PackageVersion Include="CsvHelper" Version="33.1.0" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.2" />
+    <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageVersion Include="MediatR" Version="14.0.0" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="Polly.Core" Version="8.6.4" />
+    <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.13.13" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.1" />
+    <PackageVersion Include="ZLogger" Version="2.5.10" />
+  </ItemGroup>
+</Project>

@@ -1,5 +1,5 @@
 {
   "appHost": {
-    "path": "ModernCSharp/src/ModernCSharp.AppHost/ModernCSharp.AppHost.csproj"
+    "path": "orchestrator/src/Aether.AppHost/Aether.AppHost.csproj"
   }
 }

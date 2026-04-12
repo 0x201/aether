@@ -8,7 +8,7 @@
             "name": "AppHost Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/ModernCSharp/src/ModernCSharp.AppHost/ModernCSharp.AppHost.csproj"
+            "projectPath": "${workspaceFolder}/Aether/src/Aether.AppHost/Aether.AppHost.csproj"
         }
 
     ]

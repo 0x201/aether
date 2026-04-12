@@ -1,0 +1,33 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.2.2">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>7b535cd2-6e8e-458d-88f7-279fe1570184</UserSecretsId>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DyDanmaku.API\DyDanmaku.API.csproj" />
+    <ProjectReference Include="..\Aether.WPFApp\Aether.WPFApp.csproj" />
+    <ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />
+    <ProjectReference Include="..\OrderProcessor\OrderProcessor.csproj" />
+    <ProjectReference Include="..\Aether.WebApp\Aether.WebApp.csproj" />
+    <ProjectReference Include="..\WinFormsApp\WinFormsApp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Docker" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" />
+    <PackageReference Include="Aspire.Hosting.Redis" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.Python" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Golang" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Rust" />
+  </ItemGroup>
+</Project>

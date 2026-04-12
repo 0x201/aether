@@ -1,0 +1,60 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="src/EventBus/EventBus.csproj" />
+  <Project Path="Aether.WebApp/Aether.WebApp/Aether.WebApp.csproj" />
+  <Project Path="src/DyDanmaku.API/DyDanmaku.API.csproj" />
+  <Project Path="src/DyDanmaku.Domain/DyDanmaku.Domain.csproj" />
+  <Project Path="src/DyDanmaku.Infrastructure/DyDanmaku.Infrastructure.csproj" />
+  <Project Path="src/EventBusRabbitMQ/EventBusRabbitMQ.csproj" />
+  <Project Path="src/IntegrationEventLogEF/IntegrationEventLogEF.csproj" />
+  <Project Path="src/Aether.AppDefaults/Aether.AppDefaults.csproj" />
+  <Project Path="src/Aether.AppHost/Aether.AppHost.csproj" />
+  <Project Path="src/Aether.DDD/Aether.DDD.csproj" />
+  <Project Path="src/Aether.ServiceDefaults/Aether.ServiceDefaults.csproj" />
+  <Project Path="src/Aether.Shared/Aether.Shared.csproj" />
+  <Project Path="src/Aether.WebApp/Aether.WebApp.csproj" />
+  <Project Path="src/Aether.WinUIApp.Core/Aether.WinUIApp.Core.csproj" />
+  <Project Path="src/Aether.WinUIApp/Aether.WinUIApp.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
+    <Deploy Solution="*|x64" />
+    <Deploy Solution="*|x86" />
+    <Deploy Solution="Debug|Any CPU" />
+  </Project>
+  <Project Path="src/Aether.WPFApp.Core/Aether.WPFApp.Core.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="src/Aether.WPFApp/Aether.WPFApp.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="src/Ordering.API/Ordering.API.csproj" />
+  <Project Path="src/Ordering.Application/Ordering.Application.csproj" />
+  <Project Path="src/Ordering.Domain/Ordering.Domain.csproj" />
+  <Project Path="src/Ordering.Infrastructure/Ordering.Infrastructure.csproj" />
+  <Project Path="src/OrderProcessor/OrderProcessor.csproj" />
+  <Project Path="src/WinFormsApp/WinFormsApp.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="test/Aether.Tests/Aether.Tests.csproj" />
+  <Project Path="test/Aether.WinUIApp.Tests.MSTest/Aether.WinUIApp.Tests.MSTest.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Debug|Any CPU" Project="x64" />
+  </Project>
+  <Project Path="test/Aether.WPFApp.Tests.MSTest/Aether.WPFApp.Tests.MSTest.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>

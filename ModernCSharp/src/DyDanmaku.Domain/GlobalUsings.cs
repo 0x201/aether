@@ -1,1 +1,0 @@
-global using ModernCSharp.DDD.Common;
