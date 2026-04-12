@@ -57,6 +57,10 @@ public class DanmakuQueries(
     public async Task<PagedListResult<CaptureJobDto>> GetPagedCaptureJobs(CaptureJobRequest request, CancellationToken cancellationToken = default)
     {
         var query = dbContext.CaptureJobs.AsNoTracking()
+            .WhereIf(!string.IsNullOrEmpty(request.Status), x => x.Status == request.Status)
+            .WhereIf(request.RoomId.HasValue, x => x.RoomId == request.RoomId)
+            .WhereIf(request.StartTime.HasValue, x => x.StartTime >= request.StartTime)
+            .WhereIf(request.EndTime.HasValue, x => x.StartTime <= request.EndTime)
             .Join(dbContext.Rooms.AsNoTracking(),
             (job) => job.RoomId,
             (room) => room.RoomId,
@@ -82,7 +86,7 @@ public class DanmakuQueries(
         return res;
     }
 
-    public async Task<PagedListResult<DanmakuWithRoom>> GetPagedList(CaptureJobRequest request, CancellationToken cancellationToken = default)
+    public async Task<PagedListResult<DanmakuWithRoom>> GetPagedList(DanmakuRequest request, CancellationToken cancellationToken = default)
     {
         var query = dbContext.Danmakus
                 .AsNoTracking()

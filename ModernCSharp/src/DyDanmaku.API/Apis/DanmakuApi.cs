@@ -152,7 +152,7 @@
     }
 
     static async Task<Results<Ok<PagedListResult<DanmakuWithRoom>>, BadRequest<Result>, ProblemHttpResult>> GetDanmakusAsync(
-            [AsParameters] CaptureJobRequest request,
+            [AsParameters] DanmakuRequest request,
             [AsParameters] DanmakuServices service)
     {
         if (request.Page <= 0 || request.PageSize <= 0)

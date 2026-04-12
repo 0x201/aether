@@ -1,11 +1,22 @@
 namespace DyDanmaku.API.Application.Models;
 
-public record CaptureJobRequest : PaginationRequest, ISortedRequest, ITimeRangeRequest
+public record DanmakuRequest : PaginationRequest, ISortedRequest, ITimeRangeRequest
 {
-    public string? UserName { get; set; }
-    public string? Content { get; set; }
     public int? RoomId { get; set; }
     public string? Sorter { get; set; }
+    public string? UserName { get; set; }
+    public string? Content { get; set; }
+
+    public DateTimeOffset? StartTime { get; set; }
+    public DateTimeOffset? EndTime { get; set; }
+}
+
+
+public record CaptureJobRequest : PaginationRequest, ISortedRequest, ITimeRangeRequest
+{
+    public int? RoomId { get; set; }
+    public string? Sorter { get; set; }
+    public string?  Status { get; set; }
 
     public DateTimeOffset? StartTime { get; set; }
     public DateTimeOffset? EndTime { get; set; }

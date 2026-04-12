@@ -2,7 +2,7 @@ namespace DyDanmaku.API.Application.Queries;
 
 public interface IDanmakuQueries
 {
-    Task<PagedListResult<DanmakuWithRoom>> GetPagedList(CaptureJobRequest request, CancellationToken cancellationToken = default);
+    Task<PagedListResult<DanmakuWithRoom>> GetPagedList(DanmakuRequest request, CancellationToken cancellationToken = default);
     Task< PagedListResult<RoomDto>> GetPagedRooms(RoomRequest request, CancellationToken cancellationToken = default);
     Task<PagedListResult<CaptureJobDto>> GetPagedCaptureJobs(CaptureJobRequest request, CancellationToken cancellationToken = default);
     Task<Result<IReadOnlyList<WordFrequency>>> GetAnalysisData(DanmakuAnalysisRequest request, CancellationToken cancellationToken = default);
