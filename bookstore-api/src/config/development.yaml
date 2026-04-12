@@ -10,7 +10,7 @@ database:
   schema: 'bookstore'
 
 keycloak:
-  realm: moderncsharp
+  realm: aether
   authServerUrl: http://localhost:8080
   clientId: bookstoreapi
   clientSecret:

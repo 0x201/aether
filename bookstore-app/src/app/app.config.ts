@@ -1,10 +1,14 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZonelessChangeDetection,
+} from "@angular/core";
+import { provideRouter, withComponentInputBinding } from "@angular/router";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
 
-import { routes } from './app.routes';
-import { provideNativeDateAdapter } from '@angular/material/core';
-import { ConfigService } from './services/config.service';
+import { routes } from "./app.routes";
+import { provideNativeDateAdapter } from "@angular/material/core";
+import { ConfigService } from "./services/config.service";
 import {
   AutoRefreshTokenService,
   provideKeycloak,
@@ -13,13 +17,12 @@ import {
   createInterceptorCondition,
   IncludeBearerTokenCondition,
   includeBearerTokenInterceptor,
-  INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG
-} from 'keycloak-angular';
-import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
-
+  INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+} from "keycloak-angular";
+import { JWT_OPTIONS, JwtHelperService } from "@auth0/angular-jwt";
 
 export function tokenGetter() {
-  return localStorage.getItem('access_token');
+  return localStorage.getItem("access_token");
 }
 
 export function jwtOptionsFactory(configService: ConfigService) {
@@ -34,10 +37,10 @@ export function jwtOptionsFactory(configService: ConfigService) {
 
 function getUrlCondition(configService: ConfigService): IncludeBearerTokenCondition {
   const apiEndpoint = configService.getApiEndpoint();
-  console.log('apiEndpoint', apiEndpoint);
+  console.log("apiEndpoint", apiEndpoint);
   return createInterceptorCondition<IncludeBearerTokenCondition>({
     urlPattern: /^(apiEndpoint)(\/.*)?$/i,
-    bearerPrefix: 'Bearer',
+    bearerPrefix: "Bearer",
   });
 }
 
@@ -45,21 +48,21 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideKeycloak({
       config: {
-        url: 'http://localhost:8080',
-        realm: 'moderncsharp',
-        clientId: 'bookstoreapp',
+        url: "http://localhost:8080",
+        realm: "aether",
+        clientId: "bookstoreapp",
       },
       initOptions: {
-        onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+        onLoad: "check-sso",
+        silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       },
       features: [
         withAutoRefreshToken({
-          onInactivityTimeout: 'logout',
-          sessionTimeout: 60000
-        })
+          onInactivityTimeout: "logout",
+          sessionTimeout: 60000,
+        }),
       ],
-      providers: [AutoRefreshTokenService, UserActivityService]
+      providers: [AutoRefreshTokenService, UserActivityService],
     }),
     {
       provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
@@ -69,13 +72,14 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
-    { 
-      provide: JWT_OPTIONS, 
-      useFactory: jwtOptionsFactory, 
-      deps: [ConfigService] },
+    {
+      provide: JWT_OPTIONS,
+      useFactory: jwtOptionsFactory,
+      deps: [ConfigService],
+    },
     JwtHelperService,
     provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
     provideNativeDateAdapter(),
-    ConfigService
+    ConfigService,
   ],
 };
