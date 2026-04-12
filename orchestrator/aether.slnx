@@ -9,7 +9,6 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Project Path="src/EventBus/EventBus.csproj" />
-  <Project Path="Aether.WebApp/Aether.WebApp/Aether.WebApp.csproj" />
   <Project Path="src/DyDanmaku.API/DyDanmaku.API.csproj" />
   <Project Path="src/DyDanmaku.Domain/DyDanmaku.Domain.csproj" />
   <Project Path="src/DyDanmaku.Infrastructure/DyDanmaku.Infrastructure.csproj" />
