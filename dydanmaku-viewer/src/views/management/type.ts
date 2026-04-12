@@ -5,8 +5,3 @@ export interface DanmakuSearchParams extends PaginationRequest, SortedRequest, T
   content?: string
   roomId?: string
 }
-
-export interface RoomValue {
-  label: string
-  value: string
-}

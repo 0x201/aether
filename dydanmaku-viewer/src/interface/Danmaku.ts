@@ -15,3 +15,8 @@ export interface Room {
   roomId: number
   anchorName: string
 }
+
+export interface RoomOption {
+  label: string
+  value: string
+}

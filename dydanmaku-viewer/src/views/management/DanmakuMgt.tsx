@@ -20,8 +20,8 @@ import {
 } from 'antd'
 import type { ColumnsType, TableProps } from 'antd/es/table'
 import './DanmakuMgt.css'
-import type { Danmaku } from '@/src/interface/Danmaku'
-import type { DanmakuSearchParams, RoomValue } from './type'
+import type { Danmaku, RoomOption } from '@/src/interface/Danmaku'
+import type { DanmakuSearchParams } from './type'
 import { useDanmakuManagement } from './hooks/useDanmakuManagement'
 import { buildSorter } from '@/src/util'
 import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect'
@@ -256,7 +256,7 @@ const DanmakuMgt: React.FC = () => {
               </Col>
               <Col xs={24} sm={12} md={3} lg={3} xl={4}>
                 <Form.Item name="roomId" label="房间ID">
-                  <InfiniteRefreshSelect<RoomValue>
+                  <InfiniteRefreshSelect<RoomOption>
                     fetchOptions={actions.fetchRoomOptions}
                     placeholder="请输入房间ID或主播名"
                     debounceTimeout={300}

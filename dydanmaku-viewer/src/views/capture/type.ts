@@ -1,4 +1,5 @@
-import type { DataResponse, PaginationResponse } from '@/src/interface/Response'
+import type { PaginationRequest, SortedRequest, TimeRangeRequest } from '@/src/interface/Request'
+import type { DataResponse } from '@/src/interface/Response'
 
 export interface CaptureJob {
   id: number
@@ -27,4 +28,7 @@ export interface StopCaptureRequest {
   roomId: number
 }
 
-export type CaptureJobPagedResponse = PaginationResponse<CaptureJob>
+export interface CaptureSearchParams extends PaginationRequest, SortedRequest, TimeRangeRequest {
+  roomId?: string
+  status?: string
+}

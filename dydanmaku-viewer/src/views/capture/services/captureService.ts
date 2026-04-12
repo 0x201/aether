@@ -1,48 +1,47 @@
 import config from '@/src/config'
 import type {
-  CaptureJobPagedResponse,
+  CaptureJob,
+  CaptureSearchParams,
   StartCaptureRequest,
   StartCaptureResponse,
   StopCaptureRequest,
 } from '../type'
 import type { Room } from '@/src/interface/Danmaku'
 import type { MessageInstance } from 'antd/es/message/interface'
+import type { PaginationResponse } from '@/src/interface/Response'
 
 const { apiVersion } = config
-const captureEndpoint = `/api/${apiVersion}/danmakus/capture`
-const roomEndpoint = `/api/${apiVersion}/danmakus/rooms`
+const baseUrl = `/api/${apiVersion}/danmakus`
 
 export interface CaptureService {
-  fetchJobs: (
-    page: number,
-    pageSize: number,
-    sorter: string | null,
-  ) => Promise<CaptureJobPagedResponse>
-  fetchRooms: () => Promise<Room[]>
+  fetchJobs: (searchParams: CaptureSearchParams | null) => Promise<PaginationResponse<CaptureJob>>
+  fetchRooms: (page: number, pageSize: number, search?: string) => Promise<PaginationResponse<Room>>
   startCapture: (request: StartCaptureRequest) => Promise<StartCaptureResponse>
   stopCapture: (request: StopCaptureRequest) => Promise<void>
 }
 
 export const createCaptureService = (messageApi: MessageInstance): CaptureService => {
   return {
-    fetchJobs: async (page: number, pageSize: number, sorter: string | null) => {
-      const queryParams = new URLSearchParams()
-      queryParams.append('page', page.toString())
-      queryParams.append('pageSize', pageSize.toString())
-
-      if (sorter) {
-        queryParams.append('sorter', sorter)
-      }
-
+    fetchJobs: async (searchParams: CaptureSearchParams | null) => {
       try {
-        const endpoint = `${captureEndpoint}/jobs?${queryParams.toString()}`
+        const queryParams = new URLSearchParams()
+
+        if (searchParams) {
+          Object.entries(searchParams).forEach(([key, value]) => {
+            if (value !== '' && value !== undefined && value !== null) {
+              queryParams.append(key, value.toString())
+            }
+          })
+        }
+
+        const endpoint = `${baseUrl}/capture/jobs?${queryParams.toString()}`
         const response = await fetch(endpoint)
 
         if (!response.ok) {
           throw new Error(`Failed to fetch jobs: ${response.status} ${response.statusText}`)
         }
 
-        const data: CaptureJobPagedResponse = await response.json()
+        const data = await response.json()
         return data
       } catch (error) {
         console.error('An error occurred while fetching task list:', error)
@@ -51,18 +50,32 @@ export const createCaptureService = (messageApi: MessageInstance): CaptureServic
       }
     },
 
-    fetchRooms: async (): Promise<Room[]> => {
+    fetchRooms: async (
+      page: number,
+      pageSize: number,
+      search?: string,
+    ): Promise<PaginationResponse<Room>> => {
       try {
-        const response = await fetch(`${roomEndpoint}?page=1&pageSize=100&sorter=id asc`)
+        const queryParams = new URLSearchParams()
+        queryParams.append('page', page.toString())
+        queryParams.append('pageSize', pageSize.toString())
+        queryParams.append('sorter', 'id asc')
+
+        if (search) {
+          queryParams.append('search', search)
+        }
+
+        const endpoint = `${baseUrl}/rooms?${queryParams.toString()}`
+        const response = await fetch(endpoint)
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch rooms: ${response.status} ${response.statusText}`)
+          throw new Error(`获取房间列表失败: ${response.status} ${response.statusText}`)
         }
 
         const data = await response.json()
-        return data.data
+        return data
       } catch (error) {
-        console.error('获取房间列表时发生错误:', error)
+        console.error('Failed to fetch rooms:', error)
         messageApi.error('获取房间列表失败')
         throw error
       }
@@ -70,7 +83,7 @@ export const createCaptureService = (messageApi: MessageInstance): CaptureServic
 
     startCapture: async (request: StartCaptureRequest): Promise<StartCaptureResponse> => {
       try {
-        const response = await fetch(`${captureEndpoint}/start`, {
+        const response = await fetch(`${baseUrl}/capture/start`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,7 +109,7 @@ export const createCaptureService = (messageApi: MessageInstance): CaptureServic
 
     stopCapture: async (request: StopCaptureRequest): Promise<void> => {
       try {
-        const response = await fetch(`${captureEndpoint}/stop`, {
+        const response = await fetch(`${baseUrl}/capture/stop`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

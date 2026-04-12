@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import type { Danmaku } from '@/src/interface/Danmaku'
-import type { DanmakuSearchParams, RoomValue } from '../type'
+import type { Danmaku, RoomOption } from '@/src/interface/Danmaku'
+import type { DanmakuSearchParams } from '../type'
 import { createDanmakuService } from '../services/danmakuService'
 import type { MessageInstance } from 'antd/es/message/interface'
 import type { Room } from '@/src/interface/Danmaku'
@@ -59,7 +59,7 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
       page: number = 1,
       pageSize: number = 10,
       search?: string,
-    ): Promise<{ data: RoomValue[]; total: number }> => {
+    ): Promise<{ data: RoomOption[]; total: number }> => {
       try {
         const response = await service.fetchRooms(page, pageSize, search)
 
@@ -85,16 +85,19 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
   const loadDanmakuList = useCallback(async () => {
     setLoading(true)
     try {
-      const paramsWithPagination = {
+      const params = {
         ...searchParams,
         page: currentPage,
         pageSize: pageSize,
         ...(sorter ? { sorter } : {}),
       }
 
-      const data = await service.fetchDanmakuList(paramsWithPagination)
+      const data = await service.fetchDanmakuList(params)
       setDanmakuList(data.data)
       setTotal(data.total)
+    } catch (error) {
+      console.error('Failed to fetch danmaku list:', error)
+      messageApi.error('获取弹幕列表失败')
     } finally {
       setLoading(false)
     }

@@ -143,7 +143,7 @@ const InfiniteRefreshSelect = <ValueType extends BaseOptionType = BaseOptionType
       popupRender={popupRender}
       options={selectOptions}
       {...props}
-    ></Select>
+    />
   )
 }
 

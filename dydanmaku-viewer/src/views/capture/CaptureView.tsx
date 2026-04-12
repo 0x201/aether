@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import {
   Alert,
   Table,
@@ -13,17 +13,22 @@ import {
   Pagination,
   Select,
   type SelectProps,
-  Spin,
-  Empty,
   type TableProps,
   type TablePaginationConfig,
+  type CollapseProps,
+  Row,
+  Col,
+  DatePicker,
+  Collapse,
 } from 'antd'
 import { PlayCircleOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons'
 import './CaptureView.css'
 import { buildSorter } from '@/src/util'
 import { useCaptureManagement } from './hooks/useCaptureManagement'
-import type { CaptureJob } from './type'
+import type { CaptureJob, CaptureSearchParams } from './type'
 import type { FilterValue, SorterResult } from 'antd/es/table/interface'
+import InfiniteRefreshSelect from '@/src/components/InfiniteRefreshSelect'
+import type { RoomOption } from '@/src/interface/Danmaku'
 
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
   Running: { color: 'blue', text: '运行中' },
@@ -32,6 +37,29 @@ const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
   Failed: { color: 'orange', text: '已失败' },
   Terminated: { color: 'red', text: '已终止' },
 }
+
+const JOB_STATUS = [
+  {
+    value: 'Running',
+    label: '运行中',
+  },
+  {
+    value: 'Completed',
+    label: '已完成',
+  },
+  {
+    value: 'Cancelled',
+    label: '已取消',
+  },
+  {
+    value: 'Failed',
+    label: '已失败',
+  },
+  {
+    value: 'Terminated',
+    label: '已终止',
+  },
+]
 
 const durationOptions: SelectProps['options'] = []
 
@@ -46,8 +74,10 @@ const CaptureView: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage()
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
   const [roomId, setRoomId] = useState<string>('')
+  const [selectedOptionLabel, setSelectedOptionLabel] = useState<string | null>(null)
   const [captureDuration, setCaptureDuration] = useState<number>(3600)
   const [form] = Form.useForm()
+  const [searchForm] = Form.useForm()
 
   const { state, actions } = useCaptureManagement({ messageApi })
 
@@ -58,8 +88,41 @@ const CaptureView: React.FC = () => {
   const closeModal = () => {
     setIsModalVisible(false)
     setRoomId('')
+    setSelectedOptionLabel(null) // 关闭时重置标签
     form.resetFields()
   }
+
+  // 自定义渲染下拉菜单底部的手动输入区域
+  const renderManualInput = (menu: React.ReactNode) => (
+    <>
+      {menu}
+      <div
+        style={{
+          padding: '8px',
+          borderTop: '1px solid #f0f0f0',
+        }}
+      >
+        <span>或手动输入房间ID:</span>
+        <Input
+          value={roomId}
+          onChange={(e) => {
+            setRoomId(e.target.value)
+            setSelectedOptionLabel(null)
+          }}
+          onPressEnter={(e) => {
+            setRoomId((e.target as HTMLInputElement).value)
+            setSelectedOptionLabel(null)
+            setTimeout(
+              () => document.activeElement instanceof HTMLElement && document.activeElement.blur(),
+              0,
+            )
+          }}
+          placeholder="手动输入房间ID，例如: 123456"
+          style={{ marginTop: '4px' }}
+        />
+      </div>
+    </>
+  )
 
   const handleTableChange = (
     _pagination: TablePaginationConfig,
@@ -67,7 +130,7 @@ const CaptureView: React.FC = () => {
     _sorter: SorterResult<CaptureJob> | SorterResult<CaptureJob>[],
   ) => {
     const sortString = buildSorter(_sorter)
-    actions.setSort(sortString)
+    actions.setSorter(sortString)
   }
 
   const handleStartCapture = async () => {
@@ -85,6 +148,47 @@ const CaptureView: React.FC = () => {
       messageApi.error('启动捕获失败')
     }
   }
+
+  const handleSearch = useCallback(async () => {
+    try {
+      const values = await searchForm.validateFields()
+      const roomIdValue =
+        typeof values.roomId === 'object' && values.roomId !== null
+          ? (values.roomId as any).value
+          : values.roomId
+
+      const searchParams: CaptureSearchParams = {
+        page: 1,
+        pageSize: 10,
+        status: values.status,
+        roomId: roomIdValue,
+        startTime:
+          values.timeRange && values.timeRange[0] ? values.timeRange[0].toISOString() : undefined,
+        endTime:
+          values.timeRange && values.timeRange[1] ? values.timeRange[1].toISOString() : undefined,
+      }
+
+      actions.handleSearch(searchParams)
+    } catch (error) {
+      console.error('Search validation failed:', error)
+    }
+  }, [searchForm, actions])
+
+  const handleResetSearch = useCallback(() => {
+    searchForm.resetFields()
+    actions.handleResetSearch()
+  }, [searchForm, actions])
+
+  const handleRoomIdChange = useCallback((value: string | RoomOption) => {
+    if (typeof value === 'object' && value !== null && 'value' in value) {
+      const optionVal = value as RoomOption
+      setRoomId(optionVal.value)
+      setSelectedOptionLabel(optionVal.label !== optionVal.value ? optionVal.label : null)
+    } else {
+      setRoomId(String(value))
+      setSelectedOptionLabel(null)
+    }
+  }, [])
 
   const columns: TableProps<CaptureJob>['columns'] = [
     {
@@ -166,6 +270,65 @@ const CaptureView: React.FC = () => {
     },
   ]
 
+  const collapsedItems: CollapseProps['items'] = useMemo(
+    () => [
+      {
+        key: '1',
+        label: '搜索和筛选',
+        children: (
+          <Form form={searchForm} onFinish={handleSearch}>
+            <Row gutter={16}>
+              <Col xs={24} sm={12} md={3} lg={3} xl={4}>
+                <Form.Item name="status" label="状态">
+                  <Select placeholder="请选择状态" options={JOB_STATUS}></Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={3} lg={3} xl={4}>
+                <Form.Item name="roomId" label="房间ID">
+                  <InfiniteRefreshSelect<RoomOption>
+                    fetchOptions={actions.fetchRoomOptions}
+                    placeholder="请输入房间ID或主播名"
+                    debounceTimeout={300}
+                    pageSize={10}
+                    optionRender={(option) => (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {option.label}
+                      </div>
+                    )}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6} lg={6} xl={6}>
+                <Form.Item name="timeRange" label="时间范围">
+                  <DatePicker.RangePicker
+                    showTime
+                    format="YYYY-MM-DD HH:mm:ss"
+                    placeholder={['开始时间', '结束时间']}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={3} lg={3} xl={4} style={{ textAlign: 'right' }}>
+                <Button type="primary" htmlType="submit">
+                  搜索
+                </Button>
+                <Button style={{ marginLeft: 8 }} onClick={handleResetSearch}>
+                  重置
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        ),
+      },
+    ],
+    [handleSearch, handleResetSearch, searchForm, actions.fetchRoomOptions],
+  )
+
   return (
     <div className="capture-container">
       {contextHolder}
@@ -181,15 +344,17 @@ const CaptureView: React.FC = () => {
         </Button>
         <Button
           icon={<ReloadOutlined />}
-          onClick={() => actions.fetchJobs(state.currentPage, state.pageSize, state.sort)}
+          onClick={() => actions.fetchJobs()}
           loading={state.loading}
         >
           刷新
         </Button>
       </Space>
 
+      <Collapse items={collapsedItems} defaultActiveKey={['1']} style={{ marginBottom: 12 }} />
+
       <Table
-        dataSource={state.jobs}
+        dataSource={state.jobList}
         columns={columns}
         rowKey="id"
         loading={state.loading}
@@ -220,53 +385,21 @@ const CaptureView: React.FC = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item label="房间ID" required rules={[{ required: true, message: '请输入房间ID' }]}>
-            <Select
-              showSearch={{
-                filterOption: (input, option) =>
-                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase()) ||
-                  (option?.value ?? '').toString().toLowerCase().includes(input.toLowerCase()),
-              }}
-              placeholder="请选择或输入房间ID，例如: 123456"
-              value={roomId || undefined}
-              onChange={(value) => setRoomId(value)}
-              onSelect={(value) => setRoomId(value)}
-              options={state.roomOptions}
-              loading={state.loadingRooms}
-              notFoundContent={
-                state.loadingRooms ? (
-                  <Spin size="small" />
-                ) : (
-                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无数据" />
-                )
+            <InfiniteRefreshSelect<RoomOption>
+              fetchOptions={actions.fetchRoomOptions}
+              placeholder="请输入房间ID或主播名"
+              debounceTimeout={300}
+              pageSize={10}
+              value={
+                roomId
+                  ? {
+                      value: roomId,
+                      label: selectedOptionLabel ? selectedOptionLabel : `房间ID：${roomId}`,
+                    }
+                  : undefined
               }
-              popupRender={(menu) => (
-                <>
-                  {menu}
-                  <div
-                    style={{
-                      padding: '8px',
-                      borderTop: '1px solid #f0f0f0',
-                    }}
-                  >
-                    <span>或手动输入房间ID:</span>
-                    <Input
-                      value={roomId}
-                      onChange={(e) => setRoomId(e.target.value)}
-                      onPressEnter={(e) => {
-                        setRoomId((e.target as HTMLInputElement).value)
-                        setTimeout(
-                          () =>
-                            document.activeElement instanceof HTMLElement &&
-                            document.activeElement.blur(),
-                          0,
-                        )
-                      }}
-                      placeholder="手动输入房间ID，例如: 123456"
-                      style={{ marginTop: '4px' }}
-                    />
-                  </div>
-                </>
-              )}
+              onChange={handleRoomIdChange}
+              popupRender={renderManualInput}
             />
           </Form.Item>
 
@@ -281,9 +414,9 @@ const CaptureView: React.FC = () => {
               value={captureDuration.toString() || undefined}
               onChange={(v: string) => setCaptureDuration(Number(v))}
               options={durationOptions}
-              popupRender={(menu) => (
+              popupRender={(option) => (
                 <>
-                  {menu}
+                  {option}
                   <div
                     style={{
                       padding: '8px',

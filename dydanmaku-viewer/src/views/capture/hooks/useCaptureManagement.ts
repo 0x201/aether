@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import type { CaptureJob } from '../type'
-import type { Room } from '@/src/interface/Danmaku'
+import type { CaptureJob, CaptureSearchParams } from '../type'
+import type { Room, RoomOption } from '@/src/interface/Danmaku'
 import { createCaptureService } from '../services/captureService'
 import type { MessageInstance } from 'antd/es/message/interface'
 
@@ -9,51 +9,69 @@ interface UseCaptureManagementProps {
 }
 
 export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) => {
-  const [jobs, setJobs] = useState<CaptureJob[]>([])
+  const [jobList, setJobList] = useState<CaptureJob[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [total, setTotal] = useState<number>(0)
   const [pageSize, setPageSize] = useState(10)
-  const [sort, setSort] = useState<string | null>(null)
-  const [roomOptions, setRoomOptions] = useState<{ value: string; label: string }[]>([])
-  const [loadingRooms, setLoadingRooms] = useState<boolean>(false)
+  const [sorter, setSorter] = useState<string | null>(null)
   const [captureStartRes, setCaptureStartRes] = useState<string>('')
   const [isCaptureSuccess, setIsCaptureSuccess] = useState<boolean>(false)
-
+  const [searchParams, setSearchParams] = useState<CaptureSearchParams>({
+    page: 1,
+    pageSize: 10,
+    status: '',
+    roomId: '',
+  })
   const service = useMemo(() => createCaptureService(messageApi), [messageApi])
 
-  const fetchJobs = useCallback(
-    async (page: number = 1, pageSize: number = 10, sorter: string | null = null) => {
-      setLoading(true)
+  const fetchJobs = useCallback(async () => {
+    setLoading(true)
+    try {
+      const params = {
+        ...searchParams,
+        page: currentPage,
+        pageSize: pageSize,
+        ...(sorter ? { sorter: sorter } : {}),
+      }
+      const data = await service.fetchJobs(params)
+      setJobList(data.data)
+      setTotal(data.total)
+    } catch (error) {
+      console.error('获取任务列表失败:', error)
+      messageApi.error('获取任务列表失败')
+    } finally {
+      setLoading(false)
+    }
+  }, [service, currentPage, pageSize, sorter, searchParams])
+
+  const fetchRoomOptions = useCallback(
+    async (
+      page: number = 1,
+      pageSize: number = 10,
+      search?: string,
+    ): Promise<{ data: RoomOption[]; total: number }> => {
       try {
-        const data = await service.fetchJobs(page, pageSize, sorter)
-        setJobs(data.data)
-        setTotal(data.total)
-        setCurrentPage(page)
+        const response = await service.fetchRooms(page, pageSize, search)
+
+        return {
+          data: response.data.map((room: Room) => ({
+            label: `${room.anchorName} (房间ID: ${room.roomId})`,
+            value: room.roomId.toString(),
+          })),
+          total: response.total,
+        }
       } catch (error) {
-        console.error('获取任务列表失败:', error)
-      } finally {
-        setLoading(false)
+        console.error('Failed to fetch rooms:', error)
+        messageApi.error('获取房间列表失败')
+        return {
+          data: [],
+          total: 0,
+        }
       }
     },
-    [service],
+    [service, messageApi],
   )
-
-  const fetchRooms = useCallback(async () => {
-    setLoadingRooms(true)
-    try {
-      const rooms = await service.fetchRooms()
-      const options = rooms.map((room: Room) => ({
-        value: room.roomId.toString(),
-        label: `${room.anchorName} (房间ID: ${room.roomId})`,
-      }))
-      setRoomOptions(options)
-    } catch (error) {
-      console.error('获取房间列表失败:', error)
-    } finally {
-      setLoadingRooms(false)
-    }
-  }, [service])
 
   const startCapture = useCallback(
     async (roomId: string, duration: number) => {
@@ -70,24 +88,24 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
 
         setCaptureStartRes(`开始捕获直播间 -> 主播: ${result.data.anchorName}`)
         setIsCaptureSuccess(true)
-        await fetchJobs(currentPage, pageSize, sort)
+        await fetchJobs()
       } catch (error) {
         console.error('启动捕获任务失败:', error)
       }
     },
-    [service, currentPage, pageSize, sort, messageApi, fetchJobs],
+    [service, messageApi, fetchJobs],
   )
 
   const stopCapture = useCallback(
     async (roomId: number) => {
       try {
         await service.stopCapture({ roomId })
-        await fetchJobs(currentPage, pageSize, sort)
+        await fetchJobs()
       } catch (error) {
         console.error('停止捕获任务失败:', error)
       }
     },
-    [service, currentPage, pageSize, sort, fetchJobs],
+    [service, fetchJobs],
   )
 
   const handlePageChange = useCallback(
@@ -100,30 +118,51 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
     [pageSize],
   )
 
+  const handleSearch = useCallback(
+    (newSearchParams: CaptureSearchParams) => {
+      setSearchParams(newSearchParams)
+      setCurrentPage(1)
+    },
+    [setSearchParams],
+  )
+
+  const handleResetSearch = useCallback(() => {
+    setSearchParams({
+      page: 1,
+      pageSize: 10,
+      status: undefined,
+      roomId: undefined,
+      startTime: undefined,
+      endTime: undefined,
+    })
+    setCurrentPage(1)
+  }, [setSearchParams])
+
   useEffect(() => {
-    fetchJobs(currentPage, pageSize, sort)
-    fetchRooms()
-  }, [currentPage, pageSize, sort, fetchJobs, fetchRooms])
+    fetchJobs()
+  }, [fetchJobs, fetchRoomOptions])
 
   return {
     state: {
-      jobs,
+      jobList,
       loading,
       currentPage,
       total,
       pageSize,
-      sort,
-      roomOptions,
-      loadingRooms,
+      sorter,
+      searchParams,
       captureStartRes,
       isCaptureSuccess,
     },
     actions: {
       fetchJobs,
+      fetchRoomOptions,
       startCapture,
       stopCapture,
       handlePageChange,
-      setSort,
+      handleSearch,
+      handleResetSearch,
+      setSorter,
       setIsCaptureSuccess,
     },
   }
