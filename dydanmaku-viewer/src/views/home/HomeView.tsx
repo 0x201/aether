@@ -12,7 +12,7 @@ import {
   ClusterOutlined,
   InteractionOutlined,
   ScheduleOutlined,
-  LineChartOutlined
+  LineChartOutlined,
 } from '@ant-design/icons'
 import './HomeView.css'
 
@@ -56,32 +56,32 @@ const HomeView: React.FC = () => {
     {
       title: '后端技术栈',
       description: 'Asp.NET Core Web API + EntityFrameworkCore + PostgreSQL + SignalR',
-      icon: <ApiOutlined className="tech-icon" />
+      icon: <ApiOutlined className="tech-icon" />,
     },
     {
       title: '前端技术栈',
       description: 'React 19 + TypeScript + Ant Design + Vite',
-      icon: <ClusterOutlined className="tech-icon" />
+      icon: <ClusterOutlined className="tech-icon" />,
     },
     {
       title: '实时通信',
       description: 'ASP.NET Core SignalR (WebSocket/Server-Sent Events)',
-      icon: <InteractionOutlined className="tech-icon" />
+      icon: <InteractionOutlined className="tech-icon" />,
     },
     {
       title: '数据处理',
       description: 'FastAPI + APScheduler + Jieba3 (词频分析)',
-      icon: <LineChartOutlined className="tech-icon" />
+      icon: <LineChartOutlined className="tech-icon" />,
     },
     {
       title: '任务调度',
       description: '内存任务调度器 + 定时任务服务',
-      icon: <ScheduleOutlined className="tech-icon" />
+      icon: <ScheduleOutlined className="tech-icon" />,
     },
     {
       title: '架构模式',
       description: 'CQRS + DDD + 事件驱动架构',
-      icon: <DatabaseOutlined className="tech-icon" />
+      icon: <DatabaseOutlined className="tech-icon" />,
     },
   ]
 
@@ -89,42 +89,42 @@ const HomeView: React.FC = () => {
     {
       title: '高性能实时处理',
       description: '支持每秒数百条弹幕的实时捕获与推送',
-      icon: <RocketOutlined className="capability-icon" />
+      icon: <RocketOutlined className="capability-icon" />,
     },
     {
       title: '灵活部署',
       description: '支持配置化部署与本地开发调试',
-      icon: <BulbOutlined className="capability-icon" />
+      icon: <BulbOutlined className="capability-icon" />,
     },
     {
       title: '完整API',
       description: '提供 RESTful API 进行弹幕增删改查（CRUD）操作',
-      icon: <ApiOutlined className="capability-icon" />
+      icon: <ApiOutlined className="capability-icon" />,
     },
     {
       title: '实时推送',
       description: '使用 SignalR 实现实时弹幕推送',
-      icon: <InteractionOutlined className="capability-icon" />
+      icon: <InteractionOutlined className="capability-icon" />,
     },
     {
       title: '智能分析',
       description: '自动生成词云图和小时级分布图表',
-      icon: <BarChartOutlined className="capability-icon" />
+      icon: <BarChartOutlined className="capability-icon" />,
     },
     {
       title: '响应式界面',
       description: '前端响应式界面支持弹幕展示与管理',
-      icon: <HeatMapOutlined className="capability-icon" />
+      icon: <HeatMapOutlined className="capability-icon" />,
     },
     {
       title: '定时任务',
       description: '支持定时任务配置，可预设房间进行周期性捕获',
-      icon: <ScheduleOutlined className="capability-icon" />
+      icon: <ScheduleOutlined className="capability-icon" />,
     },
     {
       title: '高并发架构',
       description: '多层架构设计，支持高并发和可扩展性',
-      icon: <ClusterOutlined className="capability-icon" />
+      icon: <ClusterOutlined className="capability-icon" />,
     },
   ]
 
@@ -157,11 +157,7 @@ const HomeView: React.FC = () => {
               {features.map((item, index) => (
                 <Col xs={12} key={index}>
                   <Card hoverable>
-                    <Meta
-                      avatar={item.icon}
-                      title={item.title}
-                      description={item.description}
-                    />
+                    <Meta avatar={item.icon} title={item.title} description={item.description} />
                   </Card>
                 </Col>
               ))}
@@ -176,11 +172,7 @@ const HomeView: React.FC = () => {
           {projectCapabilities.map((item, index) => (
             <Col xs={24} sm={12} key={index}>
               <Card hoverable className="capability-card">
-                <Meta
-                  avatar={item.icon}
-                  title={item.title}
-                  description={item.description}
-                />
+                <Meta avatar={item.icon} title={item.title} description={item.description} />
               </Card>
             </Col>
           ))}
@@ -191,11 +183,7 @@ const HomeView: React.FC = () => {
           {techStack.map((item, index) => (
             <Col xs={24} sm={12} md={8} lg={8} key={index}>
               <Card hoverable>
-                <Meta
-                  avatar={item.icon}
-                  title={item.title}
-                  description={item.description}
-                />
+                <Meta avatar={item.icon} title={item.title} description={item.description} />
               </Card>
             </Col>
           ))}
