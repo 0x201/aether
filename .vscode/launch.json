@@ -8,8 +8,7 @@
             "name": "AppHost Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Aether/src/Aether.AppHost/Aether.AppHost.csproj"
+            "projectPath": "${workspaceFolder}/orchestrator/src/Aether.AppHost/Aether.AppHost.csproj"
         }
-
     ]
 }
