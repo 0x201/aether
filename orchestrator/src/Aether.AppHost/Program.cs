@@ -86,6 +86,11 @@ builder.AddJavaScriptApp("bookstoreapp", @"../../../bookstore-app", "start")
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
+builder.AddJavaScriptApp("xapp", @"../../../aether-x-app", "start")
+    .WithPnpm()
+    .WithHttpEndpoint(port: 3013, env: "PORT")
+    .WithExternalHttpEndpoints();
+
 var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../../../dydanmaku-analytics", "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
