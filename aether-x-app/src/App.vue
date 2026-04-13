@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import {
   NLayout,
   NLayoutSider,
@@ -54,7 +54,7 @@ import {
   DocumentTextOutline,
   SettingsOutline,
 } from '@vicons/ionicons5'
-import { h, ref, computed, onMounted, onUnmounted } from 'vue'
+import { h, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import HeaderBar from './components/HeaderBar.vue'
 
 const currentThemeRef = ref<any>(null)
@@ -93,8 +93,18 @@ function renderIcon(icon: any) {
 }
 
 const activeKey = ref('home')
-
+const route = useRoute()
 const router = useRouter()
+
+watch(
+  () => route.name,
+  (routeName) => {
+    if (routeName && typeof routeName === 'string') {
+      activeKey.value = routeName
+    }
+  },
+  { immediate: true },
+)
 
 const handleSelect = (key: string) => {
   activeKey.value = key
@@ -116,6 +126,10 @@ const onThemeChange = (newTheme: 'light' | 'dark' | 'auto') => {
 const currentTheme = computed(() => currentThemeRef.value)
 
 onMounted(() => {
+  if (route.name && typeof route.name === 'string') {
+    activeKey.value = route.name
+  }
+
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
   const handleSystemThemeChange = (e: MediaQueryListEvent) => {
     systemThemeRef.value = e.matches ? 'dark' : 'light'

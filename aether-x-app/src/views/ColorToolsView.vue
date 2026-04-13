@@ -16,7 +16,11 @@
       <!-- HEX颜色值 -->
       <n-form-item label="HEX颜色值" label-placement="left">
         <n-input-group>
-          <n-input v-model:value="hexColor" placeholder="#FFFFFFFF" @update:value="handleHexChange" />
+          <n-input
+            v-model:value="hexColor"
+            placeholder="#FFFFFFFF"
+            @update:value="handleHexChange"
+          />
           <n-button @click="copyValue(ColorType.HEX)" type="primary">复制</n-button>
         </n-input-group>
       </n-form-item>
@@ -392,7 +396,7 @@ enum ColorType {
   HSV = 'hsv',
   HSVA = 'hsva',
   CMYK = 'cmyk',
-  CMYKA = 'cmyka'
+  CMYKA = 'cmyka',
 }
 
 const hexColor = ref('#409effff')
@@ -406,17 +410,17 @@ const cmykColor = ref({ c: 75, m: 39, y: 0, k: 0 })
 const cmykaColor = ref({ c: 75, m: 39, y: 0, k: 0, a: 1 })
 
 const previewColor = computed(() => {
-  const hex = hexColor.value;
+  const hex = hexColor.value
   if (hex.length === 9 && hex.startsWith('#')) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    const a = parseInt(hex.slice(7, 9), 16) / 255;
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    const a = parseInt(hex.slice(7, 9), 16) / 255
+    return `rgba(${r}, ${g}, ${b}, ${a})`
   } else {
-    return hexColor.value;
+    return hexColor.value
   }
-});
+})
 
 const colorFormatsMap = {
   hex: {
@@ -476,39 +480,45 @@ const colorFormatsMap = {
 }
 
 const hexToRgb = (hex: string) => {
-  hex = hex.replace(/^#/, '');
+  hex = hex.replace(/^#/, '')
   if (hex.length === 3) {
-    hex = hex.split('').map(char => char + char).join('');
-    hex += 'ff';
+    hex = hex
+      .split('')
+      .map((char) => char + char)
+      .join('')
+    hex += 'ff'
   } else if (hex.length === 4) {
-    hex = hex.split('').map(char => char + char).join('');
+    hex = hex
+      .split('')
+      .map((char) => char + char)
+      .join('')
   }
 
   if (hex.length === 8) {
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    const a = parseInt(hex.substring(6, 8), 16) / 255;
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    const a = parseInt(hex.substring(6, 8), 16) / 255
 
-    rgbaColor.value.a = a;
-    hslaColor.value.a = a;
-    hsvaColor.value.a = a;
-    cmykaColor.value.a = a;
-    
-    return { r, g, b };
+    rgbaColor.value.a = a
+    hslaColor.value.a = a
+    hsvaColor.value.a = a
+    cmykaColor.value.a = a
+
+    return { r, g, b }
   }
 
   if (hex.length === 6) {
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
 
-    rgbaColor.value.a = 1;
-    hslaColor.value.a = 1;
-    hsvaColor.value.a = 1;
-    cmykaColor.value.a = 1;
-    
-    return { r, g, b };
+    rgbaColor.value.a = 1
+    hslaColor.value.a = 1
+    hsvaColor.value.a = 1
+    cmykaColor.value.a = 1
+
+    return { r, g, b }
   }
 
   return { r: 0, g: 0, b: 0 }
@@ -516,20 +526,20 @@ const hexToRgb = (hex: string) => {
 
 const rgbToHex = (r: number, g: number, b: number, a?: number) => {
   const toHex = (n: number) => {
-    const hex = Math.round(n).toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  };
-
-  const hexR = toHex(r);
-  const hexG = toHex(g);
-  const hexB = toHex(b);
-
-  if (a !== undefined) {
-    const hexA = toHex(a * 255);
-    return `#${hexR}${hexG}${hexB}${hexA}`;
+    const hex = Math.round(n).toString(16)
+    return hex.length === 1 ? '0' + hex : hex
   }
 
-  return `#${hexR}${hexG}${hexB}`;
+  const hexR = toHex(r)
+  const hexG = toHex(g)
+  const hexB = toHex(b)
+
+  if (a !== undefined) {
+    const hexA = toHex(a * 255)
+    return `#${hexR}${hexG}${hexB}${hexA}`
+  }
+
+  return `#${hexR}${hexG}${hexB}`
 }
 
 const rgbToHsl = (r: number, g: number, b: number) => {
@@ -695,133 +705,143 @@ const cmykToRgb = (c: number, m: number, y: number, k: number) => {
 }
 
 const updateColorsFromSource = (sourceFormat: string, sourceValue: any) => {
-  let hex: string, 
-      rgb: { r: number; g: number; b: number; }, 
-      rgba: { a: number; r: number; g: number; b: number; }, 
-      hsl: { h: number; s: number; l: number; }, 
-      hsla: { a: number; h: number; s: number; l: number; }, 
-      hsv: { h: number; s: number; v: number; }, 
-      hsva: { a: number; h: number; s: number; v: number; }, 
-      cmyk: { c: number; m: number; y: number; k: number; }, 
-      cmyka: { a: number; c: number; m: number; y: number; k: number; };
-  
+  let hex: string,
+    rgb: { r: number; g: number; b: number },
+    rgba: { a: number; r: number; g: number; b: number },
+    hsl: { h: number; s: number; l: number },
+    hsla: { a: number; h: number; s: number; l: number },
+    hsv: { h: number; s: number; v: number },
+    hsva: { a: number; h: number; s: number; v: number },
+    cmyk: { c: number; m: number; y: number; k: number },
+    cmyka: { a: number; c: number; m: number; y: number; k: number }
+
   if (sourceFormat === 'hex') {
-    hex = sourceValue;
-    rgb = hexToRgb(sourceValue);
-    rgba = { ...rgb, a: rgbaColor.value?.a || 1 };
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    hsla = { ...hsl, a: hslaColor.value?.a || 1 };
-    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-    hsva = { ...hsv, a: hsvaColor.value?.a || 1 };
-    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 };
-  } 
-  else if (sourceFormat === 'rgb') {
-    rgb = sourceValue;
-    hex = rgbToHex(sourceValue.r, sourceValue.g, sourceValue.b);
-    rgba = { ...sourceValue, a: rgbaColor.value?.a || 1 };
-    hsl = rgbToHsl(sourceValue.r, sourceValue.g, sourceValue.b);
-    hsla = { ...hsl, a: hslaColor.value?.a || 1 };
-    hsv = rgbToHsv(sourceValue.r, sourceValue.g, sourceValue.b);
-    hsva = { ...hsv, a: hsvaColor.value?.a || 1 };
-    cmyk = rgbToCmyk(sourceValue.r, sourceValue.g, sourceValue.b);
-    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 };
-  } 
-  else if (sourceFormat === 'rgba') {
-    rgba = sourceValue;
-    rgb = { r: sourceValue.r, g: sourceValue.g, b: sourceValue.b };
-    hex = rgbToHex(sourceValue.r, sourceValue.g, sourceValue.b, sourceValue.a);
-    hsl = rgbToHsl(sourceValue.r, sourceValue.g, sourceValue.b);
-    hsla = { ...hsl, a: sourceValue.a };
-    hsv = rgbToHsv(sourceValue.r, sourceValue.g, sourceValue.b);
-    hsva = { ...hsv, a: sourceValue.a };
-    cmyk = rgbToCmyk(sourceValue.r, sourceValue.g, sourceValue.b);
-    cmyka = { ...cmyk, a: sourceValue.a };
-  } 
-  else if (sourceFormat === 'hsl') {
-    hsl = sourceValue;
-    rgb = hslToRgb(sourceValue.h, sourceValue.s, sourceValue.l);
-    hex = rgbToHex(rgb.r, rgb.g, rgb.b);
-    rgba = { ...rgb, a: rgbaColor.value?.a || 1 };
-    hsla = { ...sourceValue, a: hslaColor.value?.a || 1 };
-    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-    hsva = { ...hsv, a: hsvaColor.value?.a || 1 };
-    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 };
-  } 
-  else if (sourceFormat === 'hsla') {
-    hsla = sourceValue;
-    rgb = hslToRgb(sourceValue.h, sourceValue.s, sourceValue.l);
-    hex = rgbToHex(rgb.r, rgb.g, rgb.b, sourceValue.a);
-    rgba = { ...rgb, a: sourceValue.a };
-    hsl = { h: sourceValue.h, s: sourceValue.s, l: sourceValue.l };
-    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-    hsva = { ...hsv, a: sourceValue.a };
-    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-    cmyka = { ...cmyk, a: sourceValue.a };
-  } 
-  else if (sourceFormat === 'hsv') {
-    hsv = sourceValue;
-    rgb = hsvToRgb(sourceValue.h, sourceValue.s, sourceValue.v);
-    hex = rgbToHex(rgb.r, rgb.g, rgb.b);
-    rgba = { ...rgb, a: rgbaColor.value?.a || 1 };
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    hsla = { ...hsl, a: hslaColor.value?.a || 1 };
-    hsva = { ...sourceValue, a: hsvaColor.value?.a || 1 };
-    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 };
-  } 
-  else if (sourceFormat === 'hsva') {
-    hsva = sourceValue;
-    rgb = hsvToRgb(sourceValue.h, sourceValue.s, sourceValue.v);
-    hex = rgbToHex(rgb.r, rgb.g, rgb.b, sourceValue.a);
-    rgba = { ...rgb, a: sourceValue.a };
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    hsla = { ...hsl, a: sourceValue.a };
-    hsv = { h: sourceValue.h, s: sourceValue.s, v: sourceValue.v };
-    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-    cmyka = { ...cmyk, a: sourceValue.a };
-  } 
-  else if (sourceFormat === 'cmyk') {
-    cmyk = sourceValue;
-    rgb = cmykToRgb(sourceValue.c, sourceValue.m, sourceValue.y, sourceValue.k);
-    hex = rgbToHex(rgb.r, rgb.g, rgb.b);
-    rgba = { ...rgb, a: rgbaColor.value?.a || 1 };
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    hsla = { ...hsl, a: hslaColor.value?.a || 1 };
-    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-    hsva = { ...hsv, a: hsvaColor.value?.a || 1 };
-    cmyka = { ...sourceValue, a: cmykaColor.value?.a || 1 };
-  } 
-  else if (sourceFormat === 'cmyka') {
-    cmyka = sourceValue;
-    rgb = cmykToRgb(sourceValue.c, sourceValue.m, sourceValue.y, sourceValue.k);
-    hex = rgbToHex(rgb.r, rgb.g, rgb.b, sourceValue.a);
-    rgba = { ...rgb, a: sourceValue.a };
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    hsla = { ...hsl, a: sourceValue.a };
-    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-    hsva = { ...hsv, a: sourceValue.a };
-    cmyk = { c: sourceValue.c, m: sourceValue.m, y: sourceValue.y, k: sourceValue.k };
+    hex = sourceValue
+    rgb = hexToRgb(sourceValue)
+    rgba = { ...rgb, a: rgbaColor.value?.a || 1 }
+    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+    hsla = { ...hsl, a: hslaColor.value?.a || 1 }
+    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b)
+    hsva = { ...hsv, a: hsvaColor.value?.a || 1 }
+    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b)
+    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 }
+  } else if (sourceFormat === 'rgb') {
+    rgb = sourceValue
+    hex = rgbToHex(sourceValue.r, sourceValue.g, sourceValue.b)
+    rgba = { ...sourceValue, a: rgbaColor.value?.a || 1 }
+    hsl = rgbToHsl(sourceValue.r, sourceValue.g, sourceValue.b)
+    hsla = { ...hsl, a: hslaColor.value?.a || 1 }
+    hsv = rgbToHsv(sourceValue.r, sourceValue.g, sourceValue.b)
+    hsva = { ...hsv, a: hsvaColor.value?.a || 1 }
+    cmyk = rgbToCmyk(sourceValue.r, sourceValue.g, sourceValue.b)
+    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 }
+  } else if (sourceFormat === 'rgba') {
+    rgba = sourceValue
+    rgb = { r: sourceValue.r, g: sourceValue.g, b: sourceValue.b }
+    hex = rgbToHex(sourceValue.r, sourceValue.g, sourceValue.b, sourceValue.a)
+    hsl = rgbToHsl(sourceValue.r, sourceValue.g, sourceValue.b)
+    hsla = { ...hsl, a: sourceValue.a }
+    hsv = rgbToHsv(sourceValue.r, sourceValue.g, sourceValue.b)
+    hsva = { ...hsv, a: sourceValue.a }
+    cmyk = rgbToCmyk(sourceValue.r, sourceValue.g, sourceValue.b)
+    cmyka = { ...cmyk, a: sourceValue.a }
+  } else if (sourceFormat === 'hsl') {
+    hsl = sourceValue
+    rgb = hslToRgb(sourceValue.h, sourceValue.s, sourceValue.l)
+    hex = rgbToHex(rgb.r, rgb.g, rgb.b)
+    rgba = { ...rgb, a: rgbaColor.value?.a || 1 }
+    hsla = { ...sourceValue, a: hslaColor.value?.a || 1 }
+    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b)
+    hsva = { ...hsv, a: hsvaColor.value?.a || 1 }
+    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b)
+    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 }
+  } else if (sourceFormat === 'hsla') {
+    hsla = sourceValue
+    rgb = hslToRgb(sourceValue.h, sourceValue.s, sourceValue.l)
+    hex = rgbToHex(rgb.r, rgb.g, rgb.b, sourceValue.a)
+    rgba = { ...rgb, a: sourceValue.a }
+    hsl = { h: sourceValue.h, s: sourceValue.s, l: sourceValue.l }
+    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b)
+    hsva = { ...hsv, a: sourceValue.a }
+    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b)
+    cmyka = { ...cmyk, a: sourceValue.a }
+  } else if (sourceFormat === 'hsv') {
+    hsv = sourceValue
+    rgb = hsvToRgb(sourceValue.h, sourceValue.s, sourceValue.v)
+    hex = rgbToHex(rgb.r, rgb.g, rgb.b)
+    rgba = { ...rgb, a: rgbaColor.value?.a || 1 }
+    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+    hsla = { ...hsl, a: hslaColor.value?.a || 1 }
+    hsva = { ...sourceValue, a: hsvaColor.value?.a || 1 }
+    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b)
+    cmyka = { ...cmyk, a: cmykaColor.value?.a || 1 }
+  } else if (sourceFormat === 'hsva') {
+    hsva = sourceValue
+    rgb = hsvToRgb(sourceValue.h, sourceValue.s, sourceValue.v)
+    hex = rgbToHex(rgb.r, rgb.g, rgb.b, sourceValue.a)
+    rgba = { ...rgb, a: sourceValue.a }
+    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+    hsla = { ...hsl, a: sourceValue.a }
+    hsv = { h: sourceValue.h, s: sourceValue.s, v: sourceValue.v }
+    cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b)
+    cmyka = { ...cmyk, a: sourceValue.a }
+  } else if (sourceFormat === 'cmyk') {
+    cmyk = sourceValue
+    rgb = cmykToRgb(sourceValue.c, sourceValue.m, sourceValue.y, sourceValue.k)
+    hex = rgbToHex(rgb.r, rgb.g, rgb.b)
+    rgba = { ...rgb, a: rgbaColor.value?.a || 1 }
+    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+    hsla = { ...hsl, a: hslaColor.value?.a || 1 }
+    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b)
+    hsva = { ...hsv, a: hsvaColor.value?.a || 1 }
+    cmyka = { ...sourceValue, a: cmykaColor.value?.a || 1 }
+  } else if (sourceFormat === 'cmyka') {
+    cmyka = sourceValue
+    rgb = cmykToRgb(sourceValue.c, sourceValue.m, sourceValue.y, sourceValue.k)
+    hex = rgbToHex(rgb.r, rgb.g, rgb.b, sourceValue.a)
+    rgba = { ...rgb, a: sourceValue.a }
+    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+    hsla = { ...hsl, a: sourceValue.a }
+    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b)
+    hsva = { ...hsv, a: sourceValue.a }
+    cmyk = { c: sourceValue.c, m: sourceValue.m, y: sourceValue.y, k: sourceValue.k }
   }
 
   // 更新除源格式外的所有其他格式
-  Object.keys(colorFormatsMap).forEach(format => {
+  Object.keys(colorFormatsMap).forEach((format) => {
     if (format !== sourceFormat) {
-      switch(format) {
-        case 'hex': colorFormatsMap[format].update(hex); break;
-        case 'rgb': colorFormatsMap[format].update(rgb); break;
-        case 'rgba': colorFormatsMap[format].update(rgba); break;
-        case 'hsl': colorFormatsMap[format].update(hsl); break;
-        case 'hsla': colorFormatsMap[format].update(hsla); break;
-        case 'hsv': colorFormatsMap[format].update(hsv); break;
-        case 'hsva': colorFormatsMap[format].update(hsva); break;
-        case 'cmyk': colorFormatsMap[format].update(cmyk); break;
-        case 'cmyka': colorFormatsMap[format].update(cmyka); break;
+      switch (format) {
+        case 'hex':
+          colorFormatsMap[format].update(hex)
+          break
+        case 'rgb':
+          colorFormatsMap[format].update(rgb)
+          break
+        case 'rgba':
+          colorFormatsMap[format].update(rgba)
+          break
+        case 'hsl':
+          colorFormatsMap[format].update(hsl)
+          break
+        case 'hsla':
+          colorFormatsMap[format].update(hsla)
+          break
+        case 'hsv':
+          colorFormatsMap[format].update(hsv)
+          break
+        case 'hsva':
+          colorFormatsMap[format].update(hsva)
+          break
+        case 'cmyk':
+          colorFormatsMap[format].update(cmyk)
+          break
+        case 'cmyka':
+          colorFormatsMap[format].update(cmyka)
+          break
       }
     }
-  });
-};
+  })
+}
 
 const handleHexChange = (val: string) => {
   updateColorsFromSource('hex', val)
@@ -923,41 +943,41 @@ const copyToClipboard = async (text: string) => {
 }
 
 const copyValue = (type: ColorType) => {
-  let textToCopy = '';
-  
-  switch(type) {
+  let textToCopy = ''
+
+  switch (type) {
     case ColorType.HEX:
-      textToCopy = hexColor.value;
-      break;
+      textToCopy = hexColor.value
+      break
     case ColorType.RGB:
-      textToCopy = `${rgbColor.value.r}, ${rgbColor.value.g}, ${rgbColor.value.b}`;
-      break;
+      textToCopy = `${rgbColor.value.r}, ${rgbColor.value.g}, ${rgbColor.value.b}`
+      break
     case ColorType.RGBA:
-      textToCopy = `${rgbaColor.value.r}, ${rgbaColor.value.g}, ${rgbaColor.value.b}, ${rgbaColor.value.a}`;
-      break;
+      textToCopy = `${rgbaColor.value.r}, ${rgbaColor.value.g}, ${rgbaColor.value.b}, ${rgbaColor.value.a}`
+      break
     case ColorType.HSL:
-      textToCopy = `${hslColor.value.h}, ${hslColor.value.s}, ${hslColor.value.l}`;
-      break;
+      textToCopy = `${hslColor.value.h}, ${hslColor.value.s}, ${hslColor.value.l}`
+      break
     case ColorType.HSLA:
-      textToCopy = `${hslaColor.value.h}, ${hslaColor.value.s}, ${hslaColor.value.l}, ${hslaColor.value.a}`;
-      break;
+      textToCopy = `${hslaColor.value.h}, ${hslaColor.value.s}, ${hslaColor.value.l}, ${hslaColor.value.a}`
+      break
     case ColorType.HSV:
-      textToCopy = `${hsvColor.value.h}, ${hsvColor.value.s}, ${hsvColor.value.v}`;
-      break;
+      textToCopy = `${hsvColor.value.h}, ${hsvColor.value.s}, ${hsvColor.value.v}`
+      break
     case ColorType.HSVA:
-      textToCopy = `${hsvaColor.value.h}, ${hsvaColor.value.s}, ${hsvaColor.value.v}, ${hsvaColor.value.a}`;
-      break;
+      textToCopy = `${hsvaColor.value.h}, ${hsvaColor.value.s}, ${hsvaColor.value.v}, ${hsvaColor.value.a}`
+      break
     case ColorType.CMYK:
-      textToCopy = `${cmykColor.value.c}, ${cmykColor.value.m}, ${cmykColor.value.y}, ${cmykColor.value.k}`;
-      break;
+      textToCopy = `${cmykColor.value.c}, ${cmykColor.value.m}, ${cmykColor.value.y}, ${cmykColor.value.k}`
+      break
     case ColorType.CMYKA:
-      textToCopy = `${cmykaColor.value.c}, ${cmykaColor.value.m}, ${cmykaColor.value.y}, ${cmykaColor.value.k}, ${cmykaColor.value.a}`;
-      break;
+      textToCopy = `${cmykaColor.value.c}, ${cmykaColor.value.m}, ${cmykaColor.value.y}, ${cmykaColor.value.k}, ${cmykaColor.value.a}`
+      break
     default:
-      console.error(`Unknown color type: ${type}`);
-      return;
+      console.error(`Unknown color type: ${type}`)
+      return
   }
-  
-  copyToClipboard(textToCopy);
+
+  copyToClipboard(textToCopy)
 }
 </script>
