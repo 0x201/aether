@@ -86,7 +86,7 @@ builder.AddJavaScriptApp("bookstoreapp", @"../../../bookstore-app", "start")
     .WithReference(bookStoreApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-builder.AddJavaScriptApp("xapp", @"../../../aether-x-app", "start")
+builder.AddJavaScriptApp("xapp", @"../../../aether-x-app")
     .WithPnpm()
     .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints();
