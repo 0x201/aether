@@ -1,7 +1,7 @@
 [project]
-name = "dydamuku-analytics"
+name = "aether-social-analytics"
 version = "0.1.0"
-description = "Douyu Danmaku Analytics Service"
+description = "Aether Social Analytics Service"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [

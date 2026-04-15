@@ -67,7 +67,7 @@ var webApp = builder.AddProject<Projects.Aether_WebApp>("webapp")
     .WithReference(orderingApi)
     .WithReference(rabbitmq).WaitFor(rabbitmq);
 
-var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../../../bookstore-api", "start")
+var digitalExperienceApi = builder.AddJavaScriptApp("digital-experience-api", @"../../../digital-experience-api", "start")
     .WithPnpm()
     .WithHttpEndpoint(port: 3011, env: "PORT")
     .WithExternalHttpEndpoints()
@@ -76,22 +76,22 @@ var bookStoreApi = builder.AddJavaScriptApp("bookstoreapi", @"../../../bookstore
     .WithReference(keycloak).WaitFor(keycloak)
     .WithReference(bookstoredb).WaitFor(bookstoredb);
 
-var bookstoreApiHttpEndpoint = bookStoreApi.GetEndpoint("http");
-bookStoreApi.WithUrl($"{bookstoreApiHttpEndpoint}/scalar", "Book Store API Scalar Reference");
+var digitalExperienceApiHttpEndpoint = digitalExperienceApi.GetEndpoint("http");
+digitalExperienceApi.WithUrl($"{digitalExperienceApiHttpEndpoint}/scalar", "Digital Experience API Scalar Reference");
 
-builder.AddJavaScriptApp("bookstoreapp", @"../../../bookstore-app", "start")
+builder.AddJavaScriptApp("digital-experience-platform", @"../../../digital-experience-platform", "start")
     .WithPnpm()
     .WithHttpEndpoint(port: 3012, env: "PORT")
     .WithExternalHttpEndpoints()
-    .WithReference(bookStoreApi)
+    .WithReference(digitalExperienceApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-builder.AddJavaScriptApp("xapp", @"../../../aether-x-app")
+builder.AddJavaScriptApp("x-app", @"../../../x-app")
     .WithPnpm()
     .WithHttpEndpoint(port: 3013, env: "PORT")
     .WithExternalHttpEndpoints();
 
-var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../../../dydanmaku-analytics", "main.py")
+var socialAnalyticsHub = builder.AddPythonApp("social-analytics-hub", @"../../../social-analytics-hub", "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
@@ -99,9 +99,9 @@ var danmakuanalytics = builder.AddPythonApp("danmakuanalytics", @"../../../dydan
     .WithReference(rabbitmq).WaitFor(rabbitmq)
     .WithReference(dydanmakudb).WaitFor(dydanmakudb);
 
-danmakuanalytics.WithUrl($"{danmakuanalytics.GetEndpoint("http")}/scalar", "Douyu Danmaku Analytics API Docs");
+socialAnalyticsHub.WithUrl($"{socialAnalyticsHub.GetEndpoint("http")}/scalar", "Social Analytics Hub API Docs");
 
-builder.AddJavaScriptApp("danmakuviewer", @"../../../dydanmaku-viewer")
+builder.AddJavaScriptApp("social-dashboard", @"../../../social-dashboard")
     .WithPnpm()
     .WithHttpEndpoint(port: 3015, env: "PORT")
     .WithReference(dydanmakuApi)

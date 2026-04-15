@@ -25,7 +25,7 @@
 
         <n-layout-footer bordered position="absolute">
           <div style="padding: 12px; text-align: center; color: #999">
-            © 2026 Aether X. All rights reserved.
+            © 2026 X. All rights reserved.
           </div>
         </n-layout-footer>
       </n-layout>

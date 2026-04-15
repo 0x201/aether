@@ -1,4 +1,4 @@
-project_name: "Douyu Danmaku Analytics API"
+project_name: "Aether Social Analytics Hub API"
 version: "0.0.1"
 
 cors:
@@ -24,8 +24,10 @@ nppa:
 
 messaging:
   virtual_host: "/"
-  exchange: "mc_event_bus"
+  excchange: "mc_event_bus"
   queue: "Danmaku"
 
 cache:
   ssl: false
+
+otel_service_name: "aether-social-analytics-hub-api"

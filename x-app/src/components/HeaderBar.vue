@@ -4,7 +4,7 @@
       <div class="logo">
         <AppsOutline />
       </div>
-      <n-h1>Aether X</n-h1>
+      <n-h1>X</n-h1>
     </div>
     <div class="user-actions">
       <n-button @click="toggleTheme" quaternary>
