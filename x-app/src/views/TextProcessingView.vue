@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { NButton, NCard, NForm, NFormItem, NInput, NSpace } from 'naive-ui'
-</script>
-
 <template>
   <n-card title="文本处理" segmented>
     <n-form>
@@ -28,3 +24,8 @@ import { NButton, NCard, NForm, NFormItem, NInput, NSpace } from 'naive-ui'
     </n-form>
   </n-card>
 </template>
+
+
+<script setup lang="ts">
+import { NButton, NCard, NForm, NFormItem, NInput, NSpace } from 'naive-ui'
+</script>

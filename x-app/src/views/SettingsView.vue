@@ -1,20 +1,3 @@
-<script setup lang="ts">
-import { NCard, NForm, NFormItem, NSelect, NButton } from 'naive-ui'
-
-// 主题模式选项
-const themes = [
-  { label: '亮色', value: 'light' },
-  { label: '暗色', value: 'dark' },
-  { label: '自动', value: 'auto' },
-]
-
-// 语言选项
-const languages = [
-  { label: '中文', value: 'zh-CN' },
-  { label: 'English', value: 'en-US' },
-]
-</script>
-
 <template>
   <n-card title="系统设置" segmented>
     <n-form>
@@ -28,3 +11,19 @@ const languages = [
     </n-form>
   </n-card>
 </template>
+
+<script setup lang="ts">
+import { NCard, NForm, NFormItem, NSelect, NButton } from 'naive-ui'
+
+const themes = [
+  { label: '亮色', value: 'light' },
+  { label: '暗色', value: 'dark' },
+  { label: '自动', value: 'auto' },
+]
+
+// 语言选项
+const languages = [
+  { label: '中文', value: 'zh-CN' },
+  { label: 'English', value: 'en-US' },
+]
+</script>

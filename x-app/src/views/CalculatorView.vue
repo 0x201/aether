@@ -1,15 +1,3 @@
-<script setup lang="ts">
-import { NButton, NCard, NForm, NFormItem, NInputNumber, NSelect } from 'naive-ui'
-
-// 运算符选项
-const operators = [
-  { label: '+', value: '+' },
-  { label: '-', value: '-' },
-  { label: '×', value: '*' },
-  { label: '÷', value: '/' },
-]
-</script>
-
 <template>
   <n-card title="计算器" segmented>
     <n-form>
@@ -26,3 +14,15 @@ const operators = [
     </n-form>
   </n-card>
 </template>
+
+<script setup lang="ts">
+import { NButton, NCard, NForm, NFormItem, NInputNumber, NSelect } from 'naive-ui'
+
+// 运算符选项
+const operators = [
+  { label: '+', value: '+' },
+  { label: '-', value: '-' },
+  { label: '×', value: '*' },
+  { label: '÷', value: '/' },
+]
+</script>
