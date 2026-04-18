@@ -1,138 +1,54 @@
-import Layout, { Content, Header } from 'antd/es/layout/layout'
-import Sider from 'antd/es/layout/Sider'
-import React, { useState } from 'react'
-import { Tabs, type TabsProps } from 'antd'
-import { useLocation, useNavigate } from 'react-router-dom'
-import HomeView from '@/src/views/home'
-import DashboardView from '@/src/views/dashboard'
-import CaptureView from '@/src/views/capture'
-import DanmakuManagementView from '@/src/views/management'
-import RealtimeDanmakuView from '@/src/views/realtime-danmaku'
-import AppNavigation from './AppNavigation'
-import './DefaultLayout.css'
-import FloatButton from 'antd/es/float-button'
+import { Layout, theme } from 'antd'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { AppNavigation } from '.'
 import ThemeSwitch from '../ThemeToggle/ThemeSwitch'
-import MessageBox from '../MessageBox'
+import { MessageBox } from '../MessageBox'
+import { menuConfig } from '@/src/config/menuConfig'
+import './DefaultLayout.css'
+import SidebarMenu from './SidebarMenu'
+import { useState } from 'react'
+
+const { Header, Content, Sider } = Layout
 
 const DefaultLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
-  const location = useLocation()
+  const { pathname } = useLocation()
   const navigate = useNavigate()
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken()
 
-  const [tabs, setTabs] = useState([
-    { key: '/', label: '首页', closable: false },
-  ])
-
-  const activeKey = location.pathname
-
-  const addTab = (path: string, title: string) => {
-    setTabs(prev => {
-      if (!prev.some(tab => tab.key === path)) {
-        return [...prev, { key: path, label: title, closable: true }]
+  const getCurrentMainMenu = () => {
+    if (pathname === '/') return '/'
+    const matchedMenu = menuConfig.find((menu) => {
+      if (menu.path === pathname) return true
+      if (menu.children && menu.children.some((child) => pathname.startsWith(child.path))) {
+        return true
       }
-      return prev
-    })
-  }
 
-  const removeTab = (targetKey: string) => {
-    let newActiveKey = activeKey
-    let lastIndex = -1
-
-    tabs.forEach((tab, i) => {
-      if (tab.key === targetKey) {
-        lastIndex = i - 1
-      }
+      return false
     })
 
-    const newPanes = tabs.filter(tab => tab.key !== targetKey)
-
-    if (newPanes.length && newActiveKey === targetKey) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key
-      } else {
-        newActiveKey = newPanes[0].key
-      }
-    }
-
-    setTabs(newPanes)
-    if (activeKey === targetKey) {
-      navigate(newActiveKey)
-    }
+    return matchedMenu ? matchedMenu.path : pathname
   }
 
-  const onEdit = (targetKey: string | React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>, action: 'add' | 'remove') => {
-    if (action === 'remove') {
-      const key = typeof targetKey === 'string' ? targetKey : (targetKey.target as HTMLElement).getAttribute('data-node-key');
-      if (key) {
-        removeTab(key);
-      }
-    }
-  }
-
-  const onTabClick = (key: string) => {
-    navigate(key)
-  }
-
-  const getTitleFromPath = (path: string): string => {
-    switch (path) {
-      case '/': return '首页'
-      case '/dashboard': return '数据概览'
-      case '/capture': return '弹幕捕获'
-      case '/management': return '弹幕管理'
-      case '/realtime-danmaku': return '实时弹幕'
-      default: return '新标签页'
-    }
-  }
-
-  React.useEffect(() => {
-    if (!tabs.some(tab => tab.key === location.pathname)) {
-      addTab(location.pathname, getTitleFromPath(location.pathname))
-    }
-  }, [location.pathname])
-
-
-  const renderCurrentView = () => {
-    switch (activeKey) {
-      case '/':
-        return <HomeView />;
-      case '/dashboard':
-        return <DashboardView />;
-      case '/capture':
-        return <CaptureView />;
-      case '/management':
-        return <DanmakuManagementView />;
-      case '/realtime-danmaku':
-        return <RealtimeDanmakuView />;
-      default:
-        return <HomeView />;
-    }
-  }
-
-  const items: TabsProps['items'] = tabs.map((tab) => {
-    return {
-      label: tab.label,
-      key: tab.key,
-      closable: tab.closable,
-      children: tab.key === activeKey ? renderCurrentView() : null,
-    }
-  })
+  const currentMainMenu = getCurrentMainMenu()
 
   return (
-    <Layout>
-      <Header className="header-layout">
+    <Layout style={{ minHeight: '100vh' }}>
+      <Header className="header-layout" style={{ backgroundColor: colorBgContainer }}>
         <div className="header-left">
-          <div className="logo" />
-          <h1>斗鱼弹幕系统</h1>
+          <div className="logo" onClick={() => navigate('/')} />
+          <h1 onClick={() => navigate('/')}>Social Dashboard</h1>
         </div>
         <div className="header-center">
-          <AppNavigation mode="horizontal" />
+          <AppNavigation currentMainMenu={currentMainMenu} onMenuClick={(path) => navigate(path)} />
         </div>
         <div className="header-right">
           <MessageBox />
           <ThemeSwitch />
         </div>
       </Header>
-
       <Layout>
         <Sider
           collapsed={collapsed}
@@ -141,19 +57,10 @@ const DefaultLayout: React.FC = () => {
           collapsedWidth="60"
           className="sider-container"
         >
-          <AppNavigation mode="inline" />
+          <SidebarMenu currentMainMenu={currentMainMenu} />
         </Sider>
         <Content className="content-container">
-          <Tabs
-            type="editable-card"
-            activeKey={activeKey}
-            hideAdd
-            onEdit={onEdit}
-            items={items}
-            onTabClick={onTabClick}
-            size="middle"
-          />
-          <FloatButton.BackTop />
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

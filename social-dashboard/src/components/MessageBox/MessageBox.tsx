@@ -2,12 +2,12 @@ import React from 'react'
 import { Badge, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import { BellOutlined, ClearOutlined } from '@ant-design/icons'
-import { useMessageContext } from '@/src/contexts/useMessage'
+import { useMessage } from '@/src/contexts/useMessage'
 import dayjs from 'dayjs'
 import type { AnalyticsMessage } from '@/src/interface/Message'
 
 const MessageBox: React.FC = () => {
-  const { messages, unreadCount, markAsRead, clearAll } = useMessageContext()
+  const { messages, unreadCount, markAsRead, clearAll } = useMessage()
 
   const menuItems: MenuProps['items'] =
     messages.length > 0

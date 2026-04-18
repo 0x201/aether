@@ -16,10 +16,10 @@ export interface MessageContextType {
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined)
 
-export const useMessageContext = (): MessageContextType => {
+export const useMessage = (): MessageContextType => {
   const context = useContext(MessageContext)
   if (context === undefined) {
-    throw new Error('useMessageContext must be used within a MessageProvider')
+    throw new Error('useMessage must be used within a MessageProvider')
   }
   return context
 }

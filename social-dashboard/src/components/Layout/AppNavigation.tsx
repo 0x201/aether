@@ -1,58 +1,34 @@
-import {
-  DashboardOutlined,
-  TableOutlined,
-  HomeOutlined,
-  VideoCameraOutlined,
-  FireOutlined,
-} from '@ant-design/icons'
 import { Menu, type MenuProps } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AppNavigationProps } from './type'
+import { menuConfig } from '@/src/config/menuConfig'
 
 const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const { mode = 'horizontal', theme = 'light' } = props
+  const { mode = 'horizontal', theme = 'light', currentMainMenu, onMenuClick } = props
 
-  const items: MenuProps['items'] = [
-    {
-      label: '首页',
-      icon: <HomeOutlined />,
-      key: '/',
-    },
-    {
-      label: '数据概览',
-      icon: <DashboardOutlined />,
-      key: '/dashboard',
-    },
-    {
-      label: '弹幕捕获',
-      icon: <VideoCameraOutlined />,
-      key: '/capture',
-    },
-    {
-      label: '弹幕管理',
-      icon: <TableOutlined />,
-      key: '/management',
-    },
-    {
-      label: '实时弹幕',
-      icon: <FireOutlined />,
-      key: '/realtime-danmaku',
-    },
-  ]
+  const mainMenuItems = menuConfig.map((item) => ({
+    label: item.label,
+    icon: item.icon,
+    key: item.path || `/${item.key}`,
+  }))
 
   const onClick: MenuProps['onClick'] = (e) => {
-    navigate(e.key)
+    if (onMenuClick) {
+      onMenuClick(e.key)
+    } else {
+      navigate(e.key)
+    }
   }
 
   return (
     <Menu
       onClick={onClick}
-      selectedKeys={[location.pathname]}
+      selectedKeys={[currentMainMenu || location.pathname]}
       mode={mode}
-      items={items}
+      items={mainMenuItems}
       theme={theme}
       style={{
         flex: 1,
