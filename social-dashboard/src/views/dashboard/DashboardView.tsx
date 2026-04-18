@@ -4,7 +4,7 @@ import WordCloud from '@/src/components/Wordcloud'
 import { colormapOptions } from '@/src/components/Wordcloud/type'
 import { useDashboardData } from './useDashboardData'
 import type { HourlyDistribution, TopRoom, TopUser, WordFreq } from './type'
-import type { Room } from '@/src/interface/Danmaku'
+import type { Room } from '@/src/interface/room/type'
 import './Dashboard.css'
 import type { Dayjs } from 'dayjs'
 import { DanmakuChart, type TransformedDataItem } from '@/src/components/DanmakuChart'
@@ -31,8 +31,10 @@ const Dashboard: React.FC = () => {
       try {
         const { data } = await fetchRooms(1, 20, search)
         const noRoomOption: Room = {
+          id: -1,
           roomId: -1,
-          anchorName: '全部房间',
+          roomName: '全部房间',
+          createdAt: '',
         }
         setAllRooms([noRoomOption, ...data])
       } catch (err) {
@@ -271,7 +273,7 @@ const Dashboard: React.FC = () => {
                 }}
                 loading={loadingRooms}
                 options={allRooms.map((room) => ({
-                  label: `${room.anchorName}`,
+                  label: `${room.roomName}`,
                   value: room.roomId,
                 }))}
                 style={{ width: '100%' }}

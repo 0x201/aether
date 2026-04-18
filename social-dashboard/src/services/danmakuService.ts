@@ -1,31 +1,30 @@
 import config from '@/src/config'
-import type { Danmaku } from '@/src/interface/Danmaku'
-import { useCallback } from 'react'
-import type { DanmakuSearchParams } from '../type'
+import type { Danmaku } from '@/src/interface/danmaku/type'
 import type { MessageInstance } from 'antd/es/message/interface'
-import type { Room } from '@/src/interface/Danmaku'
-import type { PaginationResponse } from '@/src/interface/Response'
+import type { PaginationResponse } from '@/src/interface/shared/type'
+import type { DanmakuSearchParams } from '@/src/interface/management/type'
+import type { Room } from '@/src/interface/room/type'
 
 const { apiVersion } = config
 const baseUrl = `/api/${apiVersion}/danmakus`
-const roomEndpoint = `${baseUrl}/rooms`
 
-export const useDanmakuApi = (messageApi: MessageInstance) => {
-  const fetchDanmakuList = useCallback(
-    async (
-      page: number = 1,
-      pageSize: number = 20,
-      sorter: string | null = null,
-      searchParams: DanmakuSearchParams | null = null,
+export interface DanmakuService {
+  fetchDanmakuList: (
+    searchParams: DanmakuSearchParams | null,
+  ) => Promise<PaginationResponse<Danmaku>>
+  fetchRooms: (page: number, pageSize: number, search?: string) => Promise<PaginationResponse<Room>>
+  deleteDanmaku: (id: string) => Promise<boolean>
+  updateDanmaku: (id: string, data: Partial<Danmaku>) => Promise<boolean>
+}
+
+export const createDanmakuService = (messageApi: MessageInstance): DanmakuService => {
+  return {
+    fetchDanmakuList: async (
+      searchParams: DanmakuSearchParams | null,
     ): Promise<PaginationResponse<Danmaku>> => {
       try {
         const queryParams = new URLSearchParams()
-        queryParams.append('page', page.toString())
-        queryParams.append('pageSize', pageSize.toString())
 
-        if (sorter) {
-          queryParams.append('sorter', sorter)
-        }
         if (searchParams) {
           Object.entries(searchParams).forEach(([key, value]) => {
             if (value !== '' && value !== undefined && value !== null) {
@@ -33,6 +32,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
             }
           })
         }
+
         const endpoint = `${baseUrl}?${queryParams.toString()}`
         const response = await fetch(endpoint)
 
@@ -48,13 +48,10 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
         throw error
       }
     },
-    [messageApi],
-  )
 
-  const fetchRooms = useCallback(
-    async (
-      page: number = 1,
-      pageSize: number = 100,
+    fetchRooms: async (
+      page: number,
+      pageSize: number,
       search?: string,
     ): Promise<PaginationResponse<Room>> => {
       try {
@@ -67,7 +64,7 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
           queryParams.append('search', search)
         }
 
-        const endpoint = `${roomEndpoint}?${queryParams.toString()}`
+        const endpoint = `${baseUrl}/rooms?${queryParams.toString()}`
         const response = await fetch(endpoint)
 
         if (!response.ok) {
@@ -82,11 +79,8 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
         throw error
       }
     },
-    [messageApi],
-  )
 
-  const deleteDanmaku = useCallback(
-    async (id: string): Promise<boolean> => {
+    deleteDanmaku: async (id: string): Promise<boolean> => {
       try {
         const endpoint = `${baseUrl}/${id}`
         const response = await fetch(endpoint, {
@@ -106,11 +100,8 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
         return false
       }
     },
-    [messageApi],
-  )
 
-  const updateDanmaku = useCallback(
-    async (id: string, data: Partial<Danmaku>): Promise<boolean> => {
+    updateDanmaku: async (id: string, data: Partial<Danmaku>): Promise<boolean> => {
       try {
         const endpoint = `${baseUrl}/${id}`
 
@@ -135,13 +126,5 @@ export const useDanmakuApi = (messageApi: MessageInstance) => {
         return false
       }
     },
-    [messageApi],
-  )
-
-  return {
-    fetchDanmakuList,
-    fetchRooms,
-    deleteDanmaku,
-    updateDanmaku,
   }
 }

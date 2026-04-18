@@ -24,11 +24,11 @@ import {
 import { PlayCircleOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons'
 import './CaptureView.css'
 import { buildSorter } from '@/src/util'
-import { useCaptureManagement } from './hooks/useCaptureManagement'
-import type { CaptureJob, CaptureSearchParams } from './type'
+import { useCaptureMgt } from '../../hooks/useCaptureMgt'
+import type { CaptureJob, CaptureSearchParams } from '@/src/interface/capture/type'
 import type { FilterValue, SorterResult } from 'antd/es/table/interface'
 import InfiniteRefreshSelect from '@/src/components/InfiniteRefreshSelect'
-import type { RoomOption } from '@/src/interface/Danmaku'
+import type { RoomOption } from '@/src/interface/room/type'
 
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
   Running: { color: 'blue', text: '运行中' },
@@ -79,7 +79,7 @@ const CaptureView: React.FC = () => {
   const [form] = Form.useForm()
   const [searchForm] = Form.useForm()
 
-  const { state, actions } = useCaptureManagement({ messageApi })
+  const { state, actions } = useCaptureMgt({ messageApi })
 
   const openStartModal = () => {
     setIsModalVisible(true)
@@ -88,11 +88,10 @@ const CaptureView: React.FC = () => {
   const closeModal = () => {
     setIsModalVisible(false)
     setRoomId('')
-    setSelectedOptionLabel(null) // 关闭时重置标签
+    setSelectedOptionLabel(null)
     form.resetFields()
   }
 
-  // 自定义渲染下拉菜单底部的手动输入区域
   const renderManualInput = (menu: React.ReactNode) => (
     <>
       {menu}

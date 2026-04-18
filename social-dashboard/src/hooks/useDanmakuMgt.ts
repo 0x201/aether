@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import type { Danmaku, RoomOption } from '@/src/interface/Danmaku'
-import type { DanmakuSearchParams } from '../type'
-import { createDanmakuService } from '../services/danmakuService'
+import type { Danmaku } from '@/src/interface/danmaku/type'
+import type { DanmakuSearchParams } from '@/src/interface/management/type'
+import { createDanmakuService } from '@/src/services/danmakuService'
 import type { MessageInstance } from 'antd/es/message/interface'
-import type { Room } from '@/src/interface/Danmaku'
+import { useRoomOptions } from './useResourceOptions'
 
-interface UseDanmakuManagementProps {
+interface UseDanmakuMgtProps {
   messageApi: MessageInstance
 }
 
-export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) => {
+export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
   const [danmakuList, setDanmakuList] = useState<Danmaku[]>([])
   const [loading, setLoading] = useState(false)
   const [editingDanmaku, setEditingDanmaku] = useState<Danmaku | null>(null)
@@ -28,6 +28,8 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
   })
 
   const service = useMemo(() => createDanmakuService(messageApi), [messageApi])
+
+  const { fetchOptions: fetchRoomOptions } = useRoomOptions(messageApi)
 
   const medalLevelColors = useMemo(
     () => ({
@@ -54,34 +56,6 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
     [],
   )
 
-  const fetchRoomOptions = useCallback(
-    async (
-      page: number = 1,
-      pageSize: number = 10,
-      search?: string,
-    ): Promise<{ data: RoomOption[]; total: number }> => {
-      try {
-        const response = await service.fetchRooms(page, pageSize, search)
-
-        return {
-          data: response.data.map((room: Room) => ({
-            label: `${room.anchorName} (房间ID: ${room.roomId})`,
-            value: room.roomId.toString(),
-          })),
-          total: response.total,
-        }
-      } catch (error) {
-        console.error('Failed to fetch rooms:', error)
-        messageApi.error('获取房间列表失败')
-        return {
-          data: [],
-          total: 0,
-        }
-      }
-    },
-    [service, messageApi],
-  )
-
   const loadDanmakuList = useCallback(async () => {
     setLoading(true)
     try {
@@ -101,7 +75,7 @@ export const useDanmakuManagement = ({ messageApi }: UseDanmakuManagementProps) 
     } finally {
       setLoading(false)
     }
-  }, [service, currentPage, pageSize, sorter, searchParams])
+  }, [service, currentPage, pageSize, sorter, searchParams, messageApi])
 
   useEffect(() => {
     loadDanmakuList()

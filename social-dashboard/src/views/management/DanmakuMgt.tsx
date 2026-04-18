@@ -20,9 +20,10 @@ import {
 } from 'antd'
 import type { ColumnsType, TableProps } from 'antd/es/table'
 import './DanmakuMgt.css'
-import type { Danmaku, RoomOption } from '@/src/interface/Danmaku'
-import type { DanmakuSearchParams } from './type'
-import { useDanmakuManagement } from './hooks/useDanmakuManagement'
+import type { Danmaku } from '@/src/interface/danmaku/type'
+import type { RoomOption } from '@/src/interface/room/type'
+import type { DanmakuSearchParams } from '@/src/interface/management/type'
+import { useDanmakuMgt } from '../../hooks/useDanmakuMgt'
 import { buildSorter } from '@/src/util'
 import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect'
 import { CopyableText } from '@/src/components/CopyableText'
@@ -34,7 +35,7 @@ const DanmakuMgt: React.FC = () => {
   const [searchForm] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { state, actions } = useDanmakuManagement({ messageApi })
+  const { state, actions } = useDanmakuMgt({ messageApi })
 
   const handleTableChange: TableProps<Danmaku>['onChange'] = (_pagination, _filters, sorter) => {
     const sortString = buildSorter(sorter)
@@ -76,7 +77,7 @@ const DanmakuMgt: React.FC = () => {
     [actions],
   )
 
-  const handleModalOk = async () => {
+  const handleModalOk = useCallback(async () => {
     try {
       const values = await form.validateFields()
 
@@ -92,13 +93,13 @@ const DanmakuMgt: React.FC = () => {
       console.error('Validation failed:', error)
       messageApi.error('表单验证失败')
     }
-  }
+  }, [form, state.editingDanmaku, actions, messageApi])
 
-  const handleModalCancel = () => {
+  const handleModalCancel = useCallback(() => {
     actions.setIsModalVisible(false)
     form.resetFields()
     actions.setEditingDanmaku(null)
-  }
+  }, [actions, form])
 
   const columns: ColumnsType<Danmaku> = useMemo(
     () => [
@@ -233,7 +234,7 @@ const DanmakuMgt: React.FC = () => {
         responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
       },
     ],
-    [state, handleDelete],
+    [state.medalLevelColors, state.userLevelColors, handleDelete],
   )
 
   const collapsedItems: CollapseProps['items'] = useMemo(

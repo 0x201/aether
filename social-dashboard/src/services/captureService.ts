@@ -5,10 +5,10 @@ import type {
   StartCaptureRequest,
   StartCaptureResponse,
   StopCaptureRequest,
-} from '../type'
-import type { Room } from '@/src/interface/Danmaku'
+} from '@/src/interface/capture/type'
+import type { Room } from '@/src/interface/room/type'
 import type { MessageInstance } from 'antd/es/message/interface'
-import type { PaginationResponse } from '@/src/interface/Response'
+import type { PaginationResponse } from '@/src/interface/shared/type'
 
 const { apiVersion } = config
 const baseUrl = `/api/${apiVersion}/danmakus`

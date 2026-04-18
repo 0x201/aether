@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import type { CaptureJob, CaptureSearchParams } from '../type'
-import type { Room, RoomOption } from '@/src/interface/Danmaku'
-import { createCaptureService } from '../services/captureService'
+import type { CaptureJob, CaptureSearchParams } from '@/src/interface/capture/type'
+import { createCaptureService } from '@/src/services/captureService'
 import type { MessageInstance } from 'antd/es/message/interface'
+import { useRoomOptions } from './useResourceOptions'
 
-interface UseCaptureManagementProps {
+interface UseCaptureMgtProps {
   messageApi: MessageInstance
 }
 
-export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) => {
+export const useCaptureMgt = ({ messageApi }: UseCaptureMgtProps) => {
   const [jobList, setJobList] = useState<CaptureJob[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -25,6 +25,8 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
   })
   const service = useMemo(() => createCaptureService(messageApi), [messageApi])
 
+  const { fetchOptions: fetchRoomOptions } = useRoomOptions(messageApi)
+
   const fetchJobs = useCallback(async () => {
     setLoading(true)
     try {
@@ -37,41 +39,17 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
       const data = await service.fetchJobs(params)
       setJobList(data.data)
       setTotal(data.total)
+
+      if (data.data.length > 0 && !captureStartRes) {
+        setIsCaptureSuccess(true)
+      }
     } catch (error) {
       console.error('获取任务列表失败:', error)
       messageApi.error('获取任务列表失败')
     } finally {
       setLoading(false)
     }
-  }, [service, currentPage, pageSize, sorter, searchParams])
-
-  const fetchRoomOptions = useCallback(
-    async (
-      page: number = 1,
-      pageSize: number = 10,
-      search?: string,
-    ): Promise<{ data: RoomOption[]; total: number }> => {
-      try {
-        const response = await service.fetchRooms(page, pageSize, search)
-
-        return {
-          data: response.data.map((room: Room) => ({
-            label: `${room.anchorName} (房间ID: ${room.roomId})`,
-            value: room.roomId.toString(),
-          })),
-          total: response.total,
-        }
-      } catch (error) {
-        console.error('Failed to fetch rooms:', error)
-        messageApi.error('获取房间列表失败')
-        return {
-          data: [],
-          total: 0,
-        }
-      }
-    },
-    [service, messageApi],
-  )
+  }, [service, currentPage, pageSize, sorter, searchParams, captureStartRes])
 
   const startCapture = useCallback(
     async (roomId: string, duration: number) => {
@@ -86,11 +64,12 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
           duration,
         })
 
-        setCaptureStartRes(`开始捕获直播间 -> 主播: ${result.data.anchorName}`)
+        setCaptureStartRes(`开始捕获直播间 -> 主播: ${result.data.roomName}`)
         setIsCaptureSuccess(true)
         await fetchJobs()
       } catch (error) {
         console.error('启动捕获任务失败:', error)
+        messageApi.error('启动捕获任务失败')
       }
     },
     [service, messageApi, fetchJobs],
@@ -140,7 +119,7 @@ export const useCaptureManagement = ({ messageApi }: UseCaptureManagementProps) 
 
   useEffect(() => {
     fetchJobs()
-  }, [fetchJobs, fetchRoomOptions])
+  }, [fetchJobs])
 
   return {
     state: {

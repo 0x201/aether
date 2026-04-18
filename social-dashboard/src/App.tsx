@@ -9,6 +9,7 @@ import RealtimeDanmaku from '@/src/views/realtime-danmaku'
 import { MessageProvider } from './contexts/MessageContext'
 import { ThemeProvider } from './contexts/ThemeProvider'
 import './App.css'
+import RoomsMgt from '@/src/views/management/RoomsMgt'
 
 const App: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
             <Route path="/dashboard" element={<DashboardView />} />
             <Route path="/capture" element={<CaptureView />} />
             <Route path="/management" element={<DanmakuMgt />} />
+            <Route path="/management/rooms" element={<RoomsMgt />} />
             <Route path="/realtime-danmaku" element={<RealtimeDanmaku />} />
           </Route>
         </Routes>
