@@ -20,7 +20,7 @@ public class StartCaptureJobHandler(
         var roomDto = new RoomDto
         {
             RoomId = room!.RoomId,
-            AnchorName = room.RoomName,
+            RoomName = room.RoomName,
         };
 
         return Result<RoomDto>.Success(roomDto, "Capture started");

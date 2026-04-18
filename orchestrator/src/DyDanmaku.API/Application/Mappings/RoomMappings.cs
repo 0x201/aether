@@ -6,7 +6,7 @@ internal class RoomMapping
     {
         return new Room
         {
-            RoomName = roomDto.AnchorName,
+            RoomName = roomDto.RoomName,
             RoomId = roomDto.RoomId,
             CreatedAt = DateTimeOffset.UtcNow
         };
@@ -20,8 +20,10 @@ internal class RoomMapping
     {
         return new RoomDto
         {
-            AnchorName = room.RoomName,
+            Id = room.Id,
+            RoomName = room.RoomName,
             RoomId = room.RoomId,
+            CreatedAt = room.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
         };
     }
 
