@@ -1,7 +1,8 @@
 import Layout, { Content, Header } from 'antd/es/layout/layout'
-import React, { useState } from 'react'
 import Sider from 'antd/es/layout/Sider'
-import { Route, Routes } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Tabs, type TabsProps } from 'antd'
+import { useLocation, useNavigate } from 'react-router-dom'
 import HomeView from '@/src/views/home'
 import DashboardView from '@/src/views/dashboard'
 import CaptureView from '@/src/views/capture'
@@ -15,6 +16,106 @@ import MessageBox from '../MessageBox'
 
 const DefaultLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const [tabs, setTabs] = useState([
+    { key: '/', label: '首页', closable: false },
+  ])
+
+  const activeKey = location.pathname
+
+  const addTab = (path: string, title: string) => {
+    setTabs(prev => {
+      if (!prev.some(tab => tab.key === path)) {
+        return [...prev, { key: path, label: title, closable: true }]
+      }
+      return prev
+    })
+  }
+
+  const removeTab = (targetKey: string) => {
+    let newActiveKey = activeKey
+    let lastIndex = -1
+
+    tabs.forEach((tab, i) => {
+      if (tab.key === targetKey) {
+        lastIndex = i - 1
+      }
+    })
+
+    const newPanes = tabs.filter(tab => tab.key !== targetKey)
+
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key
+      } else {
+        newActiveKey = newPanes[0].key
+      }
+    }
+
+    setTabs(newPanes)
+    if (activeKey === targetKey) {
+      navigate(newActiveKey)
+    }
+  }
+
+  const onEdit = (targetKey: string | React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>, action: 'add' | 'remove') => {
+    if (action === 'remove') {
+      const key = typeof targetKey === 'string' ? targetKey : (targetKey.target as HTMLElement).getAttribute('data-node-key');
+      if (key) {
+        removeTab(key);
+      }
+    }
+  }
+
+  const onTabClick = (key: string) => {
+    navigate(key)
+  }
+
+  const getTitleFromPath = (path: string): string => {
+    switch (path) {
+      case '/': return '首页'
+      case '/dashboard': return '数据概览'
+      case '/capture': return '弹幕捕获'
+      case '/management': return '弹幕管理'
+      case '/realtime-danmaku': return '实时弹幕'
+      default: return '新标签页'
+    }
+  }
+
+  React.useEffect(() => {
+    if (!tabs.some(tab => tab.key === location.pathname)) {
+      addTab(location.pathname, getTitleFromPath(location.pathname))
+    }
+  }, [location.pathname])
+
+
+  const renderCurrentView = () => {
+    switch (activeKey) {
+      case '/':
+        return <HomeView />;
+      case '/dashboard':
+        return <DashboardView />;
+      case '/capture':
+        return <CaptureView />;
+      case '/management':
+        return <DanmakuManagementView />;
+      case '/realtime-danmaku':
+        return <RealtimeDanmakuView />;
+      default:
+        return <HomeView />;
+    }
+  }
+
+  const items: TabsProps['items'] = tabs.map((tab) => {
+    return {
+      label: tab.label,
+      key: tab.key,
+      closable: tab.closable,
+      children: tab.key === activeKey ? renderCurrentView() : null,
+    }
+  })
 
   return (
     <Layout>
@@ -43,13 +144,15 @@ const DefaultLayout: React.FC = () => {
           <AppNavigation mode="inline" />
         </Sider>
         <Content className="content-container">
-          <Routes>
-            <Route path="/" element={<HomeView />} />
-            <Route path="/dashboard" element={<DashboardView />} />
-            <Route path="/capture" element={<CaptureView />} />
-            <Route path="/management" element={<DanmakuManagementView />} />
-            <Route path="/realtime-danmaku" element={<RealtimeDanmakuView />} />
-          </Routes>
+          <Tabs
+            type="editable-card"
+            activeKey={activeKey}
+            hideAdd
+            onEdit={onEdit}
+            items={items}
+            onTabClick={onTabClick}
+            size="middle"
+          />
           <FloatButton.BackTop />
         </Content>
       </Layout>
