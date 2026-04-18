@@ -9,7 +9,7 @@ import type {
 import type { PaginationResponse } from '@/src/interface/shared/type'
 
 const { apiVersion } = config
-const baseUrl = `/api/${apiVersion}/rooms`
+const baseUrl = `/api/${apiVersion}/danmakus/rooms`
 
 export interface RoomService {
   fetchRoomList: (searchParams: RoomSearchParams | null) => Promise<PaginationResponse<Room>>
