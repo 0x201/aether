@@ -136,7 +136,7 @@ public class DanmakuQueries(
         }
         else
         {
-            query = query.OrderByDescending(x => x.RoomId);
+            query = query.OrderBy(x => x.Id);
         }
 
         var rooms = await query
