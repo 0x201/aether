@@ -25,7 +25,6 @@
   </n-card>
 </template>
 
-
 <script setup lang="ts">
 import { NButton, NCard, NForm, NFormItem, NInput, NSpace } from 'naive-ui'
 </script>

@@ -670,14 +670,14 @@ const rgbToCmyk = (r: number, g: number, b: number) => {
   g /= 255
   b /= 255
 
-  let k = 1 - Math.max(r, g, b)
+  const k = 1 - Math.max(r, g, b)
   if (k === 1) {
     return { c: 0, m: 0, y: 0, k: 100 }
   }
 
-  let c = (1 - r - k) / (1 - k)
-  let m = (1 - g - k) / (1 - k)
-  let y = (1 - b - k) / (1 - k)
+  const c = (1 - r - k) / (1 - k)
+  const m = (1 - g - k) / (1 - k)
+  const y = (1 - b - k) / (1 - k)
 
   return {
     c: Math.round(c * 100),
@@ -807,7 +807,6 @@ const updateColorsFromSource = (sourceFormat: string, sourceValue: any) => {
     cmyk = { c: sourceValue.c, m: sourceValue.m, y: sourceValue.y, k: sourceValue.k }
   }
 
-  // 更新除源格式外的所有其他格式
   Object.keys(colorFormatsMap).forEach((format) => {
     if (format !== sourceFormat) {
       switch (format) {

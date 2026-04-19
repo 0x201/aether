@@ -6,6 +6,9 @@
       </div>
       <n-h1>X</n-h1>
     </div>
+
+    <TopMenuBar @top-menu-change="handleTopMenuChange" />
+
     <div class="user-actions">
       <n-button @click="toggleTheme" quaternary>
         <n-icon size="18">
@@ -33,12 +36,16 @@ import {
   DesktopOutline,
 } from '@vicons/ionicons5'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import TopMenuBar from './TopMenuBar.vue'
+import { useMenuStore } from '@/stores/menu'
 
 const theme = ref<'light' | 'dark' | 'auto'>('auto')
 const systemTheme = ref<'light' | 'dark'>('light') // 用于存储系统主题
+const menuStore = useMenuStore()
 
 const emit = defineEmits<{
   themeChange: [theme: 'light' | 'dark' | 'auto']
+  topMenuChange: [key: string]
 }>()
 
 const dropdownOptions = [
@@ -94,6 +101,11 @@ const toggleTheme = () => {
     emit('themeChange', newTheme)
     message.info(`主题已切换至${newTheme === 'dark' ? '深色' : '浅色'}模式`)
   }
+}
+
+const handleTopMenuChange = (key: string) => {
+  menuStore.setCurrentTopMenu(key)
+  emit('topMenuChange', key)
 }
 
 onMounted(() => {
