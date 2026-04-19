@@ -1,0 +1,103 @@
+.header-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: none;
+  margin-bottom: 0.2rem;
+  background: transparent;
+  padding: 12px 24px;
+  backdrop-filter: blur(10px) saturate(120%);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .header-layout {
+  border-bottom: 1px solid rgba(149, 222, 100, 0.25);
+  box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+}
+
+.ant-layout-header {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4361ee, #3a0ca3);
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+  transition: all 0.3s ease;
+  margin-left: 1rem;
+}
+
+[data-theme='dark'] .logo {
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(67, 97, 238, 0.35);
+}
+
+[data-theme='dark'] .logo:hover {
+  box-shadow: 0 6px 16px rgba(67, 97, 238, 0.5);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-left h1 {
+  margin: 0;
+  background: linear-gradient(90deg, #4361ee, #7209b7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.header-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  margin: 0, 1rem;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.sider-container {
+  padding: 0;
+  border-right: none;
+  background: transparent;
+  backdrop-filter: blur(10px);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .sider-container {
+  box-shadow: inset -6px 0 8px -8px rgba(149, 222, 100, 0.5);
+}
+
+.content-container {
+  flex: 1;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  padding: 24px;
+  background: transparent;
+}

@@ -27,8 +27,8 @@ export const menuConfig: MainMenu[] = [
     icon: undefined,
     children: [
       {
-        key: 'dashboard-overview',
-        label: '概览',
+        key: 'dashboard',
+        label: '数据概览',
         path: '/dashboard',
         icon: 'bar-chart',
       },
@@ -47,8 +47,8 @@ export const menuConfig: MainMenu[] = [
     icon: undefined,
     children: [
       {
-        key: 'capture-status',
-        label: '状态监控',
+        key: 'capture',
+        label: '弹幕捕获',
         path: '/capture',
         icon: 'radar-chart',
       },
