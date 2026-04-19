@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { message } from 'antd'
 import type { MessageInstance } from 'antd/es/message/interface'
 import type {
@@ -23,6 +23,7 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [sorter, setSorter] = useState<string | null>(null)
+  const errorFlagRef = useRef<boolean>(false)
 
   const [searchParams, setSearchParams] = useState<RoomSearchParams>({
     page: 1,
@@ -33,10 +34,11 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
 
   const service = useMemo(() => createRoomService(messageApi || message), [messageApi])
 
-  // 使用通用的房间选项获取功能
   const { fetchOptions: fetchRoomOptions } = useRoomOptions(messageApi || message)
 
   const loadRoomList = useCallback(async () => {
+    if (errorFlagRef.current) return
+
     setLoading(true)
     try {
       const params = {
@@ -49,9 +51,13 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
       const data = await service.fetchRoomList(params)
       setRoomList(data.data)
       setTotal(data.total)
+      errorFlagRef.current = false
     } catch (error) {
       console.error('Failed to fetch room list:', error)
-      messageApi?.error('获取房间列表失败')
+      if (!errorFlagRef.current) {
+        messageApi?.error('获取房间列表失败，请检查后端服务是否正常')
+        errorFlagRef.current = true
+      }
     } finally {
       setLoading(false)
     }
@@ -67,6 +73,7 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
       if (limit && limit !== pageSize) {
         setPageSize(limit)
       }
+      errorFlagRef.current = false
     },
     [pageSize],
   )
@@ -75,6 +82,7 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
     (newSearchParams: RoomSearchParams) => {
       setSearchParams(newSearchParams)
       setCurrentPage(1)
+      errorFlagRef.current = false
     },
     [setSearchParams],
   )
@@ -87,12 +95,14 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
       roomId: undefined,
     })
     setCurrentPage(1)
+    errorFlagRef.current = false
   }, [setSearchParams])
 
   const handleDelete = useCallback(
     async (id: number) => {
       const success = await service.deleteRoom(id)
       if (success) {
+        errorFlagRef.current = false
         loadRoomList()
       }
       return success
@@ -104,6 +114,7 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
     async (id: number, data: UpdateRoomRequest) => {
       const success = await service.updateRoom(id, data)
       if (success) {
+        errorFlagRef.current = false
         loadRoomList()
       }
       return success
@@ -115,6 +126,7 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
     async (data: CreateRoomRequest) => {
       const success = await service.createRoom(data)
       if (success) {
+        errorFlagRef.current = false
         loadRoomList()
       }
       return success

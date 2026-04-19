@@ -1,17 +1,11 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef, useEffect } from 'react'
 import type { MessageInstance } from 'antd/es/message/interface'
-import type { Room, RoomOption } from '@/src/interface/room/type'
+import type { Room, RoomOption, RoomSearchParams } from '@/src/interface/room/type'
 import { createRoomService } from '@/src/services/roomService'
 
 interface ResourceOption {
   label: string
   value: string
-}
-
-interface RoomSearchParams {
-  page: number
-  pageSize: number
-  roomName?: string
 }
 
 interface UseResourceOptionsProps<T = ResourceOption> {
@@ -29,7 +23,8 @@ export const useResourceOptions = <T = ResourceOption>({
   fetchFunction,
   mapToOption,
 }: UseResourceOptionsProps<T>) => {
-  const [loading, setLoading] = useState(false)
+  const errorRef = useRef(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchOptions = useCallback(
     async (
@@ -37,36 +32,64 @@ export const useResourceOptions = <T = ResourceOption>({
       pageSize: number = 10,
       search?: string,
     ): Promise<{ data: T[]; total: number }> => {
-      setLoading(true)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
+      if (errorRef.current) {
+        return { data: [], total: 0 }
+      }
       try {
         const response = await fetchFunction(page, pageSize, search)
-
+        errorRef.current = false
         return {
           data: response.data.map(mapToOption),
           total: response.total,
         }
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          return { data: [], total: 0 }
+        }
         console.error('Failed to fetch options:', error)
-        messageApi.error('获取选项失败')
+        if (!errorRef.current) {
+          messageApi.error('获取选项失败，请检查后端服务是否正常')
+          errorRef.current = true
+        }
         return {
           data: [],
           total: 0,
         }
       } finally {
-        setLoading(false)
+        if (abortControllerRef.current === abortController) {
+          abortControllerRef.current = null
+        }
       }
     },
     [fetchFunction, mapToOption, messageApi],
   )
 
+  const resetError = useCallback(() => {
+    errorRef.current = false
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
+
   return {
-    loading,
     fetchOptions,
+    resetError,
   }
 }
 
 export const useRoomOptions = (messageApi: MessageInstance) => {
-  const roomService = useMemo(() => createRoomService(messageApi), [messageApi])
+  const roomService = useMemo(() => createRoomService(), [])
 
   return useResourceOptions<RoomOption>({
     messageApi,

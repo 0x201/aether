@@ -19,11 +19,11 @@ import {
   DatePicker,
 } from 'antd'
 import type { ColumnsType, TableProps } from 'antd/es/table'
-import './DanmakuMgt.css'
+import './danmakumgt.styles.css'
 import type { Danmaku } from '@/src/interface/danmaku/type'
 import type { RoomOption } from '@/src/interface/room/type'
 import type { DanmakuSearchParams } from '@/src/interface/management/type'
-import { useDanmakuMgt } from '../../hooks/useDanmakuMgt'
+import { useDanmakuMgt } from '@/src/hooks/useDanmakuMgt'
 import { buildSorter } from '@/src/util'
 import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect'
 import { CopyableText } from '@/src/components/CopyableText'
@@ -82,12 +82,10 @@ const DanmakuMgt: React.FC = () => {
       const values = await form.validateFields()
 
       if (state.editingDanmaku) {
-        const success = await actions.handleUpdate(state.editingDanmaku.id, values)
-        if (success) {
-          actions.setIsModalVisible(false)
-          form.resetFields()
-          actions.setEditingDanmaku(null)
-        }
+        await actions.handleUpdate(state.editingDanmaku.id, values)
+        actions.setIsModalVisible(false)
+        form.resetFields()
+        actions.setEditingDanmaku(null)
       }
     } catch (error) {
       console.error('Validation failed:', error)
@@ -289,7 +287,13 @@ const DanmakuMgt: React.FC = () => {
                 <Button type="primary" htmlType="submit">
                   搜索
                 </Button>
-                <Button style={{ marginLeft: 8 }} onClick={handleResetSearch}>
+                <Button
+                  style={{ marginLeft: 8 }}
+                  onClick={() => {
+                    actions.clearError()
+                    actions.handleResetSearch()
+                  }}
+                >
                   重置
                 </Button>
               </Col>

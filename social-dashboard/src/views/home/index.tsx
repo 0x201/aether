@@ -14,7 +14,7 @@ import {
   ScheduleOutlined,
   LineChartOutlined,
 } from '@ant-design/icons'
-import './HomeView.css'
+import './styles.css'
 
 const { Title, Paragraph } = Typography
 const { Meta } = Card
