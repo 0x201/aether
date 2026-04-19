@@ -36,20 +36,16 @@ export const useCaptureMgt = ({ messageApi }: UseCaptureMgtProps) => {
         pageSize: pageSize,
         ...(sorter ? { sorter: sorter } : {}),
       }
-      const data = await service.fetchJobs(params)
-      setJobList(data.data)
-      setTotal(data.total)
-
-      if (data.data.length > 0 && !captureStartRes) {
-        setIsCaptureSuccess(true)
-      }
+      const response = await service.fetchJobs(params)
+      setJobList(response.data)
+      setTotal(response.total)
     } catch (error) {
       console.error('获取任务列表失败:', error)
       messageApi.error('获取任务列表失败')
     } finally {
       setLoading(false)
     }
-  }, [service, currentPage, pageSize, sorter, searchParams, captureStartRes])
+  }, [service, currentPage, pageSize, sorter, searchParams])
 
   const startCapture = useCallback(
     async (roomId: string, duration: number) => {
