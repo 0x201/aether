@@ -147,4 +147,6 @@ const InfiniteRefreshSelect = <ValueType extends BaseOptionType = BaseOptionType
   )
 }
 
+export { InfiniteRefreshSelect }
+export type { InfiniteRefreshSelectProps }
 export default InfiniteRefreshSelect

@@ -1,6 +1,72 @@
 import React, { useEffect } from 'react'
 import { useTheme } from '@/src/contexts/useTheme'
-import './AnimatedThemeSwitch.css'
+import './styles.css'
+import { Button, Dropdown, Space } from 'antd'
+import type { MenuProps } from 'antd'
+import {
+  SunOutlined,
+  MoonOutlined,
+  CheckOutlined,
+  SyncOutlined,
+  SettingOutlined,
+} from '@ant-design/icons'
+
+const ThemeSwitch: React.FC = () => {
+  const { themeMode, setThemeMode } = useTheme()
+
+  const items: MenuProps['items'] = [
+    {
+      key: 'light',
+      label: (
+        <Space>
+          Light
+          {themeMode === 'light' && <CheckOutlined style={{ marginLeft: 8 }} />}
+        </Space>
+      ),
+      icon: <SunOutlined />,
+      onClick: () => setThemeMode('light'),
+    },
+    {
+      key: 'dark',
+      label: (
+        <Space>
+          Dark
+          {themeMode === 'dark' && <CheckOutlined style={{ marginLeft: 8 }} />}
+        </Space>
+      ),
+      icon: <MoonOutlined />,
+      onClick: () => setThemeMode('dark'),
+    },
+    {
+      key: 'auto',
+      label: (
+        <Space>
+          Follow System
+          {themeMode === 'auto' && <CheckOutlined style={{ marginLeft: 8 }} />}
+        </Space>
+      ),
+      icon: <SyncOutlined />,
+      onClick: () => setThemeMode('auto'),
+    },
+  ]
+
+  return (
+    <Dropdown menu={{ items }} placement="bottomRight" trigger={['hover']}>
+      <Button
+        type="text"
+        icon={<SettingOutlined />}
+        style={{
+          width: 40,
+          height: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 18,
+        }}
+      />
+    </Dropdown>
+  )
+}
 
 const AnimatedThemeSwitch: React.FC = () => {
   const { currentTheme, toggleBetweenLightAndDark } = useTheme()
@@ -52,4 +118,6 @@ const AnimatedThemeSwitch: React.FC = () => {
   )
 }
 
-export default AnimatedThemeSwitch
+export { AnimatedThemeSwitch, ThemeSwitch }
+
+export default { AnimatedThemeSwitch, ThemeSwitch }

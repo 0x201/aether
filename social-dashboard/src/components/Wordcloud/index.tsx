@@ -252,4 +252,7 @@ const WordCloud: React.FC<WordCloudProps> = (props) => {
   )
 }
 
+export { WordCloud }
+export type { WordCloudProps }
+
 export default WordCloud

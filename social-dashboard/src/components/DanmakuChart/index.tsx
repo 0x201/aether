@@ -1,5 +1,4 @@
 import { Card, Spin } from 'antd'
-import React from 'react'
 import { useMemo } from 'react'
 import {
   Bar,
@@ -11,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { DanmakuChartProps } from './type'
+import type { DanmakuChartProps, TransformedDataItem } from './type'
 import { useTheme } from '@/src/contexts/useTheme'
 
 const DanmakuChart = <T,>({
@@ -59,4 +58,7 @@ const DanmakuChart = <T,>({
   )
 }
 
-export default React.memo(DanmakuChart) as typeof DanmakuChart
+export { DanmakuChart }
+export type { DanmakuChartProps, TransformedDataItem }
+
+export default DanmakuChart

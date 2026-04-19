@@ -37,3 +37,6 @@ const CopyableText: React.FC<CopyableTextProps> = ({ text, children, style, tool
 }
 
 export default CopyableText
+
+export { CopyableText }
+export type { CopyableTextProps }

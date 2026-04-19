@@ -58,4 +58,6 @@ const MessageBox: React.FC = () => {
   )
 }
 
+export { MessageBox }
+
 export default MessageBox
