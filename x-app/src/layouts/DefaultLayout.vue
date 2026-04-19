@@ -67,7 +67,7 @@ import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
 
 interface DefaultLayoutProps {
   onThemeChange: (newTheme: 'light' | 'dark' | 'auto') => void
-  currentTheme: BuiltInGlobalTheme
+  currentTheme: BuiltInGlobalTheme | null
 }
 
 const props = defineProps<DefaultLayoutProps>()
