@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import CalculatorView from '@/views/CalculatorView.vue'
-import TextProcessingView from '@/views/TextProcessingView.vue'
-import Text2SpeechView from '@/views/Text2SpeechView.vue'
-import Text2ImageView from '@/views/Text2ImageView.vue'
+import Text2SpeechView from '@/views/TextProcessing/Text2SpeechView.vue'
+import Text2ImageView from '@/views/TextProcessing/Text2ImageView.vue'
+import Text2AsciiArt from '@/views/TextProcessing/Text2AsciiArt.vue'
 import ColorToolsView from '@/views/ColorToolsView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
@@ -46,7 +46,7 @@ const router = createRouter({
         {
           path: 'text-processing',
           name: 'text-processing',
-          component: TextProcessingView,
+          component: null,
           meta: {
             title: '文本处理',
             icon: 'document-text',
@@ -74,6 +74,17 @@ const router = createRouter({
                 icon: 'text-to-image',
                 parentKey: 'text-processing',
                 order: 2,
+              },
+            },
+            {
+              path: 'text-to-ascii-art',
+              name: 'text-to-ascii-art',
+              component: Text2AsciiArt,
+              meta: {
+                title: '文本转ASCII Art',
+                icon: 'text-to-ascii',
+                parentKey: 'text-processing',
+                order: 3,
               },
             },
           ],
