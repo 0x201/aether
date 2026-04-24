@@ -9,9 +9,9 @@ public class DanmakuCaptureService(
 {
     private int? _currentRoomId;
     private string? _currentTaskId;
-    private Action<int>? _onCaptureCompleted;
+    private Func<int, JobStatus, Task>? _onCaptureCompleted;
 
-    public void SetCleanupCallback(Action<int> onCaptureCompleted)
+    public void SetCleanupCallback(Func<int, JobStatus, Task> onCaptureCompleted)
     {
         _onCaptureCompleted = onCaptureCompleted;
     }
