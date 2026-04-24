@@ -1,7 +1,7 @@
 namespace DyDanmaku.API.Application.Services;
 
 public class CaptureJobManager(
-    IServiceProvider serviceProvider,
+    IServiceScopeFactory serviceScopeFactory,
     ILogger<CaptureJobManager> logger) : BackgroundService, ICaptureJobManager
 {
     private readonly ConcurrentDictionary<int, ActiveCaptureJob> _activeJobs = [];
@@ -90,7 +90,7 @@ public class CaptureJobManager(
             return false;
         }
 
-        using var scope = serviceProvider.CreateScope();
+        using var scope = serviceScopeFactory.CreateScope();
         var jobRepository = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
 
         var existingJob = await jobRepository.GetActiveJobByRoomIdAsync(roomId, cancellationToken);

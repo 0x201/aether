@@ -1,7 +1,7 @@
 namespace DyDanmaku.API.Application.Services;
 
 public class CaptureJobMonitoringService(
-    IServiceProvider serviceProvider,
+    IServiceScopeFactory serviceScopeFactory,
     IConfiguration configuration,
     ILogger<CaptureJobMonitoringService> logger) : BackgroundService
 {
@@ -14,7 +14,7 @@ public class CaptureJobMonitoringService(
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            using var scope = serviceProvider.CreateAsyncScope();
+            using var scope = serviceScopeFactory.CreateAsyncScope();
 
             var jobManager = scope.ServiceProvider.GetRequiredService<ICaptureJobManager>();
             var jobService = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();

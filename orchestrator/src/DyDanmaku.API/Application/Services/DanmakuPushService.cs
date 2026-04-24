@@ -1,7 +1,7 @@
 namespace DyDanmaku.API.Application.Services;
 
 public class DanmakuPushService(
-    IServiceProvider serviceProvider,
+    IServiceScopeFactory serviceScopeFactory,
     IHubContext<DyDanmakuHub> hubContext,
     ILogger<DanmakuPushService> logger)
     : IDanmakuPushService, IHostedService, IDisposable
@@ -22,7 +22,7 @@ public class DanmakuPushService(
     {
         try
         {
-            using var scope = serviceProvider.CreateScope();
+            using var scope = serviceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
 
             // Get the last push time for this room, defaulting to 10 seconds ago if not found
