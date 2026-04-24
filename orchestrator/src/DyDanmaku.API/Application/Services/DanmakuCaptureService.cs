@@ -37,49 +37,43 @@ public class DanmakuCaptureService(
             var scope = serviceProvider.CreateScope();
             var clientPool = scope.ServiceProvider.GetRequiredService<DyDanmakuClientPool>();
 
-            DyDanmakuClient scopedClient = await clientPool.RentAsync();
-            var innerCaptureJobService = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
+            await using var lease = await clientPool.RentAsync();
+            var completionStatus = JobStatus.Failed;
 
             try
             {
                 var completionCts = new CancellationTokenSource();
-                var captureTask = scopedClient.StartAsync(roomId, duration, completionCts.Token);
+                var captureTask = lease.Client.StartAsync(roomId, duration, completionCts.Token);
                 var completed = await Task.WhenAny(captureTask, Task.Delay(Timeout.InfiniteTimeSpan, cts));
 
                 if (completed == captureTask)
                 {
-                    await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Completed);
+                    completionStatus = JobStatus.Completed;
                     logger.ZLogInformation($"Danmaku capture for room [{roomId}] completed normally");
                 }
                 else
                 {
-                    await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Cancelled);
+                    completionStatus = JobStatus.Cancelled;
                     logger.ZLogInformation($"Danmaku capture for room [{roomId}] was cancelled");
                 }
             }
             catch (Exception ex)
             {
+                completionStatus = JobStatus.Failed;
                 logger.ZLogError($"An error occurred during danmaku capture for room [{roomId}]. Exception: {ex}");
-                await innerCaptureJobService.UpdateJobStatusAsync(roomId, JobStatus.Failed);
             }
             finally
             {
-                if (clientPool is not null)
-                {
-                    clientPool.ReturnClient(scopedClient);
-                }
-                else
-                {
-                    scopedClient?.Dispose();
-                }
-
                 if (_currentRoomId == roomId)
                 {
                     Reset();
                 }
                 scope.Dispose();
 
-                _onCaptureCompleted?.Invoke(roomId);
+                if (_onCaptureCompleted is not null)
+                {
+                    await _onCaptureCompleted.Invoke(roomId, completionStatus);
+                }
             }
         });
 
@@ -87,11 +81,7 @@ public class DanmakuCaptureService(
         {
             logger.ZLogError($"Failed to add task to scheduler for room [{roomId}]");
             Reset();
-            return;
         }
-        using var scope = serviceProvider.CreateScope();
-        var scopedCaptureJobService = scope.ServiceProvider.GetRequiredService<ICaptureJobRepository>();
-        await scopedCaptureJobService.CreateJobAsync(roomId, duration);
     }
 
     private void Reset()

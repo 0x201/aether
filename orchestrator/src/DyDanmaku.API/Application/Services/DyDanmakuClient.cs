@@ -1,51 +1,109 @@
+using System.Buffers;
+using System.Buffers.Binary;
+using System.IO.Pipelines;
+
 namespace DyDanmaku.API.Application.Services;
+
+internal ref struct DanmakuFrameParser(ReadOnlySpan<byte> data)
+{
+    private ReadOnlySpan<byte> _remaining = data;
+    public bool IsEmpty => _remaining.IsEmpty;
+
+    public int RemainingLength => _remaining.Length;
+    public bool TryReadFrame(out ReadOnlySpan<byte> frame)
+    {
+        frame = default;
+
+        if (_remaining.Length < 4)
+        {
+            return false;
+        }
+
+        var contentLength = BinaryPrimitives.ReadUInt32LittleEndian(_remaining);
+        var totalPacketSize = 4 + (int)contentLength;
+
+        if (_remaining.Length < totalPacketSize)
+        {
+            return false;
+        }
+
+        const int HeaderSize = 12;
+        var payloadEnd = totalPacketSize - 1;
+
+        if (payloadEnd > HeaderSize)
+        {
+            frame = _remaining[HeaderSize..payloadEnd];
+        }
+
+        _remaining = _remaining[totalPacketSize..];
+
+        return true;
+    }
+}
 
 public class DyDanmakuClient(
     ILogger<DyDanmakuClient> logger,
     IConfiguration configuration,
-    IServiceProvider serviceProvider) : IDisposable
+    IServiceProvider serviceProvider) : IAsyncDisposable, IDisposable
 {
-    private string SERVERPREFIX = configuration.GetSection("Douyu:Apis:DanmakuUrl").Get<string>() ?? "wss://danmuproxy.douyu.com";
-    private string _serverUrl = string.Empty;
-    private int _roomId;
+    private static readonly TimeSpan[] ReconnectDelays =
+    [
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromSeconds(2),
+        TimeSpan.FromSeconds(4),
+        TimeSpan.FromSeconds(8),
+        TimeSpan.FromSeconds(16),
+        TimeSpan.FromSeconds(30),
+    ];
+    private string _serverPrefix = configuration.GetSection("Douyu:Apis:DanmakuUrl").Get<string>() ?? "wss://danmuproxy.douyu.com";
+    private string _authUserName = configuration.GetSection("Douyu:Auth:UserName").Get<string>() ?? string.Empty;
+    private string _authUserId = configuration.GetSection("Douyu:Auth:UserId").Get<string>() ?? string.Empty;
+    private readonly Channel<Danmaku> _danmakuChannel = Channel.CreateBounded<Danmaku>(
+        new BoundedChannelOptions(500)
+        {
+            SingleReader = true,
+            SingleWriter = false,
+            FullMode = BoundedChannelFullMode.DropOldest
+        }
+    );
     private ClientWebSocket? _client;
-    private Timer? _heartbeatTimer;
-    private bool _isConnected;
-    private bool _isStopping = false;
-    private readonly List<Danmaku> _danmakuBuffer = [];
-    private readonly SemaphoreSlim _bufferSemaphore = new(1, 1);
-    private Timer? _flushTimer;
+    private volatile bool _isConnected;
+    private Task? _persisterTask;
+    private Task? _heartbeatTask;
+    private Task? _receiveTask;
+    private CancellationTokenSource _stopCts = new();
 
-    public string ServerUrl { get { return _serverUrl; } }
-    public int RoomId { get { return _roomId; } }
+    public string ServerUrl { get => field; private set => field = value; } = string.Empty;
+    public int RoomId { get => field; private set => field = value; }
 
 
     public async Task StartAsync(int roomId, int durationInSeconds = 3600, CancellationToken cancellationToken = default)
     {
-        _roomId = roomId;
+        RoomId = roomId;
         int port = 8500 + Random.Shared.Next(1, 6);
-        _serverUrl = $"{SERVERPREFIX}:{port}/";
-        logger.ZLogInformation($"Connecting [{_serverUrl}]...");
+        ServerUrl = $"{_serverPrefix}:{port}/";
+        logger.ZLogInformation($"Connecting [{ServerUrl}]...");
         _isConnected = false;
 
         using var durationCts = new CancellationTokenSource(TimeSpan.FromSeconds(durationInSeconds));
-        using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, durationCts.Token);
+        using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, durationCts.Token, _stopCts.Token);
+        var ct = combinedCts.Token;
 
         try
         {
             _client = new ClientWebSocket();
-            await _client.ConnectAsync(new Uri(_serverUrl), combinedCts.Token);
-
+            await _client.ConnectAsync(new Uri(ServerUrl), ct);
             _isConnected = true;
 
-            _ = Task.Run(() => ReceiveLoop(combinedCts.Token), combinedCts.Token);
+            _persisterTask = Task.Run(() => RunBatchPersisterAsync(ct), ct);
+            _receiveTask = Task.Run(() => RunReceivePipeAsync(ct), ct);
 
-            Precheck();
-            Login();
-            JoinGroup();
-            StartHeartbeat();
+            await SendMsgAsync("type@=unsub/mt@=dyh_legend_subscribe/", ct);
+            await SendLoginAsync(ct);
+            await SendMsgAsync($"type@=joingroup/rid@={RoomId}/gid@=1", ct);
 
-            await combinedCts.Token.WhenCanceled();
+            _heartbeatTask = Task.Run(() => RunHeartbeatAsync(ct), ct);
+            await ct.WhenCancelled();
         }
         catch (OperationCanceledException)
         {
@@ -53,7 +111,7 @@ public class DyDanmakuClient(
         }
         catch (Exception ex)
         {
-            logger.ZLogError($"Failed to connect: [{_serverUrl}]. Exception: {ex}");
+            logger.ZLogError($"Failed to connect: [{ServerUrl}]. Exception: {ex}");
             throw;
         }
         finally
@@ -64,14 +122,15 @@ public class DyDanmakuClient(
 
     public async Task StopAsync()
     {
-        _isStopping = true;
         _isConnected = false;
+        _stopCts.Cancel();
 
         if (_client?.State == WebSocketState.Open)
         {
             try
             {
-                await LogoutAsync();
+                await SendMsgAsync("type@=logout/", CancellationToken.None);
+                await Task.Delay(100);
                 await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", CancellationToken.None);
             }
             catch (WebSocketException)
@@ -81,114 +140,341 @@ public class DyDanmakuClient(
         }
         logger.ZLogInformation($"Stopped capture for room {RoomId}", RoomId);
 
-        _heartbeatTimer?.Dispose();
-        _flushTimer?.Dispose();
+        await CleanupResources();
 
-        await FlushBufferAsync();
-
-        _isStopping = false;
+        _stopCts.Dispose();
+        _stopCts = new CancellationTokenSource();
     }
 
     public void Reset()
     {
-        _heartbeatTimer?.Dispose();
-        _flushTimer?.Dispose();
-        _danmakuBuffer.Clear();
 
         _isConnected = false;
-        _isStopping = false;
+
+        _stopCts.Dispose();
+        _stopCts = new CancellationTokenSource();
 
         try
         {
             _client?.Abort();
             _client?.Dispose();
+            _client = null;
         }
         catch (Exception)
         {
             // ignored
         }
 
+        while (_danmakuChannel.Reader.TryRead(out _)) { }
+
         logger.LogDebug($"DyDanmakuClient has been reset");
     }
 
-    private async Task ReceiveLoop(CancellationToken cancellationToken = default)
+    private async Task RunReceivePipeAsync(CancellationToken cancellationToken)
     {
-        var buffer = new byte[1024 * 4];
+        var pipe = new Pipe();
+        var filling = FillPipeAsync(pipe.Writer, cancellationToken);
+        var reading = DrainPipeAsync(pipe.Reader, cancellationToken);
+        await Task.WhenAll(filling, reading);
+    }
+
+    private async Task FillPipeAsync(PipeWriter writer, CancellationToken cancellationToken)
+    {
         try
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 if (!_isConnected || _client?.State != WebSocketState.Open)
                 {
-                    if (!cancellationToken.IsCancellationRequested && !_isStopping)
+                    if(!await ReconnectAsync(cancellationToken))
+                        break;
+                    
+                    continue;
+                }
+
+                ValueWebSocketReceiveResult result;
+                try
+                {
+                    
+                    var memory = writer.GetMemory(4096);
+                    using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(65));
+                    using var receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
+                    result = await _client.ReceiveAsync(memory, receiveCts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.ZLogInformation($"FillPipeAsync cancelled for room [{RoomId}]");
+                    break;
+                }
+                catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+                {
+                    logger.ZLogError($"Receive error for room [{RoomId}]. Exception: {ex}");
+                    _isConnected = false;
+                    continue;
+                }
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    logger.ZLogInformation($"WebSocket connection closed by remote party for room [{RoomId}]");
+                    _isConnected = false;
+                    continue;
+                }
+
+                writer.Advance(result.Count);
+
+                var flushResult = await writer.FlushAsync(cancellationToken);
+                if (flushResult.IsCompleted) break;
+
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.ZLogError($"FillPipeAsync failed for room [{RoomId}]. Exception: {ex}");
+        }
+        finally
+        {
+            await writer.CompleteAsync();
+        }
+    }
+
+    private async Task DrainPipeAsync(PipeReader reader, CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var readResult = await reader.ReadAsync(cancellationToken);
+                var buffer = readResult.Buffer;
+
+                SequencePosition consumed = buffer.Start;
+
+                if (!buffer.IsEmpty)
+                {
+                    int consumedBytes;
+                    if (buffer.IsSingleSegment)
                     {
-                        await ReconnectAsync(cancellationToken);
+                        var span = buffer.FirstSpan;
+                        consumedBytes = ParseAndPublish(span);
                     }
                     else
                     {
-                        break;
+                        var length = (int)buffer.Length;
+                        var rented = ArrayPool<byte>.Shared.Rent(length);
+
+                        try
+                        {
+                            buffer.CopyTo(rented);
+                            consumedBytes = ParseAndPublish(rented.AsSpan(0, length));
+                        }
+                        finally
+                        {
+                            ArrayPool<byte>.Shared.Return(rented);
+                        }
+                    }
+
+                    if (consumedBytes > 0)
+                    {
+                        consumed = buffer.Slice(0, consumedBytes).End;
                     }
                 }
 
-                if (_isConnected && _client?.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
+                reader.AdvanceTo(consumed, buffer.End);
+                if (readResult.IsCompleted) break;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            logger.ZLogInformation($"DrainPipeAsync cancelled for room [{RoomId}]");
+        }
+        catch (Exception ex)
+        {
+            logger.ZLogError($"DrainPipeAsync error for room [{RoomId}]. Exception: {ex}");
+        }
+        finally
+        {
+            await reader.CompleteAsync();
+        }
+    }
+
+    private int ParseAndPublish(ReadOnlySpan<byte> data)
+    {
+        var parser = new DanmakuFrameParser(data);
+        while (parser.TryReadFrame(out var frame))
+        {
+            if (frame.IsEmpty) continue;
+
+            var msgStr = Encoding.UTF8.GetString(frame);
+            if (TryParseChatMessage(msgStr) is { } danmaku)
+            {
+                _danmakuChannel.Writer.TryWrite(danmaku);
+            }
+        }
+        return data.Length - parser.RemainingLength;
+    }
+
+    private Danmaku? TryParseChatMessage(string msgStr)
+    {
+        if (string.IsNullOrEmpty(msgStr)) return null;
+
+        if (msgStr.Contains('\0'))
+        {
+            Danmaku? last = null;
+            foreach (var part in msgStr.Split('\0', StringSplitOptions.RemoveEmptyEntries))
+            {
+                last = TryParseChatMessage(part);
+            }
+            return last;
+        }
+
+        var fields = ParseDouyuFields(msgStr);
+        if (fields is null) return null;
+        if (!fields.TryGetValue("type", out var type) || type != "chatmsg") return null;
+
+        fields.TryGetValue("rid", out var rid);
+        fields.TryGetValue("uid", out var uid);
+        fields.TryGetValue("nn", out var nn);
+        fields.TryGetValue("txt", out var txt);
+        fields.TryGetValue("level", out var level);
+
+        string? fanMedalName = null;
+        int? fanMedalLevel = null;
+        if (fields.TryGetValue("bnn", out var bnn)
+            && !string.IsNullOrEmpty(bnn)
+            && fields.TryGetValue("bl", out var bl)
+            && !string.IsNullOrEmpty(bl))
+        {
+            fanMedalName = bnn;
+            fanMedalLevel = int.TryParse(bl, out var blv) ? blv : null;
+        }
+
+        return new Danmaku
+        {
+            RoomId = int.TryParse(rid, out var roomId) ? roomId : null,
+            UserId = uid ?? string.Empty,
+            UserName = nn ?? string.Empty,
+            Content = txt ?? string.Empty,
+            UserLevel = int.TryParse(level, out var levelInt) ? levelInt : null,
+            FanMedalName = fanMedalName,
+            FanMedalLevel = fanMedalLevel,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+    }
+
+    private Dictionary<string, string>? ParseDouyuFields(string msgStr)
+    {
+        try
+        {
+            var result = new Dictionary<string, string>();
+            var msgSpan = msgStr.AsSpan();
+            foreach (var range in msgSpan.Split('/'))
+            {
+                var segement = msgSpan[range];
+                if (segement.IsEmpty) continue;
+
+                var part = segement.ToString().Replace("@s", "/").Replace("@A", "@");
+                var eqIdx = part.IndexOf("@=", StringComparison.Ordinal);
+
+                if (eqIdx > 0)
                 {
-                    var receiveCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                    receiveCts.CancelAfter(TimeSpan.FromSeconds(30));
+                    result[part[..eqIdx]] = part[(eqIdx + 2)..];
+                }
+            }
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.ZLogError($"An error occurred while parsing message from: [{ServerUrl}]. Exception: {ex}");
+            return null;
+        }
+    }
 
-                    var result = await _client.ReceiveAsync(new ArraySegment<byte>(buffer), receiveCts.Token);
+    private async Task RunBatchPersisterAsync(CancellationToken cancellationToken)
+    {
+        const int BatchSize = 20;
+        const int FlushIntervalSeconds = 5;
+        var batch = new List<Danmaku>(BatchSize);
 
-                    if (result.MessageType == WebSocketMessageType.Text)
+        using var flushTimer = new PeriodicTimer(TimeSpan.FromSeconds(FlushIntervalSeconds));
+        var flushTimerTask = flushTimer.WaitForNextTickAsync(cancellationToken).AsTask();
+
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var readTask = _danmakuChannel.Reader.WaitToReadAsync(cancellationToken).AsTask();
+                var completed = await Task.WhenAny(readTask, flushTimerTask);
+                var timerFired = completed == flushTimerTask;
+
+                if (completed == readTask)
+                {
+                    while (batch.Count < BatchSize && _danmakuChannel.Reader.TryRead(out var item))
                     {
-                        var messageBytes = new byte[result.Count];
-                        Array.Copy(buffer, messageBytes, result.Count);
-                        var message = Encoding.UTF8.GetString(messageBytes);
-
-                        await OnMessage(message);
+                        batch.Add(item);
                     }
-                    else if (result.MessageType == WebSocketMessageType.Binary)
-                    {
-                        var messageBytes = new byte[result.Count];
-                        Array.Copy(buffer, messageBytes, result.Count);
+                }
+                else
+                {
+                    flushTimerTask = flushTimer.WaitForNextTickAsync(cancellationToken).AsTask();
+                }
 
-                        var messages = MsgDecode(messageBytes);
-                        foreach (var msgStr in messages)
-                        {
-                            await OnMessage(msgStr);
-                        }
-                    }
-                    else if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        _isConnected = false;
-                        logger.ZLogInformation($"WebSocket connection closed by remote party for room [{RoomId}]");
-
-                        if (!cancellationToken.IsCancellationRequested && !_isStopping)
-                        {
-                            await ReconnectAsync(cancellationToken);
-                        }
-                    }
+                if (batch.Count >= BatchSize || (timerFired && batch.Count > 0))
+                {
+                    await PersistBatchAsync(batch, cancellationToken);
+                    batch.Clear();
                 }
             }
         }
         catch (OperationCanceledException)
         {
-            logger.ZLogInformation($"ReceiveLoop cancelled for room [{RoomId}]");
-        }
-        catch (WebSocketException ex) when (ex.Message.Contains("closed the WebSocket connection"))
-        {
-            logger.ZLogInformation($"WebSocket connection terminated by remote party for room [{RoomId}]: {ex.Message}");
-            _isConnected = false;
-            if (!cancellationToken.IsCancellationRequested && !_isStopping)
-            {
-                await ReconnectAsync(cancellationToken);
-            }
+            logger.ZLogInformation($"BatchPersister cancelled for room [{RoomId}]");
         }
         catch (Exception ex)
         {
-            logger.ZLogError($"An error occurred in ReceiveLoop for room [{RoomId}]. Exception: {ex}");
-            if (!cancellationToken.IsCancellationRequested && !_isStopping)
+            logger.ZLogError($"BatchPersister error for room [{RoomId}]. Exception: {ex}");
+        }
+        finally
+        {
+            while (_danmakuChannel.Reader.TryRead(out var item)) batch.Add(item);
+            if (batch.Count > 0) await PersistBatchAsync(batch, CancellationToken.None);
+        }
+    }
+
+    private async Task PersistBatchAsync(List<Danmaku> batch, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var scope = serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
+            await dbContext.Danmakus.AddRangeAsync(batch, cancellationToken);
+            var saved = await dbContext.SaveChangesAsync(cancellationToken);
+            logger.ZLogInformation($"Saved [{saved}] danmaku(s) to database for room [{RoomId}]");
+        }
+        catch (Exception ex)
+        {
+            logger.ZLogError($"Failed to persist danmaku batch for room [{RoomId}]. Exception: {ex}");
+        }
+    }
+
+    private async Task RunHeartbeatAsync(CancellationToken cancellationToken)
+    {
+        await SendMsgAsync("type@=mrkl/", cancellationToken);
+
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(45));
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                await ReconnectAsync(cancellationToken);
+                if (_isConnected && _client?.State == WebSocketState.Open)
+                {
+                    await SendMsgAsync("type@=mrkl/", cancellationToken);
+                }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            logger.ZLogInformation($"Heartbeat cancelled for room [{RoomId}]");
         }
     }
 
@@ -196,58 +482,85 @@ public class DyDanmakuClient(
     {
         logger.ZLogInformation($"Attempting to reconnect for room [{RoomId}]...");
 
-        _heartbeatTimer?.Dispose();
-        _heartbeatTimer = null;
-
-        try
+        for (int attempt = 0; attempt < ReconnectDelays.Length; attempt++)
         {
-            if (_client?.State == WebSocketState.Open)
-            {
-                await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Reconnecting", CancellationToken.None);
-            }
+            if (cancellationToken.IsCancellationRequested) return false;
 
-            _client = new ClientWebSocket();
-            await _client.ConnectAsync(new Uri(_serverUrl), cancellationToken);
-
-            _isConnected = true;
-
-            Precheck();
-            Login();
-            JoinGroup();
-
-            StartHeartbeat();
-
-            logger.ZLogInformation($"Reconnected successfully for room [{RoomId}]");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.ZLogError($"Failed to reconnect for room [{RoomId}], retrying in 5 seconds... Exception: {ex}");
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-                return false;
+                _client?.Dispose();
+                _client = new ClientWebSocket();
+                await _client.ConnectAsync(new Uri(ServerUrl), cancellationToken);
+                _isConnected = true;
+
+                await SendMsgAsync("type@=unsub/mt@=dyh_legend_subscribe/", cancellationToken);
+                await SendLoginAsync(cancellationToken);
+                await SendMsgAsync($"type@=joingroup/rid@={RoomId}/gid@=1", cancellationToken);
+
+                logger.ZLogInformation($"Reconnected succcessfully for romm [{RoomId}]");
+                return true;
             }
-            catch (OperationCanceledException)
+            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
             {
-                return false;
+                var baseDelay = ReconnectDelays[attempt];
+                var jitter = TimeSpan.FromMilliseconds(baseDelay.TotalMilliseconds * Random.Shared.NextDouble() * 0.3);
+                var delay = baseDelay + jitter;
+
+                logger.ZLogError($"Reconnect attempt {attempt + 1}/{ReconnectDelays.Length} failed for room [{RoomId}], retrying in {delay.TotalSeconds:F1}s. Exception: {ex}");
+
+                try
+                {
+                    await Task.Delay(delay, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    return false;
+                }
             }
         }
+
+        logger.ZLogError($"All reconnect attempts failed for room [{RoomId}]. Giving up");
+        return false;
     }
 
     private async Task CleanupResources()
     {
-        _heartbeatTimer?.Dispose();
-        _flushTimer?.Dispose();
+        if (_persisterTask is not null)
+        {
+            _danmakuChannel.Writer.TryComplete();
+            try
+            {
+                await _persisterTask;
+            }
+            catch (Exception) { }
+
+            _persisterTask = null;
+        }
+
+        if (_heartbeatTask is not null)
+        {
+            try
+            {
+                await _heartbeatTask;
+            }
+            catch (Exception) { }
+            _heartbeatTask = null;
+        }
+
+        if (_receiveTask is not null)
+        {
+            try
+            {
+                await _receiveTask;
+            }
+            catch (Exception) { }
+            _receiveTask = null;
+        }
 
         if (_client?.State == WebSocketState.Open)
         {
             try
             {
-                var logoutMsg = "type@=logout/";
-                SendMsg(logoutMsg);
-                await Task.Delay(100);
-
                 await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", CancellationToken.None);
             }
             catch (WebSocketException)
@@ -255,330 +568,112 @@ public class DyDanmakuClient(
                 logger.ZLogWarning($"WebSocket already in invalid state during cleanup: {_client?.State}");
             }
         }
-
-        await FlushBufferAsync();
     }
 
-    private async Task OnMessage(string message)
+    private async ValueTask SendLoginAsync(CancellationToken cancellationToken)
     {
+        var loginMsg = $"type@=loginreq/roomid@={RoomId}/dfl@=sn@AA=106@ASss@AA=1@Ssn@AA=107@ASss@AA=1@Ssn@AA=108@ASss@AA=1@Ssn@AA=105@ASss@AA=1/username@={_authUserName}/uid@=${_authUserId}/ver@=20220825/aver@=218101901/ct@=0/";
+        await SendMsgAsync(loginMsg, cancellationToken);
+    }
+
+    public async ValueTask SendCloseGiftAsync(CancellationToken cancellationToken = default)
+    {
+        var closeGiftMsg = "type@=dmfbdreq/dfl@=sn@AA=105@ASss@AA=1@AS@Ssn@AA=106@ASss@AA=1@AS@Ssn@AA=107@ASss@AA=1@AS@Ssn@AA=108@ASss@AA=1@AS@Ssn@AA=110@ASss@AA=1@AS@Ssn@AA=901@ASss@AA=1@AS@S/";
+        await SendMsgAsync(closeGiftMsg, cancellationToken);
+    }
+
+    private async ValueTask SendMsgAsync(string msg, CancellationToken cancellationToken)
+    {
+        if (_client?.State != WebSocketState.Open) return;
+        var payload = MsgEncode(msg);
         try
         {
-            List<string> messages = string.IsNullOrEmpty(message) ? [] : [message];
-            if (message.Contains('\0'))
-            {
-                messages = MsgDecode(Encoding.UTF8.GetBytes(message));
-            }
-
-            var chatMsgList = new List<Danmaku>();
-            foreach (var msgStr in messages)
-            {
-                var msg = MsgFormat(msgStr);
-
-                if (msg is not null && msg.TryGetValue("type", out string? value) && value == "chatmsg")
-                {
-                    var roomid = msg.TryGetValue("rid", out string? rid) ? rid : "";
-                    var userid = msg.TryGetValue("uid", out string? uid) ? uid : "";
-                    var username = msg.TryGetValue("nn", out string? nn) ? nn : "";
-                    var content = msg.TryGetValue("txt", out string? txt) ? txt : "";
-                    var fanMedalName = "";
-                    var fanMedalLevel = "";
-
-                    if (msg.TryGetValue("bnn", out string? bnn) && !string.IsNullOrEmpty(bnn) &&
-                        msg.TryGetValue("bl", out string? bl) && !string.IsNullOrEmpty(bl))
-                    {
-                        fanMedalName = bnn;
-                        fanMedalLevel = bl;
-                    }
-                    var level = msg.TryGetValue("level", out string? lv) ? lv : "";
-
-                    var danmaku = new Danmaku
-                    {
-                        UserId = userid,
-                        UserName = username,
-                        Content = content,
-                        FanMedalName = fanMedalName,
-                        FanMedalLevel = !string.IsNullOrEmpty(fanMedalLevel) ? int.Parse(fanMedalLevel) : null,
-                        UserLevel = !string.IsNullOrEmpty(level) ? int.Parse(level) : null,
-                        CreatedAt = DateTimeOffset.UtcNow,
-                        RoomId = !string.IsNullOrEmpty(roomid) ? int.Parse(roomid) : null,
-                    };
-                    chatMsgList.Add(danmaku);
-                }
-            }
-
-            if (chatMsgList.Count > 0)
-            {
-                await _bufferSemaphore.WaitAsync();
-                try
-                {
-                    _danmakuBuffer.AddRange(chatMsgList);
-
-                    if (_danmakuBuffer.Count >= 20)
-                    {
-                        _flushTimer?.Dispose();
-                        _flushTimer = null;
-                        _ = Task.Run(async () => await FlushBufferAsync());
-                    }
-                    else if (_danmakuBuffer.Count == 1)
-                    {
-                        _flushTimer?.Dispose();
-                        _flushTimer = new Timer(async _ =>
-                        {
-                            _ = Task.Run(async () => await FlushBufferAsync());
-                        }, null, TimeSpan.FromSeconds(5), Timeout.InfiniteTimeSpan);
-                    }
-                }
-                finally
-                {
-                    _bufferSemaphore.Release();
-                }
-            }
+            await _client.SendAsync(payload.AsMemory(), WebSocketMessageType.Binary, true, cancellationToken);
         }
         catch (Exception ex)
         {
-            logger.ZLogError($"An error occurred while processing message for: [{_serverUrl}]. Exception: {ex}");
-        }
-    }
-
-    private async Task FlushBufferAsync()
-    {
-        List<Danmaku> danmakusToSave = [];
-
-        await _bufferSemaphore.WaitAsync();
-        try
-        {
-            if (_danmakuBuffer.Count == 0)
-            {
-                return;
-            }
-
-            danmakusToSave = [.. _danmakuBuffer];
-            _danmakuBuffer.Clear();
-        }
-        finally
-        {
-            _bufferSemaphore.Release();
-        }
-
-        if (danmakusToSave is not null && danmakusToSave.Count > 0)
-        {
-            try
-            {
-                using var scope = serviceProvider.CreateScope();
-                using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
-                await dbContext.Danmakus.AddRangeAsync(danmakusToSave);
-                var savedRows = await dbContext.SaveChangesAsync();
-                logger.ZLogInformation($"Saved [{savedRows}] chat message(s) to database for room [{RoomId}]");
-            }
-            catch (Exception ex)
-            {
-                logger.ZLogError($"Failed to save danmaku to database. Exception: {ex}");
-            }
-        }
-    }
-
-    private void Precheck()
-    {
-        var precheckMsg = "type@=unsub/mt@=dyh_legend_subscribe/";
-        SendMsg(precheckMsg);
-    }
-
-    private void Login()
-    {
-        var loginMsg = $"type@=loginreq/roomid@={RoomId}/dfl@=sn@AA=106@ASss@AA=1@Ssn@AA=107@ASss@AA=1@Ssn@AA=108@ASss@AA=1@Ssn@AA=105@ASss@AA=1/username@=weibo_Fd5g4UoV/uid@=4845301/ver@=20220825/aver@=218101901/ct@=0/";
-        SendMsg(loginMsg);
-    }
-
-    private async Task LogoutAsync()
-    {
-        if (_client?.State == WebSocketState.Open)
-        {
-            var logoutMsg = "type@=logout/";
-            SendMsg(logoutMsg);
-            await Task.Delay(100);
-        }
-    }
-
-    private void JoinGroup()
-    {
-        var joinGroupMsg = $"type@=joingroup/rid@={RoomId}/gid@=1/";
-        SendMsg(joinGroupMsg);
-    }
-
-    public void CloseGift()
-    {
-        var closeGiftMsg = "type@=dmfbdreq/dfl@=sn@AA=105@ASss@AA=1@AS@Ssn@AA=106@ASss@AA=1@AS@Ssn@AA=107@ASss@AA=1@AS@Ssn@AA=108@ASss@AA=1@AS@Ssn@AA=110@ASss@AA=1@AS@Ssn@AA=901@ASss@AA=1@AS@S/";
-        SendMsg(closeGiftMsg);
-    }
-
-    private void StartHeartbeat()
-    {
-        SendMsg("type@=mrkl/");
-        _heartbeatTimer = new Timer(
-            (state) =>
-            {
-                if (_isConnected && _client?.State == WebSocketState.Open)
-                {
-                    SendMsg("type@=mrkl/");
-                }
-            },
-            null,
-            TimeSpan.FromSeconds(45),
-            TimeSpan.FromSeconds(45)
-        );
-    }
-
-    private void SendMsg(string msg)
-    {
-        if (_client?.State == WebSocketState.Open)
-        {
-            var msgBytes = MsgEncode(msg);
-            _ = _client.SendAsync(new ArraySegment<byte>(msgBytes), WebSocketMessageType.Binary, true, CancellationToken.None);
+            logger.ZLogError($"SendMsg failed for room [{RoomId}]. Exception: {ex}");
         }
     }
 
     private static byte[] MsgEncode(string msg)
     {
-        // 消息以 \0 结尾
-        msg += '\0';
+        var msgWithNull = msg + '\0';
+        var msgByteCount = Encoding.UTF8.GetByteCount(msgWithNull);
+        var totalLength = msgByteCount + 8;
 
-        // 将字符串转换为UTF-8编码的字节数组
-        var msgBuffer = Encoding.UTF8.GetBytes(msg);
+        var result = new byte[12 + msgByteCount];
+        var span = result.AsSpan();
 
-        // 消息长度 + 头部长度8
-        var length = msgBuffer.Length + 8;
+        BinaryPrimitives.WriteUInt32LittleEndian(span[..4], (uint)totalLength);
+        BinaryPrimitives.WriteUInt32LittleEndian(span[4..8], (uint)totalLength);
+        BinaryPrimitives.WriteUInt16LittleEndian(span[8..10], 689);
+        span[10] = 0;
+        span[11] = 0;
 
-        // 创建头部字节数组
-        var headBuffer = new byte[12]; // 4+4+2+1+1=12
-
-        // 写入消息长度（小端序）
-        BitConverter.GetBytes(length).CopyTo(headBuffer, 0);
-        BitConverter.GetBytes(length).CopyTo(headBuffer, 4);
-
-        // 斗鱼客户端发送消息类型 689
-        BitConverter.GetBytes((ushort)689).CopyTo(headBuffer, 8);
-
-        // 加密字段与保留字段，默认 0
-        headBuffer[10] = 0;
-        headBuffer[11] = 0;
-
-        // 合并头部和消息体
-        var result = new byte[headBuffer.Length + msgBuffer.Length];
-        headBuffer.CopyTo(result, 0);
-        msgBuffer.CopyTo(result, headBuffer.Length);
+        Encoding.UTF8.GetBytes(msgWithNull.AsSpan(), span[12..]);
 
         return result;
     }
 
-    private static List<string> MsgDecode(byte[] msgBytes)
-    {
-        var messages = new List<string>();
-        var buffer = msgBytes;
-        int cursor = 0;
-
-        while (cursor < buffer.Length)
-        {
-            // 读取4字节长度（小端序）
-            if (cursor + 4 > buffer.Length) break;
-
-            var contentLength = BitConverter.ToUInt32(buffer, cursor);
-
-            // 计算内容起始位置：cursor+4+8
-            var contentStart = cursor + 4 + 8;
-
-            // 计算内容结束位置：cursor+4+content_length-1
-            var contentEnd = cursor + 4 + contentLength - 1;
-
-            // 检查边界
-            if (contentEnd > buffer.Length) break;
-            if (contentEnd <= contentStart)
-            {
-                cursor = cursor + 4 + (int)contentLength;
-                continue;
-            }
-
-            // 提取并解码内容
-            var content = new byte[contentEnd - contentStart];
-            Array.Copy(buffer, contentStart, content, 0, content.Length);
-            var decodedContent = Encoding.UTF8.GetString(content);
-
-            messages.Add(decodedContent);
-
-            // 移动游标
-            cursor = cursor + 4 + (int)contentLength;
-        }
-
-        return messages;
-    }
-
-    private Dictionary<string, string>? MsgFormat(string msgStr)
-    {
-        try
-        {
-            var msgDict = new Dictionary<string, string>();
-            var msgList = msgStr.Split('/').Where(item => !string.IsNullOrEmpty(item)).ToArray();
-
-            foreach (var msg in msgList)
-            {
-                var processedMsg = msg.Replace("@s", "/").Replace("@A", "@");
-
-                var msgTmp = processedMsg.Split(["@="], StringSplitOptions.None);
-
-                if (msgTmp.Length == 2)
-                {
-                    msgDict[msgTmp[0]] = msgTmp[1];
-                }
-            }
-
-            return msgDict;
-        }
-        catch (Exception ex)
-        {
-            logger.ZLogError($"An error occurred while formatting message from: [{_serverUrl}]. Exception: {ex}");
-            return null;
-        }
-    }
-
     public void Dispose()
     {
-        _heartbeatTimer?.Dispose();
-        _flushTimer?.Dispose();
-        _bufferSemaphore?.Dispose();
+        _danmakuChannel.Writer.TryComplete();
+        _client?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
-        try
-        {
-            _client?.Abort();
-            _client?.Dispose();
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-
+    public async ValueTask DisposeAsync()
+    {
+        await CleanupResources();
+        _client?.Dispose();
         GC.SuppressFinalize(this);
     }
 }
 
-public static class CancellationTokenExtensions
+static class CancellationTokenSupport
 {
-    public static Task WhenCanceled(this CancellationToken cancellationToken)
+    extension(CancellationToken cancellationToken)
     {
-        var tcs = new TaskCompletionSource<bool>();
-        cancellationToken.Register(s =>
+        public Task WhenCancelled()
         {
-            if (s is TaskCompletionSource<bool> source)
+            if (cancellationToken.IsCancellationRequested)
             {
-                source.SetResult(true);
+                return Task.CompletedTask;
             }
-        }, tcs);
-        return tcs.Task;
+            var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            cancellationToken.Register(static s => ((TaskCompletionSource)s!).TrySetResult(), tcs);
+            return tcs.Task;
+        }
+    }
+}
+
+public sealed class DyDanmakuClientLease : IAsyncDisposable
+{
+    private readonly DyDanmakuClientPool _pool;
+    private readonly IServiceScope _scope;
+    private bool _returned;
+    public DyDanmakuClient Client { get; }
+
+    internal DyDanmakuClientLease(DyDanmakuClient client, IServiceScope scope, DyDanmakuClientPool pool)
+    {
+        Client = client;
+        _scope = scope;
+        _pool = pool;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_returned) return;
+        _returned = true;
+        await _pool.ReturnClientAsync(Client, _scope);
     }
 }
 
 
-public class DyDanmakuClientPool : IAsyncDisposable
+public sealed class DyDanmakuClientPool : IAsyncDisposable
 {
-    private readonly Channel<DyDanmakuClient> _pool;
+    private readonly Channel<(DyDanmakuClient Client, IServiceScope Scope)> _pool;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<DyDanmakuClientPool> _logger;
 
@@ -587,61 +682,69 @@ public class DyDanmakuClientPool : IAsyncDisposable
         _serviceProvider = serviceProvider;
         _logger = logger;
 
-        _pool = Channel.CreateBounded<DyDanmakuClient>(new BoundedChannelOptions(10)
+        _pool = Channel.CreateBounded<(DyDanmakuClient, IServiceScope)>(new BoundedChannelOptions(10)
         {
-            FullMode = BoundedChannelFullMode.DropOldest
+            FullMode = BoundedChannelFullMode.DropOldest,
+            SingleReader = false,
+            SingleWriter = false,
         });
 
         for (int i = 0; i < 5; i++)
         {
-            var client = CreateClient();
-            ReturnClient(client);
+            var (client, scope) = CreateClientWithScope();
+            if (!_pool.Writer.TryWrite((client, scope)))
+            {
+                client.Dispose();
+                scope.Dispose();
+            }
         }
     }
 
-    public async ValueTask<DyDanmakuClient> RentAsync()
+    public ValueTask<DyDanmakuClientLease> RentAsync()
     {
-        if (_pool.Reader.TryRead(out var existingClient))
+        if (_pool.Reader.TryRead(out var entry))
         {
-            return existingClient;
+            return ValueTask.FromResult(new DyDanmakuClientLease(entry.Client, entry.Scope, this));
         }
-        var newClient = CreateClient();
-        _logger.LogDebug($"Created new DanmakuClient (pool was empty)");
-        return newClient;
+        var (newClient, newScope) = CreateClientWithScope();
+        return ValueTask.FromResult(new DyDanmakuClientLease(newClient, newScope, this));
     }
 
-    public void ReturnClient(DyDanmakuClient client)
+    public async ValueTask ReturnClientAsync(DyDanmakuClient client, IServiceScope scope)
     {
         client.Reset();
 
-        if (_pool.Writer.TryWrite(client))
+        if (_pool.Writer.TryWrite((client, scope)))
         {
             _logger.LogDebug($"Returned DanmakuClient to pool");
         }
         else
         {
             _logger.LogDebug($"Pool full, disposing DanmakuClient");
-            client.Dispose();
+            await client.DisposeAsync();
+            scope.Dispose();
         }
     }
 
-    private DyDanmakuClient CreateClient()
+    private (DyDanmakuClient, IServiceScope Scope) CreateClientWithScope()
     {
         var scope = _serviceProvider.CreateScope();
-        return new DyDanmakuClient(
+        var client = new DyDanmakuClient(
             scope.ServiceProvider.GetRequiredService<ILogger<DyDanmakuClient>>(),
             scope.ServiceProvider.GetRequiredService<IConfiguration>(),
             scope.ServiceProvider
         );
+        return (client, scope);
     }
 
     public async ValueTask DisposeAsync()
     {
         _pool.Writer.Complete();
 
-        while (_pool.Reader.TryRead(out var client))
+        while (_pool.Reader.TryRead(out var entry))
         {
-            client.Dispose();
+            await entry.Client.DisposeAsync();
+            entry.Scope.Dispose();
         }
     }
 }

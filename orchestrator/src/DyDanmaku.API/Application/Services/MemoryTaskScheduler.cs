@@ -1,6 +1,6 @@
 namespace DyDanmaku.API.Application.Services;
 
-public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryTaskScheduler, IDisposable
+public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryTaskScheduler, IAsyncDisposable, IDisposable
 {
     private readonly ConcurrentDictionary<string, Task> _runningTasks = [];
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _cancellationTokenSources = [];
@@ -38,7 +38,7 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
             {
                 CleanupTask(taskId);
             }
-        }, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
 
         if (!_runningTasks.TryAdd(taskId, task))
         {
@@ -135,6 +135,20 @@ public class MemoryTaskScheduler(ILogger<MemoryTaskScheduler> logger) : IMemoryT
 
     public void Dispose()
     {
-        CancelAllTasksAsync().Wait(TimeSpan.FromSeconds(5));
+        foreach (var cts in _cancellationTokenSources.Values)
+        {
+            try
+            {
+                cts.Cancel(); cts.Dispose();
+            }
+            catch { }
+        }
+        _cancellationTokenSources.Clear();
+        _runningTasks.Clear();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await CancelAllTasksAsync();
     }
 }
