@@ -6,76 +6,77 @@ public class DanmakuPushService(
     ILogger<DanmakuPushService> logger)
     : IDanmakuPushService, IHostedService, IDisposable
 {
-    private readonly Dictionary<int, Timer> _roomTimers = [];
-    private readonly Dictionary<int, DateTimeOffset> _lastPushTime = [];
-    private readonly HashSet<string> _sentDanmakuIds = [];
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly Dictionary<int, (CancellationTokenSource cts, int ConnectionCount)> _rooms = [];
+    private readonly ConcurrentDictionary<int, DateTimeOffset> _lastPushTime = [];
+    private bool _dispose;
 
     public void Dispose()
     {
-        foreach (var timer in _roomTimers.Values)
+        if (_dispose)
         {
-            timer?.Dispose();
+            return;
         }
+        _dispose = true;
+        _semaphore.Wait();
+        try
+        {
+            foreach (var (cts, _) in _rooms.Values)
+            {
+                cts.Cancel();
+                cts.Dispose();
+            }
+            _rooms.Clear();
+        }
+        finally
+        {
+            _semaphore.Release();
+            _semaphore.Dispose();
+        }
+        GC.SuppressFinalize(this);
     }
 
-    private async Task PushDanmakuForRoom(int roomId)
+    private async Task RunPeriodicPushAsync(int roomId, CancellationToken cancellationToken = default)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await PushDanmakuForRoom(roomId, cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private async Task PushDanmakuForRoom(int roomId, CancellationToken cancellationToken = default)
     {
         try
         {
             using var scope = serviceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
 
-            // Get the last push time for this room, defaulting to 10 seconds ago if not found
             var lastPushTime = _lastPushTime.GetValueOrDefault(roomId, DateTimeOffset.UtcNow.AddSeconds(-10));
 
-            // Query for new danmakus since the last push time, ordered by creation time
             var newDanmakus = await dbContext.Danmakus
                 .Where(d => d.RoomId == roomId && d.CreatedAt > lastPushTime)
                 .OrderBy(d => d.CreatedAt)
                 .Take(30)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             if (newDanmakus.Count > 0)
             {
                 logger.ZLogInformation($"Room: {roomId} found {newDanmakus.Count} new danmaku");
 
-                // Filter out already sent danmakus using the _sentDanmakuIds set
                 var danmakuDtos = newDanmakus
-                    .Where(d => !_sentDanmakuIds.Contains($"{d.RoomId}_{d.Id}"))
                     .Select(DanmakuMapping.MapToDto)
                     .ToList();
-
-                if (danmakuDtos.Count > 0)
-                {
-                    await hubContext.Clients.Group($"Room_{roomId}")
-                        .SendAsync("ReceiveNewDanmaku", danmakuDtos);
-
-                    // Add the sent danmaku IDs to the tracking set
-                    foreach (var danmaku in newDanmakus)
-                    {
-                        _sentDanmakuIds.Add($"{danmaku.RoomId}_{danmaku.Id}");
-                    }
-
-                    // Update the last push time to the latest danmaku's creation time
-                    _lastPushTime[roomId] = newDanmakus.Max(d => d.CreatedAt);
-
-                    // Clean up old IDs to prevent the set from growing indefinitely
-                    if (_sentDanmakuIds.Count > 1000)
-                    {
-                        // Remove 500 oldest entries to maintain performance
-                        var idsToRemove = _sentDanmakuIds
-                            .OrderBy(x => x) // This is a simple approach; in real usage, we'd need a better timestamp-based cleanup
-                            .Take(500)
-                            .ToList();
-
-                        foreach (var id in idsToRemove)
-                        {
-                            _sentDanmakuIds.Remove(id);
-                        }
-                    }
-                }
+                await hubContext.Clients.Group($"Room_{roomId}")
+                    .SendAsync("ReceiveDanmakus", danmakuDtos, cancellationToken);
+                _lastPushTime[roomId] = newDanmakus.Max(d => d.CreatedAt);
             }
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             logger.ZLogError($"An error occurred while pushing danmaku for room: {roomId}. Exception: {ex}");
@@ -95,31 +96,45 @@ public class DanmakuPushService(
 
     public void StartPushingForRoom(int roomId)
     {
-        if (_roomTimers.ContainsKey(roomId))
+        _semaphore.Wait();
+        try
         {
-            return;
+            if (_rooms.TryGetValue(roomId, out var existing))
+            {
+                _rooms[roomId] = existing with { ConnectionCount = existing.ConnectionCount + 1 };
+                return;
+            }
+
+            var cts = new CancellationTokenSource();
+            _rooms[roomId] = (cts, 1);
+            _lastPushTime[roomId] = DateTimeOffset.UtcNow.AddSeconds(-10);
+            _ = Task.Run(() => RunPeriodicPushAsync(roomId, cts.Token));
         }
-
-        var timer = new Timer(async state => await PushDanmakuForRoom((int)state!),
-            roomId, TimeSpan.Zero, TimeSpan.FromSeconds(2));
-
-        _roomTimers[roomId] = timer;
-        _lastPushTime[roomId] = DateTimeOffset.UtcNow.AddSeconds(-10);
-
+        finally
+        {
+            _semaphore.Release();
+        }
         logger.ZLogInformation($"Started pushing danmaku for room: {roomId}");
 
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        logger.ZLogInformation($"Danmaku Push service ended");
-
-        foreach (var timer in _roomTimers.Values)
+        _semaphore.Wait();
+        try
         {
-            timer?.Dispose();
+            foreach (var (cts, _) in _rooms.Values)
+            {
+                cts.Cancel();
+                cts.Dispose();
+            }
+            _rooms.Clear();
+        }
+        finally
+        {
+            _semaphore.Release();
         }
 
-        _roomTimers.Clear();
         _lastPushTime.Clear();
 
         return Task.CompletedTask;
@@ -127,14 +142,30 @@ public class DanmakuPushService(
 
     public void StopPushingForRoom(int roomId)
     {
-        if (_roomTimers.TryGetValue(roomId, out var timer))
+        CancellationTokenSource? ctsToDispose = null;
+        _semaphore.Wait();
+        try
         {
-            timer?.Dispose();
+            if (!_rooms.TryGetValue(roomId, out var existing))
+            {
+                return;
+            }
 
-            _roomTimers.Remove(roomId);
-            _lastPushTime.Remove(roomId);
+            if (existing.ConnectionCount > 1)
+            {
+                _rooms[roomId] = existing with { ConnectionCount = existing.ConnectionCount - 1 };
+                return;
+            }
 
-            logger.ZLogInformation($"Stopped pushing danmaku for room: {roomId}");
+            ctsToDispose = existing.cts;
+            _rooms.Remove(roomId);
+            _lastPushTime.TryRemove(roomId, out _);
+
         }
+        finally
+        {
+            _semaphore.Release();
+        }
+        logger.ZLogInformation($"Stopped pushing danmaku for room: {roomId}");
     }
 }
