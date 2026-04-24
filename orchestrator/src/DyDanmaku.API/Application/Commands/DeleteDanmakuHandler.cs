@@ -9,8 +9,9 @@ public class DeleteDanmakuHandler(DyDanmakuDbContext dbContext) : IRequestHandle
         {
             return false;
         }
+        await using var transaction =await  dbContext.BeginTransactionAsync();
         dbContext.Remove(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.CommitTransactionAsync(transaction);
         return true;
     }
 }
