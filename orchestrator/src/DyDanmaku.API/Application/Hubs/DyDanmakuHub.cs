@@ -4,7 +4,7 @@ public class DyDanmakuHub(
     ILogger<DyDanmakuHub> logger,
     IDanmakuPushService danmakuPushService) : Hub
 {
-    private static readonly ConcurrentDictionary<string, string> _userRooms = [];
+    private static readonly ConcurrentDictionary<string, int> _userRooms = [];
 
     public async Task JoinRoom(int roomId)
     {
@@ -12,7 +12,7 @@ public class DyDanmakuHub(
         var connectionId = Context.ConnectionId;
         var groupName = GetRoomGroupName(roomId);
 
-        _userRooms[connectionId] = groupName;
+        _userRooms[connectionId] = roomId;
 
         await Groups.AddToGroupAsync(connectionId, groupName);
 
@@ -39,11 +39,16 @@ public class DyDanmakuHub(
         danmakuPushService.StopPushingForRoom(roomId);
     }
 
-    public string? GetCurrentRoom(string connectionId)
+    public Task Heartbeat()
     {
-        if (_userRooms.TryGetValue(connectionId, out var room))
+        return Task.CompletedTask;
+    }
+
+    public int? GetCurrentRoom(string connectionId)
+    {
+        if (_userRooms.TryGetValue(connectionId, out var roomId))
         {
-            return room;
+            return roomId;
         }
         return null;
     }
@@ -52,10 +57,10 @@ public class DyDanmakuHub(
     {
         var connectionId = Context.ConnectionId;
 
-        if (_userRooms.TryGetValue(connectionId, out var roomName))
+        if (_userRooms.TryRemove(connectionId, out var roomId))
         {
-            await Groups.RemoveFromGroupAsync(connectionId, roomName);
-            _userRooms.TryRemove(connectionId, out _);
+            await Groups.RemoveFromGroupAsync(connectionId, GetRoomGroupName(roomId));
+            danmakuPushService.StopPushingForRoom(roomId);
         }
 
         await base.OnDisconnectedAsync(exception);
