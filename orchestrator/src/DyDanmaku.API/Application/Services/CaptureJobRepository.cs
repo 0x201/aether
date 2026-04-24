@@ -1,12 +1,10 @@
 ﻿namespace DyDanmaku.API.Application.Services;
 
 public class CaptureJobRepository(
-    IServiceProvider serviceProvider) : ICaptureJobRepository
+    DyDanmakuDbContext dbContext) : ICaptureJobRepository
 {
     public async Task<CaptureJob?> CreateJobAsync(int roomId, int duration, CancellationToken cancellationToken = default)
     {
-        using var scope = serviceProvider.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
         var activeJob = await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
 
@@ -33,8 +31,6 @@ public class CaptureJobRepository(
 
     public async Task UpdateJobStatusAsync(int roomId, JobStatus status, CancellationToken cancellationToken = default)
     {
-        using var scope = serviceProvider.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
         var activeJob = await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
 
@@ -51,8 +47,6 @@ public class CaptureJobRepository(
 
     public async Task<List<CaptureJob>> GetExpiredJobsAsync(CancellationToken cancellationToken = default)
     {
-        using var scope = serviceProvider.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
         return await dbContext.CaptureJobs
             .Where(j => j.Status == JobStatus.Running.ToString() && j.StartTime.AddSeconds(j.Duration) < DateTimeOffset.UtcNow)
             .ToListAsync(cancellationToken);
@@ -60,9 +54,14 @@ public class CaptureJobRepository(
 
     public async Task<CaptureJob?> GetActiveJobByRoomIdAsync(int roomId, CancellationToken cancellationToken = default)
     {
-        using var scope = serviceProvider.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
         return await dbContext.CaptureJobs
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
+    }
+
+    public async Task<Room?> GetRoomByIdAsync(int roomId, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Rooms
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.RoomId == roomId, cancellationToken);
     }
 }

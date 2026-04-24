@@ -10,4 +10,6 @@ public interface ICaptureJobRepository
 
     Task<CaptureJob?> GetActiveJobByRoomIdAsync(int roomId, CancellationToken cancellationToken = default);
 
+    Task<Room?> GetRoomByIdAsync(int roomId, CancellationToken cancellationToken = default);
+
 }
