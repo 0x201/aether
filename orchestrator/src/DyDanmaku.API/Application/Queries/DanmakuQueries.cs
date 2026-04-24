@@ -161,6 +161,7 @@ public class DanmakuQueries(
         }
 
         var totalCount = await dbContext.Danmakus
+            .AsNoTracking()
             .WhereIf(request.StartTime.HasValue, x => x.CreatedAt >= request.StartTime)
             .WhereIf(request.EndTime.HasValue, x => x.CreatedAt <= request.EndTime)
             .WhereIf(request.RoomId.HasValue, x => x.RoomId == request.RoomId)
@@ -264,6 +265,7 @@ public class DanmakuQueries(
     public async Task<Result<CaptureJobDto>> GetActiveJob(int roomId, CancellationToken cancellationToken = default)
     {
         var job = await dbContext.CaptureJobs
+            .AsNoTracking()
             .FirstOrDefaultAsync(j => j.RoomId == roomId && j.Status == JobStatus.Running.ToString(), cancellationToken);
 
         var dto = job is null ? null : new CaptureJobDto(
