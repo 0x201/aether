@@ -14,7 +14,11 @@ builder.Logging.AddZLoggerConsole(options =>
 
 builder.AddServiceDefaults();
 builder.AddApplicationService();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 builder.Services.AddHttpClient();
 builder.Services.AddProblemDetails();
 

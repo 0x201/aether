@@ -44,15 +44,6 @@ public class DyDanmakuHub(
         return Task.CompletedTask;
     }
 
-    public int? GetCurrentRoom(string connectionId)
-    {
-        if (_userRooms.TryGetValue(connectionId, out var roomId))
-        {
-            return roomId;
-        }
-        return null;
-    }
-
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var connectionId = Context.ConnectionId;
