@@ -1,136 +1,74 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  HttpTransportType,
-  HubConnection,
-  HubConnectionBuilder,
-  HubConnectionState,
-} from "@microsoft/signalr";
+import React, { useState } from "react";
+import { HubConnectionState } from "@microsoft/signalr";
 import { Button, Input, Card, Space, message } from "antd";
 import { DanmakuDisplay } from "@/src/components/DanmakuDisplay";
-import type { Danmaku } from "@/src/interface/danmaku/type";
 import "./styles.css";
+import { useRealtimeDanmaku } from "@/src/hooks/useRealtimeDnamaku";
 
 const RealtimeDanmakuView: React.FC = () => {
-  const [connection, setConnection] = useState<HubConnection | null>(null);
   const [roomId, setRoomId] = useState<number | null>(null);
-  const [danmakuList, setDanmakuList] = useState<Danmaku[]>([]);
-  const danmakuQueueRef = useRef<Danmaku[]>([]);
-  const [isJoined, setIsJoined] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const {
+    connectionState,
+    isJoined,
+    danmakuList,
+    startConnection,
+    stopConnection,
+    joinRoom,
+    leaveRoom,
+  } = useRealtimeDanmaku();
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (danmakuQueueRef.current.length > 0) {
-        const danmakuToAdd = danmakuQueueRef.current.shift();
-        if (danmakuToAdd) {
-          setDanmakuList((prev) => {
-            const updatedList = [danmakuToAdd, ...prev];
-            return updatedList.slice(0, 100);
-          });
-        }
-      }
-    }, 100);
+  const isConnected = connectionState === HubConnectionState.Connected;
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
-
-  const startHubConnection = async () => {
-    if (!connection) {
-      const hubConnection = new HubConnectionBuilder()
-        .withUrl(`/api/danmaku-hub`, {
-          transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents,
-          timeout: 15000,
-          headers: {},
-        })
-        .withAutomaticReconnect([0, 2000, 10000, 30000])
-        .build();
-
-      hubConnection.on("ReceiveNewDanmaku", (danmakuItems: Danmaku[]) => {
-        danmakuQueueRef.current = [...danmakuQueueRef.current, ...danmakuItems];
-      });
-
-      hubConnection.on("RoomJoined", (message: string) => {
-        console.log("User joined:", message);
-      });
-
-      hubConnection.on("RoomLeft", (message: string) => {
-        console.log("User left:", message);
-        setDanmakuList([]);
-        danmakuQueueRef.current = [];
-      });
-
-      hubConnection
-        .start()
-        .then(() => {
-          setConnection(hubConnection);
-          messageApi.success("SignalR Connection Started");
-        })
-        .catch((error) => {
-          console.error("Error starting connection:", error);
-          messageApi.error("SignalR Connection Failed");
-        });
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (connection) {
-        connection.stop();
-      }
-    };
-  }, [connection]);
-
-  const stopConnection = async () => {
+  const handleStartConnection = async () => {
     try {
-      if (connection) {
-        await connection.stop();
-        setConnection(null);
-        setDanmakuList([]);
-        danmakuQueueRef.current = [];
-        messageApi.success("SignalR Connection Stopped");
-      }
-    } catch (error) {
-      console.error("Error stopping connection:", error);
-      messageApi.error("Failed to stop connection");
+      await startConnection();
+      messageApi.success("SignalR Connection Started");
+    } catch {
+      messageApi.error("SignalR Connection Failed");
     }
   };
 
-  const joinRoom = async () => {
+  const handleStopConnection = async () => {
+    try {
+      await stopConnection();
+      messageApi.success("SignalR Connection Stopped");
+    } catch {
+      messageApi.error("SignalR Connection Failed");
+    }
+  };
+
+  const handleJoinRoom = async () => {
     if (!roomId) {
       messageApi.warning("请输入房间ID");
       return;
     }
-    if (connection && connection.state === HubConnectionState.Connected) {
-      try {
-        await connection.invoke("JoinRoom", roomId);
-        messageApi.success(`Joined room: ${roomId}`);
-        setIsJoined(true);
-      } catch (error) {
-        console.error("Error joining room:", error);
-        messageApi.error("Failed to join room");
-      }
-    } else {
+
+    if (!isConnected) {
       messageApi.warning("Please start a connection first");
+      return;
+    }
+
+    try {
+      await joinRoom(roomId);
+      messageApi.success(`Joined room: ${roomId}`);
+    } catch (error) {
+      messageApi.error("Failed to join room");
     }
   };
 
-  const leaveRoom = async () => {
-    if (connection && connection.state === HubConnectionState.Connected) {
-      try {
-        await connection.invoke("LeaveRoom", roomId);
-        setDanmakuList([]);
-        danmakuQueueRef.current = [];
-        messageApi.success(`Left room: ${roomId}`);
-        setIsJoined(false);
-        setRoomId(null);
-      } catch (error) {
-        console.error("Error leaving room:", error);
-        messageApi.error("Failed to leave room");
-      }
-    } else {
+  const handleLeaveRoom = async () => {
+    if (!isConnected) {
       messageApi.warning("Please start a connection first");
+      return;
+    }
+
+    try {
+      await leaveRoom(roomId!);
+      messageApi.success(`Left room: ${roomId}`);
+      setRoomId(null);
+    } catch {
+      messageApi.error("Failed to leave room");
     }
   };
 
@@ -140,41 +78,40 @@ const RealtimeDanmakuView: React.FC = () => {
       <Card title="实时弹幕" style={{ marginBottom: "20px" }}>
         <Space wrap>
           <Button
-            type={
-              connection && connection.state === HubConnectionState.Connected
-                ? "default"
-                : "primary"
-            }
-            onClick={startHubConnection}
-            disabled={!!connection && connection.state === HubConnectionState.Connected}
+            type={isConnected ? "default" : "primary"}
+            onClick={handleStartConnection}
+            disabled={isConnected}
           >
             建立连接
           </Button>
           <Button
-            type={connection ? "primary" : "default"}
-            onClick={stopConnection}
-            disabled={!connection}
+            type={isConnected ? "primary" : "default"}
+            onClick={handleStopConnection}
+            disabled={!isConnected}
             danger
           >
             断开连接
           </Button>
           <Input
             placeholder="房间ID"
-            value={roomId!}
-            onChange={(e) => setRoomId(Number(e.target.value))}
+            value={roomId ?? ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const val = Number(e.target.value);
+              setRoomId(Number.isNaN(val) || e.target.value === "" ? null : val);
+            }}
             style={{ width: "200px" }}
           />
           <Button
-            onClick={joinRoom}
-            disabled={!connection || isJoined || !roomId}
+            onClick={handleJoinRoom}
+            disabled={!isConnected || isJoined || !roomId}
             color="cyan"
             variant="solid"
           >
             加入房间
           </Button>
           <Button
-            onClick={leaveRoom}
-            disabled={!connection || !isJoined}
+            onClick={handleLeaveRoom}
+            disabled={!isConnected || !isJoined}
             color="red"
             variant="solid"
           >
@@ -183,7 +120,7 @@ const RealtimeDanmakuView: React.FC = () => {
         </Space>
       </Card>
 
-      <div title="弹幕显示" className="danmaku-display-container">
+      <div className="danmaku-display-container">
         <DanmakuDisplay danmakuList={danmakuList} autoScroll={true} />
       </div>
     </div>
