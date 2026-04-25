@@ -3,29 +3,31 @@
     <h2>颜色板工具</h2>
     
     <div class="main-layout">
-      <!-- 颜色选择区域 -->
       <div class="palette-editor">
         <h3>自定义颜色板</h3>
 
-        <!-- 新增颜色值输入区域 -->
         <div class="color-input-section">
-          <label for="color-input">输入颜色值 (以 ; 分隔):</label>
-          <n-input
-            id="color-input"
-            type="text"
-            placeholder="例如: #FF6B6B;#4ECDC4;#45B7D1;#96CEB4;#FFEAA7"
-            @blur="parseColorInput"
-            v-model:value="currentColorInput"
-          />
-          <n-button @click="parseColorInput" size="small" style="margin-left: 10px;">生成色板</n-button>
+          <label>输入颜色值:</label>
+          <div class="color-input-grid">
+            <div v-for="(color, index) in currentPalette" :key="index" class="color-input-item">
+              <label>颜色 {{ index + 1 }}:</label>
+              <n-input
+                :value="color"
+                @update:value="(val) => updateColorValue(index, val)"
+                placeholder="例如: #FF6B6B"
+              />
+            </div>
+          </div>
+          <div class="color-actions">
+            <n-button @click="copyColors" type="info">复制颜色值</n-button>
+          </div>
         </div>
 
         <div class="controls-and-display-container">
           <div class="color-controls">
-            <div v-for="(color, index) in currentPalette" :key="index" class="color-control">
+            <div v-for="(_, index) in currentPalette" :key="index" class="color-control">
               <label>颜色 {{ index + 1 }}:</label>
-              <n-color-picker v-model:value="currentPalette[index]" :render-label="() => ''"
-                @update:value="onColorChange" />
+              <n-color-picker v-model:value="currentPalette[index]" :render-label="() => ''" />
             </div>
           </div>
 
@@ -43,7 +45,6 @@
         </div>
       </div>
 
-      <!-- 历史记录部分 -->
       <div class="history-section">
         <h3>历史记录</h3>
         <div class="history-list">
@@ -73,32 +74,40 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { NColorPicker, NButton, NInput } from 'naive-ui';
+import { NColorPicker, NButton, NInput, useMessage } from 'naive-ui';
 
 const currentPalette = ref<string[]>([
-  '#FF6B6BFF',
-  '#4ECDC4FF',
-  '#45B7D1FF',
-  '#96CEB4FF',
-  '#FFEAA7FF'
+  '#FF6B6B',
+  '#4ECDC4',
+  '#45B7D1',
+  '#96CEB4',
+  '#FFEAA7'
 ]);
-const currentColorInput = ref('');
 const history = ref<string[][]>([]);
+const message = useMessage()
 
-const parseColorInput = () => {
-  if (!currentColorInput.value.trim()) return;
-  const colors = currentColorInput.value.split(';')
-    .map(color => color.trim())
-    .filter(color => isValidColor(color));
 
-  if (colors.length > 0) {
-    currentPalette.value = colors;
+const isValidColor = (color: string) => {
+  const pattern = /^#([0-9A-Fa-f]{3}){1,2}$/;
+  return pattern.test(color);
+};
+
+const updateColorValue = (index: number, value: string) => {
+  if(isValidColor(value)) {
+    const newPalette = [...currentPalette.value];
+    newPalette[index] = value;
+    currentPalette.value = newPalette;
   }
 };
 
-const isValidColor = (color: string): boolean => {
-  const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$/;
-  return hexPattern.test(color);
+const copyColors = async () => {
+  const colorString = currentPalette.value.join(';');
+  try {
+    await navigator.clipboard.writeText(colorString);
+    message.info('颜色值已复制到剪贴板: ' + colorString);
+  } catch (err) {
+    console.error('复制失败', err);
+  }
 };
 
 const loadHistoryFromStorage = () => {
@@ -136,11 +145,6 @@ const clearHistory = () => {
 
 const loadPalette = (palette: string[]) => {
   currentPalette.value = [...palette];
-  currentColorInput.value = palette.join(';');
-};
-
-const onColorChange = () => {
-  currentColorInput.value = currentPalette.value.join(';');
 };
 
 const deleteHistoryItem = (index: number) => {
@@ -150,7 +154,6 @@ const deleteHistoryItem = (index: number) => {
 
 onMounted(() => {
   loadHistoryFromStorage();
-  currentColorInput.value = currentPalette.value.join(';');
 });
 </script>
 
@@ -229,18 +232,35 @@ onMounted(() => {
 
 .color-input-section {
   margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .color-input-section label {
-  min-width: 180px;
+  display: block;
+  margin-bottom: 10px;
   font-weight: bold;
 }
 
-.color-input-section .n-input {
-  flex: 1;
+.color-input-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.color-input-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.color-input-item label {
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: #666;
+}
+
+.color-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .palette-editor h3 {
