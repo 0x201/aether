@@ -1,7 +1,7 @@
 namespace DyDanmaku.API.Application.Services;
 
 public class DanmakuCaptureService(
-    IServiceProvider serviceProvider,
+    IServiceScopeFactory serviceScopeFactory,
     IMemoryTaskScheduler memoryTaskScheduler,
     IHttpClientFactory httpClientFactory,
     IConfiguration configuration,
@@ -34,7 +34,7 @@ public class DanmakuCaptureService(
 
         var added = await memoryTaskScheduler.AddTaskAsync(taskId, async (cts) =>
         {
-            var scope = serviceProvider.CreateScope();
+            var scope = serviceScopeFactory.CreateScope();
             var clientPool = scope.ServiceProvider.GetRequiredService<DyDanmakuClientPool>();
 
             await using var lease = await clientPool.RentAsync();
@@ -102,7 +102,7 @@ public class DanmakuCaptureService(
 
     private async Task UpdateRoomInfo(int roomId)
     {
-        using var scope = serviceProvider.CreateScope();
+        using var scope = serviceScopeFactory.CreateScope();
         using var dbContext = scope.ServiceProvider.GetRequiredService<DyDanmakuDbContext>();
         var roomExists = await dbContext.Rooms.AnyAsync(x => x.RoomId == roomId);
         if (!roomExists)
@@ -127,6 +127,7 @@ public class DanmakuCaptureService(
     {
         var url = $"{configuration.GetSection("Douyu:Apis:RoomUserInfoEndpoint").Get<string>()}{roomId}";
         var client = httpClientFactory.CreateClient();
+        client.Timeout = TimeSpan.FromSeconds(10);
 
         try
         {

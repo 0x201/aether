@@ -17,6 +17,8 @@ public static class Extensions
 
         var connectionString = builder.Configuration.GetConnectionString("dydanmakudb");
 
+        services.AddHttpContextAccessor();
+
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
         services.AddDbContext<DyDanmakuDbContext>((sp, options) =>
