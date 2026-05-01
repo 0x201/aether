@@ -19,7 +19,7 @@ import {
   DatePicker,
 } from 'antd'
 import type { ColumnsType, TableProps } from 'antd/es/table'
-import './danmakumgt.styles.css'
+import './styles.css'
 import type { Danmaku } from '@/src/interface/danmaku/type'
 import type { RoomOption } from '@/src/interface/room/type'
 import type { DanmakuSearchParams } from '@/src/interface/management/type'
@@ -70,7 +70,7 @@ const DanmakuMgt: React.FC = () => {
   }, [searchForm, actions])
 
   const handleDelete = useCallback(
-    async (id: string) => {
+    async (id: number) => {
       const success = await actions.handleDelete(id)
       return success
     },
@@ -309,7 +309,7 @@ const DanmakuMgt: React.FC = () => {
     <div className="danmaku-mgt">
       {contextHolder}
       <Title level={4}>弹幕管理</Title>
-      <Collapse items={collapsedItems} defaultActiveKey={['1']} style={{ marginBottom: 12 }} />
+      <Collapse items={collapsedItems} style={{ marginBottom: 12 }} />
       <Table
         columns={columns}
         dataSource={state.danmakuList}

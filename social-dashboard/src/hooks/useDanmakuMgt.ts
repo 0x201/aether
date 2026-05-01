@@ -235,7 +235,7 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
   }, [])
 
   const handleDelete = useCallback(
-    async (id: string) => {
+    async (id: number) => {
       try {
         await service.deleteDanmaku(id)
         messageApi.success('删除成功')
@@ -249,7 +249,7 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
   )
 
   const handleUpdate = useCallback(
-    async (id: string, data: Partial<Danmaku>) => {
+    async (id: number, data: Partial<Danmaku>) => {
       try {
         await service.updateDanmaku(id, data)
         messageApi.success('更新成功')

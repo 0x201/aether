@@ -98,6 +98,6 @@
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
-  padding: 24px;
+  padding: 1rem 1.5rem;
   background: transparent;
 }

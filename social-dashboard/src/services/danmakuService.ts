@@ -11,8 +11,8 @@ export interface DanmakuService {
     searchParams: DanmakuSearchParams | null,
     options?: { signal?: AbortSignal },
   ) => Promise<PaginationResponse<Danmaku>>
-  deleteDanmaku: (id: string) => Promise<boolean>
-  updateDanmaku: (id: string, data: Partial<Danmaku>) => Promise<boolean>
+  deleteDanmaku: (id: number) => Promise<boolean>
+  updateDanmaku: (id: number, data: Partial<Danmaku>) => Promise<boolean>
 }
 
 export const createDanmakuService = (): DanmakuService => {
@@ -41,7 +41,7 @@ export const createDanmakuService = (): DanmakuService => {
       return await response.json()
     },
 
-    deleteDanmaku: async (id: string): Promise<boolean> => {
+    deleteDanmaku: async (id: number): Promise<boolean> => {
       const endpoint = `${baseUrl}/${id}`
       const response = await fetch(endpoint, {
         method: 'DELETE',
@@ -53,7 +53,7 @@ export const createDanmakuService = (): DanmakuService => {
       return true
     },
 
-    updateDanmaku: async (id: string, data: Partial<Danmaku>): Promise<boolean> => {
+    updateDanmaku: async (id: number, data: Partial<Danmaku>): Promise<boolean> => {
       const endpoint = `${baseUrl}/${id}`
 
       const response = await fetch(endpoint, {

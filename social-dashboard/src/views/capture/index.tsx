@@ -22,7 +22,7 @@ import {
   Collapse,
 } from 'antd'
 import { PlayCircleOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons'
-import './CaptureView.css'
+import './styles.css'
 import { buildSorter } from '@/src/util'
 import { useCaptureMgt } from '../../hooks/useCaptureMgt'
 import type { CaptureJob, CaptureSearchParams } from '@/src/interface/capture/type'
@@ -332,12 +332,11 @@ const CaptureView: React.FC = () => {
     <div className="capture-container">
       {contextHolder}
       <Typography.Title level={4}>弹幕捕获任务管理</Typography.Title>
-      <Typography.Paragraph>管理你的弹幕捕获任务，监控捕获进度和状态。</Typography.Paragraph>
       {state.isCaptureSuccess && (
         <Alert closable description={state.captureStartRes} style={{ marginBottom: 24 }} />
       )}
 
-      <Space style={{ margin: '20px 0' }}>
+      <Space style={{ margin: '10px 0' }}>
         <Button type="primary" icon={<PlayCircleOutlined />} onClick={openStartModal}>
           启动新捕获任务
         </Button>
@@ -350,7 +349,7 @@ const CaptureView: React.FC = () => {
         </Button>
       </Space>
 
-      <Collapse items={collapsedItems} defaultActiveKey={['1']} style={{ marginBottom: 12 }} />
+      <Collapse items={collapsedItems} style={{ marginBottom: '0.5rem' }} />
 
       <Table
         dataSource={state.jobList}
@@ -392,9 +391,9 @@ const CaptureView: React.FC = () => {
               value={
                 roomId
                   ? {
-                      value: roomId,
-                      label: selectedOptionLabel ? selectedOptionLabel : `房间ID：${roomId}`,
-                    }
+                    value: roomId,
+                    label: selectedOptionLabel ? selectedOptionLabel : `房间ID：${roomId}`,
+                  }
                   : undefined
               }
               onChange={handleRoomIdChange}

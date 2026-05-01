@@ -133,7 +133,7 @@ const getTitleFromPath = (path: string): string => {
 }
 
 const DefaultLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
   const location = useLocation()
   const navigate = useNavigate()
   const {
@@ -255,7 +255,7 @@ const DefaultLayout: React.FC = () => {
   }))
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout>
       <Header className="header-layout" style={{ backgroundColor: colorBgContainer }}>
         <div className="header-left">
           <div className="logo" onClick={() => navigate('/')} />
@@ -289,7 +289,7 @@ const DefaultLayout: React.FC = () => {
             onEdit={onEdit}
             size="small"
           />
-          <div className="page-content" style={{ padding: '0 16px 16px' }}>
+          <div>
             <Outlet />
           </div>
         </Content>

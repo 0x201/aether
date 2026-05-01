@@ -206,7 +206,7 @@ const RoomsMgt: React.FC = () => {
         </Button>
       </div>
 
-      <Collapse items={collapsedItems} defaultActiveKey={['1']} style={{ marginBottom: 12 }} />
+      <Collapse items={collapsedItems} style={{ marginBottom: 12 }} />
 
       <Table
         columns={columns}
