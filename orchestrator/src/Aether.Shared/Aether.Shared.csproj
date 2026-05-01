@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="CsvHelper" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>

@@ -142,7 +142,7 @@ internal static class OpenApiOptionsExtensions
         options.AddOperationTransformer((operation, context, cancellationToken) =>
         {
             var apiDescription = context.Description;
-            operation.Deprecated |= apiDescription.IsDeprecated();
+            operation.Deprecated |= apiDescription.IsDeprecated;
             return Task.CompletedTask;
         });
         return options;

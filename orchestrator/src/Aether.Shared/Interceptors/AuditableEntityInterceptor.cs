@@ -1,6 +1,6 @@
 ﻿namespace Aether.Shared.Interceptors;
 
-public class AuditableEntityInterceptor : SaveChangesInterceptor
+public class AuditableEntityInterceptor(IHttpContextAccessor httpContextAccessor) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -27,6 +27,10 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
             return;
         }
 
+        var currentUser = httpContextAccessor.HttpContext?.User?.FindFirst("preferred_username")?.Value
+            ?? httpContextAccessor.HttpContext?.User?.Identity?.Name
+            ?? string.Empty;
+
         foreach (var entry in context.ChangeTracker.Entries<IAuditable>())
         {
             if (entry.State is EntityState.Added or EntityState.Modified || entry.HasChangedOwnedEntities())
@@ -34,10 +38,10 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
                 var utcNow = DateTimeOffset.UtcNow;
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Entity.CreatedBy = "";
+                    entry.Entity.CreatedBy = currentUser;
                     entry.Entity.CreatedAt = utcNow;
                 }
-                entry.Entity.LastModifiedBy = "";
+                entry.Entity.LastModifiedBy = currentUser;
                 entry.Entity.LastModifiedAt = utcNow;
             }
         }
