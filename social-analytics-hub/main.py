@@ -1,3 +1,4 @@
+from middleware.logging_middleware import LoggingMiddleware
 import os
 from contextlib import asynccontextmanager
 
@@ -42,9 +43,9 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.project_name, version=settings.version, lifespan=lifespan
     )
-
+    app.add_middleware(LoggingMiddleware)
     app.add_middleware(
-        CORSMiddleware,  # type: ignore[arg-type]
+        CORSMiddleware,
         allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],

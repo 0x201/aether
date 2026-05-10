@@ -7,9 +7,7 @@ from fastapi import APIRouter, Body, HTTPException
 from app.dataclass import PeriodType
 from app.deps import DanmakuAnalyzerDep
 
-from .timed_route import TimedRoute
-
-router = APIRouter(route_class=TimedRoute)
+router = APIRouter()
 
 
 def convert_to_utc(dt_str: str) -> datetime:

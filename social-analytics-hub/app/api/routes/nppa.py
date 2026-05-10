@@ -8,9 +8,7 @@ from app.dataclass import GameAuditDto, NetworkGameAuditDto
 from app.dataclass.common import PagedResult
 from app.deps import NPPARepositoryDep, NPPAGameAuditCrawlerDep
 
-from .timed_route import TimedRoute
-
-router = APIRouter(route_class=TimedRoute)
+router = APIRouter()
 
 
 @router.post(
