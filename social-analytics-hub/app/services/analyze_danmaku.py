@@ -415,7 +415,7 @@ class DanmakuAnalyzer:
         if await self._check_cache_exists(analysis_cache_key):
             return
 
-        with self.session_factory.get_transaction(autocommit=False) as transaction:
+        with self.session_factory.transaction(autocommit=False) as transaction:
             # Check if analysis already exists in DB
             existing_data = await self._fetch_existing_analysis(
                 transaction, analysis_stmt, analysis_cache_key
@@ -484,7 +484,7 @@ class DanmakuAnalyzer:
             )
             .distinct()
         )
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             recent_rooms = session.execute(stmt).scalars().all()
 
         for room_result in recent_rooms:

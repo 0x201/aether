@@ -23,7 +23,7 @@ class NPPARepository:
 
     def get_latest_game_audit(self) -> Optional[GameAudit]:
         """Get the latest game audit based on publish date."""
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as query:
             stmt = select(GameAudit).order_by(GameAudit.publish_date.desc()).limit(1)
             result = session.execute(stmt).scalar_one_or_none()
             return result
@@ -31,7 +31,7 @@ class NPPARepository:
     def insert_many_game_audits(self, audits: List[GameAudit]) -> bool:
         """Insert multiple game audits into the database."""
         try:
-            with self.session_factory.get_transaction() as transaction:
+            with self.session_factory.transaction() as transaction:
                 transaction.add_all(audits)
                 return True
         except Exception:
@@ -40,7 +40,7 @@ class NPPARepository:
     def insert_many_network_game_audits(self, audits: List[NetworkGameAudit]):
         """Insert multiple network game audits into the database."""
         try:
-            with self.session_factory.get_transaction() as transaction:
+            with self.session_factory.transaction() as transaction:
                 transaction.add_all(audits)
         except Exception:
             return False
@@ -48,7 +48,7 @@ class NPPARepository:
     def insert_many_egame_audits(self, audits: List[EGameAudit]):
         """Insert multiple egame audits into the database."""
         try:
-            with self.session_factory.get_transaction() as transaction:
+            with self.session_factory.transaction() as transaction:
                 transaction.add_all(audits)
         except Exception:
             return False
@@ -56,7 +56,7 @@ class NPPARepository:
     def insert_many_game_alteration_audits(self, audits: List[GameAlterationAudit]):
         """Insert multiple game alteration audits into the database."""
         try:
-            with self.session_factory.get_transaction() as transaction:
+            with self.session_factory.transaction() as transaction:
                 transaction.add_all(audits)
         except Exception:
             return False
@@ -64,7 +64,7 @@ class NPPARepository:
     def insert_many_game_revocation_audits(self, audits: List[GameRevocationAudit]):
         """Insert multiple game revocation audits into the database."""
         try:
-            with self.session_factory.get_transaction() as transaction:
+            with self.session_factory.transaction() as transaction:
                 transaction.add_all(audits)
         except Exception:
             return False
@@ -77,7 +77,7 @@ class NPPARepository:
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
     ) -> Tuple[List[NetworkGameAudit], int]:
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             conditions = []
             if start_time and end_time:
                 conditions.append(NetworkGameAudit.publish_date >= start_time)
@@ -100,7 +100,7 @@ class NPPARepository:
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
     ) -> Tuple[List[GameAudit], int]:
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             conditions = []
             if start_time and end_time:
                 conditions.append(NetworkGameAudit.publish_date >= start_time)
@@ -118,7 +118,7 @@ class NPPARepository:
 
     def update_game_audit_publish_date_by_title(self, title: str, publish_date: str):
         """Update the publish date of a game audit by title."""
-        with self.session_factory.get_transaction() as transaction:
+        with self.session_factory.transaction() as transaction:
             stmt = (
                 update(GameAudit)
                 .where(GameAudit.title == title)

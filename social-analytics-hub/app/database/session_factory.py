@@ -4,7 +4,6 @@ from typing import Iterator, Optional, Union
 
 from loguru import logger
 from sqlalchemy import URL, Engine, create_engine
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 from app.core.config import settings
@@ -40,21 +39,17 @@ class MSSQLSession:
         self._connected = False
 
     @contextmanager
-    def get_session(self) -> Iterator[Session]:
+    def query(self) -> Iterator[Session]:
         session: Session = self._create_session()
         try:
             yield session
-        except SQLAlchemyError as e:
-            logger.error(f"Database error during session: {str(e)}")
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error during session: {str(e)}")
+        except Exception:
             raise
         finally:
             session.close()
 
     @contextmanager
-    def get_transaction(self, autocommit=True) -> Iterator[Session]:
+    def transaction(self, autocommit=True) -> Iterator[Session]:
         session: Session = self._create_session()
         try:
             yield session
@@ -144,21 +139,17 @@ class SQLiteSession:
         self._connected = False
 
     @contextmanager
-    def get_session(self) -> Iterator[Session]:
+    def query(self) -> Iterator[Session]:
         session: Session = self._create_session()
         try:
             yield session
-        except SQLAlchemyError as e:
-            logger.error(f"Database error during session: {str(e)}")
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error during session: {str(e)}")
+        except Exception:
             raise
         finally:
             session.close()
 
     @contextmanager
-    def get_transaction(self, autocommit=True) -> Iterator[Session]:
+    def transaction(self, autocommit=True) -> Iterator[Session]:
         session: Session = self._create_session()
         try:
             yield session
@@ -246,21 +237,17 @@ class PostgreSQLSession:
         self._connected = False
 
     @contextmanager
-    def get_session(self) -> Iterator[Session]:
+    def query(self) -> Iterator[Session]:
         session: Session = self._create_session()
         try:
             yield session
-        except SQLAlchemyError as e:
-            logger.error(f"Database error during session: {str(e)}")
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error during session: {str(e)}")
+        except Exception:
             raise
         finally:
             session.close()
 
     @contextmanager
-    def get_transaction(self, autocommit=True) -> Iterator[Session]:
+    def transaction(self, autocommit=True) -> Iterator[Session]:
         session: Session = self._create_session()
         try:
             yield session
@@ -365,10 +352,10 @@ class SessionFactory:
             )
         return self.database_instance
 
-    def get_session(self):
+    def query(self):
         db = self._get_database()
-        return db.get_session()
+        return db.query()
 
-    def get_transaction(self, autocommit=True):
+    def transaction(self, autocommit=True):
         db = self._get_database()
-        return db.get_transaction(autocommit=autocommit)
+        return db.transaction(autocommit=autocommit)

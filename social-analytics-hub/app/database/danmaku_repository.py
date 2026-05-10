@@ -37,7 +37,7 @@ class DanmakuRepository:
             bool: True if inserted successfully, False if duplicate
         """
 
-        with self.session_factory.get_transaction() as transaction:
+        with self.session_factory.transaction() as transaction:
             danmaku = Danmaku(
                 user_id=user_id,
                 user_name=user_name,
@@ -63,14 +63,14 @@ class DanmakuRepository:
         """
         if not danmaku_list:
             return 0
-        with self.session_factory.get_transaction() as transaction:
+        with self.session_factory.transaction() as transaction:
             inserted_count = len(danmaku_list)
             transaction.add_all(danmaku_list)
             return inserted_count
 
     def get_danmaku_count(self) -> int:
         """Get total number of danmaku in database"""
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = select(func.count()).select_from(Danmaku)
                 count = session.execute(stmt).scalar()
@@ -81,7 +81,7 @@ class DanmakuRepository:
 
     def get_recent_danmaku(self, limit: int = 10) -> List[Danmaku]:
         """Get most recent danmaku entries"""
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = select(Danmaku).order_by(Danmaku.created_at.desc()).limit(limit)
                 result = session.execute(stmt).scalars().all()
@@ -92,7 +92,7 @@ class DanmakuRepository:
 
     def get_danmaku_by_user(self, user_name: str) -> List[Danmaku]:
         """Get all danmaku by a specific user"""
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = (
                     select(Danmaku)
@@ -107,7 +107,7 @@ class DanmakuRepository:
 
     def get_danmaku_by_room(self, room_id: int, limit: int = 100) -> List[Danmaku]:
         """Get recent danmaku for a specific room with limit"""
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = (
                     select(Danmaku)
@@ -137,7 +137,7 @@ class DanmakuRepository:
             bool: True if updated successfully, False otherwise
         """
 
-        with self.session_factory.get_transaction(autocommit=False) as transaction:
+        with self.session_factory.transaction(autocommit=False) as transaction:
             try:
                 # Build dynamic update query based on provided fields
                 values = {}
@@ -184,7 +184,7 @@ class DanmakuRepository:
         Returns:
             bool: True if deleted successfully, False otherwise
         """
-        with self.session_factory.get_transaction() as transaction:
+        with self.session_factory.transaction() as transaction:
             # First check if the record exists before attempting deletion
             existing = transaction.execute(
                 select(Danmaku).where(Danmaku.id == id)
@@ -204,7 +204,7 @@ class DanmakuRepository:
         Returns:
             Danmaku: Danmaku object if found, None otherwise
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = select(Danmaku).where(Danmaku.id == id)
                 result = session.execute(stmt).scalars().first()
@@ -222,7 +222,7 @@ class DanmakuRepository:
         Returns:
             List[Tuple[Danmaku, str]]: List of tuples containing (danmaku, room_name)
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 # Base query - always join with Room to get room_name
                 stmt = select(Danmaku, Room.room_name).join(
@@ -271,7 +271,7 @@ class DanmakuRepository:
         Returns:
             List[Tuple[Danmaku, str]]: List of tuples containing (danmaku, room_name) matching the criteria
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 # Base query - always join with Room to get room_name
                 stmt = select(Danmaku, Room.room_name).join(
@@ -331,7 +331,7 @@ class DanmakuRepository:
         Returns:
             int: Count of matching danmaku
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 # Base query
                 stmt = select(func.count()).select_from(Danmaku)
@@ -378,7 +378,7 @@ class DanmakuRepository:
         Returns:
             CaptureJob: The created capture job record
         """
-        with self.session_factory.get_transaction(autocommit=False) as transaction:
+        with self.session_factory.transaction(autocommit=False) as transaction:
             try:
                 job = CaptureJob(
                     room_id=room_id,
@@ -414,7 +414,7 @@ class DanmakuRepository:
         Returns:
             bool: True if updated successfully, False otherwise
         """
-        with self.session_factory.get_transaction(autocommit=False) as transaction:
+        with self.session_factory.transaction(autocommit=False) as transaction:
             try:
                 stmt = (
                     update(CaptureJob)
@@ -449,7 +449,7 @@ class DanmakuRepository:
         Returns:
             CaptureJob if found, None otherwise
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = select(CaptureJob).where(
                     and_(
@@ -470,7 +470,7 @@ class DanmakuRepository:
         Returns:
             List[CaptureJob]: List of active capture jobs
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 stmt = select(CaptureJob).where(
                     CaptureJob.status == CaptureJobStatus.RUNNING.value
@@ -494,7 +494,7 @@ class DanmakuRepository:
         Returns:
             Tuple[List[CaptureJob], int]: A tuple containing the list of jobs for the current page and the total count
         """
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             try:
                 # Calculate offset
                 offset = (page - 1) * limit
@@ -533,6 +533,6 @@ class DanmakuRepository:
         )
         if room_id:
             query = query.where(Danmaku.room_id == room_id)
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             result = list(session.execute(query).scalars().all())
         return result

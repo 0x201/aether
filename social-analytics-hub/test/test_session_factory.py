@@ -29,7 +29,7 @@ class TestSessionFactory:
         self.db_mock.get_session.return_value = session_context_mock
 
         # Act
-        with self.session_factory.get_session() as session:
+        with self.session_factory.query() as session:
             # Assert
             assert session == session_mock
             session_context_mock.__enter__.assert_called_once()
@@ -59,7 +59,7 @@ class TestSessionFactory:
         self.db_mock.get_transaction.side_effect = get_transaction_mock
 
         # Act
-        with self.session_factory.get_transaction() as transaction:
+        with self.session_factory.transaction() as transaction:
             # Assert inside the context - commit should not be called yet
             assert transaction == session_mock
             session_mock.commit.assert_not_called()
@@ -93,7 +93,7 @@ class TestSessionFactory:
         self.db_mock.get_transaction.side_effect = get_transaction_mock
 
         # Act
-        with self.session_factory.get_transaction(autocommit=False) as transaction:
+        with self.session_factory.transaction(autocommit=False) as transaction:
             # Assert
             assert transaction == session_mock
             session_mock.commit.assert_not_called()  # Should not auto-commit
@@ -123,7 +123,7 @@ class TestSessionFactory:
         self.db_mock.get_transaction.side_effect = get_transaction_mock
 
         # Act
-        with self.session_factory.get_transaction(autocommit=False) as transaction:
+        with self.session_factory.transaction(autocommit=False) as transaction:
             transaction.commit()  # Manual commit
 
             # Exit happens after this line
