@@ -15,10 +15,10 @@
           </n-form-item>
 
           <n-space justify="center">
-            <n-button 
-              type="primary" 
-              @click="convertToAsciiArt" 
-              :disabled="!inputText.trim()" 
+            <n-button
+              type="primary"
+              @click="convertToAsciiArt"
+              :disabled="!inputText.trim()"
               :loading="isLoading"
             >
               {{ isLoading ? '生成中...' : '生成 ASCII Art' }}
@@ -27,7 +27,7 @@
         </n-form>
 
         <div class="result-container" v-if="asciiArtResult">
-          <n-space justify="end" style="margin-bottom: 10px;">
+          <n-space justify="end" style="margin-bottom: 10px">
             <n-button @click="copyResult" type="primary" size="small" ghost>
               <template #icon>
                 <n-icon><CopyOutline /></n-icon>
@@ -101,9 +101,9 @@ import {
 } from 'naive-ui'
 import { Reload, Trash, CopyOutline } from '@vicons/ionicons5'
 import figlet from 'figlet'
-import standard from "figlet/fonts/Standard"
+import standard from 'figlet/fonts/Standard'
 
-figlet.parseFont("Standard", standard)
+figlet.parseFont('Standard', standard)
 
 interface HistoryItem {
   text: string

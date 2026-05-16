@@ -1,14 +1,22 @@
 <template>
   <n-message-provider>
-    <n-config-provider :theme="currentTheme">
-      <DefaultLayout :on-theme-change="onThemeChange" :current-theme="currentTheme" />
-    </n-config-provider>
+    <n-notification-provider>
+      <n-config-provider :theme="currentTheme">
+        <DefaultLayout :on-theme-change="onThemeChange" :current-theme="currentTheme" />
+      </n-config-provider>
+    </n-notification-provider>
   </n-message-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { NConfigProvider, NMessageProvider, darkTheme, lightTheme } from 'naive-ui'
+import {
+  NConfigProvider,
+  NMessageProvider,
+  NNotificationProvider,
+  darkTheme,
+  lightTheme,
+} from 'naive-ui'
 import DefaultLayout from './layouts/DefaultLayout.vue'
 import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
 

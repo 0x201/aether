@@ -1,7 +1,7 @@
 <template>
   <div class="color-palette-container">
     <h2>颜色板工具</h2>
-    
+
     <div class="main-layout">
       <div class="palette-editor">
         <h3>自定义颜色板</h3>
@@ -32,8 +32,12 @@
           </div>
 
           <div class="palette-display">
-            <div v-for="(color, index) in currentPalette" :key="index" class="color-block"
-              :style="{ backgroundColor: color }">
+            <div
+              v-for="(color, index) in currentPalette"
+              :key="index"
+              class="color-block"
+              :style="{ backgroundColor: color }"
+            >
               <span class="color-value">{{ color }}</span>
             </div>
           </div>
@@ -48,18 +52,12 @@
       <div class="history-section">
         <h3>历史记录</h3>
         <div class="history-list">
-          <div 
-            v-for="(palette, index) in history" 
-            :key="index" 
-            class="history-item-wrapper"
-          >
-            <div class="history-delete-btn" @click="deleteHistoryItem(index)">
-              ×
-            </div>
+          <div v-for="(palette, index) in history" :key="index" class="history-item-wrapper">
+            <div class="history-delete-btn" @click="deleteHistoryItem(index)">×</div>
             <div class="history-item">
-              <div 
-                v-for="(color, i) in palette" 
-                :key="i" 
+              <div
+                v-for="(color, i) in palette"
+                :key="i"
                 class="history-color-block"
                 :style="{ backgroundColor: color }"
                 @click="loadPalette(palette)"
@@ -73,88 +71,81 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { NColorPicker, NButton, NInput, useMessage } from 'naive-ui';
+import { ref, onMounted } from 'vue'
+import { NColorPicker, NButton, NInput, useMessage } from 'naive-ui'
 
-const currentPalette = ref<string[]>([
-  '#FF6B6B',
-  '#4ECDC4',
-  '#45B7D1',
-  '#96CEB4',
-  '#FFEAA7'
-]);
-const history = ref<string[][]>([]);
+const currentPalette = ref<string[]>(['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'])
+const history = ref<string[][]>([])
 const message = useMessage()
 
-
 const isValidColor = (color: string) => {
-  const pattern = /^#([0-9A-Fa-f]{3}){1,2}$/;
-  return pattern.test(color);
-};
+  const pattern = /^#([0-9A-Fa-f]{3}){1,2}$/
+  return pattern.test(color)
+}
 
 const updateColorValue = (index: number, value: string) => {
-  if(isValidColor(value)) {
-    const newPalette = [...currentPalette.value];
-    newPalette[index] = value;
-    currentPalette.value = newPalette;
+  if (isValidColor(value)) {
+    const newPalette = [...currentPalette.value]
+    newPalette[index] = value
+    currentPalette.value = newPalette
   }
-};
+}
 
 const copyColors = async () => {
-  const colorString = currentPalette.value.join(';');
+  const colorString = currentPalette.value.join(';')
   try {
-    await navigator.clipboard.writeText(colorString);
-    message.info('颜色值已复制到剪贴板: ' + colorString);
+    await navigator.clipboard.writeText(colorString)
+    message.info('颜色值已复制到剪贴板: ' + colorString)
   } catch (err) {
-    console.error('复制失败', err);
+    console.error('复制失败', err)
   }
-};
+}
 
 const loadHistoryFromStorage = () => {
-  const stored = localStorage.getItem('colorPaletteHistory');
+  const stored = localStorage.getItem('colorPaletteHistory')
   if (stored) {
     try {
-      history.value = JSON.parse(stored);
+      history.value = JSON.parse(stored)
     } catch (e) {
-      console.error('Failed to parse color palette history', e);
-      history.value = [];
+      console.error('Failed to parse color palette history', e)
+      history.value = []
     }
   }
-};
+}
 
 const saveToHistory = () => {
   const exists = history.value.some(
-    palette => JSON.stringify(palette) === JSON.stringify(currentPalette.value)
-  );
+    (palette) => JSON.stringify(palette) === JSON.stringify(currentPalette.value),
+  )
 
   if (!exists) {
-    history.value.unshift([...currentPalette.value]);
+    history.value.unshift([...currentPalette.value])
 
     if (history.value.length > 10) {
-      history.value.pop();
+      history.value.pop()
     }
 
-    localStorage.setItem('colorPaletteHistory', JSON.stringify(history.value));
+    localStorage.setItem('colorPaletteHistory', JSON.stringify(history.value))
   }
-};
+}
 
 const clearHistory = () => {
-  history.value = [];
-  localStorage.removeItem('colorPaletteHistory');
-};
+  history.value = []
+  localStorage.removeItem('colorPaletteHistory')
+}
 
 const loadPalette = (palette: string[]) => {
-  currentPalette.value = [...palette];
-};
+  currentPalette.value = [...palette]
+}
 
 const deleteHistoryItem = (index: number) => {
-  history.value.splice(index, 1);
-  localStorage.setItem('colorPaletteHistory', JSON.stringify(history.value));
-};
+  history.value.splice(index, 1)
+  localStorage.setItem('colorPaletteHistory', JSON.stringify(history.value))
+}
 
 onMounted(() => {
-  loadHistoryFromStorage();
-});
+  loadHistoryFromStorage()
+})
 </script>
 
 <style scoped>
@@ -193,7 +184,7 @@ onMounted(() => {
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
 }
 

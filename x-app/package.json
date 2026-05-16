@@ -17,6 +17,7 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "crypto-js": "^4.2.0",
     "figlet": "^1.11.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.31",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@tsconfig/node24": "^24.0.4",
+    "@types/crypto-js": "^4.2.2",
     "@types/jsdom": "^28.0.3",
     "@types/node": "^25.8.0",
     "@vicons/ionicons5": "^0.13.0",
