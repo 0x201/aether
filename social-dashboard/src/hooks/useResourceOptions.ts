@@ -29,7 +29,7 @@ export const useResourceOptions = <T = ResourceOption>({
   const fetchOptions = useCallback(
     async (
       page: number = 1,
-      pageSize: number = 10,
+      pageSize: number = 20,
       search?: string,
     ): Promise<{ data: T[]; total: number }> => {
       if (abortControllerRef.current) {

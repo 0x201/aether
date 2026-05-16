@@ -33,9 +33,9 @@ const initialState: CaptureState = {
   loading: false,
   currentPage: 1,
   total: 0,
-  pageSize: 10,
+  pageSize: 20,
   sorter: null,
-  searchParams: { page: 1, pageSize: 10, status: '', roomId: '' },
+  searchParams: { page: 1, pageSize: 20, status: '', roomId: '' },
   captureStartRes: '',
   isCaptureSuccess: false,
   error: null,
@@ -78,7 +78,7 @@ export const useCaptureMgt = ({ messageApi }: UseCaptureMgtProps) => {
   const [state, dispatch] = useReducer(captureReducer, initialState)
   const abortControllerRef = useRef<AbortController | null>(null)
   const errorFlagRef = useRef(false)
-  const service = useMemo(() => createCaptureService(messageApi), [messageApi])
+  const service = useMemo(() => createCaptureService(), [])
   const { fetchOptions: fetchRoomOptions, resetError: resetRoomError } = useRoomOptions(messageApi)
 
   const requestParams = useMemo(

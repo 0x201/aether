@@ -31,16 +31,16 @@ type DanmakuAction =
 
 const initialState: DanmakuState = {
   danmakuList: [],
-  loading: false,
+  loading: true,
   editingDanmaku: null,
   isModalVisible: false,
   total: 0,
   currentPage: 1,
-  pageSize: 10,
+  pageSize: 20,
   sorter: null,
   searchParams: {
     page: 1,
-    pageSize: 10,
+    pageSize: 20,
     userName: '',
     content: '',
     roomId: '',
@@ -79,7 +79,7 @@ function danmakuReducer(state: DanmakuState, action: DanmakuAction): DanmakuStat
         ...state,
         searchParams: {
           page: 1,
-          pageSize: 10,
+          pageSize: 20,
           userName: undefined,
           content: undefined,
           roomId: undefined,

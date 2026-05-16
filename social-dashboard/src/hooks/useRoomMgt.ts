@@ -21,18 +21,18 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [total, setTotal] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(20)
   const [sorter, setSorter] = useState<string | null>(null)
   const errorFlagRef = useRef<boolean>(false)
 
   const [searchParams, setSearchParams] = useState<RoomSearchParams>({
     page: 1,
-    pageSize: 10,
+    pageSize: 20,
     roomName: '',
     roomId: '',
   })
 
-  const service = useMemo(() => createRoomService(messageApi || message), [messageApi])
+  const service = useMemo(() => createRoomService(), [])
 
   const { fetchOptions: fetchRoomOptions } = useRoomOptions(messageApi || message)
 
@@ -90,7 +90,7 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
   const handleResetSearch = useCallback(() => {
     setSearchParams({
       page: 1,
-      pageSize: 10,
+      pageSize: 20,
       roomName: undefined,
       roomId: undefined,
     })
