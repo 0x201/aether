@@ -12,9 +12,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "run-s lint:*",
-    "lint:oxlint": "oxlint . --fix",
-    "lint:eslint": "eslint . --fix --cache",
-    "format": "oxfmt src/"
+    "lint:eslint": "eslint . --fix --cache"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
@@ -39,14 +37,12 @@
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-oxlint": "~1.65.0",
-    "eslint-plugin-playwright": "^2.10.2",
+    "eslint-plugin-playwright": "^2.10.3",
     "eslint-plugin-vue": "~10.9.1",
     "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "naive-ui": "^2.44.1",
     "npm-run-all2": "^8.0.4",
-    "oxfmt": "^0.50.0",
-    "oxlint": "~1.65.0",
     "typescript": "~6.0.3",
     "vite": "^8.0.13",
     "vitest": "^4.1.6",
