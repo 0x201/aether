@@ -1,0 +1,22 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "copyable_text_success": "已成功复制",
+  "copyable_text_failure": "复制失败",
+  "msg_box_no_notifications": "暂无通知",
+  "msg_box_clear_all": "清空所有",
+  "msg_box_analytics_room_label": "房间: {roomId}",
+  "msg_box_analytics_period_label": "统计周期: {periodType}",
+  "msg_box_analytics_start_date_label": "开始时间：{startDate}",
+  "msg_box_analytics_end_date_label": "结束时间：{endDate}",
+  "msg_box_analytics_frequencies_count_label": "词频数: {frequenciesCount}",
+  "msg_box_analytics_time_label": "时间: {time}",
+  "msg_box_danmaku_user_label": "用户: {userName}",
+  "msg_box_danmaku_content_label": "内容: {content}",
+  "msg_box_danmaku_time_label": "时间: {time}",
+  "msg_box_default_time_label": "时间: {time}",
+  "danmaku_chart_bar_label": "弹幕数量",
+  "danmaku_chart_no_data": "暂无数据",
+  "theme_toggle_light": "浅色模式",
+  "theme_toggle_dark": "深色模式",
+  "theme_toggle_system": "跟随系统"
+}

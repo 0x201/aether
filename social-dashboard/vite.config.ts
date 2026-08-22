@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
@@ -9,7 +10,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('.', import.meta.url)),
     },
   },
-  plugins: [react()],
+  plugins: [paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' }),react()],
   build: {
     rolldownOptions: {
       output: {

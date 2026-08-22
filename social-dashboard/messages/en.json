@@ -1,0 +1,22 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "copyable_text_success": "Copied successfully",
+  "copyable_text_failure": "Copy failed",
+  "msg_box_no_notifications": "No notifications",
+  "msg_box_clear_all": "Clear all",
+  "msg_box_analytics_room_label": "Room: {roomId}",
+  "msg_box_analytics_period_label": "Period: {periodType}",
+  "msg_box_analytics_start_date_label": "Start date: {startDate}",
+  "msg_box_analytics_end_date_label": "End date: {endDate}",
+  "msg_box_analytics_frequencies_count_label": "Frequency count: {frequenciesCount}",
+  "msg_box_analytics_time_label": "Time: {time}",
+  "msg_box_danmaku_user_label": "User: {userName}",
+  "msg_box_danmaku_content_label": "Content: {content}",
+  "msg_box_danmaku_time_label": "Time: {time}",
+  "msg_box_default_time_label": "Time: {time}",
+  "danmaku_chart_bar_label": "Danmaku Count",
+  "danmaku_chart_no_data": "No data available",
+  "theme_toggle_light": "Light",
+  "theme_toggle_dark": "Dark",
+  "theme_toggle_system": "Follow System"
+}
