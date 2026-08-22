@@ -1,4 +1,4 @@
-<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+﻿<!-- For more info on central package management go to https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -7,7 +7,6 @@
     <ApiVersioningVersion>10.0.0</ApiVersioningVersion>
     <MSTestVersion>4.1.0</MSTestVersion>
     <FluentUIVersion>4.14.1</FluentUIVersion>
-    <CommunityToolkitWinUIVersion>8.2.251219</CommunityToolkitWinUIVersion>
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -85,24 +84,7 @@
     <PackageVersion Include="MSTest.TestFramework" Version="4.2.1" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.48.0" />
-    <!--WPF-->
-    <PackageVersion Include="MahApps.Metro" Version="3.0.0-rc0516" />
-    <!--WinUI-->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.260416003" />
-    <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
-    <PackageVersion Include="WinUIEx" Version="2.9.0" />
-    <!--CommunityToolkit.WinUI-->
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.Primitives" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Behaviors" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Helpers" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="$(CommunityToolkitWinUIVersion)" />
-    <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
-    <!--Miscellaneous-->
+        <!--Miscellaneous-->
     <PackageVersion Include="AutoMapper" Version="15.0.1" />
     <PackageVersion Include="ClosedXML" Version="0.105.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />

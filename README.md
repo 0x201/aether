@@ -13,10 +13,6 @@ Aether is a comprehensive solution showcasing modern C# development practices wi
       - [Ordering.API](#orderingapi)
       - [EventBus / EventBusRabbitMQ](#eventbus--eventbusrabbitmq)
       - [OrderProcessor](#orderprocessor)
-    - [Desktop Applications](#desktop-applications)
-      - [Aether.WPFApp](#aetherwpfapp)
-      - [Aether.WinUIApp](#aetherwinuiapp)
-      - [WinFormsApp](#winformsapp)
     - [Web Applications](#web-applications)
       - [Angular App (bookstore-app)](#angular-app-bookstore-app)
       - [React/Vue Applications](#reactvue-applications)
@@ -31,7 +27,6 @@ Aether is a comprehensive solution showcasing modern C# development practices wi
   - [Technologies Used](#technologies-used)
     - [Backend](#backend)
     - [Frontend](#frontend)
-    - [Desktop](#desktop)
     - [Development Practices](#development-practices)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -105,17 +100,6 @@ Event-driven communication infrastructure enabling loose coupling between servic
 #### OrderProcessor
 Background service for processing orders and handling related events.
 
-### Desktop Applications
-
-#### Aether.WPFApp
-Modern WPF application demonstrating MVVM pattern and best practices.
-
-#### Aether.WinUIApp
-WinUI 3 application showcasing modern Windows desktop development.
-
-#### WinFormsApp
-Traditional WinForms application with modernized architecture patterns.
-
 ### Web Applications
 
 #### Angular App (bookstore-app)
@@ -170,11 +154,6 @@ React-based frontend application for danmaku management and visualization.
 - React (with Vite)
 - TypeScript
 - AntDesign
-
-### Desktop
-- WPF
-- WinUI 3
-- WinForms
 
 ### Development Practices
 - Domain-Driven Design (DDD)
@@ -245,8 +224,6 @@ Aether/
 │   ├── EventBus/                 # Event bus abstraction
 │   ├── EventBusRabbitMQ/         # RabbitMQ implementation
 │   ├── Aether.AppHost/     # Service orchestration
-│   ├── Aether.WPFApp/      # WPF desktop application
-│   ├── Aether.WinUIApp/    # WinUI desktop application
 │   ├── bookstore-app/            # Angular frontend application
 │   └── ...                       # Additional services and applications
 ├── test/

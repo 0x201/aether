@@ -86,12 +86,11 @@ builder.AddJavaScriptApp("digital-experience-platform", @"../../../digital-exper
     .WithReference(digitalExperienceApi)
     .WithReference(keycloak).WaitFor(keycloak);
 
-builder.AddJavaScriptApp("x-app", @"../../../x-app")
-    .WithPnpm()
-    .WithHttpEndpoint(port: 3013, env: "PORT")
-    .WithExternalHttpEndpoints();
-
-var socialAnalyticsHub = builder.AddPythonApp("social-analytics-hub", @"../../../social-analytics-hub", "main.py")
+var socialAnalyticsHub = builder
+    .AddPythonApp(
+        name: "social-analytics-hub",
+        appDirectory: @"../../../social-analytics-hub",
+        scriptPath: "main.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
@@ -106,21 +105,6 @@ builder.AddJavaScriptApp("social-dashboard", @"../../../social-dashboard")
     .WithHttpEndpoint(port: 3015, env: "PORT")
     .WithReference(dydanmakuApi)
     .WithExternalHttpEndpoints();
-
-
-var goApi = builder.AddGolangApp(
-    name: "go-api",
-    workingDirectory: @"../../../go-api")
-    .WithHttpEndpoint(port: 3000, env: "PORT");
-
-goApi.WithUrl($"{goApi.GetEndpoint("http")}/scalar", "Go API Docs");
-
-var rustApi = builder.AddRustApp(
-    name: "rust-api",
-    workingDirectory: @"../../../rust-api")
-    .WithHttpEndpoint(port: 3001, env: "PORT");
-
-rustApi.WithUrl($"{rustApi.GetEndpoint("http")}/scalar", "Rust API Docs");
 
 if (OperatingSystem.IsWindows())
 {

@@ -12,11 +12,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DyDanmaku.API\DyDanmaku.API.csproj" />
-    <ProjectReference Include="..\Aether.WPFApp\Aether.WPFApp.csproj" />
     <ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />
     <ProjectReference Include="..\OrderProcessor\OrderProcessor.csproj" />
     <ProjectReference Include="..\Aether.WebApp\Aether.WebApp.csproj" />
-    <ProjectReference Include="..\WinFormsApp\WinFormsApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,7 +25,5 @@
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
     <PackageReference Include="Aspire.Hosting.Python" />
     <PackageReference Include="Aspire.Hosting.JavaScript" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Golang" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Rust" />
   </ItemGroup>
 </Project>
