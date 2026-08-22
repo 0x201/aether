@@ -10,6 +10,7 @@ import {
   SyncOutlined,
   SettingOutlined,
 } from '@ant-design/icons'
+import { m } from "@/src/i18n"
 
 const ThemeSwitch: React.FC = () => {
   const { themeMode, setThemeMode } = useTheme()
@@ -19,7 +20,7 @@ const ThemeSwitch: React.FC = () => {
       key: 'light',
       label: (
         <Space>
-          Light
+          {m.theme_toggle_light()}
           {themeMode === 'light' && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),
@@ -30,7 +31,7 @@ const ThemeSwitch: React.FC = () => {
       key: 'dark',
       label: (
         <Space>
-          Dark
+          {m.theme_toggle_dark()}
           {themeMode === 'dark' && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),
@@ -41,7 +42,7 @@ const ThemeSwitch: React.FC = () => {
       key: 'auto',
       label: (
         <Space>
-          Follow System
+          {m.theme_toggle_system()}
           {themeMode === 'auto' && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),

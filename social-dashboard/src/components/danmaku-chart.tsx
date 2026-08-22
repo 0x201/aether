@@ -10,8 +10,26 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { DanmakuChartProps, TransformedDataItem } from './type'
 import { useTheme } from '@/src/contexts/useTheme'
+import { m } from "@/src/i18n";
+
+export interface TransformedDataItem {
+  name: string
+  value: number
+  tooltipContent?: string
+}
+
+export interface DanmakuChartProps<T> {
+  data: T[]
+  transformFunction: (data: T[]) => TransformedDataItem[]
+  title: string
+  color: string
+  loading: boolean
+  angle?: number
+  xAxisLabel?: string
+  yAxisLabel?: string
+}
+
 
 const DanmakuChart = <T,>({
   data,
@@ -44,13 +62,13 @@ const DanmakuChart = <T,>({
               <YAxis />
               <Tooltip contentStyle={{ background: bgColor }} />
               <Legend verticalAlign="top" layout="horizontal" />
-              <Bar dataKey="value" name="弹幕数量" fill={color} />
+              <Bar dataKey="value" name={m.danmaku_chart_bar_label()} fill={color} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             {loading && <Spin size="large" />}
-            {!loading && (!data || data.length === 0) && <p>暂无数据</p>}
+            {!loading && (!data || data.length === 0) && <p>{m.danmaku_chart_no_data()}</p>}
           </div>
         )}
       </div>
@@ -59,6 +77,5 @@ const DanmakuChart = <T,>({
 }
 
 export { DanmakuChart }
-export type { DanmakuChartProps, TransformedDataItem }
 
 export default DanmakuChart

@@ -25,8 +25,8 @@ import type { RoomOption } from '@/src/interface/room/type'
 import type { DanmakuSearchParams } from '@/src/interface/management/type'
 import { useDanmakuMgt } from '@/src/hooks/useDanmakuMgt'
 import { buildSorter } from '@/src/util'
-import { InfiniteRefreshSelect } from '@/src/components/InfiniteRefreshSelect'
-import { CopyableText } from '@/src/components/CopyableText'
+import { InfiniteScrollSelect } from '@/src/components/infinite-scroll-select'
+import { CopyableText } from '@/src/components/copyable-text'
 
 const { Title } = Typography
 
@@ -255,7 +255,7 @@ const DanmakuMgt: React.FC = () => {
               </Col>
               <Col xs={24} sm={12} md={3} lg={3} xl={4}>
                 <Form.Item name="roomId" label="房间ID">
-                  <InfiniteRefreshSelect<RoomOption>
+                  <InfiniteScrollSelect<RoomOption>
                     fetchOptions={actions.fetchRoomOptions}
                     placeholder="请输入房间ID或主播名"
                     debounceTimeout={300}

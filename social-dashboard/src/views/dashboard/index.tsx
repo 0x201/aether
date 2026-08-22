@@ -1,14 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { Card, Row, Col, Statistic, Spin, DatePicker, Typography, message, Select } from 'antd'
-import WordCloud from '@/src/components/Wordcloud'
-import { colormapOptions } from '@/src/components/Wordcloud/type'
+import { colormapOptions, WordCloud } from '@/src/components/word-cloud'
 import { useDashboardData } from '../../hooks/useDashboardData'
 import type { HourlyDistribution, TopRoom, TopUser, WordFreq } from './type'
 import type { RoomOption } from '@/src/interface/room/type'
 import './styles.css'
 import type { Dayjs } from 'dayjs'
-import { DanmakuChart, type TransformedDataItem } from '@/src/components/DanmakuChart'
-import InfiniteRefreshSelect from '@/src/components/InfiniteRefreshSelect'
+import { DanmakuChart, type TransformedDataItem } from '@/src/components/danmaku-chart'
+import { InfiniteScrollSelect } from '@/src/components/infinite-scroll-select'
 
 const { Title } = Typography
 const { Meta } = Card
@@ -206,7 +205,7 @@ const Dashboard: React.FC = () => {
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={6}>
               <span style={{ marginRight: 8 }}>选择房间：</span>
-              <InfiniteRefreshSelect<RoomOption>
+              <InfiniteScrollSelect<RoomOption>
                 fetchOptions={fetchRoomOptions}
                 placeholder="请输入房间ID或主播名"
                 debounceTimeout={300}
@@ -214,9 +213,9 @@ const Dashboard: React.FC = () => {
                 value={
                   selectedRoomId && selectedRoomId !== -1
                     ? {
-                        value: selectedRoomId.toString(),
-                        label: `房间ID: ${selectedRoomId}`,
-                      }
+                      value: selectedRoomId.toString(),
+                      label: `房间ID: ${selectedRoomId}`,
+                    }
                     : undefined
                 }
                 onChange={handleRoomChangeSelect}

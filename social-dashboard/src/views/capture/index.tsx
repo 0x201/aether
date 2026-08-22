@@ -27,7 +27,7 @@ import { buildSorter } from '@/src/util'
 import { useCaptureMgt } from '../../hooks/useCaptureMgt'
 import type { CaptureJob, CaptureSearchParams } from '@/src/interface/capture/type'
 import type { FilterValue, SorterResult } from 'antd/es/table/interface'
-import InfiniteRefreshSelect from '@/src/components/InfiniteRefreshSelect'
+import InfiniteScrollSelect from '@/src/components/infinite-scroll-select'
 import type { RoomOption } from '@/src/interface/room/type'
 
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
@@ -284,7 +284,7 @@ const CaptureView: React.FC = () => {
               </Col>
               <Col xs={24} sm={12} md={3} lg={3} xl={4}>
                 <Form.Item name="roomId" label="房间ID">
-                  <InfiniteRefreshSelect<RoomOption>
+                  <InfiniteScrollSelect<RoomOption>
                     fetchOptions={actions.fetchRoomOptions}
                     placeholder="请输入房间ID或主播名"
                     debounceTimeout={300}
@@ -383,7 +383,7 @@ const CaptureView: React.FC = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item label="房间ID" required rules={[{ required: true, message: '请输入房间ID' }]}>
-            <InfiniteRefreshSelect<RoomOption>
+            <InfiniteScrollSelect<RoomOption>
               fetchOptions={actions.fetchRoomOptions}
               placeholder="请输入房间ID或主播名"
               debounceTimeout={300}
