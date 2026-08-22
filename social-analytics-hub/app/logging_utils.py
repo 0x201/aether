@@ -8,7 +8,7 @@ from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.resources import Resource
 
-from app.core import settings
+from app.core import AppConfig
 
 
 class InterceptHandler(logging.Handler):
@@ -28,7 +28,7 @@ class InterceptHandler(logging.Handler):
         )
 
 
-def setup_logging() -> None:
+def setup_logging(settings: AppConfig) -> None:
     logger.remove()
 
     if settings.logging.enable_console:

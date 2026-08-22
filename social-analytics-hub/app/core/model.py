@@ -1,6 +1,5 @@
 import os
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -14,20 +13,20 @@ class DatabaseType(str, Enum):
 class SqlServerConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     server: str = Field(..., description="Database server address")
-    port: Optional[int] = Field(1433, description="Database server port")
-    username: Optional[str] = Field(None, description="Database username")
-    password: Optional[str] = Field(None, description="Database password")
+    port: int | None = Field(1433, description="Database server port")
+    username: str | None = Field(None, description="Database username")
+    password: str | None = Field(None, description="Database password")
     database: str = Field(..., description="Database name")
     trusted_connection: bool = Field(
         False, description="Use trusted connection for SQL Server"
     )
-    authentication: Optional[str] = Field(
+    authentication: str | None = Field(
         None, description="Authentication method for SQL Server"
     )
 
     @field_validator("server")
     @classmethod
-    def server_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def server_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate server if we're using SQL Server
         if info.data.get("type") == DatabaseType.SQLSERVER:
             if not v or not v.strip():
@@ -36,14 +35,14 @@ class SqlServerConfig(BaseModel):
 
     @field_validator("port")
     @classmethod
-    def port_must_be_valid(cls, v: Optional[int]) -> Optional[int]:
+    def port_must_be_valid(cls, v: int | None) -> int | None:
         if v is not None and (v < 1 or v > 65535):
             raise ValueError("Port must be between 1 and 65535")
         return v
 
     @field_validator("database")
     @classmethod
-    def database_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def database_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate database if we're using SQL Server
         if info.data.get("type") == DatabaseType.SQLSERVER:
             if v is not None and not v.strip():
@@ -52,7 +51,7 @@ class SqlServerConfig(BaseModel):
 
     @field_validator("username")
     @classmethod
-    def username_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def username_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate username if we're using SQL Server
         if info.data.get("type") == DatabaseType.SQLSERVER:
             if v is not None and not v.strip():
@@ -66,7 +65,7 @@ class SqliteConfig(BaseModel):
 
     @field_validator("sqlite_path")
     @classmethod
-    def sqlite_path_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def sqlite_path_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate sqlite_path if we're using SQLite
         if info.data.get("type") == DatabaseType.SQLITE:
             if not v or not v.strip():
@@ -79,24 +78,24 @@ class PostgreSQLConfig(BaseModel):
     host: str = Field(
         os.getenv("DYDANMAKUDB_HOST", "localhost"), description="Database host address"
     )
-    port: Optional[int] = Field(
+    port: int | None = Field(
         int(os.getenv("DYDANMAKUDB_PORT", "5432")), description="Database server port"
     )
-    username: Optional[str] = Field(
+    username: str | None = Field(
         os.getenv("DYDANMAKUDB_USERNAME", "postgres"), description="Database username"
     )
-    password: Optional[str] = Field(
+    password: str | None = Field(
         os.getenv("DYDANMAKUDB_PASSWORD", ""), description="Database password"
     )
     database: str = Field(
         os.getenv("DYDANMAKUDB_DATABASENAME", "dydanmakudb"),
         description="Database name",
     )
-    dbschema: Optional[str] = Field(None, description="Database schema")
+    dbschema: str | None = Field(None, description="Database schema")
 
     @field_validator("host")
     @classmethod
-    def host_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def host_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate server if we're using PostgreSQL
         if info.data.get("type") == DatabaseType.POSTGRESQL:
             if not v or not v.strip():
@@ -105,14 +104,14 @@ class PostgreSQLConfig(BaseModel):
 
     @field_validator("port")
     @classmethod
-    def port_must_be_valid(cls, v: Optional[int]) -> Optional[int]:
+    def port_must_be_valid(cls, v: int | None) -> int | None:
         if v is not None and (v < 1 or v > 65535):
             raise ValueError("Port must be between 1 and 65535")
         return v
 
     @field_validator("database")
     @classmethod
-    def database_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def database_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate database if we're using PostgreSQL
         if info.data.get("type") == DatabaseType.POSTGRESQL:
             if v is not None and not v.strip():
@@ -121,7 +120,7 @@ class PostgreSQLConfig(BaseModel):
 
     @field_validator("username")
     @classmethod
-    def username_must_not_be_empty(cls, v: Optional[str], info) -> Optional[str]:
+    def username_must_not_be_empty(cls, v: str | None, info) -> str | None:
         # Only validate username if we're using PostgreSQL
         if info.data.get("type") == DatabaseType.POSTGRESQL:
             if v is not None and not v.strip():
@@ -131,6 +130,4 @@ class PostgreSQLConfig(BaseModel):
 
 class DatabaseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    # sqlserver: Optional[SqlServerConfig] = Field(None, description="SQL Server config")
-    # sqlite: SqliteConfig = Field(..., description="SQLite config")
-    postgres: Optional[PostgreSQLConfig] = Field(None, description="PostgreSQL config")
+    postgres: PostgreSQLConfig | None = Field(None, description="PostgreSQL config")

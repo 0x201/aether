@@ -10,11 +10,13 @@ from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from app.core.config import settings
+from app.core.config import AppConfig
 
 
-def configure_telemetry(app: FastAPI, service_name: str = "dydanmakuanalytics"):
-    otlp_endpoint = settings.otel_exporter_otlp_endpoint
+def configure_telemetry(
+    app: FastAPI, app_config: AppConfig, service_name: str = "dydanmakuanalytics"
+):
+    otlp_endpoint = app_config.otel_exporter_otlp_endpoint
 
     # Create resource with service name
     resource = Resource.create({"service.name": service_name})

@@ -1,18 +1,18 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from redis.asyncio import Redis
 
-from app.core import settings
+from app.core import AppConfig
 
 
 class CacheSession:
-    def __init__(self):
-        self.host = settings.cache.redis_host
-        self.port = settings.cache.redis_port
-        self.password = settings.cache.redis_password
-        self.ssl = settings.cache.ssl
-        self.ssl_ca_certs = settings.cache.ssl_ca_certs
+    def __init__(self, app_config: AppConfig):
+        self.host = app_config.cache.redis_host
+        self.port = app_config.cache.redis_port
+        self.password = app_config.cache.redis_password
+        self.ssl = app_config.cache.ssl
+        self.ssl_ca_certs = app_config.cache.ssl_ca_certs
 
     @asynccontextmanager
     async def get_cache(self) -> AsyncGenerator[Redis, None]:

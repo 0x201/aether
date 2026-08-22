@@ -1,14 +1,14 @@
-from pika.adapters.blocking_connection import BlockingChannel
-from _thread import lock
 import json
 import threading
+from _thread import lock
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, Protocol
 
 import pika
 from loguru import logger
+from pika.adapters.blocking_connection import BlockingChannel
 
-from app.core.config import settings
+from app.core.config import AppConfig
 
 
 class IEventBus(Protocol):
@@ -26,20 +26,21 @@ class EventBus(IEventBus):
     Event bus for publishing integration events to RabbitMQ.
     """
 
-    def __init__(self, exchange_name: str = "mc_event_bus"):
-        self.exchange_name: str = exchange_name
+    def __init__(self, app_config: AppConfig):
+        self.app_config = app_config
+        self.exchange_name: str = app_config.messaging.exchange or "mc_event_bus"
         self._lock: lock = threading.Lock()
 
     def _create_connection(self):
         try:
             credentials = pika.PlainCredentials(
-                username=settings.messaging.rabbitmq_username,
-                password=settings.messaging.rabbitmq_password,
+                username=self.app_config.messaging.rabbitmq_username,
+                password=self.app_config.messaging.rabbitmq_password,
             )
             parameters = pika.ConnectionParameters(
-                host=settings.messaging.rabbitmq_host,
-                port=settings.messaging.rabbitmq_port,
-                virtual_host=settings.messaging.virtual_host,
+                host=self.app_config.messaging.rabbitmq_host,
+                port=self.app_config.messaging.rabbitmq_port,
+                virtual_host=self.app_config.messaging.virtual_host,
                 credentials=credentials,
                 heartbeat=600,
                 blocked_connection_timeout=300,

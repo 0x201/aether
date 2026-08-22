@@ -6,7 +6,7 @@ from loguru import logger
 from sqlalchemy import URL, Engine, create_engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-from app.core.config import settings
+from app.core.config import AppConfig
 from app.core.model import DatabaseConfig
 
 
@@ -326,7 +326,8 @@ class PostgreSQLSession:
 
 
 class SessionFactory:
-    def __init__(self):
+    def __init__(self, app_config: AppConfig):
+        self.settings = app_config
         self.database_config: Optional[DatabaseConfig] = None
         self.database_instance: Optional[
             Union[MSSQLSession, SQLiteSession, PostgreSQLSession]
@@ -334,7 +335,7 @@ class SessionFactory:
 
     def _get_database_config(self) -> DatabaseConfig:
         if self.database_config is None:
-            self.database_config = settings.databases
+            self.database_config = self.settings.databases
         return self.database_config
 
     def _get_database(self) -> Union[MSSQLSession, SQLiteSession, PostgreSQLSession]:

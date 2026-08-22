@@ -1,10 +1,10 @@
 import argparse
 import os
 from pathlib import Path
-from typing import List, Literal, Optional, Type
+from typing import Literal
 
 from loguru import logger
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -15,7 +15,7 @@ from pydantic_settings import (
 from .model import DatabaseConfig, PostgreSQLConfig
 
 
-def determine_environment(env: Optional[str | Path]) -> str:
+def determine_environment(env: str | Path | None) -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--env", default=None, help="Environment to use (local, dev, uat, prod)"
@@ -55,7 +55,7 @@ def get_yaml_file() -> Path:
     return get_project_root() / "app" / "core" / f"{current_env}.yaml"
 
 
-class LoggingConfig(BaseSettings):
+class LoggingConfig(BaseModel):
     """Logging configuration"""
 
     level: str = Field(default="INFO", description="Log level")
@@ -70,13 +70,26 @@ class LoggingConfig(BaseSettings):
     enable_file: bool = Field(default=True, description="Enable file logging")
 
 
-class NPPAConfig(BaseSettings):
+class NPPAConfig(BaseModel):
     base_url: str = Field(default="", description="Base URL for NPPAs")
-    data_url: str = Field(default="", description="Data URL for NPPAs")
-    suffix: str = Field(default=".html", description="Suffix for NPPAs URLs")
+    foreign_network_game_url: str = Field(
+        default="", description="Imported online game audit info URL"
+    )
+    import_egame_url: str = Field(
+        default="", description="Imported electronic game audit info URL"
+    )
+    domestic_network_game_url: str = Field(
+        default="", description="Domestic online game audit info URL"
+    )
+    game_alteration_url: str = Field(
+        default="", description="Game audit alteration info URL"
+    )
+    game_revocation_url: str = Field(
+        default="", description="Game audit revocation info URL"
+    )
 
 
-class RabbitMQConfig(BaseSettings):
+class RabbitMQConfig(BaseModel):
     rabbitmq_host: str = Field(
         default=os.getenv("EVENTBUS_HOST", "localhost"), description="RabbitMQ host"
     )
@@ -94,14 +107,14 @@ class RabbitMQConfig(BaseSettings):
     queue: str = Field(default="Danmaku", description="RabbitMQ queue")
 
 
-class RedisConfig(BaseSettings):
+class RedisConfig(BaseModel):
     redis_host: str = Field(
         default=os.getenv("REDIS_HOST", "localhost"), description="Redis host"
     )
     redis_port: int = Field(
         default=int(os.getenv("REDIS_PORT", "6379")), description="Redis port"
     )
-    redis_password: Optional[str] = Field(
+    redis_password: str | None = Field(
         default=os.getenv("REDIS_PASSWORD", None), description="Redis password"
     )
     ssl: bool = Field(default=False, description="Use SSL for Redis")
@@ -111,7 +124,7 @@ class RedisConfig(BaseSettings):
     )
 
 
-class Settings(BaseSettings):
+class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
     project_name: str = Field(default="DyDanmaku API", description="Project name")
     host: str = Field(default="localhost", description="Host to run the server on")
@@ -135,7 +148,7 @@ class Settings(BaseSettings):
         ),
         description="Database configuration",
     )
-    cors: Optional[List[str]] = Field(default=[], description="CORS origins to allow")
+    cors: list[str] | None = Field(default=[], description="CORS origins to allow")
     logging: LoggingConfig = Field(
         default=LoggingConfig(), description="Logging configuration"
     )
@@ -156,7 +169,7 @@ class Settings(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
@@ -170,7 +183,3 @@ class Settings(BaseSettings):
             dotenv_settings,
             file_secret_settings,
         )
-
-
-# Create settings instance
-settings = Settings()

@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
 from app.cache import CacheSession
-from app.core import settings
+from app.core import AppConfig
 from app.database import DanmakuRepository, NPPARepository, SessionFactory
 from app.messaging import EventBus
 from app.schedulers import ScheduledDanmakuAnalyzer, ScheduledNPPACrawler
@@ -11,21 +11,24 @@ from app.services import AnalyticsNotification, DanmakuAnalyzer, NPPAGameAuditCr
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
 
+    app_config = providers.Singleton(AppConfig)
+
     wiring_config = containers.WiringConfiguration(
         modules=["app.api.routes.danmaku", "app.api.routes.nppa"]
     )
 
     event_bus = providers.Singleton(
-        EventBus, exchange_name=settings.messaging.exchange or "mc_event_bus"
+        EventBus,
+        app_config=app_config(),
     )
 
     analytics_notification = providers.Singleton(
         AnalyticsNotification, event_bus=event_bus
     )
 
-    session_factory = providers.Singleton(SessionFactory)
+    session_factory = providers.Singleton(SessionFactory, app_config=app_config())
 
-    cache_session = providers.Factory(CacheSession)
+    cache_session = providers.Factory(CacheSession, app_config=app_config())
 
     danmaku_repository = providers.Factory(
         DanmakuRepository, session_factory=session_factory
