@@ -93,7 +93,7 @@ export class App implements OnInit, AfterViewInit {
   
   
   private loadMenusFromToken(): void {
-    const menus = this.userService.loadUserMenus()(); // 获取 signal 的值
+    const menus = this.userService.loadUserMenus()();
     this.menus = menus;
     const userRoles = this.extractUserRolesFromToken();
     // Convert roles to Role[] format
