@@ -9,7 +9,7 @@ from sqlalchemy import and_, select
 
 from src.cache import CacheSession
 from src.database import Danmaku, DanmakuAnalysis, SessionFactory
-from src.dataclass import PeriodType
+from src.schemas import PeriodType
 
 from .analytics_notification import AnalyticsNotification
 

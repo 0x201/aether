@@ -3,8 +3,8 @@ from datetime import UTC, datetime
 from dependency_injector.wiring import inject
 from fastapi import APIRouter, Body, HTTPException
 
-from src.dataclass import PeriodType
 from src.deps import DanmakuAnalyzerDep
+from src.schemas import PeriodType
 
 router = APIRouter()
 

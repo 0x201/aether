@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.dataclass.danmaku_model import CaptureJobStatus
+from src.schemas import CaptureJobStatus
 from src.shared import DatabaseUtils
 
 from .danmaku_models import CaptureJob, Danmaku, Room

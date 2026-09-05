@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 
 from src.database.danmaku_repository import DanmakuRepository
-from src.dataclass.danmaku_model import CaptureJobStatus
+from src.schemas import CaptureJobStatus
 
 
 class TestDanmakuRepository:

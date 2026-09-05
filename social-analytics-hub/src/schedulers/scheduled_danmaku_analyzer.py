@@ -10,8 +10,8 @@ from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
 
 from src.database import SessionFactory
-from src.dataclass import PeriodType
 from src.messaging import EventBus
+from src.schemas import PeriodType
 from src.services import DanmakuAnalyzer
 
 

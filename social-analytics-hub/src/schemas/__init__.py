@@ -1,5 +1,5 @@
 from .common import PagedResult
-from .danmaku_model import (
+from .danmaku import (
     CaptureJobStatus,
     DanmakuAnalysisDto,
     DanmakuUpdateDto,
