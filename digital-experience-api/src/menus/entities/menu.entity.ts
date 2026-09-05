@@ -1,38 +1,38 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity'
-import { RoleMenu } from './role-menu.entity'
-import { MenuDto } from '../dtos/menu.dto'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseAuditableEntity } from "../../common/BaseAuditableEntity.entity.js";
+import { RoleMenu } from "./role-menu.entity.js";
+import { MenuDto } from "../dtos/menu.dto.js";
 
-@Entity('menus', { schema: 'bookstore' })
+@Entity("menus", { schema: "bookstore" })
 export class Menu extends BaseAuditableEntity {
-  @PrimaryGeneratedColumn({ name: 'id', primaryKeyConstraintName: 'menus_pk' })
-  id: number
+  @PrimaryGeneratedColumn({ name: "id", primaryKeyConstraintName: "menus_pk" })
+  id: number;
 
-  @Column({ name: 'name', length: 100 })
-  name: string
+  @Column({ name: "name", length: 100 })
+  name: string;
 
-  @Column({ name: 'title', length: 100 })
-  title: string
+  @Column({ name: "title", length: 100 })
+  title: string;
 
-  @Column({ name: 'icon', nullable: true })
-  icon: string
+  @Column({ name: "icon", nullable: true })
+  icon: string;
 
-  @Column({ name: 'route', nullable: true })
-  route: string
+  @Column({ name: "route", nullable: true })
+  route: string;
 
-  @Column({ name: 'order' })
-  order: number
+  @Column({ name: "order" })
+  order: number;
 
-  @Column({ name: 'parent_id', nullable: true })
-  parentId: number
+  @Column({ name: "parent_id", nullable: true })
+  parentId: number;
 
-  @Column({ name: 'is_active', default: true })
-  isActive: boolean
+  @Column({ name: "is_active", default: true })
+  isActive: boolean;
 
   @OneToMany(() => RoleMenu, (roleMenu) => roleMenu.menu, {
     createForeignKeyConstraints: false,
   })
-  roleMenus: RoleMenu[]
+  roleMenus: RoleMenu[];
 
   static mapToDto(menu: Menu): MenuDto {
     return {
@@ -44,7 +44,10 @@ export class Menu extends BaseAuditableEntity {
       order: menu.order,
       parentId: menu.parentId,
       isActive: menu.isActive,
-      roles: menu.roleMenus.map((roleMenu) => ({ id: roleMenu.role.id, name: roleMenu.role.name })),
-    }
+      roles: menu.roleMenus.map((roleMenu) => ({
+        id: roleMenu.role.id,
+        name: roleMenu.role.name,
+      })),
+    };
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common'
 import { Request, Response, NextFunction } from 'express'
-import { KeycloakStrategy } from './keycloak.strategy'
+import { KeycloakStrategy } from './keycloak.strategy.js'
 
 @Injectable()
 export class KeycloakMiddleware implements NestMiddleware {

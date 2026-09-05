@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import Redis, { RedisOptions } from 'ioredis'
-import { CacheConfig } from '@/src/config/config.interface'
+import { Redis,  RedisOptions } from 'ioredis'
+import { CacheConfig } from '@/src/config/config.interface.js'
 import { readFileSync } from 'fs'
 
 @Injectable()
@@ -11,7 +11,7 @@ export class RedisService implements OnModuleDestroy {
   private readonly options: RedisOptions
 
   constructor(private configService: ConfigService) {
-    const cacheConfig = this.configService.get<CacheConfig>('cache')
+    const cacheConfig = this.configService.getOrThrow<CacheConfig>('cache')
 
     this.options = {
       host: cacheConfig.host,

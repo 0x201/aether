@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { Book } from './book.entity'
-import { Author } from '../../authors/entities/author.entity'
+import { Book } from './book.entity.js'
+import { Author } from '../../authors/entities/author.entity.js'
 
 @Entity('book_author', { schema: 'bookstore' })
 @Index('book_author_book_id_author_id_idx', ['bookId', 'authorId'], { unique: true })

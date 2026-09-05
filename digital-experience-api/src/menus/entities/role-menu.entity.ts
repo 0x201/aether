@@ -1,6 +1,6 @@
-import { Role } from '../../roles/entities/role.entity'
+import { Role } from '../../roles/entities/role.entity.js'
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { Menu } from './menu.entity'
+import { Menu } from './menu.entity.js'
 
 @Entity('role_menu', { schema: 'bookstore' })
 @Index('role_menu_role_id_menu_id_idx', ['menuId', 'roleId'], { unique: true })

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AuthService } from './auth.service'
+import { AuthService } from './auth.service.js'
 import { JwtService } from '@nestjs/jwt'
-import { CryptoService } from '@/src/shared/services/crypto.service'
+import { CryptoService } from '@/src/shared/services/crypto.service.js'
 import { ConfigModule } from '@nestjs/config'
 import { describe, beforeEach, vi, it, expect } from 'vitest'
 

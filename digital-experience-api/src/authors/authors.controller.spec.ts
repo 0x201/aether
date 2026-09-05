@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AuthorsController } from './authors.controller'
-import { AuthorsService } from './authors.service'
+import { AuthorsController } from './authors.controller.js'
+import { AuthorsService } from './authors.service.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('AuthorsController', () => {

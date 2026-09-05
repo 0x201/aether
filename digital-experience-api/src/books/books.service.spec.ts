@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { BooksService } from './books.service'
+import { BooksService } from './books.service.js'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Book } from './entities/book.entity'
-import { Author } from '@/src/authors/entities/author.entity'
-import { testTypeOrmConfig } from '@/test/typeorm-test.config'
+import { Book } from './entities/book.entity.js'
+import { Author } from '@/src/authors/entities/author.entity.js'
+import { testTypeOrmConfig } from '@/test/typeorm-test.config.js'
 import { describe, beforeEach, it, expect } from 'vitest'
 
 describe('BooksService', () => {

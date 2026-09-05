@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { DataSeedService } from './data-seed.service'
+import { DataSeedService } from './data-seed.service.js'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { describe, beforeEach, it, expect } from 'vitest'
-import { Role } from '@/src/roles/entities/role.entity'
-import { Author } from '@/src/authors/entities/author.entity'
-import { Book } from '@/src/books/entities/book.entity'
-import { testTypeOrmConfig } from '@/test/typeorm-test.config'
+import { Role } from '@/src/roles/entities/role.entity.js'
+import { Author } from '@/src/authors/entities/author.entity.js'
+import { Book } from '@/src/books/entities/book.entity.js'
+import { testTypeOrmConfig } from '@/test/typeorm-test.config.js'
 
 describe('DataSeedService', () => {
   let service: DataSeedService

@@ -16,7 +16,7 @@ export class UserContextService {
     return (this.request as any).user
   }
 
-  getUsername(): string | undefined {
+  getUsername(): string | null {
     return (this.request as any).user?.username
   }
 

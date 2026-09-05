@@ -1,7 +1,7 @@
-import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity'
+import { BaseAuditableEntity } from '../../common/BaseAuditableEntity.entity.js'
 
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { BookAuthor } from './book-author.entity'
+import { BookAuthor } from './book-author.entity.js'
 
 @Entity('books', { schema: 'bookstore' })
 @Index('books_title_idx', ['title'], { unique: true })

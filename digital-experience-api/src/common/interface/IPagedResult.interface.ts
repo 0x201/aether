@@ -1,4 +1,4 @@
-import { IResult } from '../response/Result'
+import { IResult } from '../response/Result.js'
 
 interface IFilteredResultQuery {
   filter: string | null
@@ -33,7 +33,7 @@ interface ITimeRangedQuery {
 
 interface IPagedResult<T> extends IListResult<T>, IHasTotalCount {}
 
-export {
+export type {
   IFilteredResultQuery,
   IHasTotalCount,
   ILimitedResultQuery,

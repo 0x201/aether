@@ -1,16 +1,16 @@
-import { Controller, Get, Request } from '@nestjs/common'
-import { AuthService } from './services/auth.service'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { Controller, Get, Request } from "@nestjs/common";
+import { AuthService } from "./services/auth.service.js";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
-@Controller('auth')
-@ApiTags('Auth')
+@Controller("auth")
+@ApiTags("Auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('profile')
+  @Get("profile")
   @ApiBearerAuth()
-  getProfile(@Request() req) {
-    return req.user
+  getProfile(@Request() req: Request) {
+    return req.user;
   }
 
   // @AllowAnonymous()

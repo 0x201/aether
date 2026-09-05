@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { RolesService } from './roles.service'
+import { RolesService } from './roles.service.js'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Role } from './entities/role.entity'
+import { Role } from './entities/role.entity.js'
 import { ConfigModule } from '@nestjs/config'
-import { testTypeOrmConfig } from '@/test/typeorm-test.config'
+import { testTypeOrmConfig } from '@/test/typeorm-test.config.js'
 import { describe, beforeEach, it, expect } from 'vitest'
 
 describe('RolesService', () => {

@@ -7,7 +7,7 @@ import {
   //NotFoundException,
 } from '@nestjs/common'
 //import { RolesService } from "../../roles/roles.service";
-import { Request } from 'express'
+import type { Request } from 'express'
 import { REQUEST } from '@nestjs/core'
 
 @Injectable()

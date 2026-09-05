@@ -1,12 +1,19 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNumber, IsString } from "class-validator";
 
 export class AuthorDto {
   @ApiProperty()
-  id: number
+  @IsNumber()
+  id: number;
+
   @ApiProperty()
-  firstName: string
+  @IsString()
+  firstName: string;
+
   @ApiProperty()
-  lastName: string
+  @IsString()
+  lastName: string;
+
   @ApiProperty()
-  isActive: boolean
+  isActive: boolean;
 }

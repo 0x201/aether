@@ -1,10 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { CreateAuthorDto } from "../dtos/create-author.dto.js";
 
-export class CreateAuthorCommand {
-  @ApiProperty()
-  firstName: string
-  @ApiProperty()
-  lastName: string
-  @ApiPropertyOptional()
-  isActive?: boolean
+export class CreateAuthorCommand extends CreateAuthorDto {
+  constructor(data: CreateAuthorDto) {
+    super();
+    Object.assign(this, data);
+  }
 }

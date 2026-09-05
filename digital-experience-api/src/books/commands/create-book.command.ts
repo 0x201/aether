@@ -1,19 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { AuthorDto } from '@/src/authors/dtos/author.dto'
+import { CreateBookDto } from "../dtos/create-book.dto.js";
 
-export class CreateBookCommand {
-  @ApiProperty()
-  title: string
-  @ApiProperty()
-  isbn: string
-  @ApiProperty()
-  description: string
-  @ApiProperty()
-  publishDate: string
-  @ApiProperty()
-  price: number
-  @ApiProperty()
-  authors: AuthorDto[]
-  @ApiPropertyOptional()
-  isActive?: boolean
+export class CreateBookCommand extends CreateBookDto {
+  constructor(data: CreateBookDto) {
+    super();
+    Object.assign(this, data);
+  }
 }

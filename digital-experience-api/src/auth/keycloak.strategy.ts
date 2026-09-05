@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import KeycloakConnect from 'keycloak-connect'
 import { ConfigService } from '@nestjs/config'
-import { KeycloakConfig } from './keycloak.config'
+import { KeycloakConfig } from './keycloak.config.js'
 
 @Injectable()
 export class KeycloakStrategy {
