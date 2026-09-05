@@ -89,8 +89,8 @@ builder.AddJavaScriptApp("digital-experience-platform", @"../../../digital-exper
 var socialAnalyticsHub = builder
     .AddPythonApp(
         name: "social-analytics-hub",
-        appDirectory: @"../../../social-analytics-hub",
-        scriptPath: "main.py")
+        appDirectory: @"../../../social-analytics-hub/src",
+        scriptPath: "app.py")
     .WithUv()
     .WithHttpEndpoint(port: 8000, env: "PORT")
     .WithExternalHttpEndpoints()
