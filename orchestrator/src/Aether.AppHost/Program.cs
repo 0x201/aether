@@ -106,21 +106,6 @@ builder.AddJavaScriptApp("social-dashboard", @"../../../social-dashboard")
     .WithReference(dydanmakuApi)
     .WithExternalHttpEndpoints();
 
-if (OperatingSystem.IsWindows())
-{
-    builder.AddProject<Projects.WinFormsApp>("winformsclient")
-        .WithReference(orderingApi).WaitFor(orderingApi)
-        .WithReference(orderingdb).WaitFor(orderingdb)
-        .WithExplicitStart()
-        .ExcludeFromManifest();
-
-    builder.AddProject<Projects.Aether_WPFApp>("wpfclient")
-        .WithReference(orderingApi).WaitFor(orderingApi)
-        .WithReference(orderingdb).WaitFor(orderingdb)
-        .WithExplicitStart()
-        .ExcludeFromManifest();
-}
-
 webApp.WithEnvironment("CallBackUrl", webApp.GetEndpoint("https"));
 
 builder.Build().Run();
