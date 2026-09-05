@@ -1,7 +1,9 @@
+from datetime import UTC, datetime
+
 import pytest
-from datetime import datetime, timezone
-from app.database.danmaku_repository import DanmakuRepository
-from app.dataclass.danmaku_model import CaptureJobStatus
+
+from src.database.danmaku_repository import DanmakuRepository
+from src.dataclass.danmaku_model import CaptureJobStatus
 
 
 class TestDanmakuRepository:
@@ -116,7 +118,7 @@ class TestDanmakuRepository:
 
         # Mock the CaptureJob creation
         capture_job_class_mock = mocker.patch(
-            "app.database.danmaku_repository.CaptureJob"
+            "src.database.danmaku_repository.CaptureJob"
         )
         mock_job = mocker.Mock()
         capture_job_class_mock.return_value = mock_job
@@ -146,7 +148,7 @@ class TestDanmakuRepository:
         result = self.repository.update_capture_job_status(
             job_id=123,
             status=CaptureJobStatus.COMPLETED.value,
-            end_time=datetime.now(timezone.utc),
+            end_time=datetime.now(UTC),
         )
 
         # Assert

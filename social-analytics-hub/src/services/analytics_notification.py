@@ -1,0 +1,47 @@
+
+from loguru import logger
+
+from src.messaging import EventBus
+
+
+class AnalyticsNotification:
+    """
+    Service for sending analytics completion notifications via the event bus.
+    """
+
+    def __init__(self, event_bus: EventBus):
+        self.event_bus = event_bus
+
+    def notify_analytics_completed(
+        self,
+        room_id: int | None,
+        start_date: str,
+        end_date: str,
+        period_type: str,
+        frequencies_count: int,
+        completed_at: str,
+    ):
+        """
+        Sends an analytics completed notification via the event bus.
+        """
+        event_data = {
+            "roomId": room_id,
+            "startDate": start_date,
+            "endDate": end_date,
+            "periodType": period_type,
+            "frequenciesCount": frequencies_count,
+            "completedAt": completed_at,
+        }
+
+        success = self.event_bus.publish(
+            "AnalyticsCompletedIntegrationEvent", event_data
+        )
+
+        if success:
+            logger.info(f"Analytics completed notification sent for room {room_id}")
+        else:
+            logger.error(
+                f"Failed to send analytics completed notification for room {room_id}"
+            )
+
+        return success

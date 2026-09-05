@@ -1,7 +1,0 @@
-from fastapi import APIRouter
-
-from .routes import danmaku, nppa
-
-api_router = APIRouter()
-api_router.include_router(danmaku.router, prefix="/danmakus", tags=["Danmakus"])
-api_router.include_router(nppa.router, prefix="/nppa", tags=["NPPA Game Audits"])

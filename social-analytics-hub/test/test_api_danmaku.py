@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.deps.container import Container
+
+from src.deps.container import AppContainer
 
 # Define the actual route path
 analysis_url = "/danmakus/analysis/generate"
@@ -9,7 +10,8 @@ analysis_url = "/danmakus/analysis/generate"
 def create_test_app():
     """Create a test app with the danmaku router"""
     from fastapi import FastAPI
-    from app.api.routes.danmaku import router
+
+    from src.api.routes.danmaku import router
 
     app = FastAPI()
     app.include_router(router, prefix="/danmakus", tags=["danmakus"])
@@ -20,7 +22,7 @@ def create_test_app():
 def test_client(mocker):
     """Create a test client with mocked dependencies"""
     # Create a real container instance
-    container = Container()
+    container = AppContainer()
 
     # Mock the dependencies
     mock_repo = mocker.Mock()
@@ -33,7 +35,7 @@ def test_client(mocker):
     container.cache_session.override(mock_cache_session)
 
     # Initialize the container
-    container.wire(modules=["app.api.routes.danmaku"])
+    container.wire(modules=["src.api.routes.danmaku"])
 
     # Create app with container already wired
     app = create_test_app()

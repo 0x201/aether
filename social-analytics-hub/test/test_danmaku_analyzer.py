@@ -1,6 +1,8 @@
-import pytest
 from datetime import datetime
-from app.services.analyze_danmaku import DanmakuAnalyzer
+
+import pytest
+
+from src.services.analyze_danmaku import DanmakuAnalyzer
 
 
 class TestDanmakuAnalyzer:

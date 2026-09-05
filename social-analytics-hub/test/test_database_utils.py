@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
-from app.shared.database_utils import DatabaseUtils
-from app.database.danmaku_models import Danmaku, Room
+from src.database.danmaku_models import Danmaku, Room
+from src.shared.database_utils import DatabaseUtils
 
 
 class TestDatabaseUtils:

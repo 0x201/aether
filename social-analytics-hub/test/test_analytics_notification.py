@@ -1,5 +1,6 @@
 import pytest
-from app.services.analytics_notification import AnalyticsNotification
+
+from src.services.analytics_notification import AnalyticsNotification
 
 
 class TestAnalyticsNotification:

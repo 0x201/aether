@@ -1,0 +1,36 @@
+project_name: "Aether Social Analytics Hub API"
+version: "0.0.1"
+
+cors:
+  - "http://localhost:5173"
+
+databases:
+  postgres:
+    dbschema: "dydanmaku"
+
+logging:
+  level: "INFO"
+  format: "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] [{level}] <level>{message}</level>"
+  rotation: "00:00"
+  serialize: false
+  dir_path: "./logs/"
+  enable_console: true
+  enable_file: true
+
+nppa:
+  base_url: "https://www.nppa.gov.cn/bsfw/jggs/yxspjg"
+  foreign_network_game_url: "/jkwlyxspxx/"
+  import_egame_url: "/jkdzyxspxx/"
+  domestic_network_game_url: "/gcwlyxspxx/"
+  game_alteration_url: "/yxspbgxx/"
+  game_revocation_url: "/yxspcxxx/"
+
+messaging:
+  virtual_host: "/"
+  exchange: "mc_event_bus"
+  queue: "Danmaku"
+
+cache:
+  ssl: false
+
+otel_service_name: "aether-social-analytics-hub-api"

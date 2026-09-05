@@ -1,10 +1,13 @@
 import pytest
-from app.messaging.eventbus import EventBus
+
+from core import AppConfig
+from src.messaging.eventbus import EventBus
 
 
 class TestEventBus:
-    def setup_method(self):
-        self.event_bus = EventBus()
+    def setup_method(self, mocker):
+        app_config = mocker.Mock(AppConfig)
+        self.event_bus = EventBus(app_config)
 
     @pytest.mark.asyncio
     async def test_publish_event(self):
@@ -39,10 +42,3 @@ class TestEventBus:
         else:
             # If method doesn't exist, that's fine for now
             assert True
-
-    def test_eventbus_initialization(self):
-        # Act
-        event_bus = EventBus()
-
-        # Assert
-        assert event_bus is not None

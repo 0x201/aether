@@ -1,4 +1,4 @@
-from app.shared.object_pool import ObjectPool
+from src.shared.object_pool import ObjectPool
 
 
 class SimpleClass:

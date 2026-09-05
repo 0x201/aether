@@ -1,19 +1,22 @@
 import pytest
-from app.cache.cache_session import CacheSession
+
+from core import AppConfig
+from src.cache.cache_session import CacheSession
 
 
 class TestCacheSession:
     @pytest.fixture(autouse=True)
     def setup(self, mocker):
+        app_config = mocker.Mock(AppConfig)
         # Mock the settings to control the values
-        self.mock_settings = mocker.patch("app.cache.cache_session.settings")
+        self.mock_settings = mocker.patch("src.cache.cache_session.settings")
         self.mock_settings.cache.redis_host = "localhost"
         self.mock_settings.cache.redis_port = 6379
         self.mock_settings.cache.redis_password = None
         self.mock_settings.cache.ssl = False
         self.mock_settings.cache.ssl_ca_certs = None
 
-        self.cache_session = CacheSession()
+        self.cache_session = CacheSession(app_config)
 
     def test_initialization(self):
         # Assert
@@ -31,7 +34,7 @@ class TestCacheSession:
 
         # Mock Redis creation
         redis_from_url_mock = mocker.patch(
-            "app.cache.cache_session.Redis", return_value=redis_mock
+            "src.cache.cache_session.Redis", return_value=redis_mock
         )
 
         # Act
@@ -53,7 +56,7 @@ class TestCacheSession:
         redis_mock.close = mocker.AsyncMock()
 
         # Mock Redis creation
-        mocker.patch("app.cache.cache_session.Redis", return_value=redis_mock)
+        mocker.patch("src.cache.cache_session.Redis", return_value=redis_mock)
 
         # Act
         async with self.cache_session.get_cache() as cache:
@@ -78,7 +81,7 @@ class TestCacheSession:
         redis_mock.delete = mock_delete
 
         # Mock Redis creation
-        mocker.patch("app.cache.cache_session.Redis", return_value=redis_mock)
+        mocker.patch("src.cache.cache_session.Redis", return_value=redis_mock)
 
         # Act
         async with self.cache_session.get_cache() as cache:
