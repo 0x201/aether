@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSTest.Sdk/4.3.3">
 
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
@@ -26,6 +26,10 @@
 		<Using Include="Aspire.Hosting.ApplicationModel" />
 		<Using Include="Aspire.Hosting.Testing" />
 		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+		<Using Include="Microsoft.Testing.Extensions.CodeCoverage" />
+		<Using Include="Microsoft.Testing.Extensions.TrxReport" />
+		<Using Include="MSTest.TestAdapter" />
+		<Using Include="MSTest.TestFramework" />
 	</ItemGroup>
 
 </Project>
