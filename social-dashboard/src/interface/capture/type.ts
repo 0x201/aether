@@ -3,7 +3,7 @@ import type {
   SortedRequest,
   TimeRangeRequest,
   DataResponse,
-} from '@/src/interface/shared/type'
+} from "@/src/interface/shared/type"
 
 export interface CaptureJob {
   id: number

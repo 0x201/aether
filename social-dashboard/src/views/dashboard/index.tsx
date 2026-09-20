@@ -1,13 +1,16 @@
-import React, { useCallback, useMemo, useState } from 'react'
-import { Card, Row, Col, Statistic, Spin, DatePicker, Typography, message, Select } from 'antd'
-import { colormapOptions, WordCloud } from '@/src/components/word-cloud'
-import { useDashboardData } from '../../hooks/useDashboardData'
-import type { HourlyDistribution, TopRoom, TopUser, WordFreq } from './type'
-import type { RoomOption } from '@/src/interface/room/type'
-import './styles.css'
-import type { Dayjs } from 'dayjs'
-import { DanmakuChart, type TransformedDataItem } from '@/src/components/danmaku-chart'
-import { InfiniteScrollSelect } from '@/src/components/infinite-scroll-select'
+import { Card, Row, Col, Statistic, Spin, DatePicker, Typography, message, Select } from "antd"
+import type { Dayjs } from "dayjs"
+import React, { useCallback, useMemo, useState } from "react"
+
+import { DanmakuChart, type TransformedDataItem } from "@/src/components/danmaku-chart"
+import { InfiniteScrollSelect } from "@/src/components/infinite-scroll-select"
+import { colormapOptions, WordCloud } from "@/src/components/word-cloud"
+
+import "./styles.css"
+import type { RoomOption } from "@/src/interface/room/type"
+
+import { useDashboardData } from "../../hooks/useDashboardData"
+import type { HourlyDistribution, TopRoom, TopUser, WordFreq } from "./type"
 
 const { Title } = Typography
 const { Meta } = Card
@@ -16,8 +19,8 @@ const { RangePicker } = DatePicker
 const Dashboard: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage()
   const [selectedColormap, setSelectedColormap] = useState<
-    'viridis' | 'plasma' | 'inferno' | 'magma' | 'cividis' | 'rainbow'
-  >('viridis')
+    "viridis" | "plasma" | "inferno" | "magma" | "cividis" | "rainbow"
+  >("viridis")
 
   const { state, actions } = useDashboardData({ messageApi, defaultHours: 1 })
 
@@ -46,7 +49,7 @@ const Dashboard: React.FC = () => {
 
   const handleRoomChangeSelect = useCallback(
     (value: string | RoomOption) => {
-      const roomId = typeof value === 'object' ? Number(value.value) : Number(value)
+      const roomId = typeof value === "object" ? Number(value.value) : Number(value)
       handleRoomChange(isNaN(roomId) ? null : roomId)
     },
     [handleRoomChange],
@@ -156,8 +159,8 @@ const Dashboard: React.FC = () => {
               title="最活跃用户"
               description={
                 <Statistic
-                  value={stats?.topUsers?.[0]?.count ?? 'N/A'}
-                  prefix={stats?.topUsers?.[0]?.userName ? `@${stats.topUsers[0].userName}` : 'N/A'}
+                  value={stats?.topUsers?.[0]?.count ?? "N/A"}
+                  prefix={stats?.topUsers?.[0]?.userName ? `@${stats.topUsers[0].userName}` : "N/A"}
                 />
               }
             />
@@ -169,8 +172,8 @@ const Dashboard: React.FC = () => {
               title="最活跃直播间"
               description={
                 <Statistic
-                  value={stats?.topRooms?.[0]?.count ?? 'N/A'}
-                  prefix={stats?.topRooms?.[0]?.roomName ? `@${stats.topRooms[0].roomName}` : 'N/A'}
+                  value={stats?.topRooms?.[0]?.count ?? "N/A"}
+                  prefix={stats?.topRooms?.[0]?.roomName ? `@${stats.topRooms[0].roomName}` : "N/A"}
                 />
               }
             />
@@ -187,20 +190,20 @@ const Dashboard: React.FC = () => {
 
       <Row gutter={16}>
         <Col span={24}>
-          <Title level={4} style={{ textAlign: 'center' }}>
+          <Title level={4} style={{ textAlign: "center" }}>
             弹幕数据仪表板
           </Title>
         </Col>
         <Col span={24}>
-          <Row style={{ marginBottom: '20px' }} gutter={[16, 16]}>
+          <Row style={{ marginBottom: "20px" }} gutter={[16, 16]}>
             <Col xs={24} sm={24} md={12} lg={8} xl={6}>
               <span style={{ marginRight: 8 }}>选择时间：</span>
               <RangePicker
                 showTime
                 format="YYYY-MM-DD HH:mm:ss"
-                placeholder={['开始时间', '结束时间']}
+                placeholder={["开始时间", "结束时间"]}
                 onChange={handleDateChange}
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
               />
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={6}>
@@ -213,24 +216,24 @@ const Dashboard: React.FC = () => {
                 value={
                   selectedRoomId && selectedRoomId !== -1
                     ? {
-                      value: selectedRoomId.toString(),
-                      label: `房间ID: ${selectedRoomId}`,
-                    }
+                        value: selectedRoomId.toString(),
+                        label: `房间ID: ${selectedRoomId}`,
+                      }
                     : undefined
                 }
                 onChange={handleRoomChangeSelect}
                 allowClear
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
               />
             </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={12} style={{ textAlign: 'right' }}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={12} style={{ textAlign: "right" }}>
               {/* 可以添加刷新按钮 */}
             </Col>
           </Row>
         </Col>
 
         {loading && (
-          <Col span={24} style={{ textAlign: 'center', padding: '40px 0' }}>
+          <Col span={24} style={{ textAlign: "center", padding: "40px 0" }}>
             <Spin size="large" />
             <p>正在加载数据...</p>
           </Col>
@@ -239,7 +242,7 @@ const Dashboard: React.FC = () => {
         {!loading && stats && statCards}
       </Row>
 
-      <Row gutter={16} style={{ marginTop: '20px' }}>
+      <Row gutter={16} style={{ marginTop: "20px" }}>
         <Col xs={24} sm={24} md={24} lg={12} xl={12}>
           {chartComponents.hourlyDistribution}
         </Col>
@@ -248,7 +251,7 @@ const Dashboard: React.FC = () => {
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginTop: '20px' }}>
+      <Row gutter={16} style={{ marginTop: "20px" }}>
         <Col xs={24} sm={24} md={24} lg={12} xl={12}>
           {chartComponents.topRooms}
         </Col>
@@ -257,24 +260,24 @@ const Dashboard: React.FC = () => {
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginTop: '20px' }}>
+      <Row gutter={16} style={{ marginTop: "20px" }}>
         <Col span={24}>
           <Card
             title="词云图"
             extra={
               <div
                 style={{
-                  display: 'flex',
-                  gap: '10px',
-                  alignItems: 'center',
-                  width: '16em',
+                  display: "flex",
+                  gap: "10px",
+                  alignItems: "center",
+                  width: "16em",
                 }}
               >
-                <span style={{ width: '100%' }}>选择配色方案：</span>
+                <span style={{ width: "100%" }}>选择配色方案：</span>
                 <Select
                   value={selectedColormap}
                   onChange={setSelectedColormap}
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   options={colormapOptions}
                 />
               </div>
@@ -282,7 +285,7 @@ const Dashboard: React.FC = () => {
           >
             <div>
               {loadingWordFreq ? (
-                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
                   <Spin size="large" />
                   <p>正在生成词云...</p>
                 </div>
@@ -295,7 +298,7 @@ const Dashboard: React.FC = () => {
                   colormap={selectedColormap}
                 />
               ) : (
-                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
                   <p>暂无词云数据</p>
                 </div>
               )}

@@ -4,14 +4,12 @@
       <mat-card-title>
         <h1>Welcome to Bookstore App</h1>
       </mat-card-title>
-      <mat-card-subtitle>
-        Discover your next favorite book
-      </mat-card-subtitle>
+      <mat-card-subtitle> Discover your next favorite book </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <p>
-        Browse our extensive collection of books from various genres. Find bestsellers,
-        new releases, and classic literature all in one place.
+        Browse our extensive collection of books from various genres. Find bestsellers, new
+        releases, and classic literature all in one place.
       </p>
       <div class="cta-buttons">
         <button mat-raised-button color="primary" routerLink="/books">
@@ -30,31 +28,23 @@
 
   <div class="featured-section">
     <h2>Featured Books</h2>
-    @let state = booksService.booksState$;
-
-
-    @if (state().loading) {
-      <mat-spinner></mat-spinner>
-    } 
-    @if (state().error && !state().loading) {
-      <div class="error-message">
-        <p>Error loading books: {{ state().error }}</p>
-        <button mat-raised-button color="warn" (click)="loadRandomBooks()">
-          <mat-icon>retry</mat-icon>
-          Try Again
-        </button>
-      </div>
-    }
-
-    @if (state().data === null && !state().loading && !state().error) {
-      <p>No featured books available at the moment.</p>
+    @let state = booksService.booksState$; @if (state().loading) {
+    <mat-spinner></mat-spinner>
+    } @if (state().error && !state().loading) {
+    <div class="error-message">
+      <p>Error loading books: {{ state().error }}</p>
       <button mat-raised-button color="warn" (click)="loadRandomBooks()">
-          <mat-icon>refresh</mat-icon>
-          Load books
-        </button>
-    }
-    
-    @if (state().data && state().data!.length > 0 && !state().loading) {
+        <mat-icon>retry</mat-icon>
+        Try Again
+      </button>
+    </div>
+    } @if (state().data === null && !state().loading && !state().error) {
+    <p>No featured books available at the moment.</p>
+    <button mat-raised-button color="warn" (click)="loadRandomBooks()">
+      <mat-icon>refresh</mat-icon>
+      Load books
+    </button>
+    } @if (state().data && state().data!.length > 0 && !state().loading) {
     <div class="book-grid">
       @for (book of state().data; track book.id) {
       <mat-card class="book-card">
@@ -63,27 +53,24 @@
           <mat-card-subtitle>ISBN: {{ book.isbn }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <p>
-            {{ book.description }}
-          </p>
+          <p>{{ book.description }}</p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button color="primary" (click)="viewBookDetails(book.id)">View Details</button>
+          <button mat-button color="primary" (click)="viewBookDetails(book.id)">
+            View Details
+          </button>
           <span class="spacer"></span>
           <span class="price">${{ book.price }}</span>
         </mat-card-actions>
       </mat-card>
       }
     </div>
-    }
-
-    @if (state().data && state().data!.length === 0 && !state().loading) {
-      <p>No featured books available at the moment.</p>
-      <button mat-raised-button color="warn" (click)="loadRandomBooks()">
-          <mat-icon>load</mat-icon>
-          Load Books
-        </button>
+    } @if (state().data && state().data!.length === 0 && !state().loading) {
+    <p>No featured books available at the moment.</p>
+    <button mat-raised-button color="warn" (click)="loadRandomBooks()">
+      <mat-icon>load</mat-icon>
+      Load Books
+    </button>
     }
   </div>
-
 </div>

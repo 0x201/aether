@@ -1,11 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { AuthService } from './auth.service.js'
-import { JwtService } from '@nestjs/jwt'
-import { CryptoService } from '@/src/shared/services/crypto.service.js'
-import { ConfigModule } from '@nestjs/config'
-import { describe, beforeEach, vi, it, expect } from 'vitest'
+import { ConfigModule } from "@nestjs/config"
+import { JwtService } from "@nestjs/jwt"
+import { Test, TestingModule } from "@nestjs/testing"
+import { describe, beforeEach, vi, it, expect } from "vitest"
 
-describe('AuthService', () => {
+import { CryptoService } from "@/src/shared/services/crypto.service.js"
+
+import { AuthService } from "./auth.service.js"
+
+describe("AuthService", () => {
   let authService: AuthService
 
   beforeEach(async () => {
@@ -33,7 +35,7 @@ describe('AuthService', () => {
     authService = module.get<AuthService>(AuthService)
   })
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(authService).toBeDefined()
   })
 })

@@ -1,11 +1,11 @@
-import config from '@/src/config'
+import config from "@/src/config"
 import type {
   CreateRoomRequest,
   Room,
   RoomSearchParams,
   UpdateRoomRequest,
-} from '@/src/interface/room/type'
-import type { PaginationResponse } from '@/src/interface/shared/type'
+} from "@/src/interface/room/type"
+import type { PaginationResponse } from "@/src/interface/shared/type"
 
 const { apiVersion } = config
 const baseUrl = `/api/${apiVersion}/danmakus/rooms`
@@ -25,7 +25,7 @@ export const createRoomService = (): RoomService => {
 
       if (searchParams) {
         Object.entries(searchParams).forEach(([key, value]) => {
-          if (value !== '' && value !== undefined && value !== null) {
+          if (value !== "" && value !== undefined && value !== null) {
             queryParams.append(key, value.toString())
           }
         })
@@ -57,9 +57,9 @@ export const createRoomService = (): RoomService => {
     createRoom: async (request: CreateRoomRequest): Promise<boolean> => {
       const endpoint = `${baseUrl}`
       const response = await fetch(endpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(request),
       })
@@ -73,9 +73,9 @@ export const createRoomService = (): RoomService => {
     updateRoom: async (id: number, request: UpdateRoomRequest): Promise<boolean> => {
       const endpoint = `${baseUrl}/${id}`
       const response = await fetch(endpoint, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(request),
       })
@@ -90,7 +90,7 @@ export const createRoomService = (): RoomService => {
     deleteRoom: async (id: number): Promise<boolean> => {
       const endpoint = `${baseUrl}/${id}`
       const response = await fetch(endpoint, {
-        method: 'DELETE',
+        method: "DELETE",
       })
 
       if (!response.ok) {

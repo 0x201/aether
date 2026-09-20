@@ -1,4 +1,3 @@
-import React, { useCallback, useMemo } from 'react'
 import {
   Table,
   Button,
@@ -17,16 +16,18 @@ import {
   type CollapseProps,
   Typography,
   DatePicker,
-} from 'antd'
-import type { ColumnsType, TableProps } from 'antd/es/table'
-import './styles.css'
-import type { Danmaku } from '@/src/interface/danmaku/type'
-import type { RoomOption } from '@/src/interface/room/type'
-import type { DanmakuSearchParams } from '@/src/interface/management/type'
-import { useDanmakuMgt } from '@/src/hooks/useDanmakuMgt'
-import { buildSorter } from '@/src/util'
-import { InfiniteScrollSelect } from '@/src/components/infinite-scroll-select'
-import { CopyableText } from '@/src/components/copyable-text'
+} from "antd"
+import type { ColumnsType, TableProps } from "antd/es/table"
+import React, { useCallback, useMemo } from "react"
+
+import "./styles.css"
+import { CopyableText } from "@/src/components/copyable-text"
+import { InfiniteScrollSelect } from "@/src/components/infinite-scroll-select"
+import { useDanmakuMgt } from "@/src/hooks/useDanmakuMgt"
+import type { Danmaku } from "@/src/interface/danmaku/type"
+import type { DanmakuSearchParams } from "@/src/interface/management/type"
+import type { RoomOption } from "@/src/interface/room/type"
+import { buildSorter } from "@/src/util"
 
 const { Title } = Typography
 
@@ -37,7 +38,7 @@ const DanmakuMgt: React.FC = () => {
 
   const { state, actions } = useDanmakuMgt({ messageApi })
 
-  const handleTableChange: TableProps<Danmaku>['onChange'] = (_pagination, _filters, sorter) => {
+  const handleTableChange: TableProps<Danmaku>["onChange"] = (_pagination, _filters, sorter) => {
     const sortString = buildSorter(sorter)
     actions.setSorter(sortString)
   }
@@ -60,7 +61,7 @@ const DanmakuMgt: React.FC = () => {
 
       actions.handleSearch(searchParamsWithTime)
     } catch (error) {
-      console.error('Search validation failed:', error)
+      console.error("Search validation failed:", error)
     }
   }, [searchForm, actions])
 
@@ -88,8 +89,8 @@ const DanmakuMgt: React.FC = () => {
         actions.setEditingDanmaku(null)
       }
     } catch (error) {
-      console.error('Validation failed:', error)
-      messageApi.error('表单验证失败')
+      console.error("Validation failed:", error)
+      messageApi.error("表单验证失败")
     }
   }, [form, state.editingDanmaku, actions, messageApi])
 
@@ -102,38 +103,38 @@ const DanmakuMgt: React.FC = () => {
   const columns: ColumnsType<Danmaku> = useMemo(
     () => [
       {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        title: "ID",
+        dataIndex: "id",
+        key: "id",
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         sorter: { multiple: 1 },
       },
       {
-        title: '用户ID',
-        dataIndex: 'userId',
-        key: 'userId',
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        title: "用户ID",
+        dataIndex: "userId",
+        key: "userId",
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         render: (text) => <CopyableText text={text} />,
       },
       {
-        title: '用户名',
-        dataIndex: 'userName',
-        key: 'userName',
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        title: "用户名",
+        dataIndex: "userName",
+        key: "userName",
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         render: (text) => <CopyableText text={text} />,
       },
       {
-        title: '内容',
-        dataIndex: 'content',
-        key: 'content',
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        title: "内容",
+        dataIndex: "content",
+        key: "content",
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         ellipsis: true,
         render: (text: string) => <CopyableText text={text} tooltip={text} />,
       },
       {
-        title: '粉丝牌',
-        dataIndex: 'fanMedalName',
-        key: 'fanMedalName',
+        title: "粉丝牌",
+        dataIndex: "fanMedalName",
+        key: "fanMedalName",
         render: (_, record) =>
           record.fanMedalName && record.fanMedalLevel ? (
             <Tag
@@ -147,15 +148,15 @@ const DanmakuMgt: React.FC = () => {
               {record.fanMedalName}
             </Tag>
           ) : (
-            '无'
+            "无"
           ),
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         sorter: { multiple: 5 },
       },
       {
-        title: '粉丝牌等级',
-        dataIndex: 'fanMedalLevel',
-        key: 'fanMedalLevel',
+        title: "粉丝牌等级",
+        dataIndex: "fanMedalLevel",
+        key: "fanMedalLevel",
         render: (_, record) =>
           record.fanMedalLevel ? (
             <Tag
@@ -169,15 +170,15 @@ const DanmakuMgt: React.FC = () => {
               {record.fanMedalLevel}
             </Tag>
           ) : (
-            '无'
+            "无"
           ),
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         sorter: { multiple: 4 },
       },
       {
-        title: '用户等级',
-        dataIndex: 'userLevel',
-        key: 'userLevel',
+        title: "用户等级",
+        dataIndex: "userLevel",
+        key: "userLevel",
         render: (_, record) =>
           record.userLevel ? (
             <Tag
@@ -191,30 +192,30 @@ const DanmakuMgt: React.FC = () => {
               {record.userLevel}
             </Tag>
           ) : (
-            '无'
+            "无"
           ),
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         sorter: { multiple: 3 },
       },
       {
-        title: '时间',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        title: "时间",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         sorter: { multiple: 1 },
       },
       {
-        title: '房间名称',
-        dataIndex: 'roomId',
-        key: 'roomId',
+        title: "房间名称",
+        dataIndex: "roomId",
+        key: "roomId",
         render: (_, record) =>
-          record.roomId && record.roomName ? `${record.roomName}(${record.roomId})` : '无',
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+          record.roomId && record.roomName ? `${record.roomName}(${record.roomId})` : "无",
+        responsive: ["xs", "sm", "md", "lg", "xl"],
         sorter: { multiple: 2 },
       },
       {
-        title: '操作',
-        key: 'action',
+        title: "操作",
+        key: "action",
         render: (_, record) => (
           <Space size="middle">
             <Popconfirm
@@ -229,17 +230,17 @@ const DanmakuMgt: React.FC = () => {
             </Popconfirm>
           </Space>
         ),
-        responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+        responsive: ["xs", "sm", "md", "lg", "xl"],
       },
     ],
     [state.medalLevelColors, state.userLevelColors, handleDelete],
   )
 
-  const collapsedItems: CollapseProps['items'] = useMemo(
+  const collapsedItems: CollapseProps["items"] = useMemo(
     () => [
       {
-        key: '1',
-        label: '搜索和筛选',
+        key: "1",
+        label: "搜索和筛选",
         children: (
           <Form form={searchForm} onFinish={handleSearch}>
             <Row gutter={16}>
@@ -263,8 +264,8 @@ const DanmakuMgt: React.FC = () => {
                     optionRender={(option) => (
                       <div
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
+                          display: "flex",
+                          alignItems: "center",
                         }}
                       >
                         {option.label}
@@ -278,12 +279,12 @@ const DanmakuMgt: React.FC = () => {
                   <DatePicker.RangePicker
                     showTime
                     format="YYYY-MM-DD HH:mm:ss"
-                    placeholder={['开始时间', '结束时间']}
-                    style={{ width: '100%' }}
+                    placeholder={["开始时间", "结束时间"]}
+                    style={{ width: "100%" }}
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={3} lg={3} xl={4} style={{ textAlign: 'right' }}>
+              <Col xs={24} sm={12} md={3} lg={3} xl={4} style={{ textAlign: "right" }}>
                 <Button type="primary" htmlType="submit">
                   搜索
                 </Button>
@@ -333,7 +334,7 @@ const DanmakuMgt: React.FC = () => {
       </div>
 
       <Modal
-        title={state.editingDanmaku ? '编辑弹幕' : '创建弹幕'}
+        title={state.editingDanmaku ? "编辑弹幕" : "创建弹幕"}
         open={state.isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
@@ -344,14 +345,14 @@ const DanmakuMgt: React.FC = () => {
           <Form.Item
             name="userName"
             label="用户名"
-            rules={[{ required: true, message: '请输入用户名' }]}
+            rules={[{ required: true, message: "请输入用户名" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="content"
             label="内容"
-            rules={[{ required: true, message: '请输入弹幕内容' }]}
+            rules={[{ required: true, message: "请输入弹幕内容" }]}
           >
             <Input.TextArea rows={4} />
           </Form.Item>

@@ -1,7 +1,7 @@
-import config from '@/src/config'
-import type { Danmaku } from '@/src/interface/danmaku/type'
-import type { PaginationResponse } from '@/src/interface/shared/type'
-import type { DanmakuSearchParams } from '@/src/interface/management/type'
+import config from "@/src/config"
+import type { Danmaku } from "@/src/interface/danmaku/type"
+import type { DanmakuSearchParams } from "@/src/interface/management/type"
+import type { PaginationResponse } from "@/src/interface/shared/type"
 
 const { apiVersion } = config
 const baseUrl = `/api/${apiVersion}/danmakus`
@@ -25,7 +25,7 @@ export const createDanmakuService = (): DanmakuService => {
 
       if (searchParams) {
         Object.entries(searchParams).forEach(([key, value]) => {
-          if (value !== '' && value !== undefined && value !== null) {
+          if (value !== "" && value !== undefined && value !== null) {
             queryParams.append(key, value.toString())
           }
         })
@@ -44,7 +44,7 @@ export const createDanmakuService = (): DanmakuService => {
     deleteDanmaku: async (id: number): Promise<boolean> => {
       const endpoint = `${baseUrl}/${id}`
       const response = await fetch(endpoint, {
-        method: 'DELETE',
+        method: "DELETE",
       })
 
       if (!response.ok) {
@@ -57,9 +57,9 @@ export const createDanmakuService = (): DanmakuService => {
       const endpoint = `${baseUrl}/${id}`
 
       const response = await fetch(endpoint, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       })

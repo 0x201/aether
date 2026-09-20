@@ -1,30 +1,30 @@
-import { dirname, join } from "path";
-import * as yaml from "js-yaml";
-import { readFileSync } from "fs";
-import { AppConfig } from "./config.interface.js";
+import { readFileSync } from "fs"
+import { dirname, join } from "path"
 
-const YAML_CONFIG_FILENAME = `${process.env.NODE_ENV}.yaml`;
+import * as yaml from "js-yaml"
+
+import { AppConfig } from "./config.interface.js"
+
+const YAML_CONFIG_FILENAME = `${process.env.NODE_ENV}.yaml`
 
 function getRedisSslConfig() {
-  const sslCertDir = process.env.SSL_CERT_DIR;
+  const sslCertDir = process.env.SSL_CERT_DIR
 
   if (!sslCertDir) {
-    throw new Error("SSL_CERT_DIR environment variable is not set");
+    throw new Error("SSL_CERT_DIR environment variable is not set")
   }
-  const sslCertParentPath = dirname(sslCertDir);
-  const certPemPath = join(sslCertParentPath, "cert.pem");
+  const sslCertParentPath = dirname(sslCertDir)
+  const certPemPath = join(sslCertParentPath, "cert.pem")
   const sslConfig = {
     ca: certPemPath,
-  };
-  return sslConfig;
+  }
+  return sslConfig
 }
 
 export default () => {
-  const config = yaml.load(
-    readFileSync(join(__dirname, YAML_CONFIG_FILENAME), "utf8"),
-  ) as AppConfig;
+  const config = yaml.load(readFileSync(join(__dirname, YAML_CONFIG_FILENAME), "utf8")) as AppConfig
 
-  const sslConfig = getRedisSslConfig();
+  const sslConfig = getRedisSslConfig()
   config.cache = {
     ...config.cache,
     host: process.env.REDIS_HOST || "localhost:6391",
@@ -34,7 +34,7 @@ export default () => {
       ...config.cache.tls,
       ca: sslConfig.ca,
     },
-  };
+  }
 
   config.database = {
     ...config.database,
@@ -43,7 +43,7 @@ export default () => {
     username: process.env.BOOKSTOREDB_USERNAME || "",
     password: process.env.BOOKSTOREDB_PASSWORD || "",
     port: parseInt(process.env.BOOKSTOREDB_PORT || "3012"),
-  };
+  }
 
   config.messaging = {
     ...config.messaging,
@@ -51,7 +51,7 @@ export default () => {
     port: parseInt(process.env.EVENTBUS_PORT || "5762"),
     username: process.env.EVENTBUS_USERNAME || "guest",
     password: process.env.EVENTBUS_PASSWORD || "",
-  };
+  }
 
   config.otel = {
     ...config.otel,
@@ -59,20 +59,17 @@ export default () => {
     OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
     OTEL_EXPORTER_OTLP_PROTOCOL: process.env.OTEL_EXPORTER_OTLP_PROTOCOL || "",
     OTEL_SERVICE_NAME: process.env.OTEL_SERVICE_NAME || "",
-  };
+  }
 
   config.keycloak = {
     ...config.keycloak,
     realm: process.env.KEYCLOAK_REALM || config.keycloak.realm,
     authServerUrl:
-      process.env.KEYCLOAK_HTTP ||
-      process.env.KEYCLOAK_HTTPS ||
-      config.keycloak.authServerUrl,
+      process.env.KEYCLOAK_HTTP || process.env.KEYCLOAK_HTTPS || config.keycloak.authServerUrl,
     clientId: process.env.KEYCLOAK_CLIENT_ID || config.keycloak.clientId,
-    clientSecret:
-      process.env.KEYCLOAK_CLIENT_SECRET || config.keycloak.clientSecret,
+    clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || config.keycloak.clientSecret,
     scopes: config.keycloak.scopes,
-  };
+  }
 
-  return config;
-};
+  return config
+}

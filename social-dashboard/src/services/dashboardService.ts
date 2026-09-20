@@ -1,5 +1,5 @@
-import config from '@/src/config'
-import type { DanmakuStatsResponse, WordFreqResponse } from '@/src/views/dashboard/type'
+import config from "@/src/config"
+import type { DanmakuStatsResponse, WordFreqResponse } from "@/src/views/dashboard/type"
 
 const { apiVersion } = config
 const baseUrl = `/api/${apiVersion}/danmakus`

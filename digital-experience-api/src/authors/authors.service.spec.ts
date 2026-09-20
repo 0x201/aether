@@ -1,12 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { AuthorsService } from './authors.service.js'
-import { ConfigModule } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { Author } from './entities/author.entity.js'
-import { testTypeOrmConfig } from '@/test/typeorm-test.config.js'
-import { describe, beforeEach, it, expect } from 'vitest'
+import { ConfigModule } from "@nestjs/config"
+import { Test, TestingModule } from "@nestjs/testing"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { describe, beforeEach, it, expect } from "vitest"
 
-describe('AuthorsService', () => {
+import { testTypeOrmConfig } from "@/test/typeorm-test.config.js"
+
+import { AuthorsService } from "./authors.service.js"
+import { Author } from "./entities/author.entity.js"
+
+describe("AuthorsService", () => {
   let service: AuthorsService
 
   beforeEach(async () => {
@@ -22,7 +24,7 @@ describe('AuthorsService', () => {
     service = module.get<AuthorsService>(AuthorsService)
   })
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined()
   })
 })

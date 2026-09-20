@@ -1,18 +1,19 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from "@angular/core";
-import { Router, RouterModule } from "@angular/router";
-import { MatCardModule } from "@angular/material/card";
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
-import { BooksService } from "../../services/books.service";
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatIconModule } from '@angular/material/icon'
+import { MatInputModule } from '@angular/material/input'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { Router, RouterModule } from '@angular/router'
+
+import { BooksService } from '../../services/books.service'
 
 @Component({
-  selector: "app-book-list",
-  templateUrl: "./book-list.html",
-  styleUrl: "./book-list.scss",
+  selector: 'app-book-list',
+  templateUrl: './book-list.html',
+  styleUrl: './book-list.scss',
   standalone: true,
   imports: [
     RouterModule,
@@ -27,18 +28,18 @@ import { BooksService } from "../../services/books.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookList implements OnInit {
-  booksService = inject(BooksService);
-  router = inject(Router);
+  booksService = inject(BooksService)
+  router = inject(Router)
 
   ngOnInit(): void {
-    this.loadBooks();
+    this.loadBooks()
   }
 
   loadBooks(): void {
-    this.booksService.refreshBooks();
+    this.booksService.refreshBooks()
   }
 
   viewDetails(bookId: number): void {
-    this.router.navigate(["/books", bookId]);
+    this.router.navigate(['/books', bookId])
   }
 }

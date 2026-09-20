@@ -1,17 +1,17 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
+import { IsBoolean, IsOptional, IsString } from "class-validator"
 
 export class CreateAuthorDto {
   @ApiProperty()
   @IsString()
-  firstName: string;
+  firstName: string
 
   @ApiProperty()
   @IsString()
-  lastName: string;
+  lastName: string
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  isActive?: boolean;
+  isActive?: boolean
 }

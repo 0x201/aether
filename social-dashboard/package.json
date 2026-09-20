@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint src/ test/",
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "playwright test",
@@ -44,6 +47,8 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.5",
     "globals": "^17.11.0",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
     "playwright": "^1.62.1",
     "typescript": "~7.0.2",
     "typescript-eslint": "^8.68.0",

@@ -1,6 +1,7 @@
-import type { HubConnection } from '@microsoft/signalr'
-import { createContext, useContext } from 'react'
-import type { Message } from '../interface/Message'
+import type { HubConnection } from "@microsoft/signalr"
+import { createContext, useContext } from "react"
+
+import type { Message } from "../interface/Message"
 
 export interface MessageContextType {
   messages: Message[]
@@ -19,7 +20,7 @@ const MessageContext = createContext<MessageContextType | undefined>(undefined)
 export const useMessage = (): MessageContextType => {
   const context = useContext(MessageContext)
   if (context === undefined) {
-    throw new Error('useMessage must be used within a MessageProvider')
+    throw new Error("useMessage must be used within a MessageProvider")
   }
   return context
 }

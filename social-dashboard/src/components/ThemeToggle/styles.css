@@ -28,7 +28,7 @@
   cursor: pointer;
 }
 
-.toggle[aria-pressed='true'] .toggle__container,
+.toggle[aria-pressed="true"] .toggle__container,
 .toggle.dark-mode .toggle__container {
   background-color: var(--bg-toggle-dark);
 }
@@ -46,7 +46,7 @@
 }
 
 .toggle__container::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: var(--radius-pill);
@@ -73,7 +73,7 @@
   overflow: hidden;
 }
 
-.toggle[aria-pressed='true'] .toggle__container .toggle__sun,
+.toggle[aria-pressed="true"] .toggle__container .toggle__sun,
 .toggle.dark-mode .toggle__container .toggle__sun {
   transform: translateX(calc(var(--toggle-width) - var(--sun_diameter) - var(--sun-offset)));
 }
@@ -90,7 +90,7 @@
     0em -0.06em 0.06em 0em #969696 inset;
 }
 
-.toggle[aria-pressed='true'] .toggle__container .toggle__moon-mask,
+.toggle[aria-pressed="true"] .toggle__container .toggle__moon-mask,
 .toggle.dark-mode .toggle__container .toggle__moon-mask {
   transform: translateX(0);
 }
@@ -150,7 +150,7 @@
   transition: transform var(--transition-standard);
 }
 
-.toggle[aria-pressed='true'] .toggle__container .toggle__clouds,
+.toggle[aria-pressed="true"] .toggle__container .toggle__clouds,
 .toggle.dark-mode .toggle__container .toggle__clouds {
   transform: translateY(3em);
 }
@@ -164,7 +164,7 @@
   transition: transform var(--transition-standard);
 }
 
-.toggle[aria-pressed='true'] + .toggle__container .toggle__stars {
+.toggle[aria-pressed="true"] + .toggle__container .toggle__stars {
   transform: translateY(05em);
 }
 
@@ -172,7 +172,7 @@
   transform: translateX(calc(var(--sun-offset) + 0.2em));
 }
 
-.toggle[aria-pressed='true']:hover .toggle__container .toggle__sun,
+.toggle[aria-pressed="true"]:hover .toggle__container .toggle__sun,
 .toggle.dark-mode:hover .toggle__container .toggle__sun {
   transform: translateX(
     calc(var(--toggle-width) - var(--sun_diameter) - var(--sun-offset) - 0.2em)

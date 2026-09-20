@@ -1,8 +1,10 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { Redis,  RedisOptions } from 'ioredis'
-import { CacheConfig } from '@/src/config/config.interface.js'
-import { readFileSync } from 'fs'
+import { readFileSync } from "fs"
+
+import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
+import { Redis, RedisOptions } from "ioredis"
+
+import { CacheConfig } from "@/src/config/config.interface.js"
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -11,7 +13,7 @@ export class RedisService implements OnModuleDestroy {
   private readonly options: RedisOptions
 
   constructor(private configService: ConfigService) {
-    const cacheConfig = this.configService.getOrThrow<CacheConfig>('cache')
+    const cacheConfig = this.configService.getOrThrow<CacheConfig>("cache")
 
     this.options = {
       host: cacheConfig.host,
@@ -34,7 +36,7 @@ export class RedisService implements OnModuleDestroy {
 
     if (cacheConfig.ssl) {
       this.options.tls = {
-        ca: readFileSync(cacheConfig.tls.ca, 'utf8'),
+        ca: readFileSync(cacheConfig.tls.ca, "utf8"),
         rejectUnauthorized: cacheConfig.tls.rejectUnauth,
       }
     }
@@ -42,27 +44,27 @@ export class RedisService implements OnModuleDestroy {
 
   private getClient(): Redis {
     if (!this.client) {
-      this.logger.log('🚀 Initializing Redis client...')
+      this.logger.log("🚀 Initializing Redis client...")
 
       this.client = new Redis(this.options)
-      this.client.on('connect', () => {
-        this.logger.log('✅ Redis connected successfully!')
+      this.client.on("connect", () => {
+        this.logger.log("✅ Redis connected successfully!")
       })
 
-      this.client.on('ready', () => {
-        this.logger.log('✅ Redis is ready!')
+      this.client.on("ready", () => {
+        this.logger.log("✅ Redis is ready!")
       })
 
-      this.client.on('error', (err) => {
-        this.logger.error('❌ Redis error:', err)
+      this.client.on("error", (err) => {
+        this.logger.error("❌ Redis error:", err)
       })
 
-      this.client.on('reconnecting', () => {
-        this.logger.warn('🔄 Redis is reconnecting...')
+      this.client.on("reconnecting", () => {
+        this.logger.warn("🔄 Redis is reconnecting...")
       })
 
-      this.client.on('end', () => {
-        this.logger.warn('⚠️ Redis connection closed.')
+      this.client.on("end", () => {
+        this.logger.warn("⚠️ Redis connection closed.")
       })
     }
     return this.client
@@ -105,13 +107,13 @@ export class RedisService implements OnModuleDestroy {
   async subscribe(channel: string, callback: (msg: string) => void): Promise<void> {
     const client = this.getClient()
     await client.subscribe(channel)
-    client.on('message', (ch, msg) => {
+    client.on("message", (ch, msg) => {
       if (ch === channel) callback(msg)
     })
   }
 
   getConnectionStatus(): string {
-    return this.client?.status || 'disconnected'
+    return this.client?.status || "disconnected"
   }
   async ping(): Promise<string> {
     const client = this.getClient()
@@ -119,6 +121,6 @@ export class RedisService implements OnModuleDestroy {
   }
 
   onModuleDestroy() {
-    this.client.quit().catch((err) => this.logger.error('Redis disconnection error:', err))
+    this.client.quit().catch((err) => this.logger.error("Redis disconnection error:", err))
   }
 }

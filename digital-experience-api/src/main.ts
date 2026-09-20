@@ -1,15 +1,11 @@
-import { NestFactory } from "@nestjs/core";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { AppModule } from "./app.module.js";
-import {
-  ConsoleLogger,
-  INestApplication,
-  Logger,
-  NestApplicationOptions,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { apiReference } from "@scalar/nestjs-api-reference";
-import { KeycloakConfig } from "./config/config.interface.js";
+import { ConsoleLogger, INestApplication, Logger, NestApplicationOptions } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
+import { NestFactory } from "@nestjs/core"
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
+import { apiReference } from "@scalar/nestjs-api-reference"
+
+import { AppModule } from "./app.module.js"
+import { KeycloakConfig } from "./config/config.interface.js"
 
 function useSwaggerModule(app: INestApplication, configService: ConfigService) {
   const openApi = new DocumentBuilder()
@@ -18,10 +14,10 @@ function useSwaggerModule(app: INestApplication, configService: ConfigService) {
     .setVersion("1.0")
     .addTag("Bookstore-api")
     .addOAuth2()
-    .build();
+    .build()
 
-  const document = SwaggerModule.createDocument(app, openApi);
-  const keycloakConfig = configService.get<KeycloakConfig>("keycloak")!;
+  const document = SwaggerModule.createDocument(app, openApi)
+  const keycloakConfig = configService.get<KeycloakConfig>("keycloak")!
 
   app.use(
     "/scalar",
@@ -48,7 +44,7 @@ function useSwaggerModule(app: INestApplication, configService: ConfigService) {
         },
       },
     }),
-  );
+  )
 }
 
 async function bootstrap() {
@@ -58,18 +54,18 @@ async function bootstrap() {
       json: true,
       colors: true,
     }),
-  };
-  const app = await NestFactory.create(AppModule, appOptions);
-  const logger = new Logger(app.constructor.name);
+  }
+  const app = await NestFactory.create(AppModule, appOptions)
+  const logger = new Logger(app.constructor.name)
 
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>("PORT") || 3000;
+  const configService = app.get(ConfigService)
+  const port = configService.get<number>("PORT") || 3000
 
-  app.setGlobalPrefix("/api", { exclude: ["/health"] });
-  useSwaggerModule(app, configService);
+  app.setGlobalPrefix("/api", { exclude: ["/health"] })
+  useSwaggerModule(app, configService)
 
-  await app.listen(port);
-  logger.log(`Application is running on: ${await app.getUrl()}`);
+  await app.listen(port)
+  logger.log(`Application is running on: ${await app.getUrl()}`)
 }
 
-bootstrap();
+bootstrap()

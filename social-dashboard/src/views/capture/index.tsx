@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { PlayCircleOutlined, StopOutlined, ReloadOutlined } from "@ant-design/icons"
 import {
   Alert,
   Table,
@@ -20,48 +20,51 @@ import {
   Col,
   DatePicker,
   Collapse,
-} from 'antd'
-import { PlayCircleOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons'
-import './styles.css'
-import { buildSorter } from '@/src/util'
-import { useCaptureMgt } from '../../hooks/useCaptureMgt'
-import type { CaptureJob, CaptureSearchParams } from '@/src/interface/capture/type'
-import type { FilterValue, SorterResult } from 'antd/es/table/interface'
-import InfiniteScrollSelect from '@/src/components/infinite-scroll-select'
-import type { RoomOption } from '@/src/interface/room/type'
+} from "antd"
+import type { FilterValue, SorterResult } from "antd/es/table/interface"
+
+import "./styles.css"
+import React, { useCallback, useMemo, useState } from "react"
+
+import InfiniteScrollSelect from "@/src/components/infinite-scroll-select"
+import type { CaptureJob, CaptureSearchParams } from "@/src/interface/capture/type"
+import type { RoomOption } from "@/src/interface/room/type"
+import { buildSorter } from "@/src/util"
+
+import { useCaptureMgt } from "../../hooks/useCaptureMgt"
 
 const STATUS_CONFIG: Record<string, { color: string; text: string }> = {
-  Running: { color: 'blue', text: '运行中' },
-  Completed: { color: 'green', text: '已完成' },
-  Cancelled: { color: 'orange', text: '已取消' },
-  Failed: { color: 'orange', text: '已失败' },
-  Terminated: { color: 'red', text: '已终止' },
+  Running: { color: "blue", text: "运行中" },
+  Completed: { color: "green", text: "已完成" },
+  Cancelled: { color: "orange", text: "已取消" },
+  Failed: { color: "orange", text: "已失败" },
+  Terminated: { color: "red", text: "已终止" },
 }
 
 const JOB_STATUS = [
   {
-    value: 'Running',
-    label: '运行中',
+    value: "Running",
+    label: "运行中",
   },
   {
-    value: 'Completed',
-    label: '已完成',
+    value: "Completed",
+    label: "已完成",
   },
   {
-    value: 'Cancelled',
-    label: '已取消',
+    value: "Cancelled",
+    label: "已取消",
   },
   {
-    value: 'Failed',
-    label: '已失败',
+    value: "Failed",
+    label: "已失败",
   },
   {
-    value: 'Terminated',
-    label: '已终止',
+    value: "Terminated",
+    label: "已终止",
   },
 ]
 
-const durationOptions: SelectProps['options'] = []
+const durationOptions: SelectProps["options"] = []
 
 for (let i = 1; i <= 12; i++) {
   durationOptions.push({
@@ -73,7 +76,7 @@ for (let i = 1; i <= 12; i++) {
 const CaptureView: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage()
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
-  const [roomId, setRoomId] = useState<string>('')
+  const [roomId, setRoomId] = useState<string>("")
   const [selectedOptionLabel, setSelectedOptionLabel] = useState<string | null>(null)
   const [captureDuration, setCaptureDuration] = useState<number>(3600)
   const [form] = Form.useForm()
@@ -87,7 +90,7 @@ const CaptureView: React.FC = () => {
 
   const closeModal = () => {
     setIsModalVisible(false)
-    setRoomId('')
+    setRoomId("")
     setSelectedOptionLabel(null)
     form.resetFields()
   }
@@ -97,8 +100,8 @@ const CaptureView: React.FC = () => {
       {menu}
       <div
         style={{
-          padding: '8px',
-          borderTop: '1px solid #f0f0f0',
+          padding: "8px",
+          borderTop: "1px solid #f0f0f0",
         }}
       >
         <span>或手动输入房间ID:</span>
@@ -117,7 +120,7 @@ const CaptureView: React.FC = () => {
             )
           }}
           placeholder="手动输入房间ID，例如: 123456"
-          style={{ marginTop: '4px' }}
+          style={{ marginTop: "4px" }}
         />
       </div>
     </>
@@ -134,17 +137,17 @@ const CaptureView: React.FC = () => {
 
   const handleStartCapture = async () => {
     if (!roomId) {
-      messageApi.error('请输入房间ID')
+      messageApi.error("请输入房间ID")
       return
     }
 
     try {
       await actions.startCapture(roomId, captureDuration)
-      messageApi.success('开始捕获弹幕')
+      messageApi.success("开始捕获弹幕")
       closeModal()
     } catch (error) {
-      console.error('Failed to start capture:', error)
-      messageApi.error('启动捕获失败')
+      console.error("Failed to start capture:", error)
+      messageApi.error("启动捕获失败")
     }
   }
 
@@ -152,7 +155,7 @@ const CaptureView: React.FC = () => {
     try {
       const values = await searchForm.validateFields()
       const roomIdValue =
-        typeof values.roomId === 'object' && values.roomId !== null
+        typeof values.roomId === "object" && values.roomId !== null
           ? (values.roomId as any).value
           : values.roomId
 
@@ -169,7 +172,7 @@ const CaptureView: React.FC = () => {
 
       actions.handleSearch(searchParams)
     } catch (error) {
-      console.error('Search validation failed:', error)
+      console.error("Search validation failed:", error)
     }
   }, [searchForm, actions])
 
@@ -179,7 +182,7 @@ const CaptureView: React.FC = () => {
   }, [searchForm, actions])
 
   const handleRoomIdChange = useCallback((value: string | RoomOption) => {
-    if (typeof value === 'object' && value !== null && 'value' in value) {
+    if (typeof value === "object" && value !== null && "value" in value) {
       const optionVal = value as RoomOption
       setRoomId(optionVal.value)
       setSelectedOptionLabel(optionVal.label !== optionVal.value ? optionVal.label : null)
@@ -189,32 +192,32 @@ const CaptureView: React.FC = () => {
     }
   }, [])
 
-  const columns: TableProps<CaptureJob>['columns'] = [
+  const columns: TableProps<CaptureJob>["columns"] = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
       sorter: { multiple: 1 },
     },
     {
-      title: '房间ID',
-      dataIndex: 'roomId',
-      key: 'roomId',
+      title: "房间ID",
+      dataIndex: "roomId",
+      key: "roomId",
       sorter: { multiple: 2 },
     },
     {
-      title: '房间名称',
-      dataIndex: 'roomName',
-      key: 'roomName',
+      title: "房间名称",
+      dataIndex: "roomName",
+      key: "roomName",
       sorter: { multiple: 3 },
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
+      title: "状态",
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => {
         const statusInfo = STATUS_CONFIG[status] || {
-          color: 'default',
+          color: "default",
           text: status,
         }
         return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>
@@ -222,34 +225,34 @@ const CaptureView: React.FC = () => {
       sorter: { multiple: 4 },
     },
     {
-      title: '持续时间(秒)',
-      dataIndex: 'duration',
-      key: 'duration',
+      title: "持续时间(秒)",
+      dataIndex: "duration",
+      key: "duration",
     },
     {
-      title: '开始时间',
-      dataIndex: 'startTime',
-      key: 'startTime',
+      title: "开始时间",
+      dataIndex: "startTime",
+      key: "startTime",
     },
     {
-      title: '结束时间',
-      dataIndex: 'endTime',
-      key: 'endTime',
-      render: (text: string | null) => (text ? text : 'N/A'),
+      title: "结束时间",
+      dataIndex: "endTime",
+      key: "endTime",
+      render: (text: string | null) => (text ? text : "N/A"),
       sorter: { multiple: 5 },
     },
     {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "创建时间",
+      dataIndex: "createdAt",
+      key: "createdAt",
       sorter: { multiple: 6 },
     },
     {
-      title: '操作',
-      key: 'action',
+      title: "操作",
+      key: "action",
       render: (_, record: CaptureJob) => (
         <Space size="middle">
-          {record.status === 'Running' && (
+          {record.status === "Running" && (
             <Button
               type="primary"
               danger
@@ -259,7 +262,7 @@ const CaptureView: React.FC = () => {
               停止
             </Button>
           )}
-          {record.status !== 'Running' && (
+          {record.status !== "Running" && (
             <Button type="default" disabled icon={<StopOutlined />}>
               停止
             </Button>
@@ -269,11 +272,11 @@ const CaptureView: React.FC = () => {
     },
   ]
 
-  const collapsedItems: CollapseProps['items'] = useMemo(
+  const collapsedItems: CollapseProps["items"] = useMemo(
     () => [
       {
-        key: '1',
-        label: '搜索和筛选',
+        key: "1",
+        label: "搜索和筛选",
         children: (
           <Form form={searchForm} onFinish={handleSearch}>
             <Row gutter={16}>
@@ -292,8 +295,8 @@ const CaptureView: React.FC = () => {
                     optionRender={(option) => (
                       <div
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
+                          display: "flex",
+                          alignItems: "center",
                         }}
                       >
                         {option.label}
@@ -307,12 +310,12 @@ const CaptureView: React.FC = () => {
                   <DatePicker.RangePicker
                     showTime
                     format="YYYY-MM-DD HH:mm:ss"
-                    placeholder={['开始时间', '结束时间']}
-                    style={{ width: '100%' }}
+                    placeholder={["开始时间", "结束时间"]}
+                    style={{ width: "100%" }}
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={3} lg={3} xl={4} style={{ textAlign: 'right' }}>
+              <Col xs={24} sm={12} md={3} lg={3} xl={4} style={{ textAlign: "right" }}>
                 <Button type="primary" htmlType="submit">
                   搜索
                 </Button>
@@ -336,7 +339,7 @@ const CaptureView: React.FC = () => {
         <Alert closable description={state.captureStartRes} style={{ marginBottom: 24 }} />
       )}
 
-      <Space style={{ margin: '10px 0' }}>
+      <Space style={{ margin: "10px 0" }}>
         <Button type="primary" icon={<PlayCircleOutlined />} onClick={openStartModal}>
           启动新捕获任务
         </Button>
@@ -349,7 +352,7 @@ const CaptureView: React.FC = () => {
         </Button>
       </Space>
 
-      <Collapse items={collapsedItems} style={{ marginBottom: '0.5rem' }} />
+      <Collapse items={collapsedItems} style={{ marginBottom: "0.5rem" }} />
 
       <Table
         dataSource={state.jobList}
@@ -382,7 +385,7 @@ const CaptureView: React.FC = () => {
         cancelText="取消"
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="房间ID" required rules={[{ required: true, message: '请输入房间ID' }]}>
+          <Form.Item label="房间ID" required rules={[{ required: true, message: "请输入房间ID" }]}>
             <InfiniteScrollSelect<RoomOption>
               fetchOptions={actions.fetchRoomOptions}
               placeholder="请输入房间ID或主播名"
@@ -391,9 +394,9 @@ const CaptureView: React.FC = () => {
               value={
                 roomId
                   ? {
-                    value: roomId,
-                    label: selectedOptionLabel ? selectedOptionLabel : `房间ID：${roomId}`,
-                  }
+                      value: roomId,
+                      label: selectedOptionLabel ? selectedOptionLabel : `房间ID：${roomId}`,
+                    }
                   : undefined
               }
               onChange={handleRoomIdChange}
@@ -405,8 +408,8 @@ const CaptureView: React.FC = () => {
             <Select
               showSearch={{
                 filterOption: (input, option) =>
-                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase()) ||
-                  (option?.value ?? '').toString().toLowerCase().includes(input.toLowerCase()),
+                  (option?.label ?? "").toString().toLowerCase().includes(input.toLowerCase()) ||
+                  (option?.value ?? "").toString().toLowerCase().includes(input.toLowerCase()),
               }}
               placeholder="请选择或输入捕获时长(秒)，默认3600秒(1小时)"
               value={captureDuration.toString() || undefined}
@@ -417,8 +420,8 @@ const CaptureView: React.FC = () => {
                   {option}
                   <div
                     style={{
-                      padding: '8px',
-                      borderTop: '1px solid #f0f0f0',
+                      padding: "8px",
+                      borderTop: "1px solid #f0f0f0",
                     }}
                   >
                     <span>或手动输入时长(秒):</span>
@@ -438,7 +441,7 @@ const CaptureView: React.FC = () => {
                         )
                       }}
                       placeholder="手动输入捕获时长(秒)，例如: 7200"
-                      style={{ marginTop: '4px' }}
+                      style={{ marginTop: "4px" }}
                     />
                   </div>
                 </>

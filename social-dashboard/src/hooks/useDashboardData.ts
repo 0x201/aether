@@ -1,27 +1,29 @@
+import type { MessageInstance } from "antd/es/message/interface"
+import dayjs from "dayjs"
 // src/hooks/useDashboardData.ts
-import { useReducer, useEffect, useCallback, useMemo, useRef, useState } from 'react'
-import dayjs from 'dayjs'
-import type { DateRange, DanmakuStatsResponse, WordFreqResponse } from '@/src/views/dashboard/type'
-import { createDashboardService } from '@/src/services/dashboardService'
-import { useRoomOptions } from './useResourceOptions'
-import type { MessageInstance } from 'antd/es/message/interface'
+import { useReducer, useEffect, useCallback, useMemo, useRef, useState } from "react"
+
+import { createDashboardService } from "@/src/services/dashboardService"
+import type { DateRange, DanmakuStatsResponse, WordFreqResponse } from "@/src/views/dashboard/type"
+
+import { useRoomOptions } from "./useResourceOptions"
 
 // 状态定义
 interface DashboardState {
-  stats: DanmakuStatsResponse['data'] | null
-  wordFreqs: WordFreqResponse['data'] | null
+  stats: DanmakuStatsResponse["data"] | null
+  wordFreqs: WordFreqResponse["data"] | null
   loadingStats: boolean
   loadingWordFreq: boolean
   error: string | null
 }
 
 type DashboardAction =
-  | { type: 'SET_STATS_LOADING'; payload: boolean }
-  | { type: 'SET_WORDFREQ_LOADING'; payload: boolean }
-  | { type: 'SET_STATS'; payload: DanmakuStatsResponse['data'] }
-  | { type: 'SET_WORDFREQ'; payload: WordFreqResponse['data'] }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'CLEAR_ERROR' }
+  | { type: "SET_STATS_LOADING"; payload: boolean }
+  | { type: "SET_WORDFREQ_LOADING"; payload: boolean }
+  | { type: "SET_STATS"; payload: DanmakuStatsResponse["data"] }
+  | { type: "SET_WORDFREQ"; payload: WordFreqResponse["data"] }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "CLEAR_ERROR" }
 
 const initialState: DashboardState = {
   stats: null,
@@ -33,17 +35,17 @@ const initialState: DashboardState = {
 
 function dashboardReducer(state: DashboardState, action: DashboardAction): DashboardState {
   switch (action.type) {
-    case 'SET_STATS_LOADING':
+    case "SET_STATS_LOADING":
       return { ...state, loadingStats: action.payload }
-    case 'SET_WORDFREQ_LOADING':
+    case "SET_WORDFREQ_LOADING":
       return { ...state, loadingWordFreq: action.payload }
-    case 'SET_STATS':
+    case "SET_STATS":
       return { ...state, stats: action.payload, loadingStats: false }
-    case 'SET_WORDFREQ':
+    case "SET_WORDFREQ":
       return { ...state, wordFreqs: action.payload, loadingWordFreq: false }
-    case 'SET_ERROR':
+    case "SET_ERROR":
       return { ...state, error: action.payload, loadingStats: false, loadingWordFreq: false }
-    case 'CLEAR_ERROR':
+    case "CLEAR_ERROR":
       return { ...state, error: null }
     default:
       return state
@@ -112,21 +114,21 @@ export const useDashboardData = ({ messageApi, defaultHours = 1 }: UseDashboardD
     const abortController = new AbortController()
     abortControllerRef.current = abortController
 
-    dispatch({ type: 'SET_STATS_LOADING', payload: true })
+    dispatch({ type: "SET_STATS_LOADING", payload: true })
     try {
       const params = buildRequestParams()
-      params.topN = '20'
+      params.topN = "20"
       const response = await service.fetchStats(params, abortController.signal)
       errorFlagRef.current = false
-      dispatch({ type: 'SET_STATS', payload: response.data })
+      dispatch({ type: "SET_STATS", payload: response.data })
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') return
-      console.error('获取统计数据失败:', error)
+      if (error instanceof Error && error.name === "AbortError") return
+      console.error("获取统计数据失败:", error)
       if (!errorFlagRef.current) {
-        messageApi.error('获取统计数据失败，请检查后端服务')
+        messageApi.error("获取统计数据失败，请检查后端服务")
         errorFlagRef.current = true
       }
-      dispatch({ type: 'SET_ERROR', payload: '获取统计数据失败' })
+      dispatch({ type: "SET_ERROR", payload: "获取统计数据失败" })
     } finally {
       if (abortControllerRef.current === abortController) {
         abortControllerRef.current = null
@@ -139,28 +141,28 @@ export const useDashboardData = ({ messageApi, defaultHours = 1 }: UseDashboardD
 
     const abortController = new AbortController()
 
-    dispatch({ type: 'SET_WORDFREQ_LOADING', payload: true })
+    dispatch({ type: "SET_WORDFREQ_LOADING", payload: true })
     try {
       const params = buildRequestParams()
-      params.topN = '100'
+      params.topN = "100"
       const response = await service.fetchWordFreq(params, abortController.signal)
       errorFlagRef.current = false
-      dispatch({ type: 'SET_WORDFREQ', payload: response.data })
+      dispatch({ type: "SET_WORDFREQ", payload: response.data })
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') return
-      console.error('获取词频数据失败:', error)
+      if (error instanceof Error && error.name === "AbortError") return
+      console.error("获取词频数据失败:", error)
       if (!errorFlagRef.current) {
-        messageApi.error('获取词频数据失败，请检查后端服务')
+        messageApi.error("获取词频数据失败，请检查后端服务")
         errorFlagRef.current = true
       }
-      dispatch({ type: 'SET_ERROR', payload: '获取词频数据失败' })
+      dispatch({ type: "SET_ERROR", payload: "获取词频数据失败" })
     }
   }, [service, buildRequestParams, messageApi])
 
   const getDefaultTimeRange = useCallback(() => {
     const now = dayjs()
-    const currentHour = now.startOf('hour')
-    const startHour = currentHour.subtract(defaultHoursRef.current, 'hour')
+    const currentHour = now.startOf("hour")
+    const startHour = currentHour.subtract(defaultHoursRef.current, "hour")
     return {
       startTime: startHour.toISOString(),
       endTime: currentHour.toISOString(),

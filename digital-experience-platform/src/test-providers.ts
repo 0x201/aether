@@ -1,6 +1,6 @@
-import { provideHttpClient } from "@angular/common/http";
-import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { provideHttpClient } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 
-const testProviders = [provideHttpClient(), provideHttpClientTesting()];
+const testProviders = [provideHttpClient(), provideHttpClientTesting()]
 
-export default testProviders;
+export default testProviders

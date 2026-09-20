@@ -1,10 +1,10 @@
 .book-detail-card {
   max-width: 800px;
   margin: 20px auto;
-  
+
   mat-card-header {
     padding-bottom: 15px;
-    
+
     mat-card-title {
       font-size: 2rem;
       margin-bottom: 5px;
@@ -16,12 +16,12 @@
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
     }
-    
+
     mat-card-subtitle {
       font-size: 1.1rem;
     }
   }
-  
+
   mat-card-content {
     .book-details {
       p {
@@ -34,14 +34,14 @@
         line-clamp: 8;
         -webkit-line-clamp: 8;
         -webkit-box-orient: vertical;
-        
+
         &:first-child {
           margin-top: 0;
         }
       }
     }
   }
-  
+
   mat-card-actions {
     display: flex;
     justify-content: flex-end;
@@ -59,7 +59,7 @@
 @media (max-width: 768px) {
   .book-detail-card {
     margin: 10px;
-    
+
     mat-card-header {
       mat-card-title {
         font-size: 1.5rem;

@@ -1,4 +1,4 @@
-import DanmakuMgt from './DanmakuMgt'
-import RoomsMgt from './RoomsMgt'
+import DanmakuMgt from "./DanmakuMgt"
+import RoomsMgt from "./RoomsMgt"
 
 export default { DanmakuMgt, RoomsMgt }

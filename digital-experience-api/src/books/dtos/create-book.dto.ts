@@ -1,41 +1,35 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import {
-  IsString,
-  IsNumber,
-  IsOptional,
-  IsBoolean,
-  IsDateString,
-  IsArray,
-} from "class-validator";
-import { AuthorDto } from "@/src/authors/dtos/author.dto.js";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
+import { IsString, IsNumber, IsOptional, IsBoolean, IsDateString, IsArray } from "class-validator"
+
+import { AuthorDto } from "@/src/authors/dtos/author.dto.js"
 
 export class CreateBookDto {
   @ApiProperty({ description: "Book Title" })
   @IsString()
-  title: string;
+  title: string
 
   @ApiProperty({ description: "ISBN" })
   @IsString()
-  isbn: string;
+  isbn: string
 
   @ApiProperty({ description: "Book Description" })
   @IsString()
-  description: string;
+  description: string
 
   @ApiProperty({ description: "Publish Date" })
   @IsDateString()
-  publishDate: string;
+  publishDate: string
 
   @ApiProperty({ description: "Price" })
   @IsNumber()
-  price: number;
+  price: number
 
   @ApiProperty({ description: "Author List" })
   @IsArray()
-  authors: AuthorDto[];
+  authors: AuthorDto[]
 
   @ApiPropertyOptional({ description: "Is Active" })
   @IsBoolean()
   @IsOptional()
-  isActive?: boolean;
+  isActive?: boolean
 }

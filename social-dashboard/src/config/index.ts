@@ -19,11 +19,11 @@ class ConfigLoader {
   }
 
   public get<T = unknown>(key: string, deaultValue?: T): T {
-    const keys = key.split('.')
+    const keys = key.split(".")
     let value: unknown = this.config
 
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
+      if (value && typeof value === "object" && k in value) {
         value = (value as Record<string, unknown>)[k]
       } else {
         return deaultValue as T

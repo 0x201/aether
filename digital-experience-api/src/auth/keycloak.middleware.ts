@@ -1,6 +1,7 @@
-import { Injectable, NestMiddleware } from '@nestjs/common'
-import { Request, Response, NextFunction } from 'express'
-import { KeycloakStrategy } from './keycloak.strategy.js'
+import { Injectable, NestMiddleware } from "@nestjs/common"
+import { Request, Response, NextFunction } from "express"
+
+import { KeycloakStrategy } from "./keycloak.strategy.js"
 
 @Injectable()
 export class KeycloakMiddleware implements NestMiddleware {
@@ -11,8 +12,8 @@ export class KeycloakMiddleware implements NestMiddleware {
 
     // Apply Keycloak middleware to all routes
     const middlewares = keycloak.middleware({
-      logout: '/logout',
-      admin: '/admin',
+      logout: "/logout",
+      admin: "/admin",
     })
 
     // Execute each middleware in sequence

@@ -1,9 +1,12 @@
-import React from 'react'
-import { RouterProvider } from 'react-router-dom'
-import { MessageProvider } from './contexts/MessageContext'
-import { ThemeProvider } from './contexts/ThemeProvider'
-import './App.css'
-import { router } from '@/src/router'
+import React from "react"
+import { RouterProvider } from "react-router-dom"
+
+import { router } from "@/src/router"
+
+import { MessageProvider } from "./contexts/MessageContext"
+
+import "./App.css"
+import { ThemeProvider } from "./contexts/ThemeProvider"
 
 const App: React.FC = () => {
   return (

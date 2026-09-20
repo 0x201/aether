@@ -24,17 +24,26 @@
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav [(opened)]="isSidenavOpened" mode="side" fixedInViewport="false" class="app-sidenav"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'">
+  <mat-sidenav
+    [(opened)]="isSidenavOpened"
+    mode="side"
+    fixedInViewport="false"
+    class="app-sidenav"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+  >
     <div class="sidenav-scroll-wrapper">
-      <cdk-virtual-scroll-viewport itemSize="50" minBufferPx="200" maxBufferPx="400" class="viewport">
+      <cdk-virtual-scroll-viewport
+        itemSize="50"
+        minBufferPx="200"
+        maxBufferPx="400"
+        class="viewport"
+      >
         <mat-nav-list>
           <recursive-menu *cdkVirtualFor="let menu of menus" [menu]="menu" [level]="0">
           </recursive-menu>
         </mat-nav-list>
       </cdk-virtual-scroll-viewport>
     </div>
-
   </mat-sidenav>
 
   <mat-sidenav-content class="main-content">

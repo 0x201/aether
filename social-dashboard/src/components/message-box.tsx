@@ -1,32 +1,36 @@
-import React from 'react'
-import { Badge, Dropdown } from 'antd'
-import type { MenuProps } from 'antd'
-import { BellOutlined, ClearOutlined } from '@ant-design/icons'
-import { useMessage } from '@/src/contexts/useMessage'
-import dayjs from 'dayjs'
-import type { Message } from '@/src/interface/Message'
-import { m } from "@/src/i18n";
+import { BellOutlined, ClearOutlined } from "@ant-design/icons"
+import { Badge, Dropdown } from "antd"
+import type { MenuProps } from "antd"
+import dayjs from "dayjs"
+import React from "react"
 
+import { useMessage } from "@/src/contexts/useMessage"
+import { m } from "@/src/i18n"
+import type { Message } from "@/src/interface/Message"
 
 const renderMessageLabel = (message: Message) => {
-  if (message.kind === 'analytics') {
-    const formattedTime = dayjs(message.completedAt).format('YYYY-MM-DD HH:mm:ss');
+  if (message.kind === "analytics") {
+    const formattedTime = dayjs(message.completedAt).format("YYYY-MM-DD HH:mm:ss")
     return (
-      <div style={{ width: '300px' }}>
+      <div style={{ width: "300px" }}>
         <div>
           <strong>{m.msg_box_analytics_room_label({ roomId: message.roomId })}</strong>
         </div>
         <div>{m.msg_box_analytics_period_label({ periodType: message.periodType })}</div>
         <div>{m.msg_box_analytics_start_date_label({ startDate: message.startDate })}</div>
         <div>{m.msg_box_analytics_end_date_label({ endDate: message.endDate })}</div>
-        <div>{m.msg_box_analytics_frequencies_count_label({ frequenciesCount: message.frequenciesCount })}</div>
+        <div>
+          {m.msg_box_analytics_frequencies_count_label({
+            frequenciesCount: message.frequenciesCount,
+          })}
+        </div>
         <div>{m.msg_box_analytics_time_label({ time: formattedTime })}</div>
       </div>
     )
   }
-  
-  if (message.kind === 'danmaku') {
-    const formattedTime = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss');
+
+  if (message.kind === "danmaku") {
+    const formattedTime = dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")
     return (
       <div>
         <div>
@@ -38,7 +42,7 @@ const renderMessageLabel = (message: Message) => {
     )
   }
 
-  const formattedTime = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss');
+  const formattedTime = dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")
   return (
     <div>
       <div>
@@ -53,7 +57,7 @@ const renderMessageLabel = (message: Message) => {
 const MessageBox: React.FC = () => {
   const { messages, unreadCount, markAsRead, clearAll } = useMessage()
 
-  const menuItems: MenuProps['items'] =
+  const menuItems: MenuProps["items"] =
     messages.length > 0
       ? messages.map((message, index) => ({
           key: `message-${index}`,
@@ -62,15 +66,15 @@ const MessageBox: React.FC = () => {
         }))
       : [
           {
-            key: 'empty',
+            key: "empty",
             label: m.msg_box_no_notifications(),
             disabled: true,
           },
         ]
 
-  const actionMenuItems: MenuProps['items'] = [
+  const actionMenuItems: MenuProps["items"] = [
     {
-      key: 'clear-all',
+      key: "clear-all",
       label: m.msg_box_clear_all(),
       icon: <ClearOutlined />,
       danger: true,
@@ -83,9 +87,9 @@ const MessageBox: React.FC = () => {
   }
 
   return (
-    <Dropdown menu={dropdownMenu} trigger={['click']} placement="bottomRight">
+    <Dropdown menu={dropdownMenu} trigger={["click"]} placement="bottomRight">
       <Badge count={unreadCount}>
-        <BellOutlined style={{ fontSize: '18px', cursor: 'pointer' }} />
+        <BellOutlined style={{ fontSize: "18px", cursor: "pointer" }} />
       </Badge>
     </Dropdown>
   )

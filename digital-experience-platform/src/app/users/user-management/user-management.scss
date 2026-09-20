@@ -1,35 +1,35 @@
 .user-management-container {
   padding: 20px;
-  
+
   .toolbar {
     margin-bottom: 20px;
-    
+
     button {
       mat-icon {
         margin-right: 5px;
       }
     }
   }
-  
+
   .table-container {
     overflow-x: auto;
   }
-  
+
   .users-table {
     width: 100%;
-    
+
     .mat-column-username {
       width: 25%;
     }
-    
+
     .mat-column-nickname {
       width: 25%;
     }
-    
+
     .mat-column-roles {
       width: 35%;
     }
-    
+
     .mat-column-actions {
       width: 15%;
       text-align: right;

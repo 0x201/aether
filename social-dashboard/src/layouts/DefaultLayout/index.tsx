@@ -1,12 +1,3 @@
-import { Layout, theme } from 'antd'
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Tabs, type TabsProps } from 'antd'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { ThemeSwitch } from '@/src/components/ThemeToggle'
-import MessageBox from '@/src/components/message-box'
-import { menuConfig } from '@/src/config/menuConfig'
-import { Menu, type MenuProps } from 'antd'
-import type { AppNavigationProps } from './type'
 import {
   BarChartOutlined,
   LineChartOutlined,
@@ -16,9 +7,20 @@ import {
   HomeOutlined,
   EyeOutlined,
   BellOutlined,
-} from '@ant-design/icons'
+} from "@ant-design/icons"
+import { Layout, theme } from "antd"
+import { Tabs, type TabsProps } from "antd"
+import { Menu, type MenuProps } from "antd"
+import React, { useState, useEffect, useMemo, useCallback } from "react"
+import { Outlet, useLocation, useNavigate } from "react-router-dom"
 
-import './styles.css'
+import MessageBox from "@/src/components/message-box"
+import { ThemeSwitch } from "@/src/components/ThemeToggle"
+import { menuConfig } from "@/src/config/menuConfig"
+
+import type { AppNavigationProps } from "./type"
+
+import "./styles.css"
 
 const { Header, Content, Sider } = Layout
 
@@ -26,7 +28,7 @@ const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) 
   const navigate = useNavigate()
   const location = useLocation()
 
-  const { mode = 'horizontal', theme = 'light', currentMainMenu, onMenuClick } = props
+  const { mode = "horizontal", theme = "light", currentMainMenu, onMenuClick } = props
 
   const mainMenuItems = menuConfig.map((item) => ({
     label: item.label,
@@ -34,7 +36,7 @@ const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) 
     key: item.path || `/${item.key}`,
   }))
 
-  const onClick: MenuProps['onClick'] = (e) => {
+  const onClick: MenuProps["onClick"] = (e) => {
     if (onMenuClick) {
       onMenuClick(e.key)
     } else {
@@ -51,17 +53,17 @@ const AppNavigation: React.FC<AppNavigationProps> = (props: AppNavigationProps) 
       theme={theme}
       style={{
         flex: 1,
-        height: '100%',
-        width: '100%',
+        height: "100%",
+        width: "100%",
         border: 0,
-        backgroundColor: 'transparent',
-        boxShadow: 'none',
+        backgroundColor: "transparent",
+        boxShadow: "none",
       }}
     />
   )
 }
 
-type MenuItem = Required<MenuProps>['items'][number]
+type MenuItem = Required<MenuProps>["items"][number]
 
 const SidebarMenu: React.FC<{ currentMainMenu?: string }> = ({ currentMainMenu }) => {
   const navigate = useNavigate()
@@ -74,11 +76,11 @@ const SidebarMenu: React.FC<{ currentMainMenu?: string }> = ({ currentMainMenu }
   const getIconByType = (iconType: string | null | undefined) => {
     if (!iconType) return null
     const iconMap: Record<string, React.ReactNode> = {
-      'bar-chart': <BarChartOutlined />,
-      'line-chart': <LineChartOutlined />,
+      "bar-chart": <BarChartOutlined />,
+      "line-chart": <LineChartOutlined />,
       setting: <SettingOutlined />,
-      'radar-chart': <RadarChartOutlined />,
-      'unordered-list': <UnorderedListOutlined />,
+      "radar-chart": <RadarChartOutlined />,
+      "unordered-list": <UnorderedListOutlined />,
       home: <HomeOutlined />,
       eye: <EyeOutlined />,
       bell: <BellOutlined />,
@@ -92,7 +94,7 @@ const SidebarMenu: React.FC<{ currentMainMenu?: string }> = ({ currentMainMenu }
     icon: getIconByType(item.icon),
   }))
 
-  const onClick: MenuProps['onClick'] = (e) => {
+  const onClick: MenuProps["onClick"] = (e) => {
     navigate(e.key)
   }
 
@@ -100,7 +102,7 @@ const SidebarMenu: React.FC<{ currentMainMenu?: string }> = ({ currentMainMenu }
     const exactMatch = subMenuItems.find((item) => item.path === location.pathname)
     if (exactMatch) return [exactMatch.path]
 
-    const parentMatch = subMenuItems.find((item) => location.pathname.startsWith(item.path + '/'))
+    const parentMatch = subMenuItems.find((item) => location.pathname.startsWith(item.path + "/"))
     if (parentMatch) return [parentMatch.path]
 
     return [location.pathname]
@@ -110,15 +112,15 @@ const SidebarMenu: React.FC<{ currentMainMenu?: string }> = ({ currentMainMenu }
 }
 
 const getMainModulePath = (pathname: string): string => {
-  if (pathname === '/') return '/'
+  if (pathname === "/") return "/"
   for (const menu of menuConfig) {
-    if (menu.path && menu.path !== '/') {
+    if (menu.path && menu.path !== "/") {
       if (pathname.startsWith(menu.path)) {
         return menu.path
       }
     }
   }
-  return '/'
+  return "/"
 }
 
 const getTitleFromPath = (path: string): string => {
@@ -129,7 +131,7 @@ const getTitleFromPath = (path: string): string => {
       if (child) return child.label
     }
   }
-  return '新标签页'
+  return "新标签页"
 }
 
 const DefaultLayout: React.FC = () => {
@@ -141,7 +143,7 @@ const DefaultLayout: React.FC = () => {
   } = theme.useToken()
 
   const [moduleTabsMap, setModuleTabsMap] = useState<Map<string, TabItem[]>>(
-    new Map([['/', [{ key: '/', label: '首页', closable: false }]]]),
+    new Map([["/", [{ key: "/", label: "首页", closable: false }]]]),
   )
 
   type TabItem = { key: string; label: string; closable: boolean }
@@ -196,8 +198,8 @@ const DefaultLayout: React.FC = () => {
     [moduleTabsMap, location.pathname, navigate, updateModuleTabs],
   )
 
-  const onEdit: TabsProps['onEdit'] = (targetKey, action) => {
-    if (action === 'remove' && typeof targetKey === 'string') {
+  const onEdit: TabsProps["onEdit"] = (targetKey, action) => {
+    if (action === "remove" && typeof targetKey === "string") {
       removeTab(targetKey)
     }
   }
@@ -214,7 +216,7 @@ const DefaultLayout: React.FC = () => {
       const defaultTab: TabItem = {
         key: modulePath,
         label: getTitleFromPath(modulePath),
-        closable: modulePath !== '/',
+        closable: modulePath !== "/",
       }
       updateModuleTabs(modulePath, [defaultTab])
     }
@@ -226,13 +228,13 @@ const DefaultLayout: React.FC = () => {
   }, [location.pathname, currentMainModule, moduleTabsMap, addTab, updateModuleTabs])
 
   const currentMainMenu = useMemo(() => {
-    if (location.pathname === '/') return '/'
+    if (location.pathname === "/") return "/"
     const matched = menuConfig.find(
       (menu) =>
         menu.path === location.pathname ||
         (menu.children && menu.children.some((child) => location.pathname.startsWith(child.path))),
     )
-    return matched?.path || '/'
+    return matched?.path || "/"
   }, [location.pathname])
 
   const handleMenuClick = (path: string) => {
@@ -242,13 +244,13 @@ const DefaultLayout: React.FC = () => {
       const defaultTab: TabItem = {
         key: modulePath,
         label: getTitleFromPath(modulePath),
-        closable: modulePath !== '/',
+        closable: modulePath !== "/",
       }
       updateModuleTabs(modulePath, [defaultTab])
     }
   }
 
-  const tabItems: TabsProps['items'] = currentTabs.map((tab) => ({
+  const tabItems: TabsProps["items"] = currentTabs.map((tab) => ({
     label: tab.label,
     key: tab.key,
     closable: tab.closable,
@@ -258,8 +260,8 @@ const DefaultLayout: React.FC = () => {
     <Layout>
       <Header className="header-layout" style={{ backgroundColor: colorBgContainer }}>
         <div className="header-left">
-          <div className="logo" onClick={() => navigate('/')} />
-          <h1 onClick={() => navigate('/')}>Social Dashboard</h1>
+          <div className="logo" onClick={() => navigate("/")} />
+          <h1 onClick={() => navigate("/")}>Social Dashboard</h1>
         </div>
         <div className="header-center">
           <AppNavigation currentMainMenu={currentMainMenu} onMenuClick={handleMenuClick} />

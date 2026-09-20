@@ -1,12 +1,8 @@
-@let state = booksService.bookDetailState$;
-
-@if (state().loading) {
+@let state = booksService.bookDetailState$; @if (state().loading) {
 <div class="spinner-container">
   <mat-spinner></mat-spinner>
 </div>
-}
-
-@if (state().error && !state().loading) {
+} @if (state().error && !state().loading) {
 <mat-card>
   <mat-card-content>
     <h2>Book Not Found</h2>
@@ -17,8 +13,7 @@
     </button>
   </mat-card-content>
 </mat-card>
-}
-@if (state().data && !state().loading) {
+} @if (state().data && !state().loading) {
 <button mat-raised-button color="primary" (click)="goBack()">
   <mat-icon>arrow_back</mat-icon>
   Back to Books

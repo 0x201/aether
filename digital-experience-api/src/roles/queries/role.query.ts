@@ -1,13 +1,11 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { ITimeRangedQuery } from "@/src/common/interface/IPagedResult.interface.js";
-import { PagedSortedAndFilteredResultQuery } from "@/src/common/queries/PagedResult.query.js";
+import { ApiPropertyOptional } from "@nestjs/swagger"
 
-export class RoleQuery
-  extends PagedSortedAndFilteredResultQuery
-  implements ITimeRangedQuery
-{
+import { ITimeRangedQuery } from "@/src/common/interface/IPagedResult.interface.js"
+import { PagedSortedAndFilteredResultQuery } from "@/src/common/queries/PagedResult.query.js"
+
+export class RoleQuery extends PagedSortedAndFilteredResultQuery implements ITimeRangedQuery {
   @ApiPropertyOptional()
-  startDate: string;
+  startDate: string
   @ApiPropertyOptional()
-  endDate: string;
+  endDate: string
 }

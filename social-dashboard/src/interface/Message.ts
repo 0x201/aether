@@ -1,5 +1,5 @@
 export interface AnalyticsMessage {
-  kind: 'analytics'
+  kind: "analytics"
   id: string
   completedAt: string
   roomId: string
@@ -10,7 +10,7 @@ export interface AnalyticsMessage {
 }
 
 export interface DanmakuMessage {
-  kind: 'danmaku'
+  kind: "danmaku"
   id: string
   roomId: string
   content: string
@@ -20,11 +20,11 @@ export interface DanmakuMessage {
 }
 
 export interface SystemMessage {
-  kind: 'system'
+  kind: "system"
   id: string
   title: string
   message: string
-  type: 'info' | 'success' | 'warning' | 'error'
+  type: "info" | "success" | "warning" | "error"
   timestamp: string
 }
 

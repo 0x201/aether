@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { RedisService } from './redis.service.js'
-import { ConfigModule } from '@nestjs/config'
-import { describe, beforeEach, it, expect } from 'vitest'
+import { ConfigModule } from "@nestjs/config"
+import { Test, TestingModule } from "@nestjs/testing"
+import { describe, beforeEach, it, expect } from "vitest"
 
-describe('RedisService', () => {
+import { RedisService } from "./redis.service.js"
+
+describe("RedisService", () => {
   let service: RedisService
 
   beforeEach(async () => {
@@ -15,7 +16,7 @@ describe('RedisService', () => {
     service = module.get<RedisService>(RedisService)
   })
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined()
   })
 })

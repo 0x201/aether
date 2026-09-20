@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useRef, useEffect } from 'react'
-import type { MessageInstance } from 'antd/es/message/interface'
-import type { Room, RoomOption, RoomSearchParams } from '@/src/interface/room/type'
-import { createRoomService } from '@/src/services/roomService'
+import type { MessageInstance } from "antd/es/message/interface"
+import { useCallback, useMemo, useRef, useEffect } from "react"
+
+import type { Room, RoomOption, RoomSearchParams } from "@/src/interface/room/type"
+import { createRoomService } from "@/src/services/roomService"
 
 interface ResourceOption {
   label: string
@@ -49,12 +50,12 @@ export const useResourceOptions = <T = ResourceOption>({
           total: response.total,
         }
       } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
+        if (error instanceof Error && error.name === "AbortError") {
           return { data: [], total: 0 }
         }
-        console.error('Failed to fetch options:', error)
+        console.error("Failed to fetch options:", error)
         if (!errorRef.current) {
-          messageApi.error('获取选项失败，请检查后端服务是否正常')
+          messageApi.error("获取选项失败，请检查后端服务是否正常")
           errorRef.current = true
         }
         return {

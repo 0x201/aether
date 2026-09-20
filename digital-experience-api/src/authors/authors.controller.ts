@@ -9,7 +9,8 @@ import {
   Query,
   HttpStatus,
   HttpException,
-} from "@nestjs/common";
+} from "@nestjs/common"
+import { CommandBus, QueryBus } from "@nestjs/cqrs"
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,19 +18,20 @@ import {
   ApiParam,
   ApiResponse,
   ApiTags,
-} from "@nestjs/swagger";
-import { PagedResult, Result } from "@/src/common/response/Result.js";
-import { CreateAuthorCommand } from "./commands/create-author.command.js";
-import { UpdateAuthorCommand as UpdateAuthorDto } from "./commands/update-author.command.js";
-import { Author } from "./entities/author.entity.js";
-import { GetAuthorsQuery } from "./queries/get-authors.query.js";
-import { AuthorDto } from "./dtos/author.dto.js";
-import { Roles } from "@/src/roles/role.decorator.js";
-import { RoleEnum } from "@/src/roles/role.enum.js";
-import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { CreateAuthorDto } from "./dtos/create-author.dto.js";
-import { GetAuthorQuery } from "./queries/get-author.query.js";
-import { DeleteAuthorCommand } from "./commands/delete-author.command.js";
+} from "@nestjs/swagger"
+
+import { PagedResult, Result } from "@/src/common/response/Result.js"
+import { Roles } from "@/src/roles/role.decorator.js"
+import { RoleEnum } from "@/src/roles/role.enum.js"
+
+import { CreateAuthorCommand } from "./commands/create-author.command.js"
+import { DeleteAuthorCommand } from "./commands/delete-author.command.js"
+import { UpdateAuthorCommand as UpdateAuthorDto } from "./commands/update-author.command.js"
+import { AuthorDto } from "./dtos/author.dto.js"
+import { CreateAuthorDto } from "./dtos/create-author.dto.js"
+import { Author } from "./entities/author.entity.js"
+import { GetAuthorQuery } from "./queries/get-author.query.js"
+import { GetAuthorsQuery } from "./queries/get-authors.query.js"
 
 @Controller("authors")
 @ApiTags("Authors")
@@ -50,9 +52,9 @@ export class AuthorsController {
     type: AuthorDto,
   })
   async create(@Body() createAuthorDto: CreateAuthorDto): Promise<AuthorDto> {
-    const command = new CreateAuthorCommand(createAuthorDto);
-    const author = (await this.commandBus.execute(command)) as Author;
-    return this.mapAuthorToAuthorDto(author);
+    const command = new CreateAuthorCommand(createAuthorDto)
+    const author = (await this.commandBus.execute(command)) as Author
+    return this.mapAuthorToAuthorDto(author)
   }
 
   @Get()
@@ -62,14 +64,9 @@ export class AuthorsController {
     description: "Return books with paged list",
     type: PagedResult<AuthorDto>,
   })
-  async findAuthors(
-    @Query() query: GetAuthorsQuery,
-  ): Promise<PagedResult<Author>> {
-    const [authors, totalCount] = (await this.queryBus.execute(query)) as [
-      Author[],
-      number,
-    ];
-    return new PagedResult<Author>(authors, totalCount);
+  async findAuthors(@Query() query: GetAuthorsQuery): Promise<PagedResult<Author>> {
+    const [authors, totalCount] = (await this.queryBus.execute(query)) as [Author[], number]
+    return new PagedResult<Author>(authors, totalCount)
   }
 
   @Get(":id")
@@ -81,35 +78,32 @@ export class AuthorsController {
     type: AuthorDto,
   })
   async findOne(@Param("id") id: number) {
-    const query = new GetAuthorQuery(id);
-    const entity = (await this.queryBus.execute(query)) as Author;
+    const query = new GetAuthorQuery(id)
+    const entity = (await this.queryBus.execute(query)) as Author
     if (!entity) {
-      throw new HttpException(`Cannot find the entity with id ${id}`, 404);
+      throw new HttpException(`Cannot find the entity with id ${id}`, 404)
     }
-    return Result.success(this.mapAuthorToAuthorDto(entity));
+    return Result.success(this.mapAuthorToAuthorDto(entity))
   }
 
   @Patch(":id")
-  async update(
-    @Param("id") id: number,
-    @Body() updateAuthorDto: UpdateAuthorDto,
-  ) {
-    const command = new UpdateAuthorDto(id, updateAuthorDto);
-    return await this.commandBus.execute(command);
+  async update(@Param("id") id: number, @Body() updateAuthorDto: UpdateAuthorDto) {
+    const command = new UpdateAuthorDto(id, updateAuthorDto)
+    return await this.commandBus.execute(command)
   }
 
   @Delete(":id")
   async remove(@Param("id") id: number) {
-    const command = new DeleteAuthorCommand(id);
-    return await this.commandBus.execute(command);
+    const command = new DeleteAuthorCommand(id)
+    return await this.commandBus.execute(command)
   }
 
   private mapAuthorToAuthorDto(entity: Author): AuthorDto {
-    const dto = new AuthorDto();
-    dto.id = entity.id;
-    dto.firstName = entity.firstName;
-    dto.lastName = entity.lastName;
-    dto.isActive = entity.isActive;
-    return dto;
+    const dto = new AuthorDto()
+    dto.id = entity.id
+    dto.firstName = entity.firstName
+    dto.lastName = entity.lastName
+    dto.isActive = entity.isActive
+    return dto
   }
 }

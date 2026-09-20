@@ -1,6 +1,7 @@
-import { Controller, Get } from "@nestjs/common";
-import { AllowAnonymous } from "./auth/auth.guard.js";
-import { DataSeedService } from "./data-seed/data-seed.service.js";
+import { Controller, Get } from "@nestjs/common"
+
+import { AllowAnonymous } from "./auth/auth.guard.js"
+import { DataSeedService } from "./data-seed/data-seed.service.js"
 
 @Controller()
 export class AppController {
@@ -9,13 +10,13 @@ export class AppController {
   @AllowAnonymous()
   @Get("/health")
   health(): string {
-    return "Healthy";
+    return "Healthy"
   }
 
   @AllowAnonymous()
   @Get("/seed-data")
   async seedAsync(): Promise<{}> {
-    await this.dataSeedService.seedAsync();
-    return { statusCode: 200, message: "Data seeded successfully" };
+    await this.dataSeedService.seedAsync()
+    return { statusCode: 200, message: "Data seeded successfully" }
   }
 }

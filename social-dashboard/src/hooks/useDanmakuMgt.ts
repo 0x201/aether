@@ -1,9 +1,11 @@
-import { useEffect, useCallback, useMemo, useRef, useReducer } from 'react'
-import type { Danmaku } from '@/src/interface/danmaku/type'
-import type { DanmakuSearchParams } from '@/src/interface/management/type'
-import { createDanmakuService } from '@/src/services/danmakuService'
-import type { MessageInstance } from 'antd/es/message/interface'
-import { useRoomOptions } from './useResourceOptions'
+import type { MessageInstance } from "antd/es/message/interface"
+import { useEffect, useCallback, useMemo, useRef, useReducer } from "react"
+
+import type { Danmaku } from "@/src/interface/danmaku/type"
+import type { DanmakuSearchParams } from "@/src/interface/management/type"
+import { createDanmakuService } from "@/src/services/danmakuService"
+
+import { useRoomOptions } from "./useResourceOptions"
 
 interface DanmakuState {
   danmakuList: Danmaku[]
@@ -19,15 +21,15 @@ interface DanmakuState {
 }
 
 type DanmakuAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_DANMAKU_LIST'; payload: { data: Danmaku[]; total: number } }
-  | { type: 'SET_PAGE'; payload: { page: number; pageSize?: number } }
-  | { type: 'SET_SEARCH'; payload: DanmakuSearchParams }
-  | { type: 'RESET_SEARCH' }
-  | { type: 'SET_SORTER'; payload: string | null }
-  | { type: 'SET_EDITING_DANMAKU'; payload: Danmaku | null }
-  | { type: 'SET_MODAL_VISIBLE'; payload: boolean }
-  | { type: 'CLEAR_ERROR' }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_DANMAKU_LIST"; payload: { data: Danmaku[]; total: number } }
+  | { type: "SET_PAGE"; payload: { page: number; pageSize?: number } }
+  | { type: "SET_SEARCH"; payload: DanmakuSearchParams }
+  | { type: "RESET_SEARCH" }
+  | { type: "SET_SORTER"; payload: string | null }
+  | { type: "SET_EDITING_DANMAKU"; payload: Danmaku | null }
+  | { type: "SET_MODAL_VISIBLE"; payload: boolean }
+  | { type: "CLEAR_ERROR" }
 
 const initialState: DanmakuState = {
   danmakuList: [],
@@ -41,18 +43,18 @@ const initialState: DanmakuState = {
   searchParams: {
     page: 1,
     pageSize: 20,
-    userName: '',
-    content: '',
-    roomId: '',
+    userName: "",
+    content: "",
+    roomId: "",
   },
   error: null,
 }
 
 function danmakuReducer(state: DanmakuState, action: DanmakuAction): DanmakuState {
   switch (action.type) {
-    case 'SET_LOADING':
+    case "SET_LOADING":
       return { ...state, loading: action.payload }
-    case 'SET_DANMAKU_LIST':
+    case "SET_DANMAKU_LIST":
       return {
         ...state,
         danmakuList: action.payload.data,
@@ -60,21 +62,21 @@ function danmakuReducer(state: DanmakuState, action: DanmakuAction): DanmakuStat
         loading: false,
         error: null,
       }
-    case 'SET_PAGE':
+    case "SET_PAGE":
       return {
         ...state,
         currentPage: action.payload.page,
         pageSize: action.payload.pageSize ?? state.pageSize,
         error: null,
       }
-    case 'SET_SEARCH':
+    case "SET_SEARCH":
       return {
         ...state,
         searchParams: action.payload,
         currentPage: 1,
         error: null,
       }
-    case 'RESET_SEARCH':
+    case "RESET_SEARCH":
       return {
         ...state,
         searchParams: {
@@ -89,13 +91,13 @@ function danmakuReducer(state: DanmakuState, action: DanmakuAction): DanmakuStat
         currentPage: 1,
         error: null,
       }
-    case 'SET_SORTER':
+    case "SET_SORTER":
       return { ...state, sorter: action.payload, error: null }
-    case 'SET_EDITING_DANMAKU':
+    case "SET_EDITING_DANMAKU":
       return { ...state, editingDanmaku: action.payload }
-    case 'SET_MODAL_VISIBLE':
+    case "SET_MODAL_VISIBLE":
       return { ...state, isModalVisible: action.payload }
-    case 'CLEAR_ERROR':
+    case "CLEAR_ERROR":
       return { ...state, error: null }
     default:
       return state
@@ -116,25 +118,25 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
 
   const medalLevelColors = useMemo(
     () => ({
-      0: 'var(--fan-medal-0-level)',
-      1: 'var(--fan-medal-1-level)',
-      2: 'var(--fan-medal-2-level)',
-      3: 'var(--fan-medal-3-level)',
-      4: 'var(--fan-medal-4-level)',
-      5: 'var(--fan-medal-5-level)',
+      0: "var(--fan-medal-0-level)",
+      1: "var(--fan-medal-1-level)",
+      2: "var(--fan-medal-2-level)",
+      3: "var(--fan-medal-3-level)",
+      4: "var(--fan-medal-4-level)",
+      5: "var(--fan-medal-5-level)",
     }),
     [],
   )
 
   const userLevelColors = useMemo(
     () => ({
-      0: 'var(--user-level-0)',
-      1: 'var(--user-level-1)',
-      2: 'var(--user-level-2)',
-      3: 'var(--user-level-3)',
-      4: 'var(--user-level-4)',
-      5: 'var(--user-level-5)',
-      6: 'var(--user-level-6)',
+      0: "var(--user-level-0)",
+      1: "var(--user-level-1)",
+      2: "var(--user-level-2)",
+      3: "var(--user-level-3)",
+      4: "var(--user-level-4)",
+      5: "var(--user-level-5)",
+      6: "var(--user-level-6)",
     }),
     [],
   )
@@ -163,7 +165,7 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
     const abortController = new AbortController()
     abortControllerRef.current = abortController
 
-    dispatch({ type: 'SET_LOADING', payload: true })
+    dispatch({ type: "SET_LOADING", payload: true })
 
     try {
       const response = await service.fetchDanmakus(requestParams, {
@@ -171,21 +173,21 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
       })
       errorFlagRef.current = false
       dispatch({
-        type: 'SET_DANMAKU_LIST',
+        type: "SET_DANMAKU_LIST",
         payload: { data: response.data, total: response.total },
       })
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') return
-      console.error('Failed to fetch danmaku list:', error)
+      if (error instanceof Error && error.name === "AbortError") return
+      console.error("Failed to fetch danmaku list:", error)
       if (!errorFlagRef.current) {
-        messageApi.error('获取弹幕列表失败，请检查后端服务是否正常')
+        messageApi.error("获取弹幕列表失败，请检查后端服务是否正常")
         errorFlagRef.current = true
       }
     } finally {
       if (abortControllerRef.current === abortController) {
         abortControllerRef.current = null
       }
-      dispatch({ type: 'SET_LOADING', payload: false })
+      dispatch({ type: "SET_LOADING", payload: false })
     }
   }, [service, requestParams, messageApi, cancelPendingRequest, dispatch])
 
@@ -199,7 +201,7 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
   const handlePageChange = useCallback(
     (page: number, limit?: number) => {
       resetRoomError()
-      dispatch({ type: 'SET_PAGE', payload: { page, pageSize: limit } })
+      dispatch({ type: "SET_PAGE", payload: { page, pageSize: limit } })
     },
     [resetRoomError],
   )
@@ -207,42 +209,42 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
   const handleSearch = useCallback(
     (newSearchParams: DanmakuSearchParams) => {
       resetRoomError()
-      dispatch({ type: 'SET_SEARCH', payload: newSearchParams })
+      dispatch({ type: "SET_SEARCH", payload: newSearchParams })
     },
     [resetRoomError],
   )
 
   const handleResetSearch = useCallback(() => {
     resetRoomError()
-    dispatch({ type: 'RESET_SEARCH' })
+    dispatch({ type: "RESET_SEARCH" })
   }, [resetRoomError])
 
   const setSorter = useCallback((sorter: string | null) => {
-    dispatch({ type: 'SET_SORTER', payload: sorter })
+    dispatch({ type: "SET_SORTER", payload: sorter })
   }, [])
 
   const setEditingDanmaku = useCallback((danmaku: Danmaku | null) => {
-    dispatch({ type: 'SET_EDITING_DANMAKU', payload: danmaku })
+    dispatch({ type: "SET_EDITING_DANMAKU", payload: danmaku })
   }, [])
 
   const setIsModalVisible = useCallback((visible: boolean) => {
-    dispatch({ type: 'SET_MODAL_VISIBLE', payload: visible })
+    dispatch({ type: "SET_MODAL_VISIBLE", payload: visible })
   }, [])
 
   const clearError = useCallback(() => {
     errorFlagRef.current = false
-    dispatch({ type: 'CLEAR_ERROR' })
+    dispatch({ type: "CLEAR_ERROR" })
   }, [])
 
   const handleDelete = useCallback(
     async (id: number) => {
       try {
         await service.deleteDanmaku(id)
-        messageApi.success('删除成功')
+        messageApi.success("删除成功")
         fetchDanmakus()
       } catch (error) {
-        console.error('Failed to delete danmaku: ', error as Error)
-        messageApi.error('删除失败')
+        console.error("Failed to delete danmaku: ", error as Error)
+        messageApi.error("删除失败")
       }
     },
     [service, fetchDanmakus, messageApi],
@@ -252,11 +254,11 @@ export const useDanmakuMgt = ({ messageApi }: UseDanmakuMgtProps) => {
     async (id: number, data: Partial<Danmaku>) => {
       try {
         await service.updateDanmaku(id, data)
-        messageApi.success('更新成功')
+        messageApi.success("更新成功")
         fetchDanmakus()
       } catch (error) {
-        console.error('Failed to update danmaku: ', error as Error)
-        messageApi.error('更新失败')
+        console.error("Failed to update danmaku: ", error as Error)
+        messageApi.error("更新失败")
       }
     },
     [service, fetchDanmakus, messageApi],

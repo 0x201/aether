@@ -1,17 +1,18 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { RouterModule } from '@angular/router';
-import { JwtHelperService } from '@auth0/angular-jwt';
-import { Role } from '../../models/role.model';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { MatChipsModule } from '@angular/material/chips'
+import { MatIconModule } from '@angular/material/icon'
+import { MatListModule } from '@angular/material/list'
+import { RouterModule } from '@angular/router'
+import { JwtHelperService } from '@auth0/angular-jwt'
+
+import { Role } from '../../models/role.model'
 
 interface UserProfile {
-  username: string;
-  nickname: string;
-  roles: Role[];
+  username: string
+  nickname: string
+  roles: Role[]
 }
 
 @Component({
@@ -25,19 +26,17 @@ interface UserProfile {
     MatChipsModule,
     MatIconModule,
     MatListModule,
-    RouterModule
+    RouterModule,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfileComponent implements OnInit {
-  userProfile: UserProfile | null = null;
+  userProfile: UserProfile | null = null
 
-  constructor(
-    private jwtHelper: JwtHelperService
-  ) { }
+  constructor(private jwtHelper: JwtHelperService) {}
 
   ngOnInit(): void {
-    this.loadUserProfile();
+    this.loadUserProfile()
   }
 
   loadUserProfile(): void {

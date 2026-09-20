@@ -1,20 +1,11 @@
-import {
-  DataSource,
-  Repository,
-  FindManyOptions,
-  FindOneOptions,
-  QueryRunner,
-} from "typeorm";
-import { Logger, Type } from "@nestjs/common";
-import { BaseAuditableEntity } from "../BaseAuditableEntity.entity.js";
-import { PagedSortedAndFilteredResultQuery } from "../queries/PagedResult.query.js";
+import { Logger, Type } from "@nestjs/common"
+import { DataSource, Repository, FindManyOptions, FindOneOptions, QueryRunner } from "typeorm"
 
-export abstract class GenericCrudBaseService<
-  T extends BaseAuditableEntity,
-  CreateDto,
-  UpdateDto,
-> {
-  protected readonly logger = new Logger(GenericCrudBaseService.name);
+import { BaseAuditableEntity } from "../BaseAuditableEntity.entity.js"
+import { PagedSortedAndFilteredResultQuery } from "../queries/PagedResult.query.js"
+
+export abstract class GenericCrudBaseService<T extends BaseAuditableEntity, CreateDto, UpdateDto> {
+  protected readonly logger = new Logger(GenericCrudBaseService.name)
 
   protected constructor(
     protected readonly repository: Repository<T>,
@@ -25,13 +16,13 @@ export abstract class GenericCrudBaseService<
    * Abstract method to map Create DTO to entity
    * Implementation should be provided by subclasses
    */
-  protected abstract mapCreateDtoToEntity(command: CreateDto, entity: T): void;
+  protected abstract mapCreateDtoToEntity(command: CreateDto, entity: T): void
 
   /**
    * Abstract method to map Update DTO to entity
    * Implementation should be provided by subclasses
    */
-  protected abstract mapUpdateDtoToEntity(command: UpdateDto, entity: T): void;
+  protected abstract mapUpdateDtoToEntity(command: UpdateDto, entity: T): void
 
   /**
    * Hook method called before creating an entity
@@ -43,7 +34,7 @@ export abstract class GenericCrudBaseService<
     _entity: T,
   ): Promise<void> {
     // Default implementation - do nothing
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   /**
@@ -56,7 +47,7 @@ export abstract class GenericCrudBaseService<
     _entity: T,
   ): Promise<void> {
     // Default implementation - do nothing
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   /**
@@ -69,7 +60,7 @@ export abstract class GenericCrudBaseService<
     _entity: T,
   ): Promise<void> {
     // Default implementation - do nothing
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   /**
@@ -82,31 +73,25 @@ export abstract class GenericCrudBaseService<
     _entity: T,
   ): Promise<void> {
     // Default implementation - do nothing
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   /**
    * Hook method called before deleting an entity
    * Can be overridden by subclasses for additional logic
    */
-  protected async beforeDelete(
-    _queryRunner: QueryRunner,
-    _entity: T,
-  ): Promise<void> {
+  protected async beforeDelete(_queryRunner: QueryRunner, _entity: T): Promise<void> {
     // Default implementation - do nothing
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   /**
    * Hook method called after deleting an entity
    * Can be overridden by subclasses for additional logic
    */
-  protected async afterDelete(
-    _queryRunner: QueryRunner,
-    _entity: T,
-  ): Promise<void> {
+  protected async afterDelete(_queryRunner: QueryRunner, _entity: T): Promise<void> {
     // Default implementation - do nothing
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   /**
@@ -117,20 +102,20 @@ export abstract class GenericCrudBaseService<
   protected async executeInTransaction<R>(
     operation: (queryRunner: QueryRunner) => Promise<R>,
   ): Promise<R> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
 
     try {
-      const result = await operation(queryRunner);
-      await queryRunner.commitTransaction();
-      return result;
+      const result = await operation(queryRunner)
+      await queryRunner.commitTransaction()
+      return result
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      this.logger.error(`Error in transaction`, error);
-      throw error;
+      await queryRunner.rollbackTransaction()
+      this.logger.error(`Error in transaction`, error)
+      throw error
     } finally {
-      await queryRunner.release();
+      await queryRunner.release()
     }
   }
 
@@ -141,17 +126,17 @@ export abstract class GenericCrudBaseService<
    */
   async insert(command: CreateDto): Promise<T> {
     return this.executeInTransaction(async (queryRunner) => {
-      const entity = this.repository.create();
-      this.mapCreateDtoToEntity(command, entity);
+      const entity = this.repository.create()
+      this.mapCreateDtoToEntity(command, entity)
 
-      await this.beforeCreate(queryRunner, command, entity);
+      await this.beforeCreate(queryRunner, command, entity)
 
-      const savedEntity = await queryRunner.manager.save(entity);
+      const savedEntity = await queryRunner.manager.save(entity)
 
-      await this.afterCreate(queryRunner, command, savedEntity);
+      await this.afterCreate(queryRunner, command, savedEntity)
 
-      return savedEntity;
-    });
+      return savedEntity
+    })
   }
 
   /**
@@ -160,21 +145,21 @@ export abstract class GenericCrudBaseService<
    */
   async insertMany(commands: CreateDto[]): Promise<void> {
     return this.executeInTransaction(async (queryRunner) => {
-      const entities: T[] = [];
+      const entities: T[] = []
 
       for (const command of commands) {
-        const entity = this.repository.create();
-        this.mapCreateDtoToEntity(command, entity);
-        await this.beforeCreate(queryRunner, command, entity);
-        entities.push(entity);
+        const entity = this.repository.create()
+        this.mapCreateDtoToEntity(command, entity)
+        await this.beforeCreate(queryRunner, command, entity)
+        entities.push(entity)
       }
 
-      const savedEntities = await queryRunner.manager.save(entities);
+      const savedEntities = await queryRunner.manager.save(entities)
 
       for (let i = 0; i < commands.length; i++) {
-        await this.afterCreate(queryRunner, commands[i], savedEntities[i]);
+        await this.afterCreate(queryRunner, commands[i], savedEntities[i])
       }
-    });
+    })
   }
 
   /**
@@ -185,27 +170,24 @@ export abstract class GenericCrudBaseService<
    */
   async update(id: number, command: UpdateDto): Promise<T> {
     return this.executeInTransaction(async (queryRunner) => {
-      const entity = await queryRunner.manager.findOne(
-        this.repository.target as Type<T>,
-        {
-          where: { id } as any,
-        },
-      );
+      const entity = await queryRunner.manager.findOne(this.repository.target as Type<T>, {
+        where: { id } as any,
+      })
 
       if (!entity) {
-        throw new Error(`Entity with ID ${id} not found`);
+        throw new Error(`Entity with ID ${id} not found`)
       }
 
-      this.mapUpdateDtoToEntity(command, entity);
+      this.mapUpdateDtoToEntity(command, entity)
 
-      await this.beforeUpdate(queryRunner, command, entity);
+      await this.beforeUpdate(queryRunner, command, entity)
 
-      const updatedEntity = await queryRunner.manager.save(entity);
+      const updatedEntity = await queryRunner.manager.save(entity)
 
-      await this.afterUpdate(queryRunner, command, updatedEntity);
+      await this.afterUpdate(queryRunner, command, updatedEntity)
 
-      return updatedEntity;
-    });
+      return updatedEntity
+    })
   }
 
   /**
@@ -214,18 +196,18 @@ export abstract class GenericCrudBaseService<
    */
   async delete(id: number): Promise<void> {
     return this.executeInTransaction(async (queryRunner: QueryRunner) => {
-      const entity = await this.repository.findOne({ where: { id } as any });
+      const entity = await this.repository.findOne({ where: { id } as any })
 
       if (!entity) {
-        throw new Error(`Entity with ID ${id} not found`);
+        throw new Error(`Entity with ID ${id} not found`)
       }
 
-      await this.beforeDelete(queryRunner, entity);
+      await this.beforeDelete(queryRunner, entity)
 
-      await queryRunner.manager.delete(this.repository.target, id);
+      await queryRunner.manager.delete(this.repository.target, id)
 
-      await this.afterDelete(queryRunner, entity);
-    });
+      await this.afterDelete(queryRunner, entity)
+    })
   }
 
   /**
@@ -241,7 +223,7 @@ export abstract class GenericCrudBaseService<
         ...options?.where,
         id: id,
       } as any,
-    } as FindOneOptions<T>);
+    } as FindOneOptions<T>)
   }
 
   /**
@@ -249,14 +231,12 @@ export abstract class GenericCrudBaseService<
    * @param options Find options
    * @returns Array of entities and count
    */
-  async findAllWithPagination(
-    options?: FindManyOptions<T>,
-  ): Promise<[T[], number]> {
-    return await this.repository.findAndCount(options);
+  async findAllWithPagination(options?: FindManyOptions<T>): Promise<[T[], number]> {
+    return await this.repository.findAndCount(options)
   }
 
   async findAll(): Promise<T[]> {
-    return await this.repository.find();
+    return await this.repository.find()
   }
 
   /**
@@ -269,29 +249,28 @@ export abstract class GenericCrudBaseService<
     query: PagedSortedAndFilteredResultQuery,
     baseQueryCallback?: (qb: any) => any,
   ): Promise<[T[], number]> {
-    const entityMetadata = this.repository.metadata;
-    const entityName = entityMetadata.name;
-    let qb = this.repository.createQueryBuilder(entityName.toLowerCase());
+    const entityMetadata = this.repository.metadata
+    const entityName = entityMetadata.name
+    let qb = this.repository.createQueryBuilder(entityName.toLowerCase())
 
     if (baseQueryCallback) {
-      qb = baseQueryCallback(qb);
+      qb = baseQueryCallback(qb)
     }
 
-    const sortField = query.sorting || "id";
-    const sortOrder =
-      query.order && query.order.toLowerCase() === "desc" ? "DESC" : "ASC";
+    const sortField = query.sorting || "id"
+    const sortOrder = query.order && query.order.toLowerCase() === "desc" ? "DESC" : "ASC"
 
     if (query.page < 1) {
-      query.page = 1;
+      query.page = 1
     }
 
-    query.page = query.page - 1;
+    query.page = query.page - 1
 
     return await qb
       .orderBy(`${entityName.toLowerCase()}.${sortField}`, sortOrder)
       .skip(query.page * query.pageSize || 0)
       .take(query.pageSize || 10)
-      .getManyAndCount();
+      .getManyAndCount()
   }
 
   /**
@@ -299,6 +278,6 @@ export abstract class GenericCrudBaseService<
    * @returns Number of entities
    */
   async count(): Promise<number> {
-    return await this.repository.count();
+    return await this.repository.count()
   }
 }

@@ -1,12 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { RolesController } from './roles.controller.js'
-import { RolesService } from './roles.service.js'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { Role } from './entities/role.entity.js'
-import { ConfigModule } from '@nestjs/config'
-import { describe, beforeEach, it, expect, vi } from 'vitest'
+import { ConfigModule } from "@nestjs/config"
+import { Test, TestingModule } from "@nestjs/testing"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { describe, beforeEach, it, expect, vi } from "vitest"
 
-describe('RolesController', () => {
+import { Role } from "./entities/role.entity.js"
+import { RolesController } from "./roles.controller.js"
+import { RolesService } from "./roles.service.js"
+
+describe("RolesController", () => {
   let controller: RolesController
 
   beforeEach(async () => {
@@ -31,7 +32,7 @@ describe('RolesController', () => {
     controller = module.get<RolesController>(RolesController)
   })
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined()
   })
 })

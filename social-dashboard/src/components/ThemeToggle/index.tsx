@@ -1,67 +1,69 @@
-import React, { useEffect } from 'react'
-import { useTheme } from '@/src/contexts/useTheme'
-import './styles.css'
-import { Button, Dropdown, Space } from 'antd'
-import type { MenuProps } from 'antd'
 import {
   SunOutlined,
   MoonOutlined,
   CheckOutlined,
   SyncOutlined,
   SettingOutlined,
-} from '@ant-design/icons'
+} from "@ant-design/icons"
+import { Button, Dropdown, Space } from "antd"
+
+import "./styles.css"
+import type { MenuProps } from "antd"
+import React, { useEffect } from "react"
+
+import { useTheme } from "@/src/contexts/useTheme"
 import { m } from "@/src/i18n"
 
 const ThemeSwitch: React.FC = () => {
   const { themeMode, setThemeMode } = useTheme()
 
-  const items: MenuProps['items'] = [
+  const items: MenuProps["items"] = [
     {
-      key: 'light',
+      key: "light",
       label: (
         <Space>
           {m.theme_toggle_light()}
-          {themeMode === 'light' && <CheckOutlined style={{ marginLeft: 8 }} />}
+          {themeMode === "light" && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),
       icon: <SunOutlined />,
-      onClick: () => setThemeMode('light'),
+      onClick: () => setThemeMode("light"),
     },
     {
-      key: 'dark',
+      key: "dark",
       label: (
         <Space>
           {m.theme_toggle_dark()}
-          {themeMode === 'dark' && <CheckOutlined style={{ marginLeft: 8 }} />}
+          {themeMode === "dark" && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),
       icon: <MoonOutlined />,
-      onClick: () => setThemeMode('dark'),
+      onClick: () => setThemeMode("dark"),
     },
     {
-      key: 'auto',
+      key: "auto",
       label: (
         <Space>
           {m.theme_toggle_system()}
-          {themeMode === 'auto' && <CheckOutlined style={{ marginLeft: 8 }} />}
+          {themeMode === "auto" && <CheckOutlined style={{ marginLeft: 8 }} />}
         </Space>
       ),
       icon: <SyncOutlined />,
-      onClick: () => setThemeMode('auto'),
+      onClick: () => setThemeMode("auto"),
     },
   ]
 
   return (
-    <Dropdown menu={{ items }} placement="bottomRight" trigger={['hover']}>
+    <Dropdown menu={{ items }} placement="bottomRight" trigger={["hover"]}>
       <Button
         type="text"
         icon={<SettingOutlined />}
         style={{
           width: 40,
           height: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           fontSize: 18,
         }}
       />
@@ -71,14 +73,14 @@ const ThemeSwitch: React.FC = () => {
 
 const AnimatedThemeSwitch: React.FC = () => {
   const { currentTheme, toggleBetweenLightAndDark } = useTheme()
-  const isDarkMode = currentTheme === 'dark'
+  const isDarkMode = currentTheme === "dark"
 
   useEffect(() => {
-    const button = document.getElementById('toggle-btn')
+    const button = document.getElementById("toggle-btn")
     if (button) {
-      button.setAttribute('aria-pressed', isDarkMode.toString())
-      button.classList.toggle('dark-mode', isDarkMode)
-      button.classList.toggle('light-mode', !isDarkMode)
+      button.setAttribute("aria-pressed", isDarkMode.toString())
+      button.classList.toggle("dark-mode", isDarkMode)
+      button.classList.toggle("light-mode", !isDarkMode)
     }
   }, [isDarkMode])
 
@@ -88,7 +90,7 @@ const AnimatedThemeSwitch: React.FC = () => {
 
   return (
     <button
-      className={`toggle ${isDarkMode ? 'dark-mode' : 'light-mode'}`}
+      className={`toggle ${isDarkMode ? "dark-mode" : "light-mode"}`}
       id="toggle-btn"
       role="switch"
       aria-pressed={isDarkMode}

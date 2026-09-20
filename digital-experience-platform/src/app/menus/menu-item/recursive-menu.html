@@ -7,8 +7,13 @@
   <span class="icon-placeholder"></span>
   }
 
-  <a mat-list-item [routerLink]="menu.route ? menu.route : null" routerLinkActive="active-menu"
-    [routerLinkActiveOptions]="{ exact: true }" (click)="!menu.route && hasChildren ? toggleChildren() : null">
+  <a
+    mat-list-item
+    [routerLink]="menu.route ? menu.route : null"
+    routerLinkActive="active-menu"
+    [routerLinkActiveOptions]="{ exact: true }"
+    (click)="!menu.route && hasChildren ? toggleChildren() : null"
+  >
     @if (menu.icon) {
     <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
     }
@@ -19,8 +24,7 @@
 @if (hasChildren && isExpanded) {
 <mat-list>
   @for (child of menu.children; track child.id) {
-  <recursive-menu [menu]="child" [level]="level + 1">
-  </recursive-menu>
+  <recursive-menu [menu]="child" [level]="level + 1"> </recursive-menu>
   }
 </mat-list>
 }

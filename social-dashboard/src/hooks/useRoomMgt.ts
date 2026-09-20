@@ -1,14 +1,16 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
-import { message } from 'antd'
-import type { MessageInstance } from 'antd/es/message/interface'
+import { message } from "antd"
+import type { MessageInstance } from "antd/es/message/interface"
+import { useState, useCallback, useEffect, useMemo, useRef } from "react"
+
 import type {
   CreateRoomRequest,
   Room,
   RoomSearchParams,
   UpdateRoomRequest,
-} from '@/src/interface/room/type'
-import { createRoomService } from '@/src/services/roomService'
-import { useRoomOptions } from './useResourceOptions'
+} from "@/src/interface/room/type"
+import { createRoomService } from "@/src/services/roomService"
+
+import { useRoomOptions } from "./useResourceOptions"
 
 interface UseRoomMgtProps {
   messageApi?: MessageInstance
@@ -28,8 +30,8 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
   const [searchParams, setSearchParams] = useState<RoomSearchParams>({
     page: 1,
     pageSize: 20,
-    roomName: '',
-    roomId: '',
+    roomName: "",
+    roomId: "",
   })
 
   const service = useMemo(() => createRoomService(), [])
@@ -53,9 +55,9 @@ export const useRoomMgt = ({ messageApi }: UseRoomMgtProps) => {
       setTotal(data.total)
       errorFlagRef.current = false
     } catch (error) {
-      console.error('Failed to fetch room list:', error)
+      console.error("Failed to fetch room list:", error)
       if (!errorFlagRef.current) {
-        messageApi?.error('获取房间列表失败，请检查后端服务是否正常')
+        messageApi?.error("获取房间列表失败，请检查后端服务是否正常")
         errorFlagRef.current = true
       }
     } finally {

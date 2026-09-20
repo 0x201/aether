@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { BooksController } from './books.controller.js'
-import { BooksService } from './books.service.js'
-import { describe, beforeEach, it, expect, vi } from 'vitest'
+import { Test, TestingModule } from "@nestjs/testing"
+import { describe, beforeEach, it, expect, vi } from "vitest"
 
-describe('BooksController', () => {
+import { BooksController } from "./books.controller.js"
+import { BooksService } from "./books.service.js"
+
+describe("BooksController", () => {
   let controller: BooksController
 
   beforeEach(async () => {
@@ -27,7 +28,7 @@ describe('BooksController', () => {
     controller = module.get<BooksController>(BooksController)
   })
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined()
   })
 })

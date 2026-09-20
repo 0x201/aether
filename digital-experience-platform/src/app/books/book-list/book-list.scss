@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  
+
   h1 {
     margin: 0;
   }
@@ -23,15 +23,15 @@
 
 .book-card {
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
   }
-  
+
   mat-card-header {
     padding-bottom: 10px;
-    
+
     mat-card-title {
       max-height: 4rem;
       overflow: hidden;
@@ -41,10 +41,10 @@
       -webkit-box-orient: vertical;
     }
   }
-  
+
   mat-card-content {
     min-height: 120px;
-    
+
     p {
       margin: 10px 0;
       max-height: 6rem;
@@ -56,16 +56,16 @@
       -webkit-box-orient: vertical;
     }
   }
-  
+
   mat-card-actions {
     display: flex;
     align-items: center;
-    
+
     .price {
       font-weight: 500;
       font-size: 1.1rem;
     }
-    
+
     .spacer {
       flex: 1;
     }

@@ -1,4 +1,4 @@
-import { IResult } from '../response/Result.js'
+import { IResult } from "../response/Result.js"
 
 interface IFilteredResultQuery {
   filter: string | null

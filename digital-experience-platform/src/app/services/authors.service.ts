@@ -1,36 +1,37 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Author, AuthorDto } from '../models/author.model';
+import { HttpClient } from '@angular/common/http'
+import { Injectable, inject } from '@angular/core'
+import { Observable } from 'rxjs'
+
+import { Author, AuthorDto } from '../models/author.model'
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthorsService {
-  private http = inject(HttpClient);
-  private baseUrl = '/api/authors';
+  private http = inject(HttpClient)
+  private baseUrl = '/api/authors'
 
   getAuthors(): Observable<Author[]> {
-    return this.http.get<Author[]>(this.baseUrl);
+    return this.http.get<Author[]>(this.baseUrl)
   }
 
   getAllAuthors(): Observable<Author[]> {
-    return this.http.get<Author[]>(`${this.baseUrl}/all`);
+    return this.http.get<Author[]>(`${this.baseUrl}/all`)
   }
 
   getAuthor(id: number): Observable<Author> {
-    return this.http.get<Author>(`${this.baseUrl}/${id}`);
+    return this.http.get<Author>(`${this.baseUrl}/${id}`)
   }
 
   createAuthor(author: AuthorDto): Observable<Author> {
-    return this.http.post<Author>(this.baseUrl, author);
+    return this.http.post<Author>(this.baseUrl, author)
   }
 
   updateAuthor(id: number, author: AuthorDto): Observable<Author> {
-    return this.http.put<Author>(`${this.baseUrl}/${id}`, author);
+    return this.http.put<Author>(`${this.baseUrl}/${id}`, author)
   }
 
   deleteAuthor(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`)
   }
 }

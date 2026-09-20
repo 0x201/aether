@@ -3,7 +3,7 @@
   <form [formGroup]="userForm" class="user-form">
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Username</mat-label>
-      <input matInput formControlName="username" required>
+      <input matInput formControlName="username" required />
       @if (userForm.get('username')?.hasError('required')) {
       <mat-error>Username is required</mat-error>
       }
@@ -11,27 +11,32 @@
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Nickname</mat-label>
-      <input matInput formControlName="nickname" required>
+      <input matInput formControlName="nickname" required />
       @if (userForm.get('nickname')?.hasError('required')) {
-        <mat-error>Nickname is required</mat-error>
+      <mat-error>Nickname is required</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Roles</mat-label>
-      <mat-select formControlName="roles" multiple [compareWith]="compareRoles" placeholder="Select roles">
+      <mat-select
+        formControlName="roles"
+        multiple
+        [compareWith]="compareRoles"
+        placeholder="Select roles"
+      >
         <mat-option>
-          <input 
-            placeholder="Search roles" 
+          <input
+            placeholder="Search roles"
             (keyup)="onRoleSearchKeyUp($event)"
             matInput
-            style="width: 100%; padding: 8px; border: none; outline: none;">
+            style="width: 100%; padding: 8px; border: none; outline: none"
+          />
         </mat-option>
         @for (role of filteredRoles | async; track role) {
-          <mat-option [value]="role">{{ role.name }}</mat-option>
-        }
-        @if ((filteredRoles | async)?.length === 0) {
-          <mat-option disabled>No roles found</mat-option>
+        <mat-option [value]="role">{{ role.name }}</mat-option>
+        } @if ((filteredRoles | async)?.length === 0) {
+        <mat-option disabled>No roles found</mat-option>
         }
       </mat-select>
       <mat-hint>Start typing to search for roles</mat-hint>
@@ -40,6 +45,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="userForm.invalid">{{ data.user ? 'Update' :
-    'Create' }}</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="userForm.invalid">
+    {{ data.user ? 'Update' : 'Create' }}
+  </button>
 </mat-dialog-actions>

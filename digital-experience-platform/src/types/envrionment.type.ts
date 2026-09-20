@@ -1,3 +1,3 @@
 export interface Environment {
-    BOOKSTOREAPI_HTTP: string;
+  BOOKSTOREAPI_HTTP: string
 }

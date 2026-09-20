@@ -8,17 +8,17 @@
   mat-list-item {
     height: auto;
     padding: 16px 0;
-    
+
     &:not(:last-child) {
       border-bottom: 1px solid #e0e0e0;
     }
   }
-  
+
   mat-icon {
     align-self: flex-start;
     margin-top: 4px;
   }
-  
+
   mat-chip {
     margin: 2px;
   }

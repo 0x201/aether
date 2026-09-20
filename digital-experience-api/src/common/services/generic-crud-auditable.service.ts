@@ -1,10 +1,11 @@
-import { DataSource, QueryRunner, Repository } from "typeorm";
-import { Logger, UnauthorizedException } from "@nestjs/common";
-import { BaseAuditableEntity } from "../BaseAuditableEntity.entity.js";
-import { GenericCrudBaseService } from "./generic-crud-base.service.js";
+import { Logger, UnauthorizedException } from "@nestjs/common"
+import { DataSource, QueryRunner, Repository } from "typeorm"
 
-export interface IUsernameProvider { 
-  getUsername(): string | null 
+import { BaseAuditableEntity } from "../BaseAuditableEntity.entity.js"
+import { GenericCrudBaseService } from "./generic-crud-base.service.js"
+
+export interface IUsernameProvider {
+  getUsername(): string | null
 }
 
 export interface IDateTimeProvider {
@@ -18,7 +19,7 @@ export abstract class GenericCrudAuditableService<
   TUserService extends IUsernameProvider = IUsernameProvider,
   TDateTimeService extends IDateTimeProvider = IDateTimeProvider,
 > extends GenericCrudBaseService<T, CreateDto, UpdateDto> {
-  protected readonly logger = new Logger(GenericCrudAuditableService.name);
+  protected readonly logger = new Logger(GenericCrudAuditableService.name)
 
   protected constructor(
     protected readonly repository: Repository<T>,
@@ -26,7 +27,7 @@ export abstract class GenericCrudAuditableService<
     protected readonly currentUserService: TUserService,
     protected readonly dateTimeService: TDateTimeService,
   ) {
-    super(repository, dataSource);
+    super(repository, dataSource)
   }
 
   /**
@@ -34,17 +35,17 @@ export abstract class GenericCrudAuditableService<
    * @param entity Entity to set audit fields for
    */
   private setAuditFieldsForCreate(entity: T): void {
-    const currentUser = this.currentUserService.getUsername();
+    const currentUser = this.currentUserService.getUsername()
     if (!currentUser) {
       throw new UnauthorizedException("Cannot find current info, please try to login")
     }
 
-    const now = this.dateTimeService.getNowString();
+    const now = this.dateTimeService.getNowString()
 
-    entity.createdBy = currentUser;
-    entity.createdTime = now;
-    entity.lastModifiedBy = currentUser;
-    entity.lastModifiedTime = now;
+    entity.createdBy = currentUser
+    entity.createdTime = now
+    entity.lastModifiedBy = currentUser
+    entity.lastModifiedTime = now
   }
 
   /**
@@ -52,14 +53,14 @@ export abstract class GenericCrudAuditableService<
    * @param entity Entity to set audit fields for
    */
   private setAuditFieldsForUpdate(entity: T): void {
-    const currentUser = this.currentUserService.getUsername();
+    const currentUser = this.currentUserService.getUsername()
     if (!currentUser) {
       throw new UnauthorizedException("Cannot find current info, please try to login")
     }
-    const now = this.dateTimeService.getNowString();
+    const now = this.dateTimeService.getNowString()
 
-    entity.lastModifiedBy = currentUser;
-    entity.lastModifiedTime = now;
+    entity.lastModifiedBy = currentUser
+    entity.lastModifiedTime = now
   }
 
   /**
@@ -72,8 +73,8 @@ export abstract class GenericCrudAuditableService<
     command: CreateDto,
     entity: T,
   ): Promise<void> {
-    this.setAuditFieldsForCreate(entity);
-    return super.beforeCreate(queryRunner, command, entity);
+    this.setAuditFieldsForCreate(entity)
+    return super.beforeCreate(queryRunner, command, entity)
   }
 
   /**
@@ -86,7 +87,7 @@ export abstract class GenericCrudAuditableService<
     command: UpdateDto,
     entity: T,
   ): Promise<void> {
-    this.setAuditFieldsForUpdate(entity);
-    return super.beforeUpdate(queryRunner, command, entity);
+    this.setAuditFieldsForUpdate(entity)
+    return super.beforeUpdate(queryRunner, command, entity)
   }
 }

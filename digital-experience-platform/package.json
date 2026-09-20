@@ -1,8 +1,12 @@
 {
   "name": "digital-experience-platform",
   "version": "0.1.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint src/",
     "start": "run-script-os",
     "start:win32": "ng serve --port %PORT%",
     "start:default": "ng serve --port $PORT",
@@ -10,7 +14,6 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "private": true,
   "dependencies": {
     "@angular/cdk": "^22.1.4",
     "@angular/common": "^22.1.4",
@@ -31,6 +34,8 @@
     "@angular/cli": "^22.1.6",
     "@angular/compiler-cli": "^22.1.4",
     "jsdom": "^30.0.1",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
     "run-script-os": "^1.1.6",
     "typescript": "~7.0.2",
     "vitest": "^4.1.11"

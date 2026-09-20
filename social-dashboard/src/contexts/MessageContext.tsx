@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef, type ReactNode, useMemo, useCallback } from 'react'
 import {
   HubConnection,
   HubConnectionBuilder,
   HttpTransportType,
   HubConnectionState,
-} from '@microsoft/signalr'
-import type { Message, AnalyticsMessage, DanmakuMessage, SystemMessage } from '../interface/Message'
-import { MessageContext, type MessageContextType } from './useMessage'
+} from "@microsoft/signalr"
+import React, { useState, useEffect, useRef, type ReactNode, useMemo, useCallback } from "react"
+
+import type { Message, AnalyticsMessage, DanmakuMessage, SystemMessage } from "../interface/Message"
+import { MessageContext, type MessageContextType } from "./useMessage"
 
 export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([])
@@ -26,10 +27,10 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       heartbeatIntervalRef.current = setInterval(async () => {
         if (hubConnection.state === HubConnectionState.Connected) {
           try {
-            await hubConnection.invoke('Heartbeat')
-            console.log('Heartbeat sent')
+            await hubConnection.invoke("Heartbeat")
+            console.log("Heartbeat sent")
           } catch (error) {
-            console.error('Heartbeat failed:', error)
+            console.error("Heartbeat failed:", error)
           }
         }
       }, 30000)
@@ -46,8 +47,8 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       .withAutomaticReconnect([0, 2000, 10000, 30000])
       .build()
 
-    hubConnection.on('AnalyticsCompleted', (notification: AnalyticsMessage) => {
-      console.log('Received analytics notification:', notification)
+    hubConnection.on("AnalyticsCompleted", (notification: AnalyticsMessage) => {
+      console.log("Received analytics notification:", notification)
       const newNotification: AnalyticsMessage = {
         ...notification,
         id: `${notification.roomId}-${Date.now()}`,
@@ -57,8 +58,8 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       setUnreadCount((prev) => prev + 1)
     })
 
-    hubConnection.on('ReceiveNewDanmaku', (danmakuItems: DanmakuMessage[]) => {
-      console.log('Received new danmaku:', danmakuItems)
+    hubConnection.on("ReceiveNewDanmaku", (danmakuItems: DanmakuMessage[]) => {
+      console.log("Received new danmaku:", danmakuItems)
       const newNotifications: Message[] = danmakuItems.map((danmaku) => ({
         ...danmaku,
         id: `${danmaku.roomId}-${danmaku.timestamp}-${danmaku.id || Date.now()}`,
@@ -68,8 +69,8 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       setUnreadCount((prev) => prev + newNotifications.length)
     })
 
-    hubConnection.on('SystemNotification', (notification: SystemMessage) => {
-      console.log('Received system notification:', notification)
+    hubConnection.on("SystemNotification", (notification: SystemMessage) => {
+      console.log("Received system notification:", notification)
       const newNotification: SystemMessage = {
         ...notification,
         id: `sys-${Date.now()}`,
@@ -82,7 +83,7 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
     hubConnection.onclose((error?: Error) => {
       if (!isActive) return
 
-      console.log('Message context SignalR connection closed', error)
+      console.log("Message context SignalR connection closed", error)
       setIsConnected(false)
 
       if (heartbeatIntervalRef.current) {
@@ -93,7 +94,7 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     hubConnection.onreconnecting((error?: Error) => {
       if (!isActive) return
-      console.log('Message context SignalR reconnecting...', error)
+      console.log("Message context SignalR reconnecting...", error)
       setIsConnected(false)
 
       if (heartbeatIntervalRef.current) {
@@ -104,12 +105,12 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     hubConnection.onreconnected((connectionId?: string) => {
       if (!isActive) return
-      console.log('Message context SignalR reconnected', connectionId)
+      console.log("Message context SignalR reconnected", connectionId)
       setIsConnected(true)
       startHeartbeat(hubConnection)
     })
 
-    hubConnection.on('UnreadCountUpdated', (count: number) => {
+    hubConnection.on("UnreadCountUpdated", (count: number) => {
       setUnreadCount(count)
     })
 
@@ -124,12 +125,12 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         connectionRef.current = hubConnection
         setConnection(hubConnection)
         setIsConnected(true)
-        console.log('Message context SignalR connection started')
+        console.log("Message context SignalR connection started")
         startHeartbeat(hubConnection)
       })
       .catch((error: Error) => {
         if (!isActive) return
-        console.error('Message context SignalR connection error: ', error)
+        console.error("Message context SignalR connection error: ", error)
       })
 
     return () => {
@@ -147,10 +148,10 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         conn
           .stop()
           .then(() => {
-            console.log('SignalR connection stopped during cleanup')
+            console.log("SignalR connection stopped during cleanup")
           })
           .catch((error) => {
-            console.error('Error stopping SignalR connection during cleanup:', error)
+            console.error("Error stopping SignalR connection during cleanup:", error)
           })
       }
     }
@@ -163,7 +164,7 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
       try {
         await conn.start()
         setIsConnected(true)
-        console.log('Message context SignalR connection restarted')
+        console.log("Message context SignalR connection restarted")
 
         if (heartbeatIntervalRef.current) {
           clearInterval(heartbeatIntervalRef.current)
@@ -172,15 +173,15 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         heartbeatIntervalRef.current = setInterval(async () => {
           if (conn.state === HubConnectionState.Connected) {
             try {
-              await conn.invoke('Heartbeat')
-              console.log('Heartbeat sent')
+              await conn.invoke("Heartbeat")
+              console.log("Heartbeat sent")
             } catch (error) {
-              console.error('Heartbeat failed:', error)
+              console.error("Heartbeat failed:", error)
             }
           }
         }, 30000)
       } catch (err) {
-        console.error('Failed to restart connection:', err)
+        console.error("Failed to restart connection:", err)
       }
     }
   }, [])
@@ -198,9 +199,9 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
           heartbeatIntervalRef.current = null
         }
 
-        console.log('Message context SignalR connection stopped')
+        console.log("Message context SignalR connection stopped")
       } catch (err) {
-        console.error('Error stopping connection:', err)
+        console.error("Error stopping connection:", err)
       }
     }
   }, [])
@@ -226,8 +227,8 @@ export const MessageProvider: React.FC<{ children: ReactNode }> = ({ children })
         throw error
       }
     } else {
-      console.warn('Cannot send command, connection not established')
-      throw new Error('Connection not established')
+      console.warn("Cannot send command, connection not established")
+      throw new Error("Connection not established")
     }
   }, [])
 

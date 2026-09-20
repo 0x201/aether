@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty } from "@nestjs/swagger"
 
 export interface IResultBase {
   status: number
@@ -23,19 +23,19 @@ export class Result<T> implements IResult<T> {
     this.data = data
   }
 
-  static success<T>(data: T, message = 'Request successfully'): Result<T> {
+  static success<T>(data: T, message = "Request successfully"): Result<T> {
     return new Result<T>(200, message, data)
   }
 
-  static created<T>(data: T, message = 'Created successfully'): Result<T> {
+  static created<T>(data: T, message = "Created successfully"): Result<T> {
     return new Result<T>(201, message, data)
   }
 
-  static accepted<T>(data: T, message = 'Accepted'): Result<T> {
+  static accepted<T>(data: T, message = "Accepted"): Result<T> {
     return new Result<T>(202, message, data)
   }
 
-  static noContent(message = 'No Content'): Result<null> {
+  static noContent(message = "No Content"): Result<null> {
     return new Result<null>(204, message, null)
   }
 
@@ -47,23 +47,23 @@ export class Result<T> implements IResult<T> {
     return new Result<null>(status, message, null)
   }
 
-  static unauthorized(message = 'Unauthorized'): Result<null> {
+  static unauthorized(message = "Unauthorized"): Result<null> {
     return new Result<null>(401, message, null)
   }
 
-  static forbidden(message = 'Forbidden'): Result<null> {
+  static forbidden(message = "Forbidden"): Result<null> {
     return new Result<null>(403, message, null)
   }
 
-  static notFound(message = 'Resource not found'): Result<null> {
+  static notFound(message = "Resource not found"): Result<null> {
     return new Result<null>(404, message, null)
   }
 
-  static badRequest(message = 'Bad Request'): Result<null> {
+  static badRequest(message = "Bad Request"): Result<null> {
     return new Result<null>(400, message, null)
   }
 
-  static internalError(message = 'Internal Server Error'): Result<null> {
+  static internalError(message = "Internal Server Error"): Result<null> {
     return new Result<null>(500, message, null)
   }
 }
@@ -85,7 +85,7 @@ export class PagedResult<T> implements IResultBase {
     data: ReadonlyArray<T>,
     totalCount: number,
     status: number = 200,
-    message: string = 'Request successful',
+    message: string = "Request successful",
   ) {
     this.status = status
     this.message = message
@@ -96,12 +96,12 @@ export class PagedResult<T> implements IResultBase {
   static success<T>(
     data: ReadonlyArray<T>,
     totalCount: number,
-    message = 'Request successful',
+    message = "Request successful",
   ): PagedResult<T> {
     return new PagedResult<T>(data, totalCount, 200, message)
   }
 
-  static failure<T>(message = 'Request failed', status = 500): PagedResult<T> {
+  static failure<T>(message = "Request failed", status = 500): PagedResult<T> {
     return new PagedResult<T>([], 0, status, message)
   }
 }

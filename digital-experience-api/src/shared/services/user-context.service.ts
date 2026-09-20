@@ -1,5 +1,5 @@
-import { Inject, Injectable, Scope } from '@nestjs/common'
-import { REQUEST } from '@nestjs/core'
+import { Inject, Injectable, Scope } from "@nestjs/common"
+import { REQUEST } from "@nestjs/core"
 
 export interface UserPayload {
   sub: string

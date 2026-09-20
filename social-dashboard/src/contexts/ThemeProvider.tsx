@@ -1,40 +1,42 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { ConfigProvider } from 'antd'
-import { lightTheme, darkTheme, type ThemeMode, getSystemTheme } from '@/src/themes'
-import { ThemeContext, type ThemeContextType } from './useTheme'
+import { ConfigProvider } from "antd"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 
-const THEME_STORAGE_KEY = 'dydanmaku-viewer-theme-mode'
-const THEME_MODES: ThemeMode[] = ['light', 'dark', 'auto']
+import { lightTheme, darkTheme, type ThemeMode, getSystemTheme } from "@/src/themes"
+
+import { ThemeContext, type ThemeContextType } from "./useTheme"
+
+const THEME_STORAGE_KEY = "dydanmaku-viewer-theme-mode"
+const THEME_MODES: ThemeMode[] = ["light", "dark", "auto"]
 
 const getStoredThemeMode = (): ThemeMode => {
   try {
     const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode
-    return storedTheme && THEME_MODES.includes(storedTheme) ? storedTheme : 'auto'
+    return storedTheme && THEME_MODES.includes(storedTheme) ? storedTheme : "auto"
   } catch {
-    console.warn('Error reading theme mode from local storage. Defaulting to auto.')
-    return 'auto'
+    console.warn("Error reading theme mode from local storage. Defaulting to auto.")
+    return "auto"
   }
 }
 
-const applyThemeToDocument = (theme: 'light' | 'dark') => {
+const applyThemeToDocument = (theme: "light" | "dark") => {
   const root = document.documentElement
-  root.setAttribute('data-theme', theme)
-  root.classList.remove('light-theme', 'dark-theme')
+  root.setAttribute("data-theme", theme)
+  root.classList.remove("light-theme", "dark-theme")
   root.classList.add(`${theme}-theme`)
-  root.style.setProperty('--ant-prefix', theme)
+  root.style.setProperty("--ant-prefix", theme)
 }
 
-const useSystemTheme = (): 'light' | 'dark' => {
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme)
+const useSystemTheme = (): "light" | "dark" => {
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(getSystemTheme)
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
     const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light')
+      setSystemTheme(e.matches ? "dark" : "light")
     }
 
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
   }, [])
 
   return systemTheme
@@ -44,8 +46,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [themeMode, setThemeModeState] = useState<ThemeMode>(getStoredThemeMode)
   const systemTheme = useSystemTheme()
 
-  const currentTheme = useMemo<'light' | 'dark'>(
-    () => (themeMode === 'auto' ? systemTheme : themeMode),
+  const currentTheme = useMemo<"light" | "dark">(
+    () => (themeMode === "auto" ? systemTheme : themeMode),
     [themeMode, systemTheme],
   )
 
@@ -61,7 +63,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [themeMode, setThemeMode])
 
   const toggleBetweenLightAndDark = useCallback(() => {
-    const targetMode = currentTheme === 'light' ? 'dark' : 'light'
+    const targetMode = currentTheme === "light" ? "dark" : "light"
     setThemeMode(targetMode)
   }, [currentTheme, setThemeMode])
 
@@ -70,7 +72,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [currentTheme])
 
   const themeConfig = useMemo(
-    () => (currentTheme === 'dark' ? darkTheme : lightTheme),
+    () => (currentTheme === "dark" ? darkTheme : lightTheme),
     [currentTheme],
   )
 

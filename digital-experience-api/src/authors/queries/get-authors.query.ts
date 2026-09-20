@@ -1,15 +1,16 @@
-import { IsOptional, IsString } from "class-validator";
-import { PagedSortedAndFilteredResultQuery } from "../../common/queries/PagedResult.query.js";
-import { ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiPropertyOptional } from "@nestjs/swagger"
+import { IsOptional, IsString } from "class-validator"
+
+import { PagedSortedAndFilteredResultQuery } from "../../common/queries/PagedResult.query.js"
 
 export class GetAuthorsQuery extends PagedSortedAndFilteredResultQuery {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  firstName?: string;
+  firstName?: string
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  lastName?: string;
+  lastName?: string
 }

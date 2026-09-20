@@ -5,10 +5,10 @@ import {
   Injectable,
   Logger,
   //NotFoundException,
-} from '@nestjs/common'
+} from "@nestjs/common"
+import { REQUEST } from "@nestjs/core"
 //import { RolesService } from "../../roles/roles.service";
-import type { Request } from 'express'
-import { REQUEST } from '@nestjs/core'
+import type { Request } from "express"
 
 @Injectable()
 export class AuthService {

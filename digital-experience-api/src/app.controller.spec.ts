@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { AppController } from './app.controller.js'
-import { AppService } from './app.service.js'
-import { ConfigModule } from '@nestjs/config'
-import { describe, beforeEach, it, expect } from 'vitest'
+import { ConfigModule } from "@nestjs/config"
+import { Test, TestingModule } from "@nestjs/testing"
+import { describe, beforeEach, it, expect } from "vitest"
 
-describe('AppController', () => {
+import { AppController } from "./app.controller.js"
+import { AppService } from "./app.service.js"
+
+describe("AppController", () => {
   let appController: AppController
 
   beforeEach(async () => {
@@ -17,9 +18,9 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController)
   })
 
-  describe('root', () => {
+  describe("root", () => {
     it('should return "Healthy"', () => {
-      expect(appController.health()).toBe('Healthy')
+      expect(appController.health()).toBe("Healthy")
     })
   })
 })

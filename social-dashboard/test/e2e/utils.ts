@@ -2,7 +2,7 @@
  * 测试辅助工具函数
  */
 
-import { Page } from '@playwright/test'
+import { Page } from "@playwright/test"
 
 /**
  * 等待网络空闲
@@ -10,7 +10,7 @@ import { Page } from '@playwright/test'
  * @param timeout 超时时间
  */
 export async function waitForNetworkIdle(page: Page) {
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState("networkidle")
   await page.waitForTimeout(1000) // 额外等待1秒确保数据加载完成
 }
 
@@ -38,11 +38,11 @@ export async function performSearch(
 
   if (searchParams?.roomId) {
     // 填入房间ID
-    await page.locator('.ant-select-selector input').nth(0).fill(searchParams.roomId)
+    await page.locator(".ant-select-selector input").nth(0).fill(searchParams.roomId)
     await page.waitForTimeout(1000) // 等待选项加载
 
     // 选择第一个匹配项
-    const options = page.locator('.ant-select-item-option')
+    const options = page.locator(".ant-select-item-option")
     if ((await options.count()) > 0) {
       await options.first().click()
     }
@@ -50,7 +50,7 @@ export async function performSearch(
 
   if (searchParams?.timeRange) {
     // 打开日期选择器
-    const datePickerInputs = page.locator('.ant-picker-range-wrapper input')
+    const datePickerInputs = page.locator(".ant-picker-range-wrapper input")
     await datePickerInputs.first().click()
 
     // 选择日期
@@ -63,7 +63,7 @@ export async function performSearch(
   }
 
   // 点击搜索按钮
-  await page.getByRole('button', { name: '搜索' }).click()
+  await page.getByRole("button", { name: "搜索" }).click()
 
   // 等待搜索结果
   await waitForNetworkIdle(page)
@@ -74,7 +74,7 @@ export async function performSearch(
  * @param page 页面实例
  */
 export async function resetSearch(page: Page) {
-  await page.getByRole('button', { name: '重置' }).click()
+  await page.getByRole("button", { name: "重置" }).click()
   await waitForNetworkIdle(page)
 }
 
@@ -85,8 +85,8 @@ export async function resetSearch(page: Page) {
  * @returns 是否找到文本
  */
 export async function hasTextInTable(page: Page, text: string): Promise<boolean> {
-  const table = page.locator('.ant-table-tbody')
-  const rows = table.locator('tr')
+  const table = page.locator(".ant-table-tbody")
+  const rows = table.locator("tr")
   const rowCount = await rows.count()
 
   for (let i = 0; i < rowCount; i++) {
@@ -106,7 +106,7 @@ export async function hasTextInTable(page: Page, text: string): Promise<boolean>
  * @returns 表格行数
  */
 export async function getTableRowCount(page: Page): Promise<number> {
-  const rows = page.locator('.ant-table-tbody tr')
+  const rows = page.locator(".ant-table-tbody tr")
   return await rows.count()
 }
 

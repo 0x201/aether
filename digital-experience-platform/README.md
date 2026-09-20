@@ -131,6 +131,7 @@ The application uses Angular CLI for project management and follows the standard
 - `proxy.conf.json` - Proxy configuration for API requests
 
 The application is configured with:
+
 - Zoneless change detection for better performance
 - SCSS for styling
 - Standalone components (Angular 19+ approach)
@@ -141,6 +142,7 @@ The application is configured with:
 To deploy the application:
 
 1. Build the application for production:
+
    ```bash
    pnpm build --prod
    ```

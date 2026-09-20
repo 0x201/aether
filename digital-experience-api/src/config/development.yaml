@@ -1,5 +1,5 @@
 NODE_ENV: Development
-APP_VERSION: '0.0.1'
+APP_VERSION: "0.0.1"
 HTTP_PORT: 3000
 
 database:
@@ -7,7 +7,7 @@ database:
   logging: false
   encrypt: true
   timeout: 30000
-  schema: 'bookstore'
+  schema: "bookstore"
 
 keycloak:
   realm: aether
@@ -15,10 +15,10 @@ keycloak:
   clientId: bookstoreapi
   clientSecret:
   scopes:
-    profile: 'User profile information'
-    email: 'User email address'
-    openid: 'OpenID Connect scope'
-    roles: 'User roles'
+    profile: "User profile information"
+    email: "User email address"
+    openid: "OpenID Connect scope"
+    roles: "User roles"
 
 cache:
   db: 0
@@ -27,6 +27,6 @@ cache:
     rejectUnauth: false
 
 messaging:
-  excchange: 'mc_event_bus'
-  queue: 'Bookstore'
-  virtual_host: '/'
+  excchange: "mc_event_bus"
+  queue: "Bookstore"
+  virtual_host: "/"

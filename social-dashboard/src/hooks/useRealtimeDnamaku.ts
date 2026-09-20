@@ -3,11 +3,12 @@ import {
   HubConnectionBuilder,
   HubConnectionState,
   type HubConnection,
-} from '@microsoft/signalr'
-import type { Danmaku } from '../interface/danmaku/type'
-import { useCallback, useEffect, useRef, useState } from 'react'
+} from "@microsoft/signalr"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-const HUB_URL = '/api/danmaku-hub'
+import type { Danmaku } from "../interface/danmaku/type"
+
+const HUB_URL = "/api/danmaku-hub"
 const MAX_DANMAKU = 100
 const DRAIN_INTERVAL_MS = 1000
 
@@ -66,18 +67,18 @@ export function useRealtimeDanmaku(): UseRealtimeDanmakuReturn {
       })
       .withAutomaticReconnect([0, 2000, 10000, 30000])
       .build()
-    hub.on('ReceiveDanmakus', (danmakuItems: Danmaku[]) => {
+    hub.on("ReceiveDanmakus", (danmakuItems: Danmaku[]) => {
       danmakuQueueRef.current = [...danmakuQueueRef.current, ...danmakuItems]
     })
 
-    hub.on('RoomJoined', (message: string) => {
+    hub.on("RoomJoined", (message: string) => {
       isJoinedRef.current = true
       setIsJoined(true)
-      console.log('User joined:', message)
+      console.log("User joined:", message)
     })
 
-    hub.on('RoomLeft', (message: string) => {
-      console.log('User left:', message)
+    hub.on("RoomLeft", (message: string) => {
+      console.log("User left:", message)
       isJoinedRef.current = false
       setIsJoined(false)
       clearDanmaku()
@@ -92,7 +93,7 @@ export function useRealtimeDanmaku(): UseRealtimeDanmakuReturn {
 
       if (isJoinedRef.current && currentRoomIdRef.current !== null) {
         try {
-          await hub.invoke('JoinRoom', currentRoomIdRef.current)
+          await hub.invoke("JoinRoom", currentRoomIdRef.current)
         } catch {
           isJoinedRef.current = false
           setIsJoined(false)
@@ -140,13 +141,13 @@ export function useRealtimeDanmaku(): UseRealtimeDanmakuReturn {
   const joinRoom = useCallback(async (roomId: number) => {
     const hub = connectionRef.current
     if (!hub || hub.state !== HubConnectionState.Connected) return
-    await hub.invoke('JoinRoom', roomId)
+    await hub.invoke("JoinRoom", roomId)
     currentRoomIdRef.current = roomId
   }, [])
   const leaveRoom = useCallback(async (roomId: number) => {
     const hub = connectionRef.current
     if (!hub || hub.state !== HubConnectionState.Connected) return
-    await hub.invoke('LeaveRoom', roomId)
+    await hub.invoke("LeaveRoom", roomId)
     currentRoomIdRef.current = null
   }, [])
 

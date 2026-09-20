@@ -1,16 +1,17 @@
-import { test, expect } from '@playwright/test'
-import { waitForNetworkIdle } from './utils'
+import { test, expect } from "@playwright/test"
 
-const baseUrl = 'http://localhost:3015'
+import { waitForNetworkIdle } from "./utils"
+
+const baseUrl = "http://localhost:3015"
 const homeUrl = `${baseUrl}/`
 
-test.describe('Home View E2E Tests', () => {
-  test('should load the home page and display navigation links', async ({ page }) => {
+test.describe("Home View E2E Tests", () => {
+  test("should load the home page and display navigation links", async ({ page }) => {
     // Mock the API response if needed
-    await page.route('**/api/**', (route) => {
+    await page.route("**/api/**", (route) => {
       route.fulfill({
         status: 200,
-        contentType: 'application/json',
+        contentType: "application/json",
         body: JSON.stringify({}),
       })
     })
@@ -19,7 +20,7 @@ test.describe('Home View E2E Tests', () => {
     await waitForNetworkIdle(page)
 
     // Check if the home page title or main heading is visible
-    await expect(page.locator('h1, h2, h3, .home-title, .app-title').first())
+    await expect(page.locator("h1, h2, h3, .home-title, .app-title").first())
       .toBeVisible()
       .catch(() => {
         // If no specific title is found, check for general page elements
@@ -33,10 +34,10 @@ test.describe('Home View E2E Tests', () => {
     expect(await navLinks.count()).toBeGreaterThan(0)
 
     // Verify that the layout component is loaded
-    await expect(page.locator('.layout-container, .default-layout')).toBeVisible()
+    await expect(page.locator(".layout-container, .default-layout")).toBeVisible()
   })
 
-  test('should navigate to management page from home', async ({ page }) => {
+  test("should navigate to management page from home", async ({ page }) => {
     await page.goto(homeUrl)
     await waitForNetworkIdle(page)
 
@@ -53,7 +54,7 @@ test.describe('Home View E2E Tests', () => {
     }
   })
 
-  test('should navigate to dashboard from home', async ({ page }) => {
+  test("should navigate to dashboard from home", async ({ page }) => {
     await page.goto(homeUrl)
     await waitForNetworkIdle(page)
 
@@ -62,39 +63,39 @@ test.describe('Home View E2E Tests', () => {
     if ((await dashboardLink.count()) > 0) {
       await dashboardLink.click()
       await page.waitForURL(/\/dashboard|\/home/)
-      await expect(page.locator('text=仪表板|dashboard|统计')).toBeVisible()
+      await expect(page.locator("text=仪表板|dashboard|统计")).toBeVisible()
     } else {
       // If no direct link found, test manually navigating
       await page.goto(`${baseUrl}/dashboard`)
-      await expect(page.locator('text=仪表板|dashboard|统计')).toBeVisible()
+      await expect(page.locator("text=仪表板|dashboard|统计")).toBeVisible()
     }
   })
 
-  test('should have theme toggle functionality', async ({ page }) => {
+  test("should have theme toggle functionality", async ({ page }) => {
     await page.goto(homeUrl)
     await waitForNetworkIdle(page)
 
     // Check for theme toggle button
-    const themeToggle = page.locator('.theme-toggle, .dark-mode-toggle, [data-theme-toggle]')
+    const themeToggle = page.locator(".theme-toggle, .dark-mode-toggle, [data-theme-toggle]")
     if ((await themeToggle.count()) > 0) {
-      const initialThemeClass = await page.locator('body, html').getAttribute('class')
+      const initialThemeClass = await page.locator("body, html").getAttribute("class")
 
       await themeToggle.click()
       await page.waitForTimeout(300) // Wait for transition
 
-      const newThemeClass = await page.locator('body, html').getAttribute('class')
+      const newThemeClass = await page.locator("body, html").getAttribute("class")
       expect(initialThemeClass).not.toEqual(newThemeClass)
     }
   })
 
-  test('should render footer and header components', async ({ page }) => {
+  test("should render footer and header components", async ({ page }) => {
     await page.goto(homeUrl)
     await waitForNetworkIdle(page)
 
     // Check for header
-    await expect(page.locator('header, .header, .app-header, nav')).toBeVisible()
+    await expect(page.locator("header, .header, .app-header, nav")).toBeVisible()
 
     // Check for footer
-    await expect(page.locator('footer, .footer, .app-footer')).toBeVisible()
+    await expect(page.locator("footer, .footer, .app-footer")).toBeVisible()
   })
 })

@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common'
-import { DataSeedService } from './data-seed.service.js'
-import { RolesModule } from '@/src/roles/roles.module.js'
-import { BooksModule } from '@/src/books/books.module.js'
-import { AuthorsModule } from '@/src/authors/authors.module.js'
-import { MenusModule } from '@/src/menus/menus.module.js'
+import { Module } from "@nestjs/common"
+
+import { AuthorsModule } from "@/src/authors/authors.module.js"
+import { BooksModule } from "@/src/books/books.module.js"
+import { MenusModule } from "@/src/menus/menus.module.js"
+import { RolesModule } from "@/src/roles/roles.module.js"
+
+import { DataSeedService } from "./data-seed.service.js"
 
 @Module({
   imports: [RolesModule, BooksModule, AuthorsModule, MenusModule],

@@ -1,6 +1,7 @@
-import 'reflect-metadata'
-import { beforeAll, afterEach, afterAll } from 'vitest'
-import { testDataSource } from './environment.js'
+import "reflect-metadata"
+import { beforeAll, afterEach, afterAll } from "vitest"
+
+import { testDataSource } from "./environment.js"
 
 beforeAll(async () => {
   if (!testDataSource.isInitialized) {

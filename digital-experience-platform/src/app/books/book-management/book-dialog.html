@@ -3,7 +3,7 @@
   <form [formGroup]="bookForm" class="book-dialog">
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Title</mat-label>
-      <input matInput formControlName="title" required>
+      <input matInput formControlName="title" required />
       @if (bookForm.get('title')?.hasError('required')) {
       <mat-error>Title is required</mat-error>
       }
@@ -11,7 +11,7 @@
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>ISBN</mat-label>
-      <input matInput formControlName="isbn" required>
+      <input matInput formControlName="isbn" required />
       @if (bookForm.get('isbn')?.hasError('required')) {
       <mat-error>ISBN is required</mat-error>
       }
@@ -19,18 +19,17 @@
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Price</mat-label>
-      <input matInput type="number" formControlName="price" required>
+      <input matInput type="number" formControlName="price" required />
       @if (bookForm.get('price')?.hasError('required')) {
       <mat-error>Price is required</mat-error>
-      }
-      @if (bookForm.get('price')?.hasError('min')) {
+      } @if (bookForm.get('price')?.hasError('min')) {
       <mat-error>Price must be greater than 0</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="form-field">
       <mat-label>Publish Date</mat-label>
-      <input matInput [matDatepicker]="publishDatePicker" formControlName="publishDate">
+      <input matInput [matDatepicker]="publishDatePicker" formControlName="publishDate" />
       <mat-datepicker-toggle matSuffix [for]="publishDatePicker"></mat-datepicker-toggle>
       <mat-datepicker #publishDatePicker></mat-datepicker>
     </mat-form-field>
@@ -44,7 +43,7 @@
       <mat-label>Authors</mat-label>
       <mat-select formControlName="authors" multiple [compareWith]="compareAuthors">
         @for (author of allAuthors; track author) {
-        <mat-option [value]="author">{{ `${author.firstName} ${author.lastName}`  }}</mat-option>
+        <mat-option [value]="author">{{ `${author.firstName} ${author.lastName}` }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -52,6 +51,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="bookForm.invalid">{{ data.book ? "Update" :
-    "Create" }}</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="bookForm.invalid">
+    {{ data.book ? "Update" : "Create" }}
+  </button>
 </mat-dialog-actions>

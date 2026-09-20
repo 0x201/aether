@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useCallback } from 'react'
-import './styles.css'
-import type { DanmakuDisplayProps } from './type'
+import React, { useEffect, useRef, useCallback } from "react"
+
+import "./styles.css"
+import type { DanmakuDisplayProps } from "./type"
 
 const DanmakuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProps) => {
   const { danmakuList, autoScroll = true } = props
@@ -10,7 +11,7 @@ const DanmakuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProp
   const isAutoScrollingRef = useRef<boolean>(true)
 
   const calculateUserLevelDataLevel = (userLevel: string | number): number => {
-    const levelNum = parseInt(userLevel.toString().replace(/[^0-9]/g, '')) || 0
+    const levelNum = parseInt(userLevel.toString().replace(/[^0-9]/g, "")) || 0
     switch (true) {
       case levelNum >= 1 && levelNum <= 14:
         return 0
@@ -63,8 +64,8 @@ const DanmakuDisplay: React.FC<DanmakuDisplayProps> = (props: DanmakuDisplayProp
   useEffect(() => {
     const container = danmakuContainerRef.current
     if (container) {
-      container.addEventListener('scroll', handleScroll)
-      return () => container.removeEventListener('scroll', handleScroll)
+      container.addEventListener("scroll", handleScroll)
+      return () => container.removeEventListener("scroll", handleScroll)
     }
   }, [handleScroll])
 

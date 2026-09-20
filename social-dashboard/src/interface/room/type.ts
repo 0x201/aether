@@ -3,7 +3,7 @@ import type {
   SortedRequest,
   TimeRangeRequest,
   PaginationResponse,
-} from '@/src/interface/shared/type'
+} from "@/src/interface/shared/type"
 
 export interface Room {
   id: number

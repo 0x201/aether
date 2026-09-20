@@ -1,46 +1,50 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js'
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath } from "node:url"
+
+import { paraglideVitePlugin } from "@inlang/paraglide-js"
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite"
 
 // https://vite.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('.', import.meta.url)),
+      "@": fileURLToPath(new URL(".", import.meta.url)),
     },
   },
-  plugins: [paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' }),react()],
+  plugins: [
+    paraglideVitePlugin({ project: "./project.inlang", outdir: "./src/paraglide" }),
+    react(),
+  ],
   build: {
     rolldownOptions: {
       output: {
         codeSplitting: {
           groups: [
             {
-              name: 'react-vendor',
+              name: "react-vendor",
               test: /\/react(?:-dom)?/,
             },
             {
-              name: 'antd-vendor',
+              name: "antd-vendor",
               test: /antd/,
               minSize: 100000,
               maxSize: 250000,
               priority: 10,
             },
             {
-              name: 'signalr-vendor',
+              name: "signalr-vendor",
               test: /@microsoft\/signalr/,
             },
             {
-              name: 'icons-vendor',
+              name: "icons-vendor",
               test: /@ant-design\/icons/,
             },
             {
-              name: 'lodash-vendor',
+              name: "lodash-vendor",
               test: /lodash/,
             },
             {
-              name: 'date-fns-vendor',
+              name: "date-fns-vendor",
               test: /date-fns/,
             },
           ],
@@ -50,16 +54,16 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: parseInt(process.env.PORT ?? '5175'),
+    port: parseInt(process.env.PORT ?? "5175"),
     proxy: {
-      '/api': {
+      "/api": {
         target:
           process.env.services__dydanmakuapi__http__0 ||
           process.env.services__dydanmakuapi__https__0,
         changeOrigin: true,
         ws: true,
-        secure: process.env['NODE_ENV'] !== 'development',
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: process.env["NODE_ENV"] !== "development",
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },

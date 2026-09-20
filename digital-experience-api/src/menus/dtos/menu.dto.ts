@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { RoleDto } from '@/src/roles/dtos/role.dto.js'
+import { ApiProperty } from "@nestjs/swagger"
+
+import { RoleDto } from "@/src/roles/dtos/role.dto.js"
 
 export class MenuDto {
   @ApiProperty()
