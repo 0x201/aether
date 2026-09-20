@@ -1,5 +1,7 @@
 import os
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from inspect import isawaitable
 
 import uvicorn
 from fastapi import FastAPI
@@ -7,51 +9,54 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from scalar_fastapi import Theme, get_scalar_api_reference
 
+from container import create_app_conatiner
 from src.api import api_router
+from src.container import AppContainer
 from src.core import AppConfig
-from src.deps import AppContainer
 from src.logging_utils import setup_logging
 from src.middleware.logging_middleware import LoggingMiddleware
 from src.schedulers import set_container, start_scheduled_tasks, stop_scheduled_tasks
 from src.telemetry import configure_telemetry
 
-container = AppContainer()
 
-
-def get_app_config() -> AppConfig:
-    return container.app_config()
+async def maybe_await(value: object) -> None:
+    if isawaitable(value):
+        await value
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Start scheduled analyzer and capture job scheduler on app startup"""
-    app_config = get_app_config()
-    container.config.from_dict(app_config.model_dump())
-    app.state.container = container
-    set_container(container)
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    container: AppContainer = app.state.container
 
-    setup_logging(app_config)
-    configure_telemetry(app, app_config, service_name=app_config.otel_service_name)
+    await maybe_await(container.init_resources())
 
-    start_scheduled_tasks()
-    logger.info("Application started successfully")
-    yield
+    try:
+        app_config: AppConfig = container.app_config()
 
-    """Stop schedulers and terminate all capture jobs on app shutdown"""
-    stop_scheduled_tasks()
+        set_container(container)
+        setup_logging(app_config)
+        configure_telemetry(app, app_config, service_name=app_config.otel_service_name)
 
-    if hasattr(app.state, "container"):
-        event_bus = app.state.container.event_bus()
-        event_bus.close()
+        start_scheduled_tasks()
+        logger.info("Application started successfully")
 
-    logger.info("Application shutdown successfully")
+        yield
+    finally:
+        stop_scheduled_tasks()
+        await maybe_await(container.shutdown_resources())
+        logger.info("Application shutdown successfully")
 
 
 def create_app() -> FastAPI:
-    app_config = get_app_config()
+    container = create_app_conatiner()
+
+    app_config = container.app_config()
     app = FastAPI(
         title=app_config.project_name, version=app_config.version, lifespan=lifespan
     )
+
+    app.state.container = container
+
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -94,7 +99,7 @@ async def scalar_html():
 
 
 if __name__ == "__main__":
-    app_config = get_app_config()
+    app_config = AppConfig()
     uvicorn.run(
         "main:app",
         host=app_config.host,

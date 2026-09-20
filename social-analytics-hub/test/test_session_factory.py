@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from core import AppConfig
-from src.database.session_factory import SessionFactory
+from src.database.session_factory import DatabaseFactory
 
 
 class TestSessionFactory:
@@ -13,7 +13,7 @@ class TestSessionFactory:
     def setup_mocks(self, mocker):
         """Setup mocks automatically for all tests in this class"""
         app_config = mocker.Mock(AppConfig)
-        self.session_factory = SessionFactory(app_config)
+        self.session_factory = DatabaseFactory(app_config)
 
         # Mock the _get_database method to return a mocked database instance
         self.db_mock = mocker.Mock()

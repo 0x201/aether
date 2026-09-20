@@ -67,25 +67,6 @@ class LoggingConfig(BaseModel):
     enable_file: bool = Field(default=True, description="Enable file logging")
 
 
-class NPPAConfig(BaseModel):
-    base_url: str = Field(default="", description="Base URL for NPPAs")
-    foreign_network_game_url: str = Field(
-        default="", description="Imported online game audit info URL"
-    )
-    import_egame_url: str = Field(
-        default="", description="Imported electronic game audit info URL"
-    )
-    domestic_network_game_url: str = Field(
-        default="", description="Domestic online game audit info URL"
-    )
-    game_alteration_url: str = Field(
-        default="", description="Game audit alteration info URL"
-    )
-    game_revocation_url: str = Field(
-        default="", description="Game audit revocation info URL"
-    )
-
-
 class RabbitMQConfig(BaseModel):
     rabbitmq_host: str = Field(
         default=os.getenv("EVENTBUS_HOST", "localhost"), description="RabbitMQ host"
@@ -149,7 +130,6 @@ class AppConfig(BaseSettings):
     logging: LoggingConfig = Field(
         default=LoggingConfig(), description="Logging configuration"
     )
-    nppa: NPPAConfig = Field(default=NPPAConfig(), description="NPPAs configuration")
     messaging: RabbitMQConfig = Field(
         default=RabbitMQConfig(), description="RabbitMQ configuration"
     )

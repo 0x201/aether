@@ -1,6 +1,6 @@
 import pytest
 
-from src.services.analytics_notification import AnalyticsNotification
+from src.services.analytics_notification import AnalyticsNotificationService
 
 
 class TestAnalyticsNotification:
@@ -8,12 +8,12 @@ class TestAnalyticsNotification:
     def setup_mocks(self, mocker):
         """Setup mocks automatically for all tests in this class"""
         self.event_bus_mock = mocker.Mock()
-        self.notifier = AnalyticsNotification(event_bus=self.event_bus_mock)
+        self.notifier = AnalyticsNotificationService(event_bus=self.event_bus_mock)
 
     def test_initialization(self, mocker):
         # Arrange & Act
         event_bus_mock = mocker.Mock()
-        notifier = AnalyticsNotification(event_bus=event_bus_mock)
+        notifier = AnalyticsNotificationService(event_bus=event_bus_mock)
 
         # Assert
         assert notifier.event_bus == event_bus_mock
@@ -22,7 +22,7 @@ class TestAnalyticsNotification:
         # Arrange
         event_bus_mock = mocker.Mock()
         event_bus_mock.publish = mocker.Mock(return_value=True)
-        notifier = AnalyticsNotification(event_bus=event_bus_mock)
+        notifier = AnalyticsNotificationService(event_bus=event_bus_mock)
 
         # Act
         result = notifier.notify_analytics_completed(
@@ -42,7 +42,7 @@ class TestAnalyticsNotification:
         # Arrange
         event_bus_mock = mocker.Mock()
         event_bus_mock.publish = mocker.Mock(return_value=False)
-        notifier = AnalyticsNotification(event_bus=event_bus_mock)
+        notifier = AnalyticsNotificationService(event_bus=event_bus_mock)
 
         # Act
         result = notifier.notify_analytics_completed(
@@ -62,7 +62,7 @@ class TestAnalyticsNotification:
         # Arrange
         event_bus_mock = mocker.Mock()
         event_bus_mock.publish = mocker.Mock(return_value=True)
-        notifier = AnalyticsNotification(event_bus=event_bus_mock)
+        notifier = AnalyticsNotificationService(event_bus=event_bus_mock)
 
         # Act
         result = notifier.notify_analytics_completed(
@@ -82,7 +82,7 @@ class TestAnalyticsNotification:
         # Arrange
         event_bus_mock = mocker.Mock()
         event_bus_mock.publish = mocker.Mock(return_value=True)
-        notifier = AnalyticsNotification(event_bus=event_bus_mock)
+        notifier = AnalyticsNotificationService(event_bus=event_bus_mock)
 
         # Act
         result = notifier.notify_analytics_completed(
@@ -102,7 +102,7 @@ class TestAnalyticsNotification:
         # Arrange
         event_bus_mock = mocker.Mock()
         event_bus_mock.publish = mocker.Mock(return_value=True)
-        notifier = AnalyticsNotification(event_bus=event_bus_mock)
+        notifier = AnalyticsNotificationService(event_bus=event_bus_mock)
 
         # Act
         result = notifier.notify_analytics_completed(

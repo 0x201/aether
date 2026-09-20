@@ -5,8 +5,13 @@ cors:
   - "http://localhost:5173"
 
 databases:
+  db_type: "postgresql"
   postgres:
-    dbschema: "dydanmaku"
+    host: "localhost"
+    port: 5432
+    username: ""
+    password: ""
+    schema: "dydanmaku"
 
 logging:
   level: "INFO"
@@ -16,14 +21,6 @@ logging:
   dir_path: "./logs/"
   enable_console: true
   enable_file: true
-
-nppa:
-  base_url: "https://www.nppa.gov.cn/bsfw/jggs/yxspjg"
-  foreign_network_game_url: "/jkwlyxspxx/"
-  import_egame_url: "/jkdzyxspxx/"
-  domestic_network_game_url: "/gcwlyxspxx/"
-  game_alteration_url: "/yxspbgxx/"
-  game_revocation_url: "/yxspcxxx/"
 
 messaging:
   virtual_host: "/"

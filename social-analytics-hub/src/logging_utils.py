@@ -28,34 +28,34 @@ class InterceptHandler(logging.Handler):
         )
 
 
-def setup_logging(settings: AppConfig) -> None:
+def setup_logging(app_config: AppConfig) -> None:
     logger.remove()
 
-    if settings.logging.enable_console:
+    if app_config.logging.enable_console:
         logger.add(
             sys.stdout,
-            format=settings.logging.format,
-            level=settings.logging.level,
+            format=app_config.logging.format,
+            level=app_config.logging.level,
             colorize=True,
         )
 
-    if settings.logging.enable_file:
-        log_dir = Path(settings.logging.dir_path)
+    if app_config.logging.enable_file:
+        log_dir = Path(app_config.logging.dir_path)
         log_dir.mkdir(parents=True, exist_ok=True)
 
         logger.add(
             log_dir / "app_{time:YYYY-MM-DD}.log",
-            format=settings.logging.format,
-            level=settings.logging.level,
-            rotation=settings.logging.rotation,
-            serialize=settings.logging.serialize,
+            format=app_config.logging.format,
+            level=app_config.logging.level,
+            rotation=app_config.logging.rotation,
+            serialize=app_config.logging.serialize,
             enqueue=True,
         )
 
-    resource = Resource.create({"service.name": settings.otel_service_name})
+    resource = Resource.create({"service.name": app_config.otel_service_name})
     logger_provider = LoggerProvider(resource=resource)
 
-    log_exporter = OTLPLogExporter(endpoint=settings.otel_exporter_otlp_endpoint)
+    log_exporter = OTLPLogExporter(endpoint=app_config.otel_exporter_otlp_endpoint)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
     otel_handler = LoggingHandler(level=logging.NOTSET, logger_provider=logger_provider)
@@ -63,7 +63,7 @@ def setup_logging(settings: AppConfig) -> None:
     intercept_handler = InterceptHandler()
     logging.root.addHandler(intercept_handler)
     logging.root.addHandler(otel_handler)
-    logging.root.setLevel(getattr(logging, settings.logging.level))
+    logging.root.setLevel(getattr(logging, app_config.logging.level))
 
     for uvicorn_name in ["uvicorn", "uvicorn.error", "fastapi"]:
         uvicorn_logger = logging.getLogger(uvicorn_name)

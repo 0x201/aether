@@ -23,7 +23,7 @@ class TestScheduledDanmakuAnalyzer:
         self.event_bus_mock = mocker.Mock()
 
         self.scheduled_analyzer = ScheduledDanmakuAnalyzer(
-            session_factory=self.session_factory_mock,
+            db_manager=self.session_factory_mock,
             danmaku_analyzer=self.analyzer_mock,
             event_bus=self.event_bus_mock,
         )

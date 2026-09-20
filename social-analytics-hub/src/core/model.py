@@ -1,7 +1,9 @@
+from typing import Any
 import os
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+from sqlalchemy import URL
 
 
 class DatabaseType(StrEnum):
@@ -93,10 +95,16 @@ class PostgreSQLConfig(BaseModel):
     )
     dbschema: str | None = Field(None, description="Database schema")
 
+    echo: bool = Field(False)
+    pool_size: int = Field(10)
+    max_overflow: int = Field(20)
+    pool_timeout: int = Field(30)
+    pool_recycle: int = Field(3600)
+    pool_pre_ping: bool = Field(True)
+
     @field_validator("host")
     @classmethod
     def host_must_not_be_empty(cls, v: str | None, info) -> str | None:
-        # Only validate server if we're using PostgreSQL
         if info.data.get("type") == DatabaseType.POSTGRESQL:
             if not v or not v.strip():
                 raise ValueError("Server must not be empty for PostgreSQL")
@@ -112,7 +120,6 @@ class PostgreSQLConfig(BaseModel):
     @field_validator("database")
     @classmethod
     def database_must_not_be_empty(cls, v: str | None, info) -> str | None:
-        # Only validate database if we're using PostgreSQL
         if info.data.get("type") == DatabaseType.POSTGRESQL:
             if v is not None and not v.strip():
                 raise ValueError("Database must not be empty for PostgreSQL")
@@ -121,7 +128,6 @@ class PostgreSQLConfig(BaseModel):
     @field_validator("username")
     @classmethod
     def username_must_not_be_empty(cls, v: str | None, info) -> str | None:
-        # Only validate username if we're using PostgreSQL
         if info.data.get("type") == DatabaseType.POSTGRESQL:
             if v is not None and not v.strip():
                 raise ValueError("Username must not be empty for PostgreSQL")
@@ -130,4 +136,5 @@ class PostgreSQLConfig(BaseModel):
 
 class DatabaseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    db_type: DatabaseType = Field(DatabaseType.POSTGRESQL, description="Database type")
     postgres: PostgreSQLConfig | None = Field(None, description="PostgreSQL config")
