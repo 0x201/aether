@@ -1,10 +1,10 @@
-# Bookstore API
+# Digital Experience API
 
-A modern bookstore API built with NestJS, TypeScript, and TypeORM. This API provides comprehensive functionality for managing books, authors, users, and roles in a bookstore system.
+A modern digital experience API built with NestJS, TypeScript, and TypeORM. This API provides comprehensive functionality for managing books, authors, users, and roles in a bookstore system.
 
 ## Table of Contents
 
-- [Bookstore API](#bookstore-api)
+- [Digital Experience API](#digital-experience-api)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Features](#features)
@@ -31,7 +31,7 @@ A modern bookstore API built with NestJS, TypeScript, and TypeORM. This API prov
 
 ## Overview
 
-The Bookstore API is a RESTful API service that provides backend functionality for a bookstore application. It includes features for managing books, authors, users, and roles with a complete authentication system.
+The Digital Experience API is a RESTful API service that provides backend functionality for a bookstore application. It includes features for managing books, authors, users, and roles with a complete authentication system.
 
 ## Features
 
@@ -49,7 +49,7 @@ The Bookstore API is a RESTful API service that provides backend functionality f
 - [TypeScript](https://www.typescriptlang.org/) - Typed superset of JavaScript
 - [TypeORM](https://typeorm.io/) - ORM for TypeScript and JavaScript
 - [JWT](https://jwt.io/) - JSON Web Token implementation for authentication
-- [Jest](https://jestjs.io/) - Testing framework
+- [Vitest](https://vitest.dev/) - Testing framework
 - [PNPM](https://pnpm.io/) - Fast, disk space efficient package manager
 - [Docker](https://www.docker.com/) - Containerization platform
 
