@@ -12,11 +12,11 @@ export class KeycloakStrategy {
 
   constructor(private readonly configService: ConfigService) {
     this.keycloakConfig = {
-      realm: this.configService.get<string>("keycloak.realm"),
-      "auth-server-url": this.configService.get<string>("keycloak.authServerUrl"),
-      resource: this.configService.get<string>("keycloak.clientId"),
-      clientId: this.configService.get<string>("keycloak.clientId"),
-      clientSecret: this.configService.get<string>("keycloak.clientSecret"),
+      realm: this.configService.get<string>("keycloak.realm")!,
+      "auth-server-url": this.configService.get<string>("keycloak.authServerUrl")!,
+      resource: this.configService.get<string>("keycloak.clientId")!,
+      clientId: this.configService.get<string>("keycloak.clientId")!,
+      clientSecret: this.configService.get<string>("keycloak.clientSecret")!,
       "ssl-required": "external",
       "confidential-port": 8080,
     }

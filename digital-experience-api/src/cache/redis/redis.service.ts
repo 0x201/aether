@@ -115,6 +115,7 @@ export class RedisService implements OnModuleDestroy {
   getConnectionStatus(): string {
     return this.client?.status || "disconnected"
   }
+
   async ping(): Promise<string> {
     const client = this.getClient()
     return client.ping()

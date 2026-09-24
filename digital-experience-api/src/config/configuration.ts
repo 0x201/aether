@@ -22,7 +22,7 @@ function getRedisSslConfig() {
 }
 
 export default () => {
-  const config = yaml.load(readFileSync(join(__dirname, YAML_CONFIG_FILENAME), "utf8")) as AppConfig
+  const config = yaml.load(readFileSync(join(import.meta.dirname, YAML_CONFIG_FILENAME), "utf8")) as AppConfig
 
   const sslConfig = getRedisSslConfig()
   config.cache = {

@@ -7,7 +7,7 @@
     "assets": [
       {
         "include": "./config/*.yaml",
-        "outDir": "./dist/src"
+        "outDir": "./dist"
       }
     ]
   }

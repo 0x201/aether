@@ -1,7 +1,15 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import type { Relation } from "typeorm";
 
-import { Role } from "../../roles/entities/role.entity.js"
-import { Menu } from "./menu.entity.js"
+import { Role } from "../../roles/entities/role.entity.js";
+import { Menu } from "./menu.entity.js";
 
 @Entity("role_menu", { schema: "bookstore" })
 @Index("role_menu_role_id_menu_id_idx", ["menuId", "roleId"], { unique: true })
@@ -10,29 +18,29 @@ export class RoleMenu {
     name: "id",
     primaryKeyConstraintName: "role_menu_pk",
   })
-  id: number
+  id: number;
 
   @Column({ name: "menu_id" })
-  menuId: number
+  menuId: number;
 
   @Column({ name: "role_id" })
-  roleId: number
+  roleId: number;
 
   @Column({ name: "assigned_at" })
-  assignedAt: string
+  assignedAt: string;
 
   @Column({ name: "assigned_by", length: 100, nullable: true })
-  assignedBy: string
+  assignedBy: string | null;
 
   @ManyToOne(() => Role, (role) => role.roleMenus, {
     createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: "role_id" })
-  role: Role
+  role: Relation<Role>;
 
   @ManyToOne(() => Menu, (menu) => menu.roleMenus, {
     createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: "menu_id" })
-  menu: Menu
+  menu: Relation<Menu>;
 }

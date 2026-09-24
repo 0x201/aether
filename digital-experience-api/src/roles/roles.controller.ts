@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Query,
   UseGuards,
+  NotFoundException,
 } from "@nestjs/common"
 import {
   ApiTags,
@@ -75,7 +76,10 @@ export class RolesController {
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Role not found" })
   async getRoleById(@Param("id", ParseIntPipe) id: number): Promise<Role> {
-    return this.rolesService.findOne(id)
+    const role = await this.rolesService.findOne(id)
+    if (!role)
+      throw new NotFoundException(`Role with id ${id} not found`)
+    return role
   }
 
   @Post()

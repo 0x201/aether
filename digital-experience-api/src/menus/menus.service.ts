@@ -175,7 +175,7 @@ export class MenusService extends GenericCrudAuditableService<
     return super.delete(id)
   }
 
-  async findOne(id: number): Promise<Menu> {
+  async findOne(id: number): Promise<Menu | null> {
     return super.findOne(id, {
       relations: {
         roleMenus: true,
