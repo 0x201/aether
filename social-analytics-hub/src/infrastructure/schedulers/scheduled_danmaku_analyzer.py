@@ -1,6 +1,4 @@
-"""
-Scheduled analyzer service for precomputing word frequency and wordcloud data
-"""
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime, timedelta
@@ -9,24 +7,17 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
 
-from src.database import PsycopgDbSessionManager
-from src.messaging import EventBus
-from src.schemas import PeriodType
-from src.services import DanmakuAnalyzer
+from src.application.danmaku.services import DanmakuAnalyzer
+from src.domain.danmaku.value_objects import AnalysisPeriod
 
 
 class TimeRangeStrategy(ABC):
-    """Time range calculation strategy interface"""
-
     @abstractmethod
     def calculate_time_range(self, now: datetime) -> tuple[datetime, datetime]:
-        """Calculate time range, return (start_time, end_time)"""
-        pass
+        raise NotImplementedError
 
 
 class HourlyTimeRangeStrategy(TimeRangeStrategy):
-    """Calculate the time range of the previous hour"""
-
     def calculate_time_range(self, now: datetime) -> tuple[datetime, datetime]:
         end_time = now.replace(minute=0, second=0, microsecond=0)
         start_time = end_time - timedelta(hours=1)
@@ -34,8 +25,6 @@ class HourlyTimeRangeStrategy(TimeRangeStrategy):
 
 
 class DailyTimeRangeStrategy(TimeRangeStrategy):
-    """Calculate the time range of the previous day"""
-
     def calculate_time_range(self, now: datetime) -> tuple[datetime, datetime]:
         end_time = now.replace(hour=0, minute=0, second=0, microsecond=0)
         start_time = end_time - timedelta(days=1)
@@ -43,25 +32,18 @@ class DailyTimeRangeStrategy(TimeRangeStrategy):
 
 
 class WeeklyTimeRangeStrategy(TimeRangeStrategy):
-    """Calculate the time range of the previous week (Monday to Sunday)"""
-
     def calculate_time_range(self, now: datetime) -> tuple[datetime, datetime]:
-        # Calculate to the Monday of the current week
-        days_since_monday = now.weekday()  # Monday is 0, Sunday is 6
+        days_since_monday = now.weekday()
         end_time = (now - timedelta(days=days_since_monday)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
-        start_time = end_time - timedelta(weeks=1)  # Last Monday
+        start_time = end_time - timedelta(weeks=1)
         return start_time, end_time
 
 
 class MonthlyTimeRangeStrategy(TimeRangeStrategy):
-    """Calculate the time range of the previous month"""
-
     def calculate_time_range(self, now: datetime) -> tuple[datetime, datetime]:
-        # Get the first day of the current month
         end_time = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        # Calculate the first day of the previous month
         if end_time.month == 1:
             start_time = end_time.replace(year=end_time.year - 1, month=12)
         else:
@@ -70,8 +52,6 @@ class MonthlyTimeRangeStrategy(TimeRangeStrategy):
 
 
 class YearlyTimeRangeStrategy(TimeRangeStrategy):
-    """Calculate the time range of the previous year"""
-
     def calculate_time_range(self, now: datetime) -> tuple[datetime, datetime]:
         end_time = now.replace(
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0
@@ -81,106 +61,85 @@ class YearlyTimeRangeStrategy(TimeRangeStrategy):
 
 
 class TimeRangeStrategyFactory:
-    """TimeRangeStrategy Factory"""
-
-    _strategies = {
-        PeriodType.HOURLY: HourlyTimeRangeStrategy(),
-        PeriodType.DAILY: DailyTimeRangeStrategy(),
-        PeriodType.WEEKLY: WeeklyTimeRangeStrategy(),
-        PeriodType.MONTHLY: MonthlyTimeRangeStrategy(),
-        PeriodType.YEARLY: YearlyTimeRangeStrategy(),
+    _strategies: dict[AnalysisPeriod, TimeRangeStrategy] = {
+        AnalysisPeriod.HOURLY: HourlyTimeRangeStrategy(),
+        AnalysisPeriod.DAILY: DailyTimeRangeStrategy(),
+        AnalysisPeriod.WEEKLY: WeeklyTimeRangeStrategy(),
+        AnalysisPeriod.MONTHLY: MonthlyTimeRangeStrategy(),
+        AnalysisPeriod.YEARLY: YearlyTimeRangeStrategy(),
     }
 
     @classmethod
-    def get_strategy(cls, date_range: PeriodType) -> TimeRangeStrategy:
+    def get_strategy(cls, date_range: AnalysisPeriod) -> TimeRangeStrategy:
         strategy = cls._strategies.get(date_range)
         if not strategy:
-            # Fallback to Hourly
-            strategy = cls._strategies[PeriodType.HOURLY]
+            strategy = cls._strategies[AnalysisPeriod.HOURLY]
         return strategy
 
 
 class ScheduledDanmakuAnalyzer:
-    def __init__(
-        self,
-        db_manager: PsycopgDbSessionManager,
-        danmaku_analyzer: DanmakuAnalyzer,
-        event_bus: EventBus,
-    ):
+    def __init__(self, danmaku_analyzer: DanmakuAnalyzer) -> None:
         self.scheduler = AsyncIOScheduler()
-        self.db_manager = db_manager
         self.analyzer = danmaku_analyzer
-        self.event_bus = event_bus
 
-    async def _execute_precompute_analyses(self, period_type: PeriodType):
+    async def _execute_precompute_analyses(self, period_type: AnalysisPeriod):
         await self._precompute_analyses(period_type)
 
-    def start(self):
-        """Start the scheduled analyzer"""
-        # Schedule the precomputation to run every hour at 1 minutes past the hour
+    def start(self) -> None:
         self.scheduler.add_job(
             self._execute_precompute_analyses,
-            CronTrigger(minute=1),  # Run at 1 minutes past each hour except midnight
+            CronTrigger(minute=1),
             id="precompute_hourly_analyses",
             name="Precompute hourly analyses",
             replace_existing=True,
-            args=[PeriodType.HOURLY],
+            args=[AnalysisPeriod.HOURLY],
         )
-
-        # Schedule daily analysis computation to run at 00:02 every day
-        # This computes analysis for the previous day, avoiding conflict with hourly job
         self.scheduler.add_job(
             self._execute_precompute_analyses,
             CronTrigger(hour=0, minute=2),
             id="precompute_daily_analyses",
             name="Precompute daily analyses",
             replace_existing=True,
-            args=[PeriodType.DAILY],
+            args=[AnalysisPeriod.DAILY],
         )
-
-        # Schedule weekly analysis computation to run on Mondays at 00:03
         self.scheduler.add_job(
             self._execute_precompute_analyses,
             CronTrigger(day_of_week=0, hour=0, minute=3),
             id="precompute_weekly_analyses",
             name="Precompute weekly analyses",
             replace_existing=True,
-            args=[PeriodType.WEEKLY],
+            args=[AnalysisPeriod.WEEKLY],
         )
-
-        # Schedule monthly analysis computation to run on the first day of each month at 00:04
         self.scheduler.add_job(
             self._execute_precompute_analyses,
             CronTrigger(day=1, hour=0, minute=4),
             id="precompute_monthly_analyses",
             name="Precompute monthly analyses",
             replace_existing=True,
-            args=[PeriodType.MONTHLY],
+            args=[AnalysisPeriod.MONTHLY],
         )
-
-        # Schedule yearly analysis computation to run on the first day of each year at 00:05
         self.scheduler.add_job(
             self._execute_precompute_analyses,
             CronTrigger(month=1, day=1, hour=0, minute=5),
             id="precompute_yearly_analyses",
             name="Precompute yearly analyses",
             replace_existing=True,
-            args=[PeriodType.YEARLY],
+            args=[AnalysisPeriod.YEARLY],
         )
 
         if not self.scheduler.running:
             self.scheduler.start()
         logger.info("Scheduled analyzer started")
 
-    def stop(self):
-        """Stop the scheduled analyzer"""
-        self.scheduler.shutdown()
+    def stop(self) -> None:
+        if self.scheduler.running:
+            self.scheduler.shutdown()
         logger.info("Scheduled analyzer stopped")
 
-    async def _precompute_analyses(self, period_type: PeriodType = PeriodType.HOURLY):
-        """Precompute analyses for the last completed period based on date_range"""
+    async def _precompute_analyses(
+        self, period_type: AnalysisPeriod = AnalysisPeriod.HOURLY
+    ) -> None:
         now = datetime.now(UTC)
-
         strategy = TimeRangeStrategyFactory.get_strategy(period_type)
         start_time, end_time = strategy.calculate_time_range(now)
 
@@ -193,6 +152,5 @@ class ScheduledDanmakuAnalyzer:
             await self.analyzer.precompute_for_all_rooms(
                 period_type, start_time, end_time
             )
-
         except Exception:
             logger.exception("Error during scheduled precomputation")

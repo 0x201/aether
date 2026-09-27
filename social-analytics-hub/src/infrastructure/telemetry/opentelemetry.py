@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import FastAPI
 from opentelemetry import metrics, trace
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
@@ -13,7 +15,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from src.core.config import AppConfig
 
 
-def configure_telemetry(
+def configure_opentelemetry(
     app: FastAPI, app_config: AppConfig, service_name: str = "dydanmakuanalytics"
 ):
     otlp_endpoint = app_config.otel_exporter_otlp_endpoint

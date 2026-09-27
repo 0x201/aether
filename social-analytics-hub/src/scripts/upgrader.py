@@ -1,7 +1,4 @@
-"""
-Interactive dependency updater for uv with table display.
-Features: arrow keys, Space to toggle, 'a' to select all, Enter to confirm.
-"""
+from __future__ import annotations
 
 import json
 import subprocess
@@ -114,7 +111,10 @@ def main():
         )
         choices.append(questionary.Choice(title=label, value=name, checked=False))
 
-    header = f"{'Package':<{name_width}}  {'Current':<{cur_width}}  →  {'Latest':<{latest_width}}"
+    header = (
+        f"{'Package':<{name_width}}  {'Current':<{cur_width}}  "
+        f"→  {'Latest':<{latest_width}}"
+    )
     print("\n" + header)
     print("-" * len(header))
     print("(Use ↑↓ to move, Space to toggle, 'a' to select all, Enter to confirm)\n")

@@ -5,7 +5,15 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 # Import the database models for autogenerate support
-from src.database import Base
+from src.infrastructure.persistence.models.base import Base
+from src.infrastructure.persistence.models.capture_job import (
+    CaptureJobModel,  # noqa: F401
+)
+from src.infrastructure.persistence.models.danmaku import DanmakuModel  # noqa: F401
+from src.infrastructure.persistence.models.danmaku_analysis import (  # noqa: F401
+    DanmakuAnalysisModel,
+)
+from src.infrastructure.persistence.models.room import RoomModel  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

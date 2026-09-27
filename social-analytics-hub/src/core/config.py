@@ -12,44 +12,38 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-from .model import DatabaseConfig, PostgreSQLConfig
+from .model import DatabaseConfig
 
 
-def determine_environment(env: str | Path | None) -> str:
+def determine_environment(env: str | Path | None = None) -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--env", default=None, help="Environment to use (local, dev, uat, prod)"
+        "--env", default=None, help="Environment to use (local, dev, uat)"
     )
     args, _ = parser.parse_known_args()
     env_value = env or args.env or os.getenv("DYDANMU_ENV", "local")
     env_map = {
         "local": "local",
         "dev": "development",
+        "development": "development",
         "uat": "uat",
-        "prod": "production",
     }
 
     if isinstance(env_value, Path):
         env_value = str(env_value)
 
-    current_env = env_map.get(env_value.lower(), "local")
+    current_env = env_map.get(str(env_value).lower(), "local")
     logger.info(f"Environment: {current_env}")
     return current_env
 
 
-def get_project_root() -> Path:
-    current_path = Path(__file__).resolve()
-    while current_path != current_path.root:
-        if (current_path / "main.py").exists() or (
-            current_path / "app" / "core" / "config"
-        ).is_dir():
-            return current_path
-        current_path = current_path.parent
+def get_config_dir() -> Path:
+    """配置 YAML 所在目录（`src/core/`）。"""
+    return Path(__file__).resolve().parent
 
 
-def get_yaml_file() -> Path:
-    current_env = determine_environment(None)
-    return get_project_root() / "app" / "core" / f"{current_env}.yaml"
+def get_yaml_file(env: str | Path | None = None) -> Path:
+    return get_config_dir() / f"{determine_environment(env)}.yaml"
 
 
 class LoggingConfig(BaseModel):
@@ -57,7 +51,10 @@ class LoggingConfig(BaseModel):
 
     level: str = Field(default="INFO", description="Log level")
     format: str = Field(
-        default="[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] [{level}] <level>{message}</level>",
+        default=(
+            "[<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>] "
+            "[{level}] <level>{message}</level>"
+        ),
         description="Log format",
     )
     rotation: str = Field(default="100 MB", description="Log rotation size")
@@ -100,13 +97,33 @@ class RedisConfig(BaseModel):
         default=os.getenv("SSL_CERT_FILE", ""),
         description="Path to SSL CA certificates",
     )
+    socket_connect_timeout: float = Field(
+        default=float(os.getenv("REDIS_CONNECT_TIMEOUT", "3")),
+        gt=0,
+        description="Redis connect timeout in seconds",
+    )
+    socket_timeout: float = Field(
+        default=float(os.getenv("REDIS_SOCKET_TIMEOUT", "3")),
+        gt=0,
+        description="Redis socket read/write timeout in seconds",
+    )
+    operation_timeout: float = Field(
+        default=float(os.getenv("REDIS_OPERATION_TIMEOUT", "3")),
+        gt=0,
+        description=(
+            "Hard timeout for a single cache operation in seconds; "
+            "guards against clients that ignore socket timeouts"
+        ),
+    )
 
 
 class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
-    project_name: str = Field(default="DyDanmaku API", description="Project name")
+    project_name: str = Field(
+        default="Aether Social Analytics Hub API", description="Project name"
+    )
     host: str = Field(default="localhost", description="Host to run the server on")
-    environment: Literal["local", "development", "uat", "production"] = Field(
+    environment: Literal["local", "development", "uat"] = Field(
         default="local", description="Environment to run the server in"
     )
     version: str = Field(default="0.0.1", description="Version of the server")
@@ -114,17 +131,7 @@ class AppConfig(BaseSettings):
         default=int(os.getenv("PORT", "8000")), description="Port to run the server on"
     )
     databases: DatabaseConfig = Field(
-        default=DatabaseConfig(
-            postgres=PostgreSQLConfig(
-                host=os.getenv("DYDANMAKUDB_HOST", "localhost"),
-                port=int(os.getenv("DYDANMAKUDB_PORT", "5432")),
-                username=os.getenv("DYDANMAKUDB_USERNAME", "postgres"),
-                password=os.getenv("DYDANMAKUDB_PASSWORD", ""),
-                database=os.getenv("DYDANMAKUDB_DATABASENAME", "dydanmakudb"),
-                dbschema="dydanmaku",
-            ),
-        ),
-        description="Database configuration",
+        default_factory=DatabaseConfig, description="Database configuration"
     )
     cors: list[str] | None = Field(default=[], description="CORS origins to allow")
     logging: LoggingConfig = Field(

@@ -1,16 +1,11 @@
-from typing import TypeVar
+"""HTTP 契约公共模型。"""
 
 from pydantic import BaseModel, Field
 
-T = TypeVar("T")
-
-
-class PagedRequestBase(BaseModel):
-    page: int = Field(default=1, description="Current page number")
-    pageSize: int = Field(default=10, description="Number of items per page")
-
 
 class ResultBase(BaseModel):
+    """统一响应包装基类。"""
+
     status: int = Field(default=200, description="HTTP status code")
     message: str = Field(
         default="Request successfully", description="HTTP status message"
@@ -26,5 +21,7 @@ class ResultBase(BaseModel):
 
 
 class PagedResult[T](ResultBase):
-    data: list[T] = Field(default=[], description="List of items")
+    """分页响应包装。"""
+
+    data: list[T] = Field(default_factory=list, description="List of items")
     totalCount: int = Field(default=0, description="Total number of items")

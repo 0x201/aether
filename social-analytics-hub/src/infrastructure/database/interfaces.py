@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from contextlib import (
     AbstractAsyncContextManager,
@@ -26,4 +28,3 @@ class DatabaseSessionManager(ABC):
     @abstractmethod
     def async_uow(self) -> AbstractAsyncContextManager[AsyncSession]:
         raise NotImplementedError
-

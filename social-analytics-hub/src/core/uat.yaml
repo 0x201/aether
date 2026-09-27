@@ -5,13 +5,13 @@ cors:
   - "http://localhost:5173"
 
 databases:
-  db_type: "postgresql"
+  db_type: "postgres"
   postgres:
     host: "localhost"
     port: 5432
     username: ""
     password: ""
-    schema: "dydanmaku"
+    dbschema: "dydanmaku"
 
 logging:
   level: "INFO"

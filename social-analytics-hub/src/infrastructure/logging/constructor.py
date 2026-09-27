@@ -28,6 +28,29 @@ class InterceptHandler(logging.Handler):
         )
 
 
+def _add_file_sink(app_config: AppConfig, log_dir: Path) -> None:
+    """注册文件 sink。
+
+    `enqueue=True` 需要创建 multiprocessing 管道，在受限运行环境（例如禁止
+    命名管道的沙箱或部分容器）中会抛 `OSError`。此时降级为同步写入，
+    而不是让整个应用启动失败。
+    """
+    sink_options = {
+        "format": app_config.logging.format,
+        "level": app_config.logging.level,
+        "rotation": app_config.logging.rotation,
+        "serialize": app_config.logging.serialize,
+    }
+    try:
+        logger.add(log_dir / "app_{time:YYYY-MM-DD}.log", enqueue=True, **sink_options)
+    except (OSError, PermissionError) as error:
+        logger.warning(
+            f"Enqueued file logging unavailable ({error}); "
+            "falling back to synchronous writing"
+        )
+        logger.add(log_dir / "app_{time:YYYY-MM-DD}.log", enqueue=False, **sink_options)
+
+
 def setup_logging(app_config: AppConfig) -> None:
     logger.remove()
 
@@ -42,15 +65,7 @@ def setup_logging(app_config: AppConfig) -> None:
     if app_config.logging.enable_file:
         log_dir = Path(app_config.logging.dir_path)
         log_dir.mkdir(parents=True, exist_ok=True)
-
-        logger.add(
-            log_dir / "app_{time:YYYY-MM-DD}.log",
-            format=app_config.logging.format,
-            level=app_config.logging.level,
-            rotation=app_config.logging.rotation,
-            serialize=app_config.logging.serialize,
-            enqueue=True,
-        )
+        _add_file_sink(app_config, log_dir)
 
     resource = Resource.create({"service.name": app_config.otel_service_name})
     logger_provider = LoggerProvider(resource=resource)
